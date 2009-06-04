@@ -1,0 +1,18 @@
+To compile the examples, execute the following commands in the directory
+example:
+
+scons verdandi=".." model_forward
+scons verdandi=".." optimal_interpolation_twin_experiment
+
+
+To load the results, you can launch 
+
+ipython -pylab 
+
+and then
+
+run load.py result/river-truth
+run load.py result/river
+
+
+
