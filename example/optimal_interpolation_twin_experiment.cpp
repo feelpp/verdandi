@@ -29,33 +29,33 @@ int main(int argc, char** argv)
 
     if (argc != 2)
     {
-	string mesg  = "Usage:\n";
-	mesg += string("  ") + argv[0] + " [configuration file]";
-	cout << mesg << endl;
-	return 1;
+        string mesg  = "Usage:\n";
+        mesg += string("  ") + argv[0] + " [configuration file]";
+        cout << mesg << endl;
+        return 1;
     }
 
     typedef double real;
     typedef ShallowWater<real> ClassModel;
     typedef OptimalInterpolation<real, ClassModel,
-	GridToNetworkObservationManager<real> > ClassOptimalInterpolation;
+        GridToNetworkObservationManager<real> > ClassOptimalInterpolation;
 
     ClassOptimalInterpolation driver(argv[1]);
 
     OutputSaver<real, ClassOptimalInterpolation> output_saver(argv[1],
-							      driver);
-  
+                                                              driver);
+
     driver.Initialize(argv[1]);
     output_saver.Initialize(argv[1], driver);
 
     while (!driver.HasFinished())
     {
-	driver.InitializeStep();
-	output_saver.InitializeStep();
-	driver.Forward();
-	output_saver.Save(driver);
-	driver.Analyze();
-	output_saver.Save(driver);
+        driver.InitializeStep();
+        output_saver.InitializeStep();
+        driver.Forward();
+        output_saver.Save(driver);
+        driver.Analyze();
+        output_saver.Save(driver);
     }
 
     END;
