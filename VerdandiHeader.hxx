@@ -53,6 +53,7 @@ namespace Verdandi
 
 
 #include "share/Error.hxx"
+#include "share/UsefulFunction.hxx"
 
 
 #define VERDANDI_FILE_VERDANDIHEADER_HXX

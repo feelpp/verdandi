@@ -1,5 +1,5 @@
-// Copyright (C) 2008-2009 INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Copyright (C) 2008, INRIA
+// Author(s): Vivien Mallet
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -17,19 +17,24 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_VERDANDI_HXX
+#ifndef VERDANDI_FILE_SHARE_USEFULFUNCTION_HXX
 
 
-#include "VerdandiHeader.hxx"
+namespace Verdandi
+{
 
 
-#include "seldon/Seldon.hxx"
-#include "talos/Talos.hxx"
+    template <class T, class TM>
+    T interpolate(T x_min, T Delta_x, T y_min, T Delta_y,
+                  const Matrix<TM>& input, T x, T y);
 
 
-#include "share/Error.cxx"
-#include "share/UsefulFunction.cxx"
+    void get_position(int index, const Vector<int>& shape,
+                      Vector<int>& position);
 
 
-#define VERDANDI_FILE_VERDANDI_HXX
+} // namespace Verdandi.
+
+
+#define VERDANDI_FILE_SHARE_USEFULFUNCTION_HXX
 #endif
