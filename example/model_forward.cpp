@@ -1,28 +1,16 @@
 // Generates the truth observations by applying the model from truth initial
 // conditions (river-truth.cfg).
-#define SELDONDATA_DEBUG_LEVEL_4
 #define SELDON_DEBUG_LEVEL_4
 #define SELDON_WITH_ABORT
 
-#include <iostream>
-using namespace std;
+#include "Verdandi.hxx"
+using namespace Verdandi;
 
 #include "OptimalInterpolation.cxx"
 #include "GridToNetworkObservationManager.cxx"
 #include "ShallowWater.cxx"
 #include "OutputSaver.cxx"
 #include "newran.h"
-
-namespace SeldonData
-{
-    using Talos::to_num;
-    using Talos::to_str;
-    class Error;
-    class IOError;
-    class WrongDim;
-}
-
-using namespace Verdandi;
 
 int main(int argc, char** argv)
 {

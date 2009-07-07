@@ -20,21 +20,11 @@
 #ifndef VERDANDI_FILE_SHALLOWWATER_HXX
 
 
-#include "talos/Talos.hxx"
-using namespace Talos;
-
-#include "seldon/Seldon.hxx"
-using namespace Seldon;
-
 #include "newran/newran.h"
 
 
 namespace Verdandi
 {
-
-
-    using Talos::to_num;
-    using Talos::to_str;
 
 
     ////////////////////////

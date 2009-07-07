@@ -20,10 +20,6 @@
 #ifndef VERDANDI_FILE_OUTPUTSAVER_HXX
 
 
-#include "Seldon.hxx"
-#include "Talos.hxx"
-
-
 namespace Verdandi
 {
 

@@ -20,13 +20,6 @@
 #ifndef VERDANDI_FILE_GRIDTONETWORKOBSERVATIONMANAGER_HXX
 
 
-#include <fstream>
-
-#include "ShallowWater.hxx"
-#include "Seldon.hxx"
-using namespace Seldon;
-
-
 namespace Verdandi
 {
 

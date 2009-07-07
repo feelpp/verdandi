@@ -20,21 +20,8 @@
 #ifndef VERDANDI_FILE_OPTIMALINTERPOLATION_HXX
 
 
-#include <map>
-
-#include "ShallowWater.hxx"
-#include "GridToNetworkObservationManager.hxx"
-#include "Seldon.hxx"
-#include "Talos.hxx"
-
-
 namespace Verdandi
 {
-
-
-    using namespace std;
-    using namespace Seldon;
-    using namespace Talos;
 
 
     //////////////////////////
