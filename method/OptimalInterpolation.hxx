@@ -66,7 +66,6 @@ namespace Verdandi
 
         /*** Constructors and destructor ***/
 
-        OptimalInterpolation();
         OptimalInterpolation(string configuration_file);
         ~OptimalInterpolation();
 
