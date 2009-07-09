@@ -197,7 +197,6 @@ namespace Verdandi
         void StepBack(const Vector<T>& state);
 
         // Access methods.
-        string GetConfigurationFile() const;
         int GetCurrentDate() const;
         int GetNt() const;
         int GetNx() const;
