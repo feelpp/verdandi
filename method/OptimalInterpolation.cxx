@@ -195,11 +195,51 @@ namespace Verdandi
     //! Computes BLUE for optimal interpolation.
     /*! The state is updated by the combination of background state and
       innovation. It computes the BLUE (best linear unbiased estimator).
-      \param[in] state_vector the state_vector to analyze.
+      \param[in] state_vector the state vector to analyze.
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::ComputeBLUE(Vector<T>& state_vector)
+    {
+        // B, R and H are sparse.
+        if (model_.IsErrorSparse() and observation_manager_.IsErrorSparse()
+            and observation_manager_.IsOperatorSparse())
+            ComputeBLUESparse(state_vector);
+
+        // B and H are sparse, R is not sparse.
+        else if (model_.IsErrorSparse()
+                 and observation_manager_.IsOperatorSparse()
+                 and not observation_manager_.IsErrorSparse())
+            ComputeBLUESparse(state_vector);
+
+        // At least one matrix is sparse.
+        else if (model_.IsErrorSparse()
+                 or observation_manager_.IsErrorSparse()
+                 or observation_manager_.IsOperatorSparse())
+        {
+#ifdef SELDON_DEBUG_LEVEL_4
+            cout << "Warning! At least one sparse matrix is used (either in"
+                 << " the model or in the observation manager), but not all"
+                 << " matrices are sparse. Therefore the computation will use"
+                 << " dense operations, leading to a potential loss of"
+                 << " performance." << endl;
+#endif
+            ComputeBLUEDense(state_vector);
+        }
+
+        // B, R and H are not sparse.
+        else
+            ComputeBLUEDense(state_vector);
+    }
+
+
+    //! Computes BLUE for optimal interpolation with dense matrices.
+    /*!
+      \param[in] state_vector the state vector to analyze.
+    */
+    template <class T, class ClassModel, class ClassObservationManager>
+    void OptimalInterpolation<T, ClassModel, ClassObservationManager>
+    ::ComputeBLUEDense(Vector<T>& state_vector)
     {
         int r, c;
 
@@ -274,6 +314,69 @@ namespace Verdandi
 
             state_vector(r) += DotProd(working_vector0, working_vector);
         }
+    }
+
+
+    //! Computes BLUE for optimal interpolation with sparse matrices.
+    /*!
+      \param[in] state_vector the state vector to analyze.
+    */
+    template <class T, class ClassModel, class ClassObservationManager>
+    void OptimalInterpolation<T, ClassModel, ClassObservationManager>
+    ::ComputeBLUESparse(Vector<T>& state_vector)
+    {
+        // Number of observations at current date.
+        Nobservation_ = observation_manager_.GetNobservation();
+
+        // Temporary matrix and vector.
+
+        // As soon as sparse matrix-matrix product is available in Seldon:
+        // DiagonalSparseMatrix<T> working_matrix;
+        // OR Matrix<T, General, RowSparse> working_matrix;
+
+        Matrix<T> working_matrix_so(Nstate_, Nobservation_);
+        Matrix<T> working_matrix_oo(Nobservation_, Nobservation_);
+
+        // Computes BH'.
+        MltAdd(T(1), SeldonNoTrans,
+               model_.GetBackgroundErrorCovarianceMatrix(), SeldonTrans,
+               observation_manager_.GetTangentOperatorMatrix(), T(0),
+               working_matrix_so);
+
+        // Computes HBH'.
+        MltAdd(T(1), observation_manager_.GetTangentOperatorMatrix(),
+               working_matrix_so, T(0), working_matrix_oo);
+
+        // Computes (HBH' + R).
+        if (observation_manager_.HasErrorMatrix())
+            Add(T(1),
+                observation_manager_.GetObservationErrorCovarianceMatrix(),
+                working_matrix_oo);
+
+        else
+            for (int r = 0; r < Nobservation_; r++)
+                for (int c = 0; c < Nobservation_; c++)
+                    working_matrix_oo(r, c) += observation_manager_
+                        .GetObservationErrorCovariance(r, c);
+
+        // Computes (HBH' + R)^{-1}.
+        GetInverse(working_matrix_oo);
+
+        // Computes BH' * (HBH' + R)^{-1} (K).
+        Matrix<T> matrix_K(Nstate_, Nobservation_);
+        MltAdd(T(1), working_matrix_so, working_matrix_oo, T(0),
+               matrix_K);
+
+        // Computes innovation.
+        Vector<T> innovation(Nobservation_);
+        observation_manager_.GetInnovation(state_vector, innovation);
+
+        // Computes matrix_K * innovation.
+        Vector<T> working_vector(Nobservation_);
+        MltAdd(T(1), matrix_K, innovation, T(0), working_vector);
+
+        // Computes new state.
+        Add(T(1), working_vector, state_vector);
     }
 
 

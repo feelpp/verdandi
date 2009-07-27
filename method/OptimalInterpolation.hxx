@@ -80,6 +80,8 @@ namespace Verdandi
         void Analyze();
 
         void ComputeBLUE(Vector<T>& state_vector);
+        void ComputeBLUEDense(Vector<T>& state_vector);
+        void ComputeBLUESparse(Vector<T>& state_vector);
 
         bool HasFinished() const;
 
