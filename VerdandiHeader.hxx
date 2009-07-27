@@ -49,7 +49,7 @@ namespace Verdandi
     using Seldon::to_str;
 
 
-} // namespace Verdandi
+} // namespace Verdandi.
 
 
 #include "share/Error.hxx"
