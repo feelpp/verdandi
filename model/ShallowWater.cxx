@@ -21,6 +21,7 @@
 
 
 #include "ShallowWater.hxx"
+#include "DiagonalSparseMatrix.cxx"
 
 
 namespace Verdandi
@@ -145,6 +146,12 @@ namespace Verdandi
         configuration_stream.GetValue("Background_error_scale",
                                       "strictly positive",
                                       Balgovind_scale_background_);
+        configuration_stream.PeekValue("Error_sparse",
+                                       error_sparse_);
+        if (error_sparse_)
+            background_error_covariance_matrix_
+                .Initialize(Nx_ * Ny_, background_error_variance_);
+
         configuration_stream.GetValue("Model_error_variance", "positive",
                                       model_error_variance_);
         configuration_stream.GetValue("Model_error_scale",
@@ -246,6 +253,7 @@ namespace Verdandi
 
         data_to_save_ = true;
     }
+
 
     //! Initializes the current time step for the model.
     template <class T>
@@ -440,6 +448,7 @@ namespace Verdandi
         return Nt_;
     }
 
+
     //! Returns the number of points along x (in the grid for height).
     /*!
       \return The number of points along x (in the grid for height).
@@ -449,6 +458,7 @@ namespace Verdandi
     {
         return Nx_;
     }
+
 
     //! Returns the number of points along y (in the grid for height).
     /*!
@@ -477,7 +487,6 @@ namespace Verdandi
     {
         return 3;
     }
-
 
 
     //! Returns the first abscissa.
@@ -560,6 +569,7 @@ namespace Verdandi
                 state(position++) = h_(i, j);
     }
 
+
     //! Sets the reduced state vector.
     /*! Before setting the reduced state vector, special requirements can be
       enforced; e.g. positivity requirement or inferior and superior limits.
@@ -581,7 +591,6 @@ namespace Verdandi
     }
 
 
-
     //! Provides the full state vector.
     /*!
       \param[out] state the full state vector.
@@ -597,7 +606,6 @@ namespace Verdandi
                 state(2 * Nx_ * Ny_ + i * Ny_ + j) = v_(i, j);
             }
     }
-
 
 
     //! Sets the full state vector.
@@ -636,27 +644,63 @@ namespace Verdandi
             current_row_ = row;
             current_column_ = -1;
 
-            // Positions related to 'row'.
-            int i_row = row / Ny_;
-            int j_row = row - i_row * Ny_;
+            if (error_sparse_)
+                background_error_covariance_matrix_
+                    .GetRow(row, error_covariance_vector);
 
-            T distance_x, distance_y;
-            T distance;
-            int position = 0;
-            for (i = 0; i < Nx_; i++)
-                for (j = 0; j < Ny_; j++)
-                {
-                    distance_x = Delta_x_ * T(i - i_row);
-                    distance_y = Delta_y_ * T(j - j_row);
-                    distance = sqrt(distance_x * distance_x + distance_y
-                                    * distance_y)
-                        / Balgovind_scale_background_;
-                    error_covariance_vector_(position++)
-                        = background_error_variance_ * (1. + distance)
-                        * exp(-distance);
-                }
-            error_covariance_vector = error_covariance_vector_;
+            else
+            {
+                // Positions related to 'row'.
+                int i_row = row / Ny_;
+                int j_row = row - i_row * Ny_;
+
+                T distance_x, distance_y;
+                T distance;
+                int position = 0;
+                for (i = 0; i < Nx_; i++)
+                    for (j = 0; j < Ny_; j++)
+                    {
+                        distance_x = Delta_x_ * T(i - i_row);
+                        distance_y = Delta_y_ * T(j - j_row);
+                        distance = sqrt(distance_x * distance_x + distance_y
+                                        * distance_y)
+                            / Balgovind_scale_background_;
+                        error_covariance_vector_(position++)
+                            = background_error_variance_ * (1. + distance)
+                            * exp(-distance);
+                    }
+                error_covariance_vector = error_covariance_vector_;
+            }
         }
+    }
+
+
+    //! Returns the background error covariance matrix (B) if available.
+    /*! Returns the background error covariance matrix (B) if available,
+      raises an exception otherwise.
+      \return The matrix of the background error covariance.
+    */
+    template <class T>
+    const Matrix<T, General, RowSparse>& ShallowWater<T>
+    ::GetBackgroundErrorCovarianceMatrix() const
+    {
+        if (error_sparse_)
+            return background_error_covariance_matrix_.GetMatrix();
+        else
+            throw ErrorUndefined(
+                "ShallowWater::GetBackgroundErrorCovarianceMatrix()",
+                "the background error covariance matrix is not available!");
+    }
+
+
+    //! Checks if the error covariance matrix is sparse.
+    /*!
+      \return True if there is a sparse error matrix, false otherwise.
+    */
+    template <class T>
+    bool ShallowWater<T>::IsErrorSparse() const
+    {
+        return error_sparse_;
     }
 
 

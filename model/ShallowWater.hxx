@@ -22,6 +22,8 @@
 
 #include "newran/newran.h"
 
+#include "DiagonalSparseMatrix.hxx"
+
 
 namespace Verdandi
 {
@@ -153,6 +155,10 @@ namespace Verdandi
         double Balgovind_scale_background_;
         //! Background error variance.
         double background_error_variance_;
+        //! Flag that indicates whether the error covariance matrix is sparse.
+        bool error_sparse_;
+        //! Background error covariance matrix (B).
+        DiagonalSparseMatrix<T> background_error_covariance_matrix_;
 
         //! Balgovind scale for model covariance.
         double Balgovind_scale_model_;
@@ -216,6 +222,9 @@ namespace Verdandi
         void GetBackgroundErrorCovarianceRow(int row,
                                              Vector<T>&
                                              error_covariance_vector);
+        const Matrix<T, General, RowSparse>&
+        GetBackgroundErrorCovarianceMatrix() const;
+        bool IsErrorSparse() const;
 
         // Access methods useful for saving with the output saver.
         const ShallowWater<T>& GetModel() const;
