@@ -71,11 +71,18 @@ namespace Verdandi
         //! Interpolation weights for active locations.
         Matrix<T> active_interpolation_weight_;
 
+        //! Is the observation operator available in a sparse matrix?
+        bool operator_sparse_;
+
         //! Availability of observations at current date.
         bool availability_;
 
         //! Observation error variance.
         T error_variance_;
+        //! Is the observation error covariance matrix sparse?
+        bool error_sparse_;
+        //! Is the observation error covariance available in a matrix?
+        bool error_matrix_availability_;
 
         /*** Model domain ***/
 
@@ -107,6 +114,9 @@ namespace Verdandi
         // Access.
         int GetNobservation() const;
         const Vector<T>& GetObservation() const;
+        bool IsOperatorSparse() const;
+        bool IsErrorSparse() const;
+        bool HasErrorMatrix() const;
 
         // Operators.
         void ApplyOperator(const Vector<T>& x, Vector<T>& y) const;
@@ -115,6 +125,7 @@ namespace Verdandi
         T GetTangentOperator(int i, int j) const;
         void GetTangentOperatorRow(int row,
                                    Vector<T>& tangent_operator_row) const;
+        const Matrix<T, General, RowSparse>& GetTangentOperatorMatrix() const;
 
         void ApplyAdjointOperator(const Vector<T>& x, Vector<T>& y) const;
 
@@ -125,6 +136,7 @@ namespace Verdandi
         void GetBLUECorrection(Vector<T>& BLUE_correction) const;
 
         T GetObservationErrorCovariance(int i, int j) const;
+        const Matrix<T>& GetObservationErrorCovarianceMatrix() const;
     };
 
 

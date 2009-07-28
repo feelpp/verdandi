@@ -54,7 +54,8 @@ namespace Verdandi
     GridToNetworkObservationManager<T>
     ::GridToNetworkObservationManager(const ClassModel& model,
                                       string configuration_file):
-        availability_(false)
+        operator_sparse_(false), availability_(false), error_sparse_(false),
+        error_matrix_availability_(false)
     {
         //   Initialize(model, configuration_file);
     }
@@ -264,6 +265,44 @@ namespace Verdandi
     }
 
 
+    /*! \brief Checks whether the observation operator is available in a
+      sparse matrix. */
+    /*!
+      \return True if the observation operator is available in a sparse
+      matrix, false otherwise.
+    */
+    template <class T>
+    bool GridToNetworkObservationManager<T>::IsOperatorSparse() const
+    {
+        return operator_sparse_;
+    }
+
+
+    //! Checks whether the observation error covariance matrix is sparse.
+    /*!
+      \return True if the observation error covariance matrix is sparse, false
+      otherwise.
+    */
+    template <class T>
+    bool GridToNetworkObservationManager<T>::IsErrorSparse() const
+    {
+        return error_sparse_;
+    }
+
+
+    /*! \brief Checks whether the observation error covariance is available in
+      a matrix. */
+    /*!
+      \return True if the observation error covariance is available in a
+      matrix, false otherwise.
+    */
+    template <class T>
+    bool GridToNetworkObservationManager<T>::HasErrorMatrix() const
+    {
+        return error_matrix_availability_;
+    }
+
+
     ///////////////
     // OPERATORS //
     ///////////////
@@ -342,6 +381,19 @@ namespace Verdandi
     {
         for (int i = 0; i < tangent_operator_row.GetLength(); i++)
             tangent_operator_row(i) = GetTangentOperator(row, i);
+    }
+
+
+    //! Linearized observation operator.
+    /*!
+      \return The matrix of the linearized operator.
+    */
+    template <class T>
+    const Matrix<T, General, RowSparse>& GridToNetworkObservationManager<T>
+    ::GetTangentOperatorMatrix() const
+    {
+        throw ErrorUndefined(
+            "GridToNetworkObservationManager::GetTangentOperatorMatrix()");
     }
 
 
@@ -425,6 +477,20 @@ namespace Verdandi
             return error_variance_;
         else
             return T(0);
+    }
+
+
+    //! Observation error covariance matrix.
+    /*!
+      \return The matrix of the observation error covariance.
+    */
+    template <class T>
+    const Matrix<T>& GridToNetworkObservationManager<T>
+    ::GetObservationErrorCovarianceMatrix() const
+    {
+        throw ErrorUndefined(
+            string("GridToNetworkObservationManager")
+            +"::GetObservationErrorCovarianceMatrix()");
     }
 
 
