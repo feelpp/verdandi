@@ -102,7 +102,7 @@ namespace Verdandi
         template <class ClassModel>
         void LoadObservation(const ClassModel& model);
 
-        bool IsAvailable() const;
+        bool HasObservation() const;
 
         // Access.
         int GetNobservation() const;

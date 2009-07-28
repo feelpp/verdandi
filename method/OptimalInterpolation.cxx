@@ -114,7 +114,7 @@ namespace Verdandi
             // Retrieves observations.
             observation_manager_.LoadObservation(model_);
 
-            if (observation_manager_.IsAvailable())
+            if (observation_manager_.HasObservation())
             {
                 if (option_display_["show_date"])
                     cout << "Performing optimal interpolation at time step ["
@@ -171,7 +171,7 @@ namespace Verdandi
         Vector<T> state_vector;
         observation_manager_.LoadObservation(model_);
 
-        if (observation_manager_.IsAvailable())
+        if (observation_manager_.HasObservation())
         {
             if (option_display_["show_date"])
                 cout << "Performing optimal interpolation at time step ["

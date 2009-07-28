@@ -230,7 +230,7 @@ namespace Verdandi
       \return True if observations are available, false otherwise.
     */
     template <class T>
-    bool GridToNetworkObservationManager<T>::IsAvailable() const
+    bool GridToNetworkObservationManager<T>::HasObservation() const
     {
         return availability_;
     }
