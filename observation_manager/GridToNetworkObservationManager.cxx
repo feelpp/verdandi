@@ -333,7 +333,7 @@ namespace Verdandi
     //! Linearized observation operator.
     /*!
       \param[in] row row index.
-      \param[out] tangent_operator_row the row \a i of the linearized
+      \param[out] tangent_operator_row the row \a row of the linearized
       operator.
     */
     template <class T>
@@ -393,9 +393,8 @@ namespace Verdandi
     bool GridToNetworkObservationManager<T>
     ::HasBLUECorrection() const
     {
-        throw string("Error: GridToNetworkObservationManager\
-                     ::GetBLUECorrection")
-            + " has been called but is empty!";
+        throw ErrorUndefined(
+            "GridToNetworkObservationManager::HasBLUECorrection()");
     }
 
 
@@ -407,9 +406,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetBLUECorrection(Vector<T>& BLUE_correction) const
     {
-        throw string("Error: GridToNetworkObservationManager \
-                     ::GetBLUECorrection")
-            + " has been called but is empty!";
+        throw ErrorUndefined(
+            "GridToNetworkObservationManager::GetBLUECorrection(correction)");
     }
 
 
