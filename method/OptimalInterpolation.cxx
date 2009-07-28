@@ -253,8 +253,9 @@ namespace Verdandi
         Vector<T> tangent_operator_row(Nstate_);
 
         // Temporary matrix and vector.
-        Matrix<T> working_matrix(Nobservation_, Nobservation_);
-        working_matrix.Fill(T(0));
+        // 'HBHR_inv' will eventually contain the matrix (HBH' + R)^(-1).
+        Matrix<T> HBHR_inv(Nobservation_, Nobservation_);
+        HBHR_inv.Fill(T(0));
 
         Vector<T> row(Nobservation_);
 
@@ -276,30 +277,30 @@ namespace Verdandi
             {
                 H_entry = observation_manager_.GetTangentOperator(r, j);
                 for (c = 0; c < Nobservation_; c++)
-                    working_matrix(r, c) += H_entry * row(c);
+                    HBHR_inv(r, c) += H_entry * row(c);
             }
         }
 
         // Computes (HBH' + R).
         for (r = 0; r < Nobservation_; r++)
             for (c = 0; c < Nobservation_; c++)
-                working_matrix(r, c) += observation_manager_
+                HBHR_inv(r, c) += observation_manager_
                     .GetObservationErrorCovariance(r, c);
 
         // Computes (HBH' + R)^{-1}.
-        GetInverse(working_matrix);
+        GetInverse(HBHR_inv);
 
         // Computes innovation.
         Vector<T> innovation(Nobservation_);
         observation_manager_.GetInnovation(state_vector, innovation);
 
-        // Computes working_matrix * innovation.
-        Vector<T> working_vector(Nobservation_);
-        MltAdd(T(1), working_matrix, innovation, T(0), working_vector);
+        // Computes HBHR_inv * innovation.
+        Vector<T> HBHR_inv_innovation(Nobservation_);
+        MltAdd(T(1), HBHR_inv, innovation, T(0), HBHR_inv_innovation);
 
         // Computes new state.
-        Vector<T> working_vector0(Nobservation_);
-        working_vector0.Fill(T(0));
+        Vector<T> BHt_row(Nobservation_);
+        BHt_row.Fill(T(0));
         for (r = 0; r < Nstate_; r++)
         {
             // Computes the r-th row of BH'.
@@ -308,11 +309,11 @@ namespace Verdandi
             {
                 observation_manager_
                     .GetTangentOperatorRow(c, tangent_operator_row);
-                working_vector0(c) = DotProd(error_covariance_row,
-                                             tangent_operator_row);
+                BHt_row(c) = DotProd(error_covariance_row,
+				     tangent_operator_row);
             }
 
-            state_vector(r) += DotProd(working_vector0, working_vector);
+            state_vector(r) += DotProd(BHt_row, HBHR_inv_innovation);
         }
     }
 
