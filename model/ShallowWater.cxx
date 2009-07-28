@@ -152,6 +152,9 @@ namespace Verdandi
             background_error_covariance_matrix_
                 .Initialize(Nx_ * Ny_, background_error_variance_);
 
+        configuration_stream.PeekValue("Error_dense_diagonal",
+                                       error_dense_diagonal_);
+
         configuration_stream.GetValue("Model_error_variance", "positive",
                                       model_error_variance_);
         configuration_stream.GetValue("Model_error_scale",
@@ -635,41 +638,50 @@ namespace Verdandi
     ::GetBackgroundErrorCovarianceRow(int row,
                                       Vector<T>& error_covariance_vector)
     {
-        // The row has already been computed.
-        if (row == current_row_)
-            error_covariance_vector = error_covariance_vector_;
+        if (error_sparse_)
+            background_error_covariance_matrix_
+                .GetRow(row, error_covariance_vector);
+
         else
         {
-            int i, j;
-            current_row_ = row;
-            current_column_ = -1;
-
-            if (error_sparse_)
-                background_error_covariance_matrix_
-                    .GetRow(row, error_covariance_vector);
-
+            if (error_dense_diagonal_)
+            {
+                error_covariance_vector.Reallocate(Nx_ * Ny_);
+                error_covariance_vector.Zero();
+                error_covariance_vector(row) = background_error_variance_;
+            }
             else
             {
-                // Positions related to 'row'.
-                int i_row = row / Ny_;
-                int j_row = row - i_row * Ny_;
+                // The row has already been computed.
+                if (row == current_row_)
+                    error_covariance_vector = error_covariance_vector_;
+                else
+                {
+                    int i, j;
+                    current_row_ = row;
+                    current_column_ = -1;
 
-                T distance_x, distance_y;
-                T distance;
-                int position = 0;
-                for (i = 0; i < Nx_; i++)
-                    for (j = 0; j < Ny_; j++)
-                    {
-                        distance_x = Delta_x_ * T(i - i_row);
-                        distance_y = Delta_y_ * T(j - j_row);
-                        distance = sqrt(distance_x * distance_x + distance_y
-                                        * distance_y)
-                            / Balgovind_scale_background_;
-                        error_covariance_vector_(position++)
-                            = background_error_variance_ * (1. + distance)
-                            * exp(-distance);
-                    }
-                error_covariance_vector = error_covariance_vector_;
+                    // Positions related to 'row'.
+                    int i_row = row / Ny_;
+                    int j_row = row - i_row * Ny_;
+
+                    T distance_x, distance_y;
+                    T distance;
+                    int position = 0;
+                    for (i = 0; i < Nx_; i++)
+                        for (j = 0; j < Ny_; j++)
+                        {
+                            distance_x = Delta_x_ * T(i - i_row);
+                            distance_y = Delta_y_ * T(j - j_row);
+                            distance = sqrt(distance_x * distance_x
+                                            + distance_y * distance_y)
+                                / Balgovind_scale_background_;
+                            error_covariance_vector_(position++)
+                                = background_error_variance_ * (1. + distance)
+                                * exp(-distance);
+                        }
+                    error_covariance_vector = error_covariance_vector_;
+                }
             }
         }
     }
