@@ -159,6 +159,10 @@ namespace Verdandi
         bool error_sparse_;
         //! Background error covariance matrix (B).
         DiagonalSparseMatrix<T> background_error_covariance_matrix_;
+        /*! \brief Flag that indicates whether the error covariance matrix is
+          dense and diagonal.
+        */
+        bool error_dense_diagonal_;
 
         //! Balgovind scale for model covariance.
         double Balgovind_scale_model_;
