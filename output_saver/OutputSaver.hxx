@@ -24,8 +24,6 @@ namespace Verdandi
 {
 
 
-    using namespace std;
-    using namespace Seldon;
     using namespace Talos;
 
 
