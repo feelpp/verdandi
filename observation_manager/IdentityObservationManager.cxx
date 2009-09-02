@@ -84,7 +84,7 @@ namespace Verdandi
     void IdentityObservationManager<T>
     ::Initialize(const ClassModel& model, string configuration_file)
     {
-        ConfigStream configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file.c_str());
 
         //! First abscissa.
         double x_min_model = model.GetXMin();
@@ -99,14 +99,12 @@ namespace Verdandi
         Nx_model_ = model.GetNx();
         Ny_model_ = model.GetNy();
 
-        configuration_stream.SetSection("[observation]");
-        configuration_stream.PeekValue("File", observation_file_);
-        configuration_stream.PeekValue("Period_observation",
-                                       "strictly positive",
-                                       period_observation_);
-        configuration_stream.PeekValue("Nskip", "strictly positive", Nskip_);
-        configuration_stream.PeekValue("Error_variance", "strictly positive",
-                                       error_variance_);
+        configuration_stream.set_prefix("observation/");
+        observation_file_ = configuration_stream("File",
+                                                 "configuration_error");
+        period_observation_ = configuration_stream("Period_observation", -1);
+        Nskip_ = configuration_stream("Nskip", -1);
+        error_variance_ = configuration_stream("Error_variance", -1.);
 
         Nobservation_ = Nx_model_ * Ny_model_;
         observation_.Reallocate(Nobservation_);

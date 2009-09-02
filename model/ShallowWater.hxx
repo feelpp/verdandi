@@ -239,8 +239,7 @@ namespace Verdandi
     private:
         // Configuration.
         void ReadConfigurationBoundaryCondition(string side,
-                                                ConfigStream&
-                                                configuration_stream,
+                                                GetPot& configuration_stream,
                                                 int& type, T& value,
                                                 T& amplitude, T& frequency);
 

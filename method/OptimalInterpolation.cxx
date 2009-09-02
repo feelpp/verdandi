@@ -43,7 +43,7 @@ namespace Verdandi
         observation_manager_(model_, configuration_file),
         data_to_save_(false), analyzed_data_to_save_(false)
     {
-        ConfigStream configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file.c_str());
 
         /*** Initializations ***/
 
@@ -59,21 +59,21 @@ namespace Verdandi
 
         /*** Display options ***/
 
-        configuration_stream.SetSection("[display]");
+        configuration_stream.set_prefix("display/");
         // Should iterations be displayed on screen?
-        configuration_stream.PeekValue("Show_iterations",
-                                       option_display_["show_iterations"]);
+        option_display_["show_iterations"]
+            = configuration_stream("Show_iterations", false);
         // Should current date be displayed on screen?
-        configuration_stream.PeekValue("Show_date",
-                                       option_display_["show_date"]);
+        option_display_["show_date"]
+            = configuration_stream("Show_date", false);
 
         /*** Assimilation options ***/
 
         Nstate_ = model_.GetNstate();
 
-        configuration_stream.SetSection("[data_assimilation]");
-        configuration_stream.PeekValue("Analyze_first_step",
-                                       analyze_first_step_);
+        configuration_stream.set_prefix("data_assimilation/");
+        analyze_first_step_ = configuration_stream("Analyze_first_step",
+                                                   false);
 
     }
 

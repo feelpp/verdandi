@@ -123,6 +123,176 @@ namespace Verdandi
     }
 
 
+    //! Converts strings to most types.
+    /*!
+      \param[in] s string to be converted.
+      \param[out] out \a s converted to 'T'.
+    */
+    template <class T>
+    void convert(const string& s, T& out)
+    {
+	istringstream str(s);
+	str >> out;
+    }
+
+
+    //! Sets a string.
+    /*!
+      \param[in] s input string.
+      \param[out] out output string, equal to \a s on exit.
+    */
+    void convert(const string& s, string& out)
+    {
+	out = s;
+    }
+
+
+    //! Checks whether a string is a number.
+    /*!
+      \param[in] str string to be checked.
+      \return True if \a str is a number, false otherwise.
+    */
+    bool is_num(const string& str)
+    {
+	if (str == "")
+	    return false;
+
+	bool mant, mant_a, mant_b, exp;
+	string::size_type pos;
+	string m, e, m_a, m_b;
+
+	pos = str.find_first_of("eE");
+	// Mantissa.
+	m = str.substr(0, pos);
+	// Exponent.
+	e = pos == string::npos ? "" : str.substr(pos + 1);
+
+	exp = pos != string::npos;
+
+	pos = m.find_first_of(".");
+	// Mantissa in the form: [m_a].[m_b].
+	m_a = m.substr(0, pos);
+	// Exponent.
+	m_b = pos == string::npos ? "" : m.substr(pos + 1);
+
+	mant = m != "" && m != "-" && m != "+";
+	mant_a = m_a != "" && m_a != "-" && m_a != "+";
+	mant_b = m_b != "";
+
+	return (mant
+                && ((mant_a || mant_b)
+                     && (!mant_a || is_integer(m_a))
+                     && (!mant_b || is_unsigned_integer(m_b)))
+                && (!exp || is_integer(e)));
+    }
+
+
+    //! Checks whether a string is an integer.
+    /*!
+      \param[in] str string to be checked.
+      \return True if \a str is an integer, false otherwise.
+    */
+    bool is_integer(const string& str)
+    {
+	bool ans;
+
+	ans = (str.size() > 0 && isdigit(str[0]))
+	    || (str.size() > 1 && (str[0] == '+' || str[0] == '-'));
+
+	unsigned int i(1);
+	while (i < str.size() && ans)
+	{
+	    ans = ans && isdigit(str[i]);
+	    i++;
+	}
+
+	return ans;
+    }
+
+
+    //! Checks whether a string is an unsigned integer.
+    /*!
+      \param[in] str string to be checked.
+      \return True if \a str is an unsigned integer, false otherwise.
+    */
+    bool is_unsigned_integer(const string& str)
+    {
+	bool ans(str.size() > 0);
+
+	unsigned int i(0);
+	while (i < str.size() && ans)
+	{
+	    ans = ans && isdigit(str[i]);
+	    i++;
+	}
+
+	return ans;
+    }
+
+
+    //! Trims off a string.
+    /*!
+      Removes delimiters at each edge of the string.
+      \param[in] str string to be trimmed off.
+      \param[in] delimiters characters to be removed.
+      \return \a str trimmed off.
+    */
+    string trim(string str, string delimiters)
+    {
+	string::size_type index_end = str.find_last_not_of(delimiters);
+	string::size_type index_beg = str.find_first_not_of(delimiters);
+
+	if (index_beg == string::npos)
+	    return "";
+
+	return str.substr(index_beg, index_end - index_beg + 1);
+    }
+
+
+    //! Splits a string.
+    /*!
+      The string is split according to delimiters and elements are stored
+      in the vector 'vect'.
+      \param[in] str string to be split.
+      \param[out] vect (output) vector containing elements of the string.
+      \param[in] delimiters (optional) delimiters. Default: " \n\t".
+    */
+    template <class T>
+    void split(string str, vector<T>& vect, string delimiters)
+    {
+	vect.clear();
+
+	T tmp;
+	string::size_type index_beg, index_end;
+
+	index_beg = str.find_first_not_of(delimiters);
+
+	while (index_beg != string::npos)
+	{
+	    index_end = str.find_first_of(delimiters, index_beg);
+	    convert(str.substr(index_beg, index_end == string::npos ?
+			       string::npos : (index_end - index_beg)), tmp);
+	    vect.push_back(tmp);
+	    index_beg = str.find_first_not_of(delimiters, index_end);
+	}
+    }
+
+
+    //! Splits a string.
+    /*!
+      The string is split according to delimiters.
+      \param[in] str string to be split.
+      \param[in] delimiters (optional) delimiters. Default: " \n\t".
+      \return A vector containing elements of the string.
+    */
+    vector<string> split(string str, string delimiters)
+    {
+	vector<string> vect;
+	split(str, vect, delimiters);
+	return vect;
+    }
+
+
 } // namespace Verdandi.
 
 

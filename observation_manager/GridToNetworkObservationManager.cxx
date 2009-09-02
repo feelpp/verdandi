@@ -85,7 +85,7 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::Initialize(const ClassModel& model, string configuration_file)
     {
-        ConfigStream configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file.c_str());
 
         //! First abscissa.
         double x_min_model = model.GetXMin();
@@ -100,22 +100,29 @@ namespace Verdandi
         Nx_model_ = model.GetNx();
         Ny_model_ = model.GetNy();
 
-        configuration_stream.SetSection("[observation]");
-        configuration_stream.PeekValue("File", observation_file_);
-        configuration_stream.PeekValue("Period_observation",
-                                       "strictly positive",
-                                       period_observation_);
-        configuration_stream.PeekValue("Nskip", "strictly positive", Nskip_);
-        configuration_stream.PeekValue("Error_variance", "strictly positive",
-                                       error_variance_);
 
+        configuration_stream.set_prefix("observation/");
+        observation_file_ = configuration_stream("File",
+                                                 "configuration_error");
+        period_observation_ = configuration_stream("Period_observation", -1);
+        Nskip_ = configuration_stream("Nskip", -1);
+        error_variance_ = configuration_stream("Error_variance", -1.);
 
-        configuration_stream.SetSection("[observation_location]");
+        configuration_stream.set_prefix("observation_location/");
 
-        while (!configuration_stream.IsEmpty())
+        string observation_location
+            = configuration_stream("Observation_location",
+                                   "configuration_error");
+        vector<string> observation_location_vector
+            = split(observation_location);
+        int value;
+        for (int i = 0; i < int(observation_location_vector.size() - 1);
+             i += 2)
         {
-            location_x_.PushBack(int(configuration_stream.GetNumber()));
-            location_y_.PushBack(int(configuration_stream.GetNumber()));
+            to_num(observation_location_vector[i], value);
+            location_x_.PushBack(value);
+            to_num(observation_location_vector[i + 1], value);
+            location_y_.PushBack(value);
         }
 
         Nobservation_ = int(location_x_.GetSize());

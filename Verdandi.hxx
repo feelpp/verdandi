@@ -24,7 +24,7 @@
 
 
 #include "seldon/Seldon.hxx"
-#include "talos/Talos.hxx"
+#include "getpot/GetPot.cpp"
 
 
 #include "share/Error.cxx"

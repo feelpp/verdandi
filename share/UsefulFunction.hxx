@@ -32,6 +32,16 @@ namespace Verdandi
     void get_position(int index, const Vector<int>& shape,
                       Vector<int>& position);
 
+    /*** From Talos library ***/
+
+    bool is_num(const string& s);
+    bool is_integer(const string& s);
+    bool is_unsigned_integer(const string& s);
+    string trim(string str, string delimiters = " \n\t");
+    template <class T>
+    void split(string str, vector<T>& vect, string delimiters = " \n\t");
+    vector<string> split(string str, string delimiters = " \n\t");
+
 
 } // namespace Verdandi.
 

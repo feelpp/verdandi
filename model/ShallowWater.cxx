@@ -84,36 +84,39 @@ namespace Verdandi
 
         /*** Configuration ***/
 
-        ConfigStream configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file.c_str());
 
-        configuration_stream.SetSection("[domain]");
+        configuration_stream.set_prefix("domain/");
 
-        configuration_stream.PeekValue("x_min", x_min_);
-        configuration_stream.PeekValue("y_min", y_min_);
-        configuration_stream.PeekValue("Delta_x", Delta_x_);
-        configuration_stream.PeekValue("Delta_y", Delta_y_);
-        configuration_stream.PeekValue("Nx", Nx_);
-        configuration_stream.PeekValue("Ny", Ny_);
+        x_min_ = configuration_stream("x_min", -1.);
+        y_min_ = configuration_stream("y_min", -1.);
+        Delta_x_ = configuration_stream("Delta_x", -1.);
+        Delta_y_ = configuration_stream("Delta_y", -1.);
+        Nx_ = configuration_stream("Nx", -1);
+        Ny_ = configuration_stream("Ny", -1);
 
-        configuration_stream.PeekValue("Delta_t", Delta_t_);
-        configuration_stream.PeekValue("Nt", Nt_);
+        Delta_t_ = configuration_stream("Delta_t", -1.);
+        Nt_ = configuration_stream("Nt", -1);
 
         // Departure from the uniform initial condition.
-        configuration_stream.SetSection("[initial_condition]");
-        configuration_stream.PeekValue("Value", value_);
+        configuration_stream.set_prefix("initial_condition/");
+        value_ = configuration_stream("Value", -1.);
 
         // Perturbations.
-        configuration_stream.SetSection("[model_error]");
-        configuration_stream.GetValue("Standard_deviation_bc", "positive",
-                                      model_error_std_bc_);
-        configuration_stream.GetValue("Standard_deviation_ic", "positive",
-                                      model_error_std_ic_);
+        configuration_stream.set_prefix("model_error/");
+        model_error_std_bc_ = configuration_stream("Standard_deviation_bc",
+                                                   -1.);
+        model_error_std_ic_ = configuration_stream("Standard_deviation_ic",
+                                                   -1.);
+
         if (value_ - 2. * model_error_std_ic_ <= T(0))
             throw "The model standard-deviation of "
                 + to_str(model_error_std_ic_)
                 + " for initial conditions is too high to avoid negative "
                 + "water heights.";
-        configuration_stream.GetValue("Random_seed", seed_);
+
+        seed_ = configuration_stream("Random_seed", "current_time");
+
         if (is_num(seed_) && urng_ == 0)
         {
             double seed_number;
@@ -140,26 +143,24 @@ namespace Verdandi
         }
 
         // Error statistics.
-        configuration_stream.SetSection("[error_statistics]");
-        configuration_stream.GetValue("Background_error_variance", "positive",
-                                      background_error_variance_);
-        configuration_stream.GetValue("Background_error_scale",
-                                      "strictly positive",
-                                      Balgovind_scale_background_);
-        configuration_stream.PeekValue("Error_sparse",
-                                       error_sparse_);
+        configuration_stream.set_prefix("error_statistics/");
+
+        background_error_variance_
+            = configuration_stream("Background_error_variance", -1.);
+        Balgovind_scale_background_
+            = configuration_stream("Background_error_scale", -1.);
+        error_sparse_ = configuration_stream("Error_sparse", false);
         if (error_sparse_)
             background_error_covariance_matrix_
                 .Initialize(Nx_ * Ny_, background_error_variance_);
 
-        configuration_stream.PeekValue("Error_dense_diagonal",
-                                       error_dense_diagonal_);
+        error_dense_diagonal_ = configuration_stream("Error_dense_diagonal",
+                                                     true);
 
-        configuration_stream.GetValue("Model_error_variance", "positive",
-                                      model_error_variance_);
-        configuration_stream.GetValue("Model_error_scale",
-                                      "strictly positive",
-                                      Balgovind_scale_model_);
+        model_error_variance_
+            = configuration_stream("Model_error_variance", -1.);
+        Balgovind_scale_model_
+            = configuration_stream("Model_error_scale", -1.);
 
         // Description of boundary conditions.
         ReadConfigurationBoundaryCondition("Left", configuration_stream,
@@ -193,17 +194,17 @@ namespace Verdandi
                                            value_top_, amplitude_top_,
                                            frequency_top_);
 
-        configuration_stream.SetSection("[data_assimilation]");
+        configuration_stream.set_prefix("data_assimilation/");
 
-        configuration_stream.PeekValue("Nt_assimilation", Nt_assimilation_);
+        Nt_assimilation_ = configuration_stream("Nt_assimilation", -1);
 
         Nt_prediction_ = Nt_ - Nt_assimilation_;
         if (Nt_prediction_ < 0)
             throw string("Error: the assimilation window is longer")
                 + " than the simulation period.";
 
-        configuration_stream.PeekValue("With_positivity_requirement",
-                                       with_positivity_requirement_);
+        with_positivity_requirement_
+            = configuration_stream("With_positivity_requirement", false);
 
 
         /*** Allocations ***/
@@ -216,9 +217,9 @@ namespace Verdandi
         h_.Fill(1.);
         NEWRAN::Random::Set(*urng_);
         value_ += max(-2., min(2., normal_.Next())) * model_error_std_ic_;
-        configuration_stream.SetSection("[initial_condition]");
+        configuration_stream.set_prefix("initial_condition/");
         bool source;
-        configuration_stream.PeekValue("Center", source);
+        source = configuration_stream("Center", true);
         if (source)
         {
             int center_x = (Nx_ - 1) / 2;
@@ -233,7 +234,7 @@ namespace Verdandi
         u_.Fill(0.);
         v_.Fill(0.);
 
-        configuration_stream.PeekValue("Left", source);
+        source = configuration_stream("Left", false);
         if (source)
         {
             int position_x = Nx_ / 10;
@@ -782,14 +783,12 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>
     ::ReadConfigurationBoundaryCondition(string side,
-                                         ConfigStream& configuration_stream,
+                                         GetPot& configuration_stream,
                                          int& type, T& value,
                                          T& amplitude, T& frequency)
     {
-        configuration_stream.SetSection("[boundary_condition]");
-        configuration_stream.Find(side);
-        string description = trim(configuration_stream.GetLine());
-
+        configuration_stream.set_prefix("boundary_condition/");
+        string description = configuration_stream(side.c_str(), "free");
         if (description == "free")
         {
             type = 0;

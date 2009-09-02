@@ -24,9 +24,6 @@ namespace Verdandi
 {
 
 
-    using namespace Talos;
-
-
     /////////////////
     // OUTPUTSAVER //
     /////////////////

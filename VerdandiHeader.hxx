@@ -33,7 +33,7 @@ namespace Verdandi
 #include <map>
 
 #include "seldon/SeldonHeader.hxx"
-#include "talos/TalosHeader.hxx"
+#include "getpot/GetPot.hpp"
 
 
 namespace Verdandi
@@ -43,7 +43,6 @@ namespace Verdandi
     using namespace std;
 
     using namespace Seldon;
-    using namespace Talos;
 
     using Seldon::to_num;
     using Seldon::to_str;

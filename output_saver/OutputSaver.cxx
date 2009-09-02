@@ -41,7 +41,7 @@ namespace Verdandi
     OutputSaver<T, ClassAssimilationDriver>
     ::OutputSaver(string configuration_file, ClassAssimilationDriver& driver)
     {
-        ConfigStream configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file.c_str());
 
 
         /***********************
@@ -51,10 +51,10 @@ namespace Verdandi
 
         /*** Save options ***/
 
-        configuration_stream.SetSection("[save]");
-        configuration_stream.PeekValue("Output_directory",
-                                       output_directory_);
-        configuration_stream.PeekValue("Period_save", period_save_);
+        configuration_stream.set_prefix("save/");
+        output_directory_ = configuration_stream("Output_directory",
+                                                 "configuration_error");
+        period_save_ = configuration_stream("Period_save", -1);
 
         /*** Initializations ***/
 
