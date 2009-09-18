@@ -181,8 +181,8 @@ namespace Verdandi
 
 	return (mant
                 && ((mant_a || mant_b)
-                     && (!mant_a || is_integer(m_a))
-                     && (!mant_b || is_unsigned_integer(m_b)))
+                    && (!mant_a || is_integer(m_a))
+                    && (!mant_b || is_unsigned_integer(m_b)))
                 && (!exp || is_integer(e)));
     }
 

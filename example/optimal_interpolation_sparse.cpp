@@ -1,3 +1,6 @@
+// Program to test the equivalence between dense and sparse observation
+// operator. Use the identity observation operator to do so either dense or
+// sparse.
 #define SELDON_WITH_CBLAS
 #define SELDON_WITH_LAPACK
 #define SELDON_DEBUG_LEVEL_4
