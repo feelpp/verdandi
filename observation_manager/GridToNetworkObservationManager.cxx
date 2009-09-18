@@ -106,9 +106,9 @@ namespace Verdandi
                                                  "configuration_error");
         period_observation_ = configuration_stream("Period_observation", -1);
         Nskip_ = configuration_stream("Nskip", -1);
-        error_variance_ = configuration_stream("Error_variance", -1.);
+        error_variance_ = configuration_stream("error/Variance", -1.);
 
-        configuration_stream.set_prefix("observation_location/");
+        configuration_stream.set_prefix("observation/location/");
 
         string observation_location
             = configuration_stream("Observation_location",

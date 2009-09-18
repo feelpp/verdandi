@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2009 INRIA
-// Author(s): Claire Mouton, Vivien Mallet
+// Author(s): Vivien Mallet, Claire Mouton
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -17,11 +17,10 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_OBSERVATION_MANAGER_DIAGONALSPARSEOBSERVATIONMANAGER_CXX
-
+#ifndef VERDANDI_FILE_LINEAROBSERVATIONMANAGER_CXX
 
 #include <cstdlib>
-#include "DiagonalSparseObservationManager.hxx"
+#include "LinearObservationManager.hxx"
 
 
 namespace Verdandi
@@ -38,25 +37,23 @@ namespace Verdandi
       with this implementation.
     */
     template <class T>
-    DiagonalSparseObservationManager<T>
-    ::DiagonalSparseObservationManager()
+    LinearObservationManager<T>::LinearObservationManager()
     {
     }
 
 
     //! Main constructor.
-    /*! It defines the operator for a 2D regular grid.
+    /*!
       \param[in] model model.
       \param[in] configuration_file configuration_file.
       \tparam Model the model type; e.g. ShallowWater<double>
     */
     template <class T>
     template <class Model>
-    DiagonalSparseObservationManager<T>
-    ::DiagonalSparseObservationManager(const Model& model,
-                                       string configuration_file):
-        operator_sparse_(true), availability_(false), error_sparse_(true),
-        error_matrix_availability_(true)
+    LinearObservationManager<T>
+    ::LinearObservationManager(const Model& model,
+                               string configuration_file):
+        availability_(false)
     {
         //   Initialize(model, configuration_file);
     }
@@ -64,8 +61,8 @@ namespace Verdandi
 
     //! Destructor.
     template <class T>
-    DiagonalSparseObservationManager<T>
-    ::~DiagonalSparseObservationManager()
+    LinearObservationManager<T>
+    ::~LinearObservationManager()
     {
     }
 
@@ -83,7 +80,7 @@ namespace Verdandi
     */
     template <class T>
     template <class Model>
-    void DiagonalSparseObservationManager<T>
+    void LinearObservationManager<T>
     ::Initialize(const Model& model, string configuration_file)
     {
         GetPot configuration_stream(configuration_file.c_str());
@@ -106,17 +103,32 @@ namespace Verdandi
                                                  "configuration_error");
         period_observation_ = configuration_stream("Period_observation", -1);
         Nskip_ = configuration_stream("Nskip", -1);
-        error_variance_ = configuration_stream("Error_variance", -1.);
+
+        error_variance_ = configuration_stream("error/Variance", -1.);
+        error_sparse_ = configuration_stream("error/Sparse", false);
+        error_matrix_availability_
+            = configuration_stream("error/Matrix_availability", false);
+
+        operator_sparse_ = configuration_stream("operator/Sparse", false);
+        operator_definition_ = configuration_stream("operator/Definition",
+                                                    "configuration_error");
+        operator_diagonal_value_
+            = configuration_stream("operator/Diagonal_value", -1.);
+        operator_file_
+            = configuration_stream("operator/File", "default_file");
 
         Nobservation_ = Nx_model_ * Ny_model_;
         observation_.Reallocate(Nobservation_);
 
         /*** Building the sparse matrices ***/
 
-        tangent_operator_matrix_.Initialize(Nobservation_, T(1));
+        if (operator_sparse_)
+            tangent_operator_matrix_.Initialize(Nobservation_,
+                                                operator_diagonal_value_);
 
-        observation_error_covariance_matrix_.Initialize(Nobservation_,
-                                                        error_variance_);
+        if (error_sparse_)
+            observation_error_covariance_matrix_.Initialize(Nobservation_,
+                                                            error_variance_);
     }
 
 
@@ -132,7 +144,7 @@ namespace Verdandi
     */
     template <class T>
     template <class Model>
-    void DiagonalSparseObservationManager<T>
+    void LinearObservationManager<T>
     ::LoadObservation(const Model& model)
     {
         int step = model.GetCurrentDate();
@@ -153,7 +165,7 @@ namespace Verdandi
 #ifdef SELDON_CHECK_IO
             // Checks if the file was opened.
             if (!file_stream.is_open())
-                throw IOError("DiagonalSparseObservationManager"
+                throw IOError("LinearObservationManager"
                               "::LoadObservation(model)",
                               string("Unable to open file \"")
                               + observation_file_ + "\".");
@@ -168,8 +180,6 @@ namespace Verdandi
 
             file_stream.close();
 
-            // To be optimized: avoid the copy by reading directly to a data
-            // container.
             for (int i = 0; i < Nobservation_; i++)
             {
                 div_t division;
@@ -185,7 +195,7 @@ namespace Verdandi
       \return True if observations are available, false otherwise.
     */
     template <class T>
-    bool DiagonalSparseObservationManager<T>::HasObservation() const
+    bool LinearObservationManager<T>::HasObservation() const
     {
         return availability_;
     }
@@ -201,7 +211,7 @@ namespace Verdandi
       \return Observation dimension.
     */
     template <class T>
-    int DiagonalSparseObservationManager<T>::GetNobservation() const
+    int LinearObservationManager<T>::GetNobservation() const
     {
         return Nobservation_;
     }
@@ -212,7 +222,7 @@ namespace Verdandi
       \return The values of observations.
     */
     template <class T>
-    const Vector<T>& DiagonalSparseObservationManager<T>
+    const Vector<T>& LinearObservationManager<T>
     ::GetObservation() const
     {
         return observation_;
@@ -226,7 +236,7 @@ namespace Verdandi
       matrix, false otherwise.
     */
     template <class T>
-    bool DiagonalSparseObservationManager<T>::IsOperatorSparse() const
+    bool LinearObservationManager<T>::IsOperatorSparse() const
     {
         return operator_sparse_;
     }
@@ -238,7 +248,7 @@ namespace Verdandi
       otherwise.
     */
     template <class T>
-    bool DiagonalSparseObservationManager<T>::IsErrorSparse() const
+    bool LinearObservationManager<T>::IsErrorSparse() const
     {
         return error_sparse_;
     }
@@ -251,7 +261,7 @@ namespace Verdandi
       matrix, false otherwise.
     */
     template <class T>
-    bool DiagonalSparseObservationManager<T>::HasErrorMatrix() const
+    bool LinearObservationManager<T>::HasErrorMatrix() const
     {
         return error_matrix_availability_;
     }
@@ -268,10 +278,19 @@ namespace Verdandi
       \param[out] y the value of the operator at \a x.
     */
     template <class T>
-    void DiagonalSparseObservationManager<T>
+    void LinearObservationManager<T>
     ::ApplyOperator(const Vector<T>& x, Vector<T>& y) const
     {
-        y = x;
+        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+        {
+            y = x;
+            Mlt(operator_diagonal_value_, y);
+        }
+
+        // Operator defined in a file.
+        else
+            throw ErrorUndefined("LinearObservationManager"
+                                 "::ApplyOperator(x, y)");
     }
 
 
@@ -281,7 +300,7 @@ namespace Verdandi
       \param[out] y the value of the tangent linear operator at \a x.
     */
     template <class T>
-    void DiagonalSparseObservationManager<T>
+    void LinearObservationManager<T>
     ::ApplyTangentOperator(const Vector<T>& x, Vector<T>& y) const
     {
         ApplyOperator(x, y);
@@ -295,10 +314,21 @@ namespace Verdandi
       \return The element (\a i, \a j) of the linearized operator.
     */
     template <class T>
-    T DiagonalSparseObservationManager<T>
+    T LinearObservationManager<T>
     ::GetTangentOperator(int i, int j) const
     {
-        return tangent_operator_matrix_.GetValue(i, j);
+        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+        {
+            if (i == j)
+                return operator_diagonal_value_;
+            else
+                return T(0);
+        }
+
+        // Operator defined in a file.
+        else
+            throw ErrorUndefined("LinearObservationManager"
+                                 "::GetTangentOperator(i, j)");
     }
 
 
@@ -309,10 +339,31 @@ namespace Verdandi
       operator.
     */
     template <class T>
-    void DiagonalSparseObservationManager<T>
+    void LinearObservationManager<T>
     ::GetTangentOperatorRow(int row, Vector<T>& tangent_operator_row) const
     {
-        tangent_operator_matrix_.GetRow(row, tangent_operator_row);
+        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+        {
+            // if (operator_sparse_)
+            // {
+            //     tangent_operator_row.Reallocate(1);
+            //     tangent_operator_row.Index(0) = row;
+            //     tangent_operator_row.Fill(operator_diagonal_value_);
+            // }
+
+            // // Dense operator.
+            // else
+            {
+                tangent_operator_row.Reallocate(Nobservation_);
+                tangent_operator_row.Zero();
+                tangent_operator_row(row) = operator_diagonal_value_;
+            }
+        }
+
+        // Operator defined in a file.
+        else
+            throw ErrorUndefined("LinearObservationManager"
+                                 "::GetTangentOperatorRow()");
     }
 
 
@@ -321,24 +372,39 @@ namespace Verdandi
       \return The matrix of the linearized operator.
     */
     template <class T>
-    const Matrix<T, General, RowSparse>& DiagonalSparseObservationManager<T>
+    const Matrix<T, General, RowSparse>& LinearObservationManager<T>
     ::GetTangentOperatorMatrix() const
     {
-        return tangent_operator_matrix_.GetMatrix();
+        if (strcmp(operator_definition_.c_str(), "diagonal") == 0 and
+            operator_sparse_)
+            return tangent_operator_matrix_.GetMatrix();
+
+        // Dense operator or operator defined in a file.
+        else
+            throw ErrorUndefined("LinearObservationManager"
+                                 "::GetTangentOperatorMatrix()");
     }
 
 
     //! Applies the adjoint operator to a given vector.
     /*!
       \param[in] x a vector.
-      \param[out] y the value of the operator at \a x. It is resized if
-      needed.
+      \param[out] y the value of the operator at \a x.
     */
     template <class T>
-    void DiagonalSparseObservationManager<T>
+    void LinearObservationManager<T>
     ::ApplyAdjointOperator(const Vector<T>& x, Vector<T>& y) const
     {
-        y = x;
+        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+        {
+            y = x;
+            Mlt(operator_diagonal_value_, y);
+        }
+
+        // Operator defined in a file.
+        else
+            throw ErrorUndefined("LinearObservationManager"
+                                 "::ApplyOperator(x, y)");
     }
 
 
@@ -348,7 +414,7 @@ namespace Verdandi
       \param[out] innovation innovation vector.
     */
     template <class T>
-    void DiagonalSparseObservationManager<T>
+    void LinearObservationManager<T>
     ::GetInnovation(const Vector<T>& state, Vector<T>& innovation) const
     {
         ApplyOperator(state, innovation);
@@ -362,10 +428,10 @@ namespace Verdandi
       \return True if a BLUE correction is available, false otherwise.
     */
     template <class T>
-    bool DiagonalSparseObservationManager<T>
+    bool LinearObservationManager<T>
     ::HasBLUECorrection() const
     {
-        throw ErrorUndefined("DiagonalSparseObservationManager"
+        throw ErrorUndefined("LinearObservationManager"
                              "::HasBLUECorrection()");
     }
 
@@ -375,10 +441,10 @@ namespace Verdandi
       \param[out] BLUE_correction BLUE correction vector.
     */
     template <class T>
-    void DiagonalSparseObservationManager<T>
+    void LinearObservationManager<T>
     ::GetBLUECorrection(Vector<T>& BLUE_correction) const
     {
-        throw ErrorUndefined("DiagonalSparseObservationManager"
+        throw ErrorUndefined("LinearObservationManager"
                              "::GetBLUECorrection(correction)");
     }
 
@@ -390,10 +456,13 @@ namespace Verdandi
       \return The element (\a i, \a j) of the observation error covariance.
     */
     template <class T>
-    T DiagonalSparseObservationManager<T>
+    T LinearObservationManager<T>
     ::GetObservationErrorCovariance(int i, int j) const
     {
-        return observation_error_covariance_matrix_.GetValue(i, j);
+        if (i == j)
+            return error_variance_;
+        else
+            return T(0);
     }
 
 
@@ -402,15 +471,19 @@ namespace Verdandi
       \return The matrix of the observation error covariance.
     */
     template <class T>
-    const Matrix<T, General, RowSparse>& DiagonalSparseObservationManager<T>
+    const Matrix<T, General, RowSparse>& LinearObservationManager<T>
     ::GetObservationErrorCovarianceMatrix() const
     {
-        return observation_error_covariance_matrix_.GetMatrix();
+        if (error_matrix_availability_)
+            return observation_error_covariance_matrix_.GetMatrix();
+        else
+            throw ErrorUndefined("LinearObservationManager"
+                                 "::GetObservationErrorCovarianceMatrix()");
     }
 
 
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_OBSERVATION_MANAGER_DIAGONALSPARSEOBSERVATIONMANAGER_CXX
+#define VERDANDI_FILE_LINEAROBSERVATIONMANAGER_CXX
 #endif

@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2009 INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Author(s): Claire Mouton, Vivien Mallet
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -17,25 +17,27 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_IDENTITYOBSERVATIONMANAGER_HXX
+#ifndef VERDANDI_FILE_LINEAROBSERVATIONMANAGER_HXX
+
+
+#include "DiagonalSparseMatrix.hxx"
 
 
 namespace Verdandi
 {
 
 
-    ////////////////////////////////
-    // IDENTITYOBSERVATIONMANAGER //
-    ////////////////////////////////
+    //////////////////////////////
+    // LINEAROBSERVATIONMANAGER //
+    //////////////////////////////
 
 
-    //! Identity observation operator.
-    /*! The identity observation operator \f$H\f$ satisfies \f$H{\bf x} = {\bf
-      x}\f$ for any vector \f${\bf x}\f$ of any size.
+    //! Linear observation operator.
+    /*!
       \tparam T the type of floating-point numbers.
     */
     template <class T>
-    class IdentityObservationManager
+    class LinearObservationManager
     {
     protected:
 
@@ -48,6 +50,17 @@ namespace Verdandi
         //! Period with which available observations are actually loaded.
         int Nskip_;
 
+        //! Tangent operator matrix (H).
+        DiagonalSparseMatrix<T> tangent_operator_matrix_;
+        //! Is the observation operator available in a sparse matrix?
+        bool operator_sparse_;
+        //! How is defined the observation operator?
+        string operator_definition_;
+        //! In case of a diagonal operator.
+        T operator_diagonal_value_;
+        //! In case of an operator defined in a file.
+        string operator_file_;
+
         //! Observation data.
         Vector<T> observation_;
 
@@ -59,14 +72,13 @@ namespace Verdandi
         //! Number of total observations at current date.
         int Nobservation_;
 
-        //! Is the observation operator available in a sparse matrix?
-        bool operator_sparse_;
-
         //! Availability of observations at current date.
         bool availability_;
 
         //! Observation error variance.
         T error_variance_;
+        //! Observation error covariance matrix (R).
+        DiagonalSparseMatrix<T> observation_error_covariance_matrix_;
         //! Is the observation error covariance matrix sparse?
         bool error_sparse_;
         //! Is the observation error covariance available in a matrix?
@@ -82,19 +94,19 @@ namespace Verdandi
 
     public:
         // Constructors and destructor.
-        IdentityObservationManager();
-        template <class ClassModel>
-        IdentityObservationManager(const ClassModel& model,
-                                   string configuration_file);
-        ~IdentityObservationManager();
+        LinearObservationManager();
+        template <class Model>
+        LinearObservationManager(const Model& model,
+                                 string configuration_file);
+        ~LinearObservationManager();
 
         // Initialization.
-        template <class ClassModel>
-        void Initialize(const ClassModel& model, string configuration_file);
+        template <class Model>
+        void Initialize(const Model& model, string configuration_file);
 
         // Loads the observations at a given date.
-        template <class ClassModel>
-        void LoadObservation(const ClassModel& model);
+        template <class Model>
+        void LoadObservation(const Model& model);
 
         bool HasObservation() const;
 
@@ -123,12 +135,13 @@ namespace Verdandi
         void GetBLUECorrection(Vector<T>& BLUE_correction) const;
 
         T GetObservationErrorCovariance(int i, int j) const;
-        const Matrix<T>& GetObservationErrorCovarianceMatrix() const;
+        const Matrix<T, General, RowSparse>&
+        GetObservationErrorCovarianceMatrix() const;
     };
 
 
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_IDENTITYOBSERVATIONMANAGER_HXX
+#define VERDANDI_FILE_LINEAROBSERVATIONMANAGER_HXX
 #endif

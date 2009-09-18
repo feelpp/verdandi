@@ -7,7 +7,7 @@
 using namespace Verdandi;
 
 #include "OptimalInterpolation.cxx"
-#include "IdentityObservationManager.cxx"
+#include "LinearObservationManager.cxx"
 #include "ShallowWater.cxx"
 #include "OutputSaver.cxx"
 #include "newran.h"
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     typedef double real;
     typedef ShallowWater<real> ClassModel;
     typedef OptimalInterpolation<real, ClassModel,
-        IdentityObservationManager<real> > ClassOptimalInterpolation;
+        LinearObservationManager<real> > ClassOptimalInterpolation;
 
     ClassOptimalInterpolation driver(argv[1]);
 
