@@ -83,7 +83,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::Initialize(const Model& model, string configuration_file)
     {
-        GetPot configuration_stream(configuration_file.c_str());
+        GetPot configuration_stream(configuration_file);
 
         //! First abscissa.
         double x_min_model = model.GetXMin();
@@ -99,23 +99,20 @@ namespace Verdandi
         Ny_model_ = model.GetNy();
 
         configuration_stream.set_prefix("observation/");
-        observation_file_ = configuration_stream("File",
-                                                 "configuration_error");
-        period_observation_ = configuration_stream("Period_observation", -1);
-        Nskip_ = configuration_stream("Nskip", -1);
+        configuration_stream.put("File", observation_file_);
+        configuration_stream.put("Period_observation", period_observation_);
+        configuration_stream.put("Nskip", Nskip_);
 
-        error_variance_ = configuration_stream("error/Variance", -1.);
-        error_sparse_ = configuration_stream("error/Sparse", false);
-        error_matrix_availability_
-            = configuration_stream("error/Matrix_availability", false);
+        configuration_stream.put("error/Variance", error_variance_);
+        configuration_stream.put("error/Sparse", error_sparse_);
+        configuration_stream.put("error/Matrix_availability",
+                                 error_matrix_availability_);
 
-        operator_sparse_ = configuration_stream("operator/Sparse", false);
-        operator_definition_ = configuration_stream("operator/Definition",
-                                                    "configuration_error");
-        operator_diagonal_value_
-            = configuration_stream("operator/Diagonal_value", -1.);
-        operator_file_
-            = configuration_stream("operator/File", "default_file");
+        configuration_stream.put("operator/Sparse", operator_sparse_);
+        configuration_stream.put("operator/Definition", operator_definition_);
+        configuration_stream.put("operator/Diagonal_value",
+                                 operator_diagonal_value_);
+        configuration_stream.put("operator/File", operator_file_);
 
         Nobservation_ = Nx_model_ * Ny_model_;
         observation_.Reallocate(Nobservation_);

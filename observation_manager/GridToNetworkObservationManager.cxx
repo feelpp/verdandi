@@ -85,7 +85,7 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::Initialize(const ClassModel& model, string configuration_file)
     {
-        GetPot configuration_stream(configuration_file.c_str());
+        GetPot configuration_stream(configuration_file);
 
         //! First abscissa.
         double x_min_model = model.GetXMin();
@@ -102,17 +102,16 @@ namespace Verdandi
 
 
         configuration_stream.set_prefix("observation/");
-        observation_file_ = configuration_stream("File",
-                                                 "configuration_error");
-        period_observation_ = configuration_stream("Period_observation", -1);
-        Nskip_ = configuration_stream("Nskip", -1);
-        error_variance_ = configuration_stream("error/Variance", -1.);
+        configuration_stream.put("File", observation_file_);
+        configuration_stream.put("Period_observation", period_observation_);
+        configuration_stream.put("Nskip", Nskip_);
+        configuration_stream.put("error/Variance", error_variance_);
 
         configuration_stream.set_prefix("observation/location/");
 
-        string observation_location
-            = configuration_stream("Observation_location",
-                                   "configuration_error");
+        string observation_location;
+        configuration_stream.put("Observation_location",
+                                 observation_location);
         vector<string> observation_location_vector
             = split(observation_location);
         int value;
