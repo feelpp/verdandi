@@ -103,9 +103,10 @@ namespace Verdandi
 
         configuration_stream.set_prefix("observation/");
         configuration_stream.put("File", observation_file_);
-        configuration_stream.put("Period_observation", period_observation_);
-        configuration_stream.put("Nskip", Nskip_);
-        configuration_stream.put("error/Variance", error_variance_);
+        configuration_stream.put("Period_observation", "> 0",
+                                 period_observation_);
+        configuration_stream.put("Nskip", "> 0", Nskip_);
+        configuration_stream.put("error/Variance", "> 0", error_variance_);
 
         configuration_stream.set_prefix("observation/location/");
 

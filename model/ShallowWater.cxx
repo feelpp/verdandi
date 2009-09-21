@@ -104,9 +104,9 @@ namespace Verdandi
 
         // Perturbations.
         configuration_stream.set_prefix("model_error/");
-        configuration_stream.put("Standard_deviation_bc",
+        configuration_stream.put("Standard_deviation_bc", ">= 0",
                                  model_error_std_bc_);
-        configuration_stream.put("Standard_deviation_ic",
+        configuration_stream.put("Standard_deviation_ic", ">= 0",
                                  model_error_std_ic_);
 
         if (value_ - 2. * model_error_std_ic_ <= T(0))
@@ -145,9 +145,9 @@ namespace Verdandi
         // Error statistics.
         configuration_stream.set_prefix("error_statistics/");
 
-        configuration_stream.put("Background_error_variance",
+        configuration_stream.put("Background_error_variance", ">= 0",
                                  background_error_variance_);
-        configuration_stream.put("Background_error_scale",
+        configuration_stream.put("Background_error_scale", "> 0",
                                  Balgovind_scale_background_);
         configuration_stream.put("Error_sparse", error_sparse_);
         if (error_sparse_)
@@ -157,9 +157,10 @@ namespace Verdandi
         configuration_stream.put("Error_dense_diagonal",
                                  error_dense_diagonal_);
 
-        configuration_stream.put("Model_error_variance",
+        configuration_stream.put("Model_error_variance", ">= 0",
                                  model_error_variance_);
-        configuration_stream.put("Model_error_scale", Balgovind_scale_model_);
+        configuration_stream.put("Model_error_scale", "> 0",
+                                 Balgovind_scale_model_);
 
         // Description of boundary conditions.
         ReadConfigurationBoundaryCondition("Left", configuration_stream,
