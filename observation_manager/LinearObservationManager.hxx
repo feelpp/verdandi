@@ -51,7 +51,10 @@ namespace Verdandi
         int Nskip_;
 
         //! Tangent operator matrix (H).
-        DiagonalSparseMatrix<T> tangent_operator_matrix_;
+        Matrix<T> tangent_operator_matrix_;
+        DiagonalSparseMatrix<T> tangent_operator_sparse_matrix_;
+        //! Is the observation operator available in a dense matrix?
+        bool operator_dense_;
         //! Is the observation operator available in a sparse matrix?
         bool operator_sparse_;
         //! How is defined the observation operator?

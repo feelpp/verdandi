@@ -1,7 +1,7 @@
 // Program to test the equivalence between dense and sparse observation
 // operator. Use the identity observation operator to do so either dense or
-// sparse. Example to be called with river-sparse.cfg and
-// river-diagonal-dense.cfg.
+// sparse. Example to be called with river-sparse.cfg,
+// river-diagonal-dense.cfg and river-operator-from-file.cfg.
 #define SELDON_WITH_CBLAS
 #define SELDON_WITH_LAPACK
 #define SELDON_DEBUG_LEVEL_4

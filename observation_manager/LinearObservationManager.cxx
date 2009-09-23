@@ -53,7 +53,7 @@ namespace Verdandi
     LinearObservationManager<T>
     ::LinearObservationManager(const Model& model,
                                string configuration_file):
-        availability_(false)
+        operator_dense_(false), availability_(false)
     {
         //   Initialize(model, configuration_file);
     }
@@ -110,7 +110,8 @@ namespace Verdandi
                                  error_matrix_availability_);
 
         configuration_stream.put("operator/Sparse", operator_sparse_);
-        configuration_stream.put("operator/Definition", operator_definition_);
+        configuration_stream.put("operator/Definition", "'diagonal'| file'",
+                                 operator_definition_);
         configuration_stream.put("operator/Diagonal_value",
                                  operator_diagonal_value_);
         configuration_stream.put("operator/File", operator_file_);
@@ -118,15 +119,21 @@ namespace Verdandi
         Nobservation_ = Nx_model_ * Ny_model_;
         observation_.Reallocate(Nobservation_);
 
-        /*** Building the sparse matrices ***/
+        /*** Building the matrices ***/
 
         if (operator_sparse_)
-            tangent_operator_matrix_.Initialize(Nobservation_,
-                                                operator_diagonal_value_);
+            tangent_operator_sparse_matrix_
+                .Initialize(Nobservation_, operator_diagonal_value_);
 
         if (error_sparse_)
             observation_error_covariance_matrix_.Initialize(Nobservation_,
                                                             error_variance_);
+
+        if (strcmp(operator_definition_.c_str(), "file") == 0)
+        {
+            operator_dense_ = true;
+            tangent_operator_matrix_.Read(operator_file_);
+        }
     }
 
 
@@ -287,8 +294,7 @@ namespace Verdandi
 
         // Operator defined in a file.
         else
-            throw ErrorUndefined("LinearObservationManager"
-                                 "::ApplyOperator(x, y)");
+            Mlt(tangent_operator_matrix_, x, y);
     }
 
 
@@ -325,8 +331,7 @@ namespace Verdandi
 
         // Operator defined in a file.
         else
-            throw ErrorUndefined("LinearObservationManager"
-                                 "::GetTangentOperator(i, j)");
+            return tangent_operator_matrix_(i, j);
     }
 
 
@@ -360,8 +365,7 @@ namespace Verdandi
 
         // Operator defined in a file.
         else
-            throw ErrorUndefined("LinearObservationManager"
-                                 "::GetTangentOperatorRow()");
+            GetRow(tangent_operator_matrix_, row, tangent_operator_row);
     }
 
 
@@ -375,7 +379,7 @@ namespace Verdandi
     {
         if (strcmp(operator_definition_.c_str(), "diagonal") == 0 and
             operator_sparse_)
-            return tangent_operator_matrix_.GetMatrix();
+            return tangent_operator_sparse_matrix_.GetMatrix();
 
         // Dense operator or operator defined in a file.
         else
@@ -401,8 +405,7 @@ namespace Verdandi
 
         // Operator defined in a file.
         else
-            throw ErrorUndefined("LinearObservationManager"
-                                 "::ApplyOperator(x, y)");
+            Mlt(1., SeldonTrans, tangent_operator_matrix_, x, 0., y);
     }
 
 
