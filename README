@@ -1,18 +1,29 @@
 To compile the examples, execute the following commands in the directory
 example:
 
-scons verdandi=".." model_forward
-scons verdandi=".." optimal_interpolation_twin_experiment
+scons
+write_matrix
+model_forward configuration/river-truth.cfg
+optimal_interpolation_twin_experiment configuration/river.cfg
+optimal_interpolation_diagonal_dense_sparse configuration/river-diagonal-dense.cfg
+optimal_interpolation_diagonal_dense_sparse configuration/river-sparse.cfg
+optimal_interpolation_diagonal_dense_sparse configuration/river-operator-from-file.cfg
 
 
-To load the results, you can launch 
+To load the results, you can launch:
 
 ipython -pylab 
 
 and then
 
 run load.py result/river-truth
+h_t = h
 run load.py result/river
 
+plot(time_evolution(h_t - h, rms))
 
+plot(h_t[100])
+plot(h[100])
 
+The results in result/river-operator-from-file/, result/river-diagonal-dense/,
+result/river-sparse/ should be identical.
