@@ -20,6 +20,9 @@
 #ifndef VERDANDI_FILE_GRIDTONETWORKOBSERVATIONMANAGER_HXX
 
 
+#include "DiagonalSparseMatrix.hxx"
+
+
 namespace Verdandi
 {
 
@@ -37,6 +40,11 @@ namespace Verdandi
     template <class T>
     class GridToNetworkObservationManager
     {
+    public:
+        typedef Matrix<T, General, RowSparse> tangent_operator_sparse_matrix;
+        typedef Matrix<T, General, RowSparse> observation_error_variance;
+        typedef Vector<T> tangent_operator_vector;
+
     protected:
 
         /*** Observations ***/
@@ -119,24 +127,30 @@ namespace Verdandi
         bool HasErrorMatrix() const;
 
         // Operators.
-        void ApplyOperator(const Vector<T>& x, Vector<T>& y) const;
+        template <class state_vector>
+        void ApplyOperator(const state_vector& x, Vector<T>& y) const;
 
-        void ApplyTangentOperator(const Vector<T>& x, Vector<T>& y) const;
+        template <class state_vector>
+        void ApplyTangentOperator(const state_vector& x, Vector<T>& y) const;
         T GetTangentOperator(int i, int j) const;
-        void GetTangentOperatorRow(int row,
-                                   Vector<T>& tangent_operator_row) const;
-        const Matrix<T, General, RowSparse>& GetTangentOperatorMatrix() const;
+        void GetTangentOperatorRow(int row, tangent_operator_vector&
+                                   tangent_operator_row) const;
+        const tangent_operator_sparse_matrix& GetTangentOperatorMatrix()
+            const;
 
-        void ApplyAdjointOperator(const Vector<T>& x, Vector<T>& y) const;
+        template <class state_vector>
+        void ApplyAdjointOperator(const state_vector& x, Vector<T>& y) const;
 
-        void GetInnovation(const Vector<T>& state,
+        template <class state_vector>
+        void GetInnovation(const state_vector& state,
                            Vector<T>& innovation) const;
 
         bool HasBLUECorrection() const;
         void GetBLUECorrection(Vector<T>& BLUE_correction) const;
 
         T GetObservationErrorCovariance(int i, int j) const;
-        const Matrix<T>& GetObservationErrorCovarianceMatrix() const;
+        const observation_error_variance&
+        GetObservationErrorVariance() const;
     };
 
 

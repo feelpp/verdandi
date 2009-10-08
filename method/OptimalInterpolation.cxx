@@ -100,7 +100,7 @@ namespace Verdandi
     {
         cout.precision(20);
 
-        Vector<T> state_vector;
+        state_vector state_vector;
 
         /*** Initializations ***/
 
@@ -166,7 +166,7 @@ namespace Verdandi
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Analyze()
     {
-        Vector<T> state_vector;
+        state_vector state_vector;
         observation_manager_.LoadObservation(model_);
 
         if (observation_manager_.HasObservation())
@@ -197,7 +197,7 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE(Vector<T>& state_vector)
+    ::ComputeBLUE(state_vector& state_vector)
     {
         // B, R and H are sparse.
         if (model_.IsErrorSparse() and observation_manager_.IsErrorSparse()
@@ -237,7 +237,7 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUEDense(Vector<T>& state_vector)
+    ::ComputeBLUEDense(state_vector& state_vector)
     {
         int r, c;
 
@@ -245,10 +245,10 @@ namespace Verdandi
         Nobservation_ = observation_manager_.GetNobservation();
 
         // One row of background matrix B.
-        Vector<T> error_covariance_row(Nstate_);
+        background_error_covariance_vector error_covariance_row(Nstate_);
 
         // One row of tangent operator matrix.
-        Vector<T> tangent_operator_row(Nstate_);
+        tangent_operator_vector tangent_operator_row(Nstate_);
 
         // Temporary matrix and vector.
         // 'HBHR_inv' will eventually contain the matrix (HBH' + R)^(-1).

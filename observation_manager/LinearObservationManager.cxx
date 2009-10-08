@@ -126,8 +126,8 @@ namespace Verdandi
                 .Initialize(Nobservation_, operator_diagonal_value_);
 
         if (error_sparse_)
-            observation_error_covariance_matrix_.Initialize(Nobservation_,
-                                                            error_variance_);
+            observation_error_variance_.Initialize(Nobservation_,
+						   error_variance_);
 
         if (strcmp(operator_definition_.c_str(), "file") == 0)
         {
@@ -283,8 +283,9 @@ namespace Verdandi
       \param[out] y the value of the operator at \a x.
     */
     template <class T>
+    template <class state_vector>
     void LinearObservationManager<T>
-    ::ApplyOperator(const Vector<T>& x, Vector<T>& y) const
+    ::ApplyOperator(const state_vector& x, Vector<T>& y) const
     {
         if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
         {
@@ -304,8 +305,9 @@ namespace Verdandi
       \param[out] y the value of the tangent linear operator at \a x.
     */
     template <class T>
+    template <class state_vector>
     void LinearObservationManager<T>
-    ::ApplyTangentOperator(const Vector<T>& x, Vector<T>& y) const
+    ::ApplyTangentOperator(const state_vector& x, Vector<T>& y) const
     {
         ApplyOperator(x, y);
     }
@@ -343,7 +345,8 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetTangentOperatorRow(int row, Vector<T>& tangent_operator_row) const
+    ::GetTangentOperatorRow(int row, tangent_operator_vector&
+                            tangent_operator_row) const
     {
         if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
         {
@@ -374,7 +377,8 @@ namespace Verdandi
       \return The matrix of the linearized operator.
     */
     template <class T>
-    const Matrix<T, General, RowSparse>& LinearObservationManager<T>
+    const typename LinearObservationManager<T>
+    ::tangent_operator_sparse_matrix& LinearObservationManager<T>
     ::GetTangentOperatorMatrix() const
     {
         if (strcmp(operator_definition_.c_str(), "diagonal") == 0 and
@@ -394,8 +398,9 @@ namespace Verdandi
       \param[out] y the value of the operator at \a x.
     */
     template <class T>
+    template <class state_vector>
     void LinearObservationManager<T>
-    ::ApplyAdjointOperator(const Vector<T>& x, Vector<T>& y) const
+    ::ApplyAdjointOperator(const state_vector& x, Vector<T>& y) const
     {
         if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
         {
@@ -415,8 +420,9 @@ namespace Verdandi
       \param[out] innovation innovation vector.
     */
     template <class T>
+    template <class state_vector>
     void LinearObservationManager<T>
-    ::GetInnovation(const Vector<T>& state, Vector<T>& innovation) const
+    ::GetInnovation(const state_vector& state, Vector<T>& innovation) const
     {
         ApplyOperator(state, innovation);
         Mlt(T(-1), innovation);
@@ -472,14 +478,15 @@ namespace Verdandi
       \return The matrix of the observation error covariance.
     */
     template <class T>
-    const Matrix<T, General, RowSparse>& LinearObservationManager<T>
-    ::GetObservationErrorCovarianceMatrix() const
+    const typename LinearObservationManager<T>
+    ::observation_error_variance& LinearObservationManager<T>
+    ::GetObservationErrorVariance() const
     {
         if (error_matrix_availability_)
-            return observation_error_covariance_matrix_.GetMatrix();
+            return observation_error_variance_.GetMatrix();
         else
             throw ErrorUndefined("LinearObservationManager"
-                                 "::GetObservationErrorCovarianceMatrix()");
+                                 "::GetObservationErrorVariance()");
     }
 
 

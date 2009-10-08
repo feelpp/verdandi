@@ -33,6 +33,16 @@ namespace Verdandi
     class OptimalInterpolation
     {
 
+    public:
+        typedef typename ClassModel::error_covariance_vector
+        background_error_covariance_vector;
+        typedef typename ClassModel::state_vector state_vector;
+        typedef typename ClassModel::crossed_matrix crossed_matrix;
+        typedef typename ClassObservationManager
+        ::tangent_operator_sparse_matrix tangent_operator_sparse_matrix;
+        typedef typename ClassObservationManager::tangent_operator_vector
+        tangent_operator_vector;
+
     protected:
 
         /*** Main components ***/
@@ -79,9 +89,9 @@ namespace Verdandi
 
         void Analyze();
 
-        void ComputeBLUE(Vector<T>& state_vector);
-        void ComputeBLUEDense(Vector<T>& state_vector);
-        void ComputeBLUESparse(Vector<T>& state_vector);
+        void ComputeBLUE(state_vector& state_vector);
+        void ComputeBLUEDense(state_vector& state_vector);
+        void ComputeBLUESparse(state_vector& state_vector);
 
         bool HasFinished() const;
 

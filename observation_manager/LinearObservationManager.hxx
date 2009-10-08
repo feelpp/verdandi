@@ -39,6 +39,12 @@ namespace Verdandi
     template <class T>
     class LinearObservationManager
     {
+    public:
+        typedef Matrix<T> tangent_operator_matrix;
+        typedef Matrix<T, General, RowSparse> tangent_operator_sparse_matrix;
+        typedef Matrix<T, General, RowSparse> observation_error_variance;
+        typedef Vector<T> tangent_operator_vector;
+
     protected:
 
         /*** Observations ***/
@@ -51,7 +57,7 @@ namespace Verdandi
         int Nskip_;
 
         //! Tangent operator matrix (H).
-        Matrix<T> tangent_operator_matrix_;
+        tangent_operator_matrix tangent_operator_matrix_;
         DiagonalSparseMatrix<T> tangent_operator_sparse_matrix_;
         //! Is the observation operator available in a dense matrix?
         bool operator_dense_;
@@ -81,7 +87,7 @@ namespace Verdandi
         //! Observation error variance.
         T error_variance_;
         //! Observation error covariance matrix (R).
-        DiagonalSparseMatrix<T> observation_error_covariance_matrix_;
+        DiagonalSparseMatrix<T> observation_error_variance_;
         //! Is the observation error covariance matrix sparse?
         bool error_sparse_;
         //! Is the observation error covariance available in a matrix?
@@ -121,25 +127,30 @@ namespace Verdandi
         bool HasErrorMatrix() const;
 
         // Operators.
-        void ApplyOperator(const Vector<T>& x, Vector<T>& y) const;
+        template <class state_vector>
+        void ApplyOperator(const state_vector& x, Vector<T>& y) const;
 
-        void ApplyTangentOperator(const Vector<T>& x, Vector<T>& y) const;
+        template <class state_vector>
+        void ApplyTangentOperator(const state_vector& x, Vector<T>& y) const;
         T GetTangentOperator(int i, int j) const;
-        void GetTangentOperatorRow(int row,
-                                   Vector<T>& tangent_operator_row) const;
-        const Matrix<T, General, RowSparse>& GetTangentOperatorMatrix() const;
+        void GetTangentOperatorRow(int row, tangent_operator_vector&
+                                   tangent_operator_row) const;
+        const tangent_operator_sparse_matrix& GetTangentOperatorMatrix()
+            const;
 
-        void ApplyAdjointOperator(const Vector<T>& x, Vector<T>& y) const;
+        template <class state_vector>
+        void ApplyAdjointOperator(const state_vector& x, Vector<T>& y) const;
 
-        void GetInnovation(const Vector<T>& state,
+        template <class state_vector>
+        void GetInnovation(const state_vector& state,
                            Vector<T>& innovation) const;
 
         bool HasBLUECorrection() const;
         void GetBLUECorrection(Vector<T>& BLUE_correction) const;
 
         T GetObservationErrorCovariance(int i, int j) const;
-        const Matrix<T, General, RowSparse>&
-        GetObservationErrorCovarianceMatrix() const;
+        const observation_error_variance&
+        GetObservationErrorVariance() const;
     };
 
 

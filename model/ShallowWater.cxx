@@ -146,13 +146,13 @@ namespace Verdandi
         configuration_stream.set_prefix("error_statistics/");
 
         configuration_stream.put("Background_error_variance", ">= 0",
-                                 background_error_variance_);
+                                 background_error_variance_value_);
         configuration_stream.put("Background_error_scale", "> 0",
                                  Balgovind_scale_background_);
         configuration_stream.put("Error_sparse", error_sparse_);
         if (error_sparse_)
-            background_error_covariance_matrix_
-                .Initialize(Nx_ * Ny_, background_error_variance_);
+            background_error_variance_
+                .Initialize(Nx_ * Ny_, background_error_variance_value_);
 
         configuration_stream.put("Error_dense_diagonal",
                                  error_dense_diagonal_);
@@ -419,7 +419,7 @@ namespace Verdandi
       \param[in] state state vector.
     */
     template <class T>
-    void ShallowWater<T>::StepBack(const Vector<T>& state)
+    void ShallowWater<T>::StepBack(const state_vector& state)
     {
         time_step_--;
         SetFullState(state);
@@ -564,7 +564,7 @@ namespace Verdandi
       \param[out] state the reduced state vector.
     */
     template <class T>
-    void ShallowWater<T>::GetState(Vector<T>& state) const
+    void ShallowWater<T>::GetState(state_vector& state) const
     {
         int position = 0;
         state.Reallocate(Nx_ * Ny_);
@@ -580,7 +580,7 @@ namespace Verdandi
       \param[in] state the reduced state vector.
     */
     template <class T>
-    void ShallowWater<T>::SetState(Vector<T>& state)
+    void ShallowWater<T>::SetState(state_vector& state)
     {
         // Positivity requirement.
         if (with_positivity_requirement_)
@@ -600,7 +600,7 @@ namespace Verdandi
       \param[out] state the full state vector.
     */
     template <class T>
-    void ShallowWater<T>::GetFullState(Vector<T>& state) const
+    void ShallowWater<T>::GetFullState(state_vector& state) const
     {
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
@@ -617,7 +617,7 @@ namespace Verdandi
       \param[in] state the full state vector.
     */
     template <class T>
-    void ShallowWater<T>::SetFullState(const Vector<T>& state)
+    void ShallowWater<T>::SetFullState(const state_vector& state)
     {
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
@@ -636,12 +636,11 @@ namespace Verdandi
     */
     template <class T>
     void ShallowWater<T>
-    ::GetBackgroundErrorCovarianceRow(int row,
-                                      Vector<T>& error_covariance_vector)
+    ::GetBackgroundErrorCovarianceRow(int row, error_covariance_vector&
+                                      error_covariance_vector)
     {
         if (error_sparse_)
-            background_error_covariance_matrix_
-                .GetRow(row, error_covariance_vector);
+            background_error_variance_.GetRow(row, error_covariance_vector);
 
         else
         {
@@ -649,7 +648,8 @@ namespace Verdandi
             {
                 error_covariance_vector.Reallocate(Nx_ * Ny_);
                 error_covariance_vector.Zero();
-                error_covariance_vector(row) = background_error_variance_;
+                error_covariance_vector(row)
+                    = background_error_variance_value_;
             }
             else
             {
@@ -678,8 +678,8 @@ namespace Verdandi
                                             + distance_y * distance_y)
                                 / Balgovind_scale_background_;
                             error_covariance_vector_(position++)
-                                = background_error_variance_ * (1. + distance)
-                                * exp(-distance);
+                                = background_error_variance_value_
+                                * (1. + distance) * exp(-distance);
                         }
                     error_covariance_vector = error_covariance_vector_;
                 }
@@ -694,14 +694,14 @@ namespace Verdandi
       \return The matrix of the background error covariance.
     */
     template <class T>
-    const Matrix<T, General, RowSparse>& ShallowWater<T>
-    ::GetBackgroundErrorCovarianceMatrix() const
+    const typename ShallowWater<T>::background_error_variance& ShallowWater<T>
+    ::GetBackgroundErrorVarianceMatrix() const
     {
         if (error_sparse_)
-            return background_error_covariance_matrix_.GetMatrix();
+            return background_error_variance_.GetMatrix();
         else
             throw ErrorUndefined(
-                "ShallowWater::GetBackgroundErrorCovarianceMatrix()",
+                "ShallowWater::GetBackgroundErrorVarianceMatrix()",
                 "the background error covariance matrix is not available!");
     }
 

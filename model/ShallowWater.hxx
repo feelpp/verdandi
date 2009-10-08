@@ -47,6 +47,10 @@ namespace Verdandi
         typedef const T* const_pointer;
         typedef T& reference;
         typedef const T& const_reference;
+        typedef Matrix<T, General, RowSparse> background_error_variance;
+        typedef Vector<T> error_covariance_vector;
+        typedef Vector<T> state_vector;
+        typedef Matrix<T, General, RowSparse> crossed_matrix;
 
     protected:
 
@@ -154,11 +158,11 @@ namespace Verdandi
         //! Balgovind scale for background covariance.
         double Balgovind_scale_background_;
         //! Background error variance.
-        double background_error_variance_;
+        double background_error_variance_value_;
         //! Flag that indicates whether the error covariance matrix is sparse.
         bool error_sparse_;
         //! Background error covariance matrix (B).
-        DiagonalSparseMatrix<T> background_error_covariance_matrix_;
+        DiagonalSparseMatrix<T> background_error_variance_;
         /*! \brief Flag that indicates whether the error covariance matrix is
           dense and diagonal.
         */
@@ -174,7 +178,7 @@ namespace Verdandi
         //! Number of the column of Q currently stored.
         int current_column_;
         //! Value of the row of B or of the column of Q currently stored.
-        Vector<T> error_covariance_vector_;
+        error_covariance_vector error_covariance_vector_;
 
         /*** Experiment settings ***/
 
@@ -204,7 +208,7 @@ namespace Verdandi
         // Processing.
         void Forward();
         bool HasFinished() const;
-        void StepBack(const Vector<T>& state);
+        void StepBack(const state_vector& state);
 
         // Access methods.
         int GetCurrentDate() const;
@@ -219,15 +223,15 @@ namespace Verdandi
         int GetDeltaY() const;
         int GetNstate() const;
         int GetNtAssimilation() const;
-        void GetState(Vector<T>& state) const;
-        void SetState(Vector<T>& state);
-        void GetFullState(Vector<T>& state) const;
-        void SetFullState(const Vector<T>& state);
+        void GetState(state_vector& state) const;
+        void SetState(state_vector& state);
+        void GetFullState(state_vector& state) const;
+        void SetFullState(const state_vector& state);
         void GetBackgroundErrorCovarianceRow(int row,
-                                             Vector<T>&
+                                             error_covariance_vector&
                                              error_covariance_vector);
-        const Matrix<T, General, RowSparse>&
-        GetBackgroundErrorCovarianceMatrix() const;
+        const background_error_variance&
+        GetBackgroundErrorVarianceMatrix() const;
         bool IsErrorSparse() const;
 
         // Access methods useful for saving with the output saver.

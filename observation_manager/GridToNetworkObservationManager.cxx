@@ -21,6 +21,7 @@
 
 
 #include "GridToNetworkObservationManager.hxx"
+#include "DiagonalSparseMatrix.cxx"
 
 
 namespace Verdandi
@@ -322,8 +323,9 @@ namespace Verdandi
       needed.
     */
     template <class T>
+    template <class state_vector>
     void GridToNetworkObservationManager<T>
-    ::ApplyOperator(const Vector<T>& x, Vector<T>& y) const
+    ::ApplyOperator(const state_vector& x, Vector<T>& y) const
     {
         y.Reallocate(active_interpolation_index_.GetM());
         y.Zero();
@@ -346,8 +348,9 @@ namespace Verdandi
       resized if needed.
     */
     template <class T>
+    template <class state_vector>
     void GridToNetworkObservationManager<T>
-    ::ApplyTangentOperator(const Vector<T>& x, Vector<T>& y) const
+    ::ApplyTangentOperator(const state_vector& x, Vector<T>& y) const
     {
         ApplyOperator(x, y);
     }
@@ -384,7 +387,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetTangentOperatorRow(int row, Vector<T>& tangent_operator_row) const
+    ::GetTangentOperatorRow(int row, tangent_operator_vector&
+                            tangent_operator_row) const
     {
         for (int i = 0; i < tangent_operator_row.GetLength(); i++)
             tangent_operator_row(i) = GetTangentOperator(row, i);
@@ -396,7 +400,9 @@ namespace Verdandi
       \return The matrix of the linearized operator.
     */
     template <class T>
-    const Matrix<T, General, RowSparse>& GridToNetworkObservationManager<T>
+    const typename
+    GridToNetworkObservationManager<T>::tangent_operator_sparse_matrix&
+    GridToNetworkObservationManager<T>
     ::GetTangentOperatorMatrix() const
     {
         throw ErrorUndefined(
@@ -411,8 +417,9 @@ namespace Verdandi
       needed.
     */
     template <class T>
+    template <class state_vector>
     void GridToNetworkObservationManager<T>
-    ::ApplyAdjointOperator(const Vector<T>& x, Vector<T>& y) const
+    ::ApplyAdjointOperator(const state_vector& x, Vector<T>& y) const
     {
         y.Reallocate(Nx_model_ * Ny_model_);
         y.Zero();
@@ -435,8 +442,9 @@ namespace Verdandi
       \param[out] innovation innovation vector.
     */
     template <class T>
+    template <class state_vector>
     void GridToNetworkObservationManager<T>
-    ::GetInnovation(const Vector<T>& state, Vector<T>& innovation) const
+    ::GetInnovation(const state_vector& state, Vector<T>& innovation) const
     {
         ApplyOperator(state, innovation);
         Mlt(T(-1), innovation);
@@ -492,12 +500,14 @@ namespace Verdandi
       \return The matrix of the observation error covariance.
     */
     template <class T>
-    const Matrix<T>& GridToNetworkObservationManager<T>
-    ::GetObservationErrorCovarianceMatrix() const
+    const typename
+    GridToNetworkObservationManager<T>::observation_error_variance&
+    GridToNetworkObservationManager<T>
+    ::GetObservationErrorVariance() const
     {
         throw ErrorUndefined(
             string("GridToNetworkObservationManager")
-            +"::GetObservationErrorCovarianceMatrix()");
+            +"::GetObservationErrorVariance()");
     }
 
 
