@@ -6,7 +6,6 @@
 #include "Verdandi.hxx"
 using namespace Verdandi;
 
-#include "OptimalInterpolation.cxx"
 #include "GridToNetworkObservationManager.cxx"
 #include "ShallowWater.cxx"
 #include "OutputSaver.cxx"
