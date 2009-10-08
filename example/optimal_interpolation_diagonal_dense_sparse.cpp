@@ -4,11 +4,14 @@
 // river-diagonal-dense.cfg and river-operator-from-file.cfg.
 #define SELDON_WITH_CBLAS
 #define SELDON_WITH_LAPACK
+#define SELDON_WITH_SUPERLU
 #define SELDON_DEBUG_LEVEL_4
 #define SELDON_WITH_ABORT
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
+
+#include "seldon/SeldonSolver.hxx"
 
 #include "OptimalInterpolation.cxx"
 #include "LinearObservationManager.cxx"

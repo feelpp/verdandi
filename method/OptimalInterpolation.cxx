@@ -322,57 +322,55 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUESparse(Vector<T>& state_vector)
+    ::ComputeBLUESparse(state_vector& state_vector)
     {
         // Number of observations at current date.
         Nobservation_ = observation_manager_.GetNobservation();
 
         // Temporary matrix and vector.
-
-        // As soon as sparse matrix-matrix product is available in Seldon:
-        // DiagonalSparseMatrix<T> working_matrix;
-        // OR Matrix<T, General, RowSparse> working_matrix;
-
-        Matrix<T> working_matrix_so(Nstate_, Nobservation_);
-        Matrix<T> working_matrix_oo(Nobservation_, Nobservation_);
+        crossed_matrix working_matrix_so(Nstate_, Nobservation_);
+        tangent_operator_sparse_matrix working_matrix_oo(Nobservation_,
+                                                         Nobservation_);
 
         // Computes BH'.
         MltAdd(T(1), SeldonNoTrans,
-               model_.GetBackgroundErrorCovarianceMatrix(), SeldonTrans,
+               model_.GetBackgroundErrorVarianceMatrix(), SeldonTrans,
                observation_manager_.GetTangentOperatorMatrix(), T(0),
                working_matrix_so);
 
         // Computes HBH'.
-        MltAdd(T(1), observation_manager_.GetTangentOperatorMatrix(),
-               working_matrix_so, T(0), working_matrix_oo);
+        Mlt(observation_manager_.GetTangentOperatorMatrix(),
+            working_matrix_so, working_matrix_oo);
 
         // Computes (HBH' + R).
         if (observation_manager_.HasErrorMatrix())
             Add(T(1),
-                observation_manager_.GetObservationErrorCovarianceMatrix(),
+                observation_manager_.GetObservationErrorVariance(),
                 working_matrix_oo);
 
         else
-            for (int r = 0; r < Nobservation_; r++)
-                for (int c = 0; c < Nobservation_; c++)
-                    working_matrix_oo(r, c) += observation_manager_
-                        .GetObservationErrorCovariance(r, c);
+            // B and H are sparse, R is not sparse.
+            throw ErrorUndefined(
+                "OptimalInterpolation::ComputeBLUESparse(state_vector)");
+        // for (int r = 0; r < Nobservation_; r++)
+        //     for (int c = 0; c < Nobservation_; c++)
+        //         working_matrix_oo(r, c) += observation_manager_
+        //             .GetObservationErrorCovariance(r, c);
 
-        // Computes (HBH' + R)^{-1}.
-        GetInverse(working_matrix_oo);
-
-        // Computes BH' * (HBH' + R)^{-1} (K).
-        Matrix<T> matrix_K(Nstate_, Nobservation_);
-        MltAdd(T(1), working_matrix_so, working_matrix_oo, T(0),
-               matrix_K);
-
-        // Computes innovation.
-        Vector<T> innovation(Nobservation_);
-        observation_manager_.GetInnovation(state_vector, innovation);
-
-        // Computes matrix_K * innovation.
+        // Computes innovation in working_vector.
         Vector<T> working_vector(Nobservation_);
-        MltAdd(T(1), matrix_K, innovation, T(0), working_vector);
+        observation_manager_.GetInnovation(state_vector, working_vector);
+
+        // Computes x = (HBH' + R)^{-1} * innovation by solving the linear
+        // system (HBH' + R) * x = innovation.
+        MatrixSuperLU<T> matrix_super_lu;
+        GetLU(working_matrix_oo, matrix_super_lu);
+        Vector<T> x(Nobservation_);
+        x = working_vector;
+        SolveLU(matrix_super_lu, x);
+
+        // Computes BH' * (HBH' + R)^{-1} * innovation.
+        Mlt(working_matrix_so, x, working_vector);
 
         // Computes new state.
         Add(T(1), working_vector, state_vector);
