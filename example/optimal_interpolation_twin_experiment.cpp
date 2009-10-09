@@ -3,6 +3,7 @@
 #define SELDON_WITH_SUPERLU
 #define SELDON_DEBUG_LEVEL_4
 #define SELDON_WITH_ABORT
+#define GETPOT_ACTIVATE_EXCEPTION true
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
