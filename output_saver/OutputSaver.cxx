@@ -52,8 +52,8 @@ namespace Verdandi
         /*** Save options ***/
 
         configuration_stream.set_prefix("save/");
-        configuration_stream.put("Output_directory", output_directory_);
-        configuration_stream.put("Period_save", period_save_);
+        configuration_stream.set("Output_directory", output_directory_);
+        configuration_stream.set("Period_save", period_save_);
 
         /*** Initializations ***/
 

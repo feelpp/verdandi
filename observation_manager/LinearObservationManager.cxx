@@ -99,22 +99,22 @@ namespace Verdandi
         Ny_model_ = model.GetNy();
 
         configuration_stream.set_prefix("observation/");
-        configuration_stream.put("File", observation_file_);
-        configuration_stream.put("Period_observation",  "> 0",
-                                 period_observation_);
-        configuration_stream.put("Nskip", "> 0", Nskip_);
+        configuration_stream.set("File", observation_file_);
+        configuration_stream.set("Period_observation",
+                                 period_observation_,  "> 0");
+        configuration_stream.set("Nskip", Nskip_, "> 0");
 
-        configuration_stream.put("error/Variance", "> 0", error_variance_);
-        configuration_stream.put("error/Sparse", error_sparse_);
-        configuration_stream.put("error/Matrix_availability",
+        configuration_stream.set("error/Variance", error_variance_, "> 0");
+        configuration_stream.set("error/Sparse", error_sparse_);
+        configuration_stream.set("error/Matrix_availability",
                                  error_matrix_availability_);
 
-        configuration_stream.put("operator/Sparse", operator_sparse_);
-        configuration_stream.put("operator/Definition", "'diagonal'| file'",
-                                 operator_definition_);
-        configuration_stream.put("operator/Diagonal_value",
+        configuration_stream.set("operator/Sparse", operator_sparse_);
+        configuration_stream.set("operator/Definition",
+                                 operator_definition_, "'diagonal'| 'file'");
+        configuration_stream.set("operator/Diagonal_value",
                                  operator_diagonal_value_);
-        configuration_stream.put("operator/File", operator_file_);
+        configuration_stream.set("operator/File", operator_file_);
 
         Nobservation_ = Nx_model_ * Ny_model_;
         observation_.Reallocate(Nobservation_);

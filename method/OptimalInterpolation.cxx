@@ -61,17 +61,17 @@ namespace Verdandi
 
         configuration_stream.set_prefix("display/");
         // Should iterations be displayed on screen?
-        configuration_stream.put("Show_iterations",
+        configuration_stream.set("Show_iterations",
                                  option_display_["show_iterations"]);
         // Should current date be displayed on screen?
-        configuration_stream.put("Show_date", option_display_["show_date"]);
+        configuration_stream.set("Show_date", option_display_["show_date"]);
 
         /*** Assimilation options ***/
 
         Nstate_ = model_.GetNstate();
 
         configuration_stream.set_prefix("data_assimilation/");
-        configuration_stream.put("Analyze_first_step", analyze_first_step_);
+        configuration_stream.set("Analyze_first_step", analyze_first_step_);
 
     }
 

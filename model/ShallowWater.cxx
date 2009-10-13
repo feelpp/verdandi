@@ -88,26 +88,26 @@ namespace Verdandi
 
         configuration_stream.set_prefix("domain/");
 
-        configuration_stream.put("x_min", x_min_);
-        configuration_stream.put("y_min", y_min_);
-        configuration_stream.put("Delta_x", Delta_x_);
-        configuration_stream.put("Delta_y", Delta_y_);
-        configuration_stream.put("Nx", Nx_);
-        configuration_stream.put("Ny", Ny_);
+        configuration_stream.set("x_min", x_min_);
+        configuration_stream.set("y_min", y_min_);
+        configuration_stream.set("Delta_x", Delta_x_);
+        configuration_stream.set("Delta_y", Delta_y_);
+        configuration_stream.set("Nx", Nx_);
+        configuration_stream.set("Ny", Ny_);
 
-        configuration_stream.put("Delta_t", Delta_t_);
-        configuration_stream.put("Nt", Nt_);
+        configuration_stream.set("Delta_t", Delta_t_);
+        configuration_stream.set("Nt", Nt_);
 
         // Departure from the uniform initial condition.
         configuration_stream.set_prefix("initial_condition/");
-        configuration_stream.put("Value", value_);
+        configuration_stream.set("Value", value_);
 
         // Perturbations.
         configuration_stream.set_prefix("model_error/");
-        configuration_stream.put("Standard_deviation_bc", ">= 0",
-                                 model_error_std_bc_);
-        configuration_stream.put("Standard_deviation_ic", ">= 0",
-                                 model_error_std_ic_);
+        configuration_stream.set("Standard_deviation_bc",
+                                 model_error_std_bc_, ">= 0");
+        configuration_stream.set("Standard_deviation_ic",
+                                 model_error_std_ic_, ">= 0");
 
         if (value_ - 2. * model_error_std_ic_ <= T(0))
             throw "The model standard-deviation of "
@@ -115,7 +115,7 @@ namespace Verdandi
                 + " for initial conditions is too high to avoid negative "
                 + "water heights.";
 
-        configuration_stream.put("Random_seed", seed_);
+        configuration_stream.set("Random_seed", seed_);
 
         if (is_num(seed_) && urng_ == 0)
         {
@@ -145,22 +145,22 @@ namespace Verdandi
         // Error statistics.
         configuration_stream.set_prefix("error_statistics/");
 
-        configuration_stream.put("Background_error_variance", ">= 0",
-                                 background_error_variance_value_);
-        configuration_stream.put("Background_error_scale", "> 0",
-                                 Balgovind_scale_background_);
-        configuration_stream.put("Error_sparse", error_sparse_);
+        configuration_stream.set("Background_error_variance",
+                                 background_error_variance_value_, ">= 0");
+        configuration_stream.set("Background_error_scale",
+                                 Balgovind_scale_background_, "> 0");
+        configuration_stream.set("Error_sparse", error_sparse_);
         if (error_sparse_)
             background_error_variance_
                 .Initialize(Nx_ * Ny_, background_error_variance_value_);
 
-        configuration_stream.put("Error_dense_diagonal",
+        configuration_stream.set("Error_dense_diagonal",
                                  error_dense_diagonal_);
 
-        configuration_stream.put("Model_error_variance", ">= 0",
-                                 model_error_variance_);
-        configuration_stream.put("Model_error_scale", "> 0",
-                                 Balgovind_scale_model_);
+        configuration_stream.set("Model_error_variance",
+                                 model_error_variance_, ">= 0");
+        configuration_stream.set("Model_error_scale",
+                                 Balgovind_scale_model_, "> 0");
 
         // Description of boundary conditions.
         ReadConfigurationBoundaryCondition("Left", configuration_stream,
@@ -196,14 +196,14 @@ namespace Verdandi
 
         configuration_stream.set_prefix("data_assimilation/");
 
-        configuration_stream.put("Nt_assimilation", Nt_assimilation_);
+        configuration_stream.set("Nt_assimilation", Nt_assimilation_);
 
         Nt_prediction_ = Nt_ - Nt_assimilation_;
         if (Nt_prediction_ < 0)
             throw string("Error: the assimilation window is longer")
                 + " than the simulation period.";
 
-        configuration_stream.put("With_positivity_requirement",
+        configuration_stream.set("With_positivity_requirement",
                                  with_positivity_requirement_);
 
 
@@ -219,7 +219,7 @@ namespace Verdandi
         value_ += max(-2., min(2., normal_.Next())) * model_error_std_ic_;
         configuration_stream.set_prefix("initial_condition/");
         bool source;
-        configuration_stream.put("Center", source);
+        configuration_stream.set("Center", source);
         if (source)
         {
             int center_x = (Nx_ - 1) / 2;
@@ -234,7 +234,7 @@ namespace Verdandi
         u_.Fill(0.);
         v_.Fill(0.);
 
-        configuration_stream.put("Left", source);
+        configuration_stream.set("Left", source);
         if (source)
         {
             int position_x = Nx_ / 10;
@@ -789,7 +789,7 @@ namespace Verdandi
     {
         configuration_stream.set_prefix("boundary_condition/");
         string description;
-        configuration_stream.put(side, description);
+        configuration_stream.set(side, description);
         if (description == "free")
         {
             type = 0;

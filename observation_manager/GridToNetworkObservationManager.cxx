@@ -103,16 +103,16 @@ namespace Verdandi
 
 
         configuration_stream.set_prefix("observation/");
-        configuration_stream.put("File", observation_file_);
-        configuration_stream.put("Period_observation", "> 0",
-                                 period_observation_);
-        configuration_stream.put("Nskip", "> 0", Nskip_);
-        configuration_stream.put("error/Variance", "> 0", error_variance_);
+        configuration_stream.set("File", observation_file_);
+        configuration_stream.set("Period_observation",
+                                 period_observation_, "> 0");
+        configuration_stream.set("Nskip", Nskip_, "> 0");
+        configuration_stream.set("error/Variance", error_variance_, "> 0");
 
         configuration_stream.set_prefix("observation/location/");
 
         string observation_location;
-        configuration_stream.put("Observation_location",
+        configuration_stream.set("Observation_location",
                                  observation_location);
         vector<string> observation_location_vector
             = split(observation_location);
