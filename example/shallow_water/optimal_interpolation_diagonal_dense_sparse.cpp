@@ -18,7 +18,7 @@ using namespace Verdandi;
 #include "LinearObservationManager.cxx"
 #include "ShallowWater.cxx"
 #include "OutputSaver.cxx"
-#include "newran.h"
+#include "newran/newran.h"
 
 int main(int argc, char** argv)
 {
