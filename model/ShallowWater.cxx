@@ -253,7 +253,7 @@ namespace Verdandi
         vf_x_.Reallocate(Nx_ + 1, Ny_);
         vf_y_.Reallocate(Nx_, Ny_ + 1);
 
-        error_covariance_vector_.Reallocate(Nx_ * Ny_);
+        error_covariance_row_.Reallocate(Nx_ * Ny_);
 
         data_to_save_ = true;
     }
@@ -632,30 +632,30 @@ namespace Verdandi
     //! Computes a row of the background error covariance matrix B.
     /*!
       \param[in] row row index.
-      \param[out] error_covariance_vector the value of row number \a row.
+      \param[out] error_covariance_row the value of row number \a row.
     */
     template <class T>
     void ShallowWater<T>
-    ::GetBackgroundErrorCovarianceRow(int row, error_covariance_vector&
-                                      error_covariance_vector)
+    ::GetBackgroundErrorCovarianceRow(int row, error_covariance_row&
+                                      error_covariance_row)
     {
         if (error_sparse_)
-            background_error_variance_.GetRow(row, error_covariance_vector);
+            background_error_variance_.GetRow(row, error_covariance_row);
 
         else
         {
             if (error_dense_diagonal_)
             {
-                error_covariance_vector.Reallocate(Nx_ * Ny_);
-                error_covariance_vector.Zero();
-                error_covariance_vector(row)
+                error_covariance_row.Reallocate(Nx_ * Ny_);
+                error_covariance_row.Zero();
+                error_covariance_row(row)
                     = background_error_variance_value_;
             }
             else
             {
                 // The row has already been computed.
                 if (row == current_row_)
-                    error_covariance_vector = error_covariance_vector_;
+                    error_covariance_row = error_covariance_row_;
                 else
                 {
                     int i, j;
@@ -677,11 +677,11 @@ namespace Verdandi
                             distance = sqrt(distance_x * distance_x
                                             + distance_y * distance_y)
                                 / Balgovind_scale_background_;
-                            error_covariance_vector_(position++)
+                            error_covariance_row_(position++)
                                 = background_error_variance_value_
                                 * (1. + distance) * exp(-distance);
                         }
-                    error_covariance_vector = error_covariance_vector_;
+                    error_covariance_row = error_covariance_row_;
                 }
             }
         }

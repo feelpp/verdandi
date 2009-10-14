@@ -104,7 +104,8 @@ namespace Verdandi
                                  period_observation_,  "> 0");
         configuration_stream.set("Nskip", Nskip_, "> 0");
 
-        configuration_stream.set("error/Variance", error_variance_, "> 0");
+        configuration_stream.set("error/Variance", error_variance_value_,
+                                 "> 0");
         configuration_stream.set("error/Sparse", error_sparse_);
         configuration_stream.set("error/Matrix_availability",
                                  error_matrix_availability_);
@@ -126,8 +127,7 @@ namespace Verdandi
                 .Initialize(Nobservation_, operator_diagonal_value_);
 
         if (error_sparse_)
-            observation_error_variance_.Initialize(Nobservation_,
-						   error_variance_);
+            error_variance_.Initialize(Nobservation_, error_variance_value_);
 
         if (strcmp(operator_definition_.c_str(), "file") == 0)
         {
@@ -345,7 +345,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetTangentOperatorRow(int row, tangent_operator_vector&
+    ::GetTangentOperatorRow(int row, tangent_operator_row&
                             tangent_operator_row) const
     {
         if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
@@ -467,7 +467,7 @@ namespace Verdandi
     ::GetObservationErrorCovariance(int i, int j) const
     {
         if (i == j)
-            return error_variance_;
+            return error_variance_value_;
         else
             return T(0);
     }
@@ -479,11 +479,11 @@ namespace Verdandi
     */
     template <class T>
     const typename LinearObservationManager<T>
-    ::observation_error_variance& LinearObservationManager<T>
+    ::error_variance& LinearObservationManager<T>
     ::GetObservationErrorVariance() const
     {
         if (error_matrix_availability_)
-            return observation_error_variance_.GetMatrix();
+            return error_variance_.GetMatrix();
         else
             throw ErrorUndefined("LinearObservationManager"
                                  "::GetObservationErrorVariance()");

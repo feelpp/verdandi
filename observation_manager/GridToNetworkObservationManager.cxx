@@ -107,7 +107,8 @@ namespace Verdandi
         configuration_stream.set("Period_observation",
                                  period_observation_, "> 0");
         configuration_stream.set("Nskip", Nskip_, "> 0");
-        configuration_stream.set("error/Variance", error_variance_, "> 0");
+        configuration_stream.set("error/Variance", error_variance_value_,
+                                 "> 0");
 
         configuration_stream.set_prefix("observation/location/");
 
@@ -387,7 +388,7 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetTangentOperatorRow(int row, tangent_operator_vector&
+    ::GetTangentOperatorRow(int row, tangent_operator_row&
                             tangent_operator_row) const
     {
         for (int i = 0; i < tangent_operator_row.GetLength(); i++)
@@ -489,7 +490,7 @@ namespace Verdandi
     ::GetObservationErrorCovariance(int i, int j) const
     {
         if (i == j)
-            return error_variance_;
+            return error_variance_value_;
         else
             return T(0);
     }
@@ -501,7 +502,7 @@ namespace Verdandi
     */
     template <class T>
     const typename
-    GridToNetworkObservationManager<T>::observation_error_variance&
+    GridToNetworkObservationManager<T>::error_variance&
     GridToNetworkObservationManager<T>
     ::GetObservationErrorVariance() const
     {

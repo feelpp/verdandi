@@ -34,13 +34,13 @@ namespace Verdandi
     {
 
     public:
-        typedef typename ClassModel::error_covariance_vector
+        typedef typename ClassModel::error_covariance_row
         background_error_covariance_vector;
         typedef typename ClassModel::state_vector state_vector;
         typedef typename ClassModel::crossed_matrix crossed_matrix;
         typedef typename ClassObservationManager
         ::tangent_operator_sparse_matrix tangent_operator_sparse_matrix;
-        typedef typename ClassObservationManager::tangent_operator_vector
+        typedef typename ClassObservationManager::tangent_operator_row
         tangent_operator_vector;
 
     protected:

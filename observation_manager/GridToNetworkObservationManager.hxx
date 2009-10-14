@@ -42,8 +42,8 @@ namespace Verdandi
     {
     public:
         typedef Matrix<T, General, RowSparse> tangent_operator_sparse_matrix;
-        typedef Matrix<T, General, RowSparse> observation_error_variance;
-        typedef Vector<T> tangent_operator_vector;
+        typedef Matrix<T, General, RowSparse> error_variance;
+        typedef Vector<T> tangent_operator_row;
 
     protected:
 
@@ -86,7 +86,7 @@ namespace Verdandi
         bool availability_;
 
         //! Observation error variance.
-        T error_variance_;
+        T error_variance_value_;
         //! Is the observation error covariance matrix sparse?
         bool error_sparse_;
         //! Is the observation error covariance available in a matrix?
@@ -133,7 +133,7 @@ namespace Verdandi
         template <class state_vector>
         void ApplyTangentOperator(const state_vector& x, Vector<T>& y) const;
         T GetTangentOperator(int i, int j) const;
-        void GetTangentOperatorRow(int row, tangent_operator_vector&
+        void GetTangentOperatorRow(int row, tangent_operator_row&
                                    tangent_operator_row) const;
         const tangent_operator_sparse_matrix& GetTangentOperatorMatrix()
             const;
@@ -149,8 +149,7 @@ namespace Verdandi
         void GetBLUECorrection(Vector<T>& BLUE_correction) const;
 
         T GetObservationErrorCovariance(int i, int j) const;
-        const observation_error_variance&
-        GetObservationErrorVariance() const;
+        const error_variance& GetObservationErrorVariance() const;
     };
 
 

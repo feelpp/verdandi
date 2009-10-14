@@ -48,7 +48,7 @@ namespace Verdandi
         typedef T& reference;
         typedef const T& const_reference;
         typedef Matrix<T, General, RowSparse> background_error_variance;
-        typedef Vector<T> error_covariance_vector;
+        typedef Vector<T> error_covariance_row;
         typedef Vector<T> state_vector;
         typedef Matrix<T, General, RowSparse> crossed_matrix;
 
@@ -177,8 +177,8 @@ namespace Verdandi
         int current_row_;
         //! Number of the column of Q currently stored.
         int current_column_;
-        //! Value of the row of B or of the column of Q currently stored.
-        error_covariance_vector error_covariance_vector_;
+        //! Value of the row of B currently stored.
+        error_covariance_row error_covariance_row_;
 
         /*** Experiment settings ***/
 
@@ -228,8 +228,8 @@ namespace Verdandi
         void GetFullState(state_vector& state) const;
         void SetFullState(const state_vector& state);
         void GetBackgroundErrorCovarianceRow(int row,
-                                             error_covariance_vector&
-                                             error_covariance_vector);
+                                             error_covariance_row&
+                                             error_covariance_row);
         const background_error_variance&
         GetBackgroundErrorVarianceMatrix() const;
         bool IsErrorSparse() const;
