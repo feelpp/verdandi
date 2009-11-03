@@ -19,9 +19,16 @@
 
 #ifndef VERDANDI_FILE_CLAMPEDBAR_HXX
 
+
+#include "seldon/SeldonSolver.hxx"
+
+#include "OutputSaver.cxx"
+
+
+
+
 namespace Verdandi
 {
-
 
     //////////////////////
     // CLAMPEDBAR MODEL //
@@ -66,6 +73,7 @@ namespace Verdandi
         //! Young's Modulus.
         double Young_modulus_;
 
+
         //! FEM Vector
         Vector<T> disp_0_;
         Vector<T> velo_0_;
@@ -77,10 +85,26 @@ namespace Verdandi
         Matrix<T, General, RowMajor> Mass_matrix_el_;
         //! Stiffness FEM matrix.
         Matrix<T, General, RowMajor> Stiff_matrix_el_;
+
         //! Newmark Global FEM matrix
-        Matrix<T, General, RowSparse> Mass_matrix_;
-        Matrix<T, General, RowSparse> Newmark_matrix_0_;
-        Matrix<T, General, RowSparse> Newmark_matrix_1_;
+        Matrix<T, Symmetric, RowSymSparse> Mass_matrix_;
+        Matrix<T, Symmetric, RowSymSparse> Newmark_matrix_0_;
+        Matrix<T, Symmetric, RowSymSparse> Newmark_matrix_1_;
+
+
+
+#if defined(SELDON_WITH_UMFPACK) && defined(VERDANDI_WITH_DIRECT_SOLVER)
+        MatrixUmfPack<T> mat_lu;
+#endif
+#if defined(SELDON_WITH_SUPERLU) && defined(VERDANDI_WITH_DIRECT_SOLVER)
+        MatrixSuperLU<T> mat_lu;
+#endif
+#if defined(SELDON_WITH_MUMPS) && defined(VERDANDI_WITH_DIRECT_SOLVER)
+        MatrixMumps<T> mat_lu;
+#endif
+
+
+
 
     public:
         // Constructor and destructor.
@@ -95,7 +119,7 @@ namespace Verdandi
         void Forward();
         bool HasFinished() const;
 
-    private:
+        string GetName() const;
 
 
     };
