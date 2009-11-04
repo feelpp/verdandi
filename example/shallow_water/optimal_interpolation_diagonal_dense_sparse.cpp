@@ -7,7 +7,6 @@
 #define SELDON_WITH_SUPERLU
 #define SELDON_DEBUG_LEVEL_4
 #define SELDON_WITH_ABORT
-#define GETPOT_ACTIVATE_EXCEPTION true
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
@@ -17,8 +16,7 @@ using namespace Verdandi;
 #include "OptimalInterpolation.cxx"
 #include "LinearObservationManager.cxx"
 #include "ShallowWater.cxx"
-#include "OutputSaver.cxx"
-#include "newran/newran.h"
+#include "newran.h"
 
 int main(int argc, char** argv)
 {
@@ -40,20 +38,15 @@ int main(int argc, char** argv)
 
     ClassOptimalInterpolation driver(argv[1]);
 
-    OutputSaver<real, ClassOptimalInterpolation> output_saver(argv[1],
-                                                              driver);
-
     driver.Initialize(argv[1]);
-    output_saver.Initialize(argv[1], driver);
 
     while (!driver.HasFinished())
     {
         driver.InitializeStep();
-        output_saver.InitializeStep();
+
         driver.Forward();
-        output_saver.Save(driver);
+
         driver.Analyze();
-        output_saver.Save(driver);
     }
 
     END;
