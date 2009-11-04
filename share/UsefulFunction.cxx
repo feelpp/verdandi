@@ -131,8 +131,8 @@ namespace Verdandi
     template <class T>
     void convert(const string& s, T& out)
     {
-	istringstream str(s);
-	str >> out;
+        istringstream str(s);
+        str >> out;
     }
 
 
@@ -143,7 +143,7 @@ namespace Verdandi
     */
     void convert(const string& s, string& out)
     {
-	out = s;
+        out = s;
     }
 
 
@@ -154,32 +154,32 @@ namespace Verdandi
     */
     bool is_num(const string& str)
     {
-	if (str == "")
-	    return false;
+        if (str == "")
+            return false;
 
-	bool mant, mant_a, mant_b, exp;
-	string::size_type pos;
-	string m, e, m_a, m_b;
+        bool mant, mant_a, mant_b, exp;
+        string::size_type pos;
+        string m, e, m_a, m_b;
 
-	pos = str.find_first_of("eE");
-	// Mantissa.
-	m = str.substr(0, pos);
-	// Exponent.
-	e = pos == string::npos ? "" : str.substr(pos + 1);
+        pos = str.find_first_of("eE");
+        // Mantissa.
+        m = str.substr(0, pos);
+        // Exponent.
+        e = pos == string::npos ? "" : str.substr(pos + 1);
 
-	exp = pos != string::npos;
+        exp = pos != string::npos;
 
-	pos = m.find_first_of(".");
-	// Mantissa in the form: [m_a].[m_b].
-	m_a = m.substr(0, pos);
-	// Exponent.
-	m_b = pos == string::npos ? "" : m.substr(pos + 1);
+        pos = m.find_first_of(".");
+        // Mantissa in the form: [m_a].[m_b].
+        m_a = m.substr(0, pos);
+        // Exponent.
+        m_b = pos == string::npos ? "" : m.substr(pos + 1);
 
-	mant = m != "" && m != "-" && m != "+";
-	mant_a = m_a != "" && m_a != "-" && m_a != "+";
-	mant_b = m_b != "";
+        mant = m != "" && m != "-" && m != "+";
+        mant_a = m_a != "" && m_a != "-" && m_a != "+";
+        mant_b = m_b != "";
 
-	return (mant
+        return (mant
                 && ((mant_a || mant_b)
                     && (!mant_a || is_integer(m_a))
                     && (!mant_b || is_unsigned_integer(m_b)))
@@ -194,19 +194,19 @@ namespace Verdandi
     */
     bool is_integer(const string& str)
     {
-	bool ans;
+        bool ans;
 
-	ans = (str.size() > 0 && isdigit(str[0]))
-	    || (str.size() > 1 && (str[0] == '+' || str[0] == '-'));
+        ans = (str.size() > 0 && isdigit(str[0]))
+            || (str.size() > 1 && (str[0] == '+' || str[0] == '-'));
 
-	unsigned int i(1);
-	while (i < str.size() && ans)
-	{
-	    ans = ans && isdigit(str[i]);
-	    i++;
-	}
+        unsigned int i(1);
+        while (i < str.size() && ans)
+        {
+            ans = ans && isdigit(str[i]);
+            i++;
+        }
 
-	return ans;
+        return ans;
     }
 
 
@@ -217,16 +217,16 @@ namespace Verdandi
     */
     bool is_unsigned_integer(const string& str)
     {
-	bool ans(str.size() > 0);
+        bool ans(str.size() > 0);
 
-	unsigned int i(0);
-	while (i < str.size() && ans)
-	{
-	    ans = ans && isdigit(str[i]);
-	    i++;
-	}
+        unsigned int i(0);
+        while (i < str.size() && ans)
+        {
+            ans = ans && isdigit(str[i]);
+            i++;
+        }
 
-	return ans;
+        return ans;
     }
 
 
@@ -239,13 +239,13 @@ namespace Verdandi
     */
     string trim(string str, string delimiters)
     {
-	string::size_type index_end = str.find_last_not_of(delimiters);
-	string::size_type index_beg = str.find_first_not_of(delimiters);
+        string::size_type index_end = str.find_last_not_of(delimiters);
+        string::size_type index_beg = str.find_first_not_of(delimiters);
 
-	if (index_beg == string::npos)
-	    return "";
+        if (index_beg == string::npos)
+            return "";
 
-	return str.substr(index_beg, index_end - index_beg + 1);
+        return str.substr(index_beg, index_end - index_beg + 1);
     }
 
 
@@ -260,21 +260,21 @@ namespace Verdandi
     template <class T>
     void split(string str, vector<T>& vect, string delimiters)
     {
-	vect.clear();
+        vect.clear();
 
-	T tmp;
-	string::size_type index_beg, index_end;
+        T tmp;
+        string::size_type index_beg, index_end;
 
-	index_beg = str.find_first_not_of(delimiters);
+        index_beg = str.find_first_not_of(delimiters);
 
-	while (index_beg != string::npos)
-	{
-	    index_end = str.find_first_of(delimiters, index_beg);
-	    convert(str.substr(index_beg, index_end == string::npos ?
-			       string::npos : (index_end - index_beg)), tmp);
-	    vect.push_back(tmp);
-	    index_beg = str.find_first_not_of(delimiters, index_end);
-	}
+        while (index_beg != string::npos)
+        {
+            index_end = str.find_first_of(delimiters, index_beg);
+            convert(str.substr(index_beg, index_end == string::npos ?
+                               string::npos : (index_end - index_beg)), tmp);
+            vect.push_back(tmp);
+            index_beg = str.find_first_not_of(delimiters, index_end);
+        }
     }
 
 
@@ -287,9 +287,9 @@ namespace Verdandi
     */
     vector<string> split(string str, string delimiters)
     {
-	vector<string> vect;
-	split(str, vect, delimiters);
-	return vect;
+        vector<string> vect;
+        split(str, vect, delimiters);
+        return vect;
     }
 
 
