@@ -19,6 +19,9 @@
 
 #ifndef VERDANDI_FILE_SHARE_USEFULFUNCTION_HXX
 
+#include <sstream>
+#include <string>
+#include <iostream>
 
 namespace Verdandi
 {
@@ -41,6 +44,12 @@ namespace Verdandi
     template <class T>
     void split(string str, vector<T>& vect, string delimiters = " \n\t");
     vector<string> split(string str, string delimiters = " \n\t");
+    string find_replace(string str, string old_str, string new_str);
+    template<class T>
+    bool is_equal(T x, T y, T epsilon = 1.e-6);
+    template<class T>
+    bool is_multiple(T x, T d, T epsilon = 1.e-6);
+    string upper_case(string str);
 
 
 } // namespace Verdandi.

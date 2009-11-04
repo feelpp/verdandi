@@ -293,6 +293,72 @@ namespace Verdandi
     }
 
 
+    //! Finds and replace a substring.
+    /*!
+      \param str base string.
+      \param old_str substring to be replaced.
+      \param new_str substring to be put in place of 'old_str'.
+      \return 'str' where 'old_str' was replaced by 'new'str'.
+    */
+    string find_replace(string str, string old_str, string new_str)
+    {
+        string::size_type index = str.find(old_str);
+
+        while (index != string::npos)
+        {
+            str.replace(index, old_str.size(), new_str);
+            index = str.find(old_str, index + new_str.size());
+        }
+
+        return str;
+    }
+
+
+    //! Checks equality with a tolerance interval of epsilon.
+    /*!
+      \param x first number.
+      \param y second number.
+      \param epsilon relative tolerance.
+      \return True if \a x equals \a y with a relative tolerance of \a
+      epsilon.
+    */
+    template<class T>
+    bool is_equal(T x, T y, T epsilon = 1.e-6)
+    {
+        return abs(x - y) <=  0.5 * epsilon * (abs(x) + abs(y));
+    }
+
+
+    //! Checks whether a number is multiple of another, with given tolerance.
+    /*!
+      \param x possible multiple.
+      \param d base number.
+      \param epsilon relative tolerance.
+      \return True if \a x is a multiple of \a d with a relative tolerance of
+      epsilon.
+    */
+    template<class T>
+    bool is_multiple(T x, T d, T epsilon = 1.e-6)
+    {
+        int i = int(x / d + .5);
+        return is_equal(x, T(i) * d, epsilon);
+    }
+
+
+    //! Converts a string to upper-case string.
+    /*!
+      \param str string to be converted.
+      \return \a str in upper case.
+    */
+    string upper_case(string str)
+    {
+        string upper(str);
+        std::transform(upper.begin(), upper.end(), upper.begin(),
+                       (int(*)(int))toupper);
+        return upper;
+    }
+
+
 } // namespace Verdandi.
 
 
