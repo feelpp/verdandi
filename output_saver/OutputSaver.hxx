@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2009 INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Author(s): Marc Fragu, Vivien Mallet
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -17,7 +17,14 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_OUTPUTSAVER_HXX
+#ifndef VERDANDI_FILE_OUTPUTSAVER_OUTPUTSAVER_HXX
+
+
+#include "Variable.cxx"
+
+#include <iostream>
+#include <fstream>
+#include <string>
 
 
 namespace Verdandi
@@ -29,44 +36,69 @@ namespace Verdandi
     /////////////////
 
 
-    template <class T, class ClassAssimilationDriver>
+
     class OutputSaver
     {
 
-    protected:
+    private:
 
-        /*** Main components ***/
+        //! Time interval between two saves.
+        double save_period_;
+        //! Tolerance on the time interval.
+        double time_tolerance_;
 
-        //! Output directory.
-        string output_directory_;
-        //! Number of time steps between two saves.
-        int period_save_;
-        //! Output ofstream for h.
-        ofstream h_stream_;
-        //! Output ofstream for h after assimilation.
-        ofstream h_assimilation_stream_;
-        //! Output ofstream for u.
-        ofstream u_stream_;
-        //! Output ofstream for v.
-        ofstream v_stream_;
+        //! Default mode.
+        string mode_;
+
+        //! Default mode for scalar variables.
+        string mode_scalar_;
+
+        //! Stores the variables properties.
+        map<string, Variable> variable_list_;
 
     public:
 
         /*** Constructors and destructor ***/
 
         OutputSaver();
-        OutputSaver(string configuration_file,
-                    ClassAssimilationDriver& driver);
+        OutputSaver(string configuration_file, string method_name);
         ~OutputSaver();
+
+        string GetName() const;
 
         /*** Methods ***/
 
-        void Initialize(string configuration_file,
-                        ClassAssimilationDriver& driver);
+        template <class S>
+        void Save(const S& x, double time, string variable_name);
 
-        void InitializeStep();
+        template <class S>
+        void Save(const S& x, string variable_name);
 
-        void Save(ClassAssimilationDriver& driver);
+        template <class S>
+        void WriteText(const S& x, string file_name) const;
+
+        template <class S>
+        void WriteBinary(const S& x, string file_name) const;
+
+        template <class T, class Prop, class Allocator>
+        void WriteBinary(const Matrix<T, Prop, RowSparse, Allocator>& x,
+                         string file_name) const;
+
+        template <class T, class Prop, class Allocator>
+        void WriteBinary(const Matrix<T, Prop, ColSparse, Allocator>& x,
+                         string file_name) const;
+
+        void DisplayVariableList() const;
+
+    private:
+
+        void SetVariable(GetPot configuration_stream,
+                         string generic_path,
+                         string default_mode,
+                         string variable_name);
+        template <class S>
+        void SetVariable(Variable& variable);
+        void SetVariableFile(Variable& variable);
 
     };
 
@@ -74,5 +106,6 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_OUTPUTSAVER_HXX
+#define VERDANDI_FILE_OUTPUTSAVER_OUTPUTSAVER_HXX
 #endif
+

@@ -1,0 +1,127 @@
+// Copyright (C) 2008-2009 INRIA
+// Author(s): Marc Fragu
+//
+// This file is part of the data assimilation library Verdandi.
+//
+// Verdandi is free software; you can redistribute it and/or modify it under
+// the terms of the GNU Lesser General Public License as published by the Free
+// Software Foundation; either version 2.1 of the License, or (at your option)
+// any later version.
+//
+// Verdandi is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+// more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with Verdandi. If not, see http://www.gnu.org/licenses/.
+
+
+#ifndef VERDANDI_FILE_OUTPUTSAVER_VARIABLE_CXX
+
+
+#include "Variable.hxx"
+
+
+namespace Verdandi
+{
+
+
+    //////////////////////////////////////
+    // CONSTRUCTORS AND DESTRUCTOR //
+    /////////////////////////////////////
+
+
+    //! Default constructor.
+    Variable::Variable()
+    {
+    }
+
+
+    //! Main constructor.
+    /*!
+      \param string mode saving format (e.g., "binary", "text").
+      \param string file path to the output file.
+    */
+    Variable::Variable(string mode, string file):
+        mode_(mode), file_(file)
+    {
+    }
+
+
+    //! Copy constructor.
+    /*!
+      \param variable instance to be copied.
+    */
+    Variable::Variable(const Variable& variable)
+    {
+        mode_ = variable.GetMode();
+        file_ = variable.GetFile();
+    }
+
+
+    //! Destructor.
+    Variable::~Variable()
+    {
+    }
+
+
+    ///////////////////
+    // ACCESS METHOD //
+    ///////////////////
+
+
+    //! Mode accessor.
+    /*! Sets the saving mode.
+      \param mode saving format (e.g., "binary", "text").
+    */
+    void Variable::SetMode (string mode)
+    {
+        mode_ = mode;
+    }
+
+
+    //! Filename accessor.
+    /*! Sets the path to the output file.
+      \param file path to the output file.
+    */
+    void Variable::SetFile(string file)
+    {
+        file_ = file;
+    }
+
+
+    //! Mode accessor.
+    /*! Returns the saving mode.
+      \return The saving format.
+    */
+    string Variable::GetMode() const
+    {
+        return mode_;
+    }
+
+
+    //! File accessor.
+    /*! Returns the path to the output file.
+      \return The path to the output file.
+    */
+    string Variable::GetFile() const
+    {
+        return file_;
+    }
+
+
+    //! Displays on screen the saving mode and the output filename.
+    void Variable::Display() const
+    {
+        cout << "Mode: " << mode_ << "\n";
+        cout << "File: " << file_ << endl;
+    }
+
+
+}
+
+
+#define VERDANDI_FILE_OUTPUTSAVER_VARIABLE_CXX
+#endif
+

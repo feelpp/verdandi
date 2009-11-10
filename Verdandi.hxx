@@ -30,6 +30,8 @@
 #include "share/Error.cxx"
 #include "share/UsefulFunction.cxx"
 
+#include "output_saver/OutputSaver.cxx"
+
 
 #define VERDANDI_FILE_VERDANDI_HXX
 #endif
