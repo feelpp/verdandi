@@ -39,7 +39,7 @@ namespace Verdandi
         typedef typename ClassModel::state_vector state_vector;
         typedef typename ClassModel::crossed_matrix crossed_matrix;
         typedef typename ClassObservationManager
-        ::tangent_operator_sparse_matrix tangent_operator_sparse_matrix;
+        ::tangent_operator_matrix tangent_operator_matrix;
         typedef typename ClassObservationManager::tangent_operator_row
         tangent_operator_vector;
 

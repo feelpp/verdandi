@@ -158,7 +158,7 @@ namespace Verdandi
     }
 
 
-    //! Computes the analyze.
+    //! Computes the analysis.
     /*! To be called after the Forward method. Whenever observations are
       available, it assimilates them using optimal interpolation.
     */
@@ -197,7 +197,9 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE(state_vector& state_vector)
+    ::ComputeBLUE(typename
+                  OptimalInterpolation<T, ClassModel, ClassObservationManager>
+                  ::state_vector& state_vector)
     {
         // B, R and H are sparse.
         if (model_.IsErrorSparse() and observation_manager_.IsErrorSparse()
@@ -237,7 +239,9 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUEDense(state_vector& state_vector)
+    ::ComputeBLUEDense(
+        typename OptimalInterpolation<T, ClassModel, ClassObservationManager>
+        ::state_vector& state_vector)
     {
         int r, c;
 
@@ -322,15 +326,17 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUESparse(state_vector& state_vector)
+    ::ComputeBLUESparse(
+        typename OptimalInterpolation<T, ClassModel, ClassObservationManager>
+        ::state_vector& state_vector)
     {
         // Number of observations at current date.
         Nobservation_ = observation_manager_.GetNobservation();
 
         // Temporary matrix and vector.
         crossed_matrix working_matrix_so(Nstate_, Nobservation_);
-        tangent_operator_sparse_matrix working_matrix_oo(Nobservation_,
-                                                         Nobservation_);
+        tangent_operator_matrix working_matrix_oo(Nobservation_,
+                                                  Nobservation_);
 
         // Computes BH'.
         MltAdd(T(1), SeldonNoTrans,

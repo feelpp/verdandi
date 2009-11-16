@@ -388,8 +388,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetTangentOperatorRow(int row, tangent_operator_row&
-                            tangent_operator_row) const
+    ::GetTangentOperatorRow(int row, GridToNetworkObservationManager<T>
+                            ::tangent_operator_row& tangent_operator_row)
+        const
     {
         for (int i = 0; i < tangent_operator_row.GetLength(); i++)
             tangent_operator_row(i) = GetTangentOperator(row, i);
@@ -402,7 +403,7 @@ namespace Verdandi
     */
     template <class T>
     const typename
-    GridToNetworkObservationManager<T>::tangent_operator_sparse_matrix&
+    GridToNetworkObservationManager<T>::tangent_operator_matrix&
     GridToNetworkObservationManager<T>
     ::GetTangentOperatorMatrix() const
     {

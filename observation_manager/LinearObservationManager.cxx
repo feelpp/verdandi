@@ -345,8 +345,9 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetTangentOperatorRow(int row, tangent_operator_row&
-                            tangent_operator_row) const
+    ::GetTangentOperatorRow(int row, typename LinearObservationManager<T>
+                            ::tangent_operator_row& tangent_operator_row)
+        const
     {
         if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
         {
@@ -378,12 +379,12 @@ namespace Verdandi
     */
     template <class T>
     const typename LinearObservationManager<T>
-    ::tangent_operator_sparse_matrix& LinearObservationManager<T>
+    ::tangent_operator_matrix& LinearObservationManager<T>
     ::GetTangentOperatorMatrix() const
     {
         if (strcmp(operator_definition_.c_str(), "diagonal") == 0 and
             operator_sparse_)
-            return tangent_operator_sparse_matrix_.GetMatrix();
+            return tangent_operator_matrix_.GetMatrix();
 
         // Dense operator or operator defined in a file.
         else

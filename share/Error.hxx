@@ -102,7 +102,7 @@ namespace Verdandi
     };
 
 
-}
+} // namespace Verdandi.
 
 
 #define VERDANDI_FILE_SHARE_ERROR_HXX

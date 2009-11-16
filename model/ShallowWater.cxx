@@ -419,7 +419,8 @@ namespace Verdandi
       \param[in] state state vector.
     */
     template <class T>
-    void ShallowWater<T>::StepBack(const state_vector& state)
+    void ShallowWater<T>::StepBack(const typename ShallowWater<T>
+                                   ::state_vector& state)
     {
         time_step_--;
         SetFullState(state);
@@ -564,7 +565,8 @@ namespace Verdandi
       \param[out] state the reduced state vector.
     */
     template <class T>
-    void ShallowWater<T>::GetState(state_vector& state) const
+    void ShallowWater<T>::GetState(typename ShallowWater<T>
+                                   ::state_vector& state) const
     {
         int position = 0;
         state.Reallocate(Nx_ * Ny_);
@@ -580,7 +582,8 @@ namespace Verdandi
       \param[in] state the reduced state vector.
     */
     template <class T>
-    void ShallowWater<T>::SetState(state_vector& state)
+    void ShallowWater<T>::SetState(typename ShallowWater<T>
+                                   ::state_vector& state)
     {
         // Positivity requirement.
         if (with_positivity_requirement_)
@@ -600,7 +603,8 @@ namespace Verdandi
       \param[out] state the full state vector.
     */
     template <class T>
-    void ShallowWater<T>::GetFullState(state_vector& state) const
+    void ShallowWater<T>::GetFullState(typename ShallowWater<T>
+                                       ::state_vector& state) const
     {
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
@@ -617,7 +621,8 @@ namespace Verdandi
       \param[in] state the full state vector.
     */
     template <class T>
-    void ShallowWater<T>::SetFullState(const state_vector& state)
+    void ShallowWater<T>::SetFullState(const typename ShallowWater<T>
+                                       ::state_vector& state)
     {
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)

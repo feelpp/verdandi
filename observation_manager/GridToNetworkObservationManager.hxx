@@ -41,7 +41,7 @@ namespace Verdandi
     class GridToNetworkObservationManager
     {
     public:
-        typedef Matrix<T, General, RowSparse> tangent_operator_sparse_matrix;
+        typedef Matrix<T, General, RowSparse> tangent_operator_matrix;
         typedef Matrix<T, General, RowSparse> error_variance;
         typedef Vector<T> tangent_operator_row;
 
@@ -135,7 +135,7 @@ namespace Verdandi
         T GetTangentOperator(int i, int j) const;
         void GetTangentOperatorRow(int row, tangent_operator_row&
                                    tangent_operator_row) const;
-        const tangent_operator_sparse_matrix& GetTangentOperatorMatrix()
+        const tangent_operator_matrix& GetTangentOperatorMatrix()
             const;
 
         template <class state_vector>
