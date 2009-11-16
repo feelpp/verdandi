@@ -31,6 +31,7 @@ namespace Verdandi
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <list>
 
 #include "seldon/SeldonHeader.hxx"
 #include "getpot/GetPot.hpp"
@@ -53,6 +54,7 @@ namespace Verdandi
 
 #include "share/Error.hxx"
 #include "share/UsefulFunction.hxx"
+#include "share/MessageHandler.hxx"
 
 #include "output_saver/OutputSaver.hxx"
 

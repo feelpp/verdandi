@@ -29,6 +29,7 @@
 
 #include "share/Error.cxx"
 #include "share/UsefulFunction.cxx"
+#include "share/MessageHandler.cxx"
 
 #include "output_saver/OutputSaver.cxx"
 
