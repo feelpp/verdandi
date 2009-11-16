@@ -359,6 +359,33 @@ namespace Verdandi
     }
 
 
+    //! Builds a diagonal sparse matrix.
+    /*!
+      \param[in] size number of lines (or columns).
+      \param[in] diagonal_value value on the diagonal of the matrix.
+      \param[out] matrix the initialized diagonal sparse matrix.
+    */
+    template <class T>
+    void build_diagonal_sparse_matrix(int size, T diagonal_value,
+                                      Matrix<T, General, RowSparse>& matrix)
+    {
+        Vector<int> column(size);
+        Vector<int> pointer(size + 1);
+        Vector<T> value(size);
+
+        value.Fill(diagonal_value);
+
+        for (int i = 0; i < size; i++)
+        {
+            column(i) = i;
+            pointer(i) = i;
+        }
+        pointer(size) = size;
+
+        matrix.SetData(size, size, value, pointer, column);
+    }
+
+
 } // namespace Verdandi.
 
 

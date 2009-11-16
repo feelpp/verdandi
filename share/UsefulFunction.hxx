@@ -51,6 +51,12 @@ namespace Verdandi
     bool is_multiple(T x, T d, T epsilon = 1.e-6);
     string upper_case(string str);
 
+    /*** Builds a diagonal sparse matrix ***/
+
+    template <class T>
+    void build_diagonal_sparse_matrix(int size, T diagonal_value,
+                                      Matrix<T, General, RowSparse>& matrix);
+
 
 } // namespace Verdandi.
 
