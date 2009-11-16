@@ -3,11 +3,14 @@ example:
 
 scons
 write_matrix
-model_forward configuration/river-truth.cfg
+forward configuration/river-truth.cfg
 optimal_interpolation_twin_experiment configuration/river.cfg
-optimal_interpolation_diagonal_dense_sparse configuration/river-diagonal-dense.cfg
+optimal_interpolation_diagonal_dense_sparse
+configuration/river-diagonal-dense.cfg (with #define VERDANDI_DENSE)
 optimal_interpolation_diagonal_dense_sparse configuration/river-sparse.cfg
-optimal_interpolation_diagonal_dense_sparse configuration/river-operator-from-file.cfg
+(with #define VERDANDI_SPARSE)
+optimal_interpolation_diagonal_dense_sparse
+configuration/river-operator-from-file.cfg (with #define VERDANDI_DENSE)
 
 
 To load the results, you can launch:
