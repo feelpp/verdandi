@@ -22,8 +22,6 @@
 
 #include "newran/newran.h"
 
-#include "DiagonalSparseMatrix.hxx"
-
 
 namespace Verdandi
 {

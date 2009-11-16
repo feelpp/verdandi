@@ -21,7 +21,6 @@
 
 
 #include "GridToNetworkObservationManager.hxx"
-#include "DiagonalSparseMatrix.cxx"
 
 
 namespace Verdandi

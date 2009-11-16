@@ -21,7 +21,6 @@
 
 
 #include "ShallowWater.hxx"
-#include "DiagonalSparseMatrix.cxx"
 
 
 namespace Verdandi

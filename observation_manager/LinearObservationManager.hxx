@@ -20,9 +20,6 @@
 #ifndef VERDANDI_FILE_LINEAROBSERVATIONMANAGER_HXX
 
 
-#include "DiagonalSparseMatrix.hxx"
-
-
 namespace Verdandi
 {
 
