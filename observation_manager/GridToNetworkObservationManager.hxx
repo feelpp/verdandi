@@ -79,18 +79,11 @@ namespace Verdandi
         //! Interpolation weights for active locations.
         Matrix<T> active_interpolation_weight_;
 
-        //! Is the observation operator available in a sparse matrix?
-        bool operator_sparse_;
-
         //! Availability of observations at current date.
         bool availability_;
 
         //! Observation error variance.
         T error_variance_value_;
-        //! Is the observation error covariance matrix sparse?
-        bool error_sparse_;
-        //! Is the observation error covariance available in a matrix?
-        bool error_matrix_availability_;
 
         /*** Model domain ***/
 

@@ -1,6 +1,7 @@
 // Program to test the equivalence between dense and sparse observation
-// operator. Use the identity observation operator to do so either dense or
-// sparse. Example to be called with river-sparse.cfg,
+// operator. To do so use the identity observation operator either dense or
+// sparse. Example to be called with 'VERDANDI_SPARSE' defined for
+// river-sparse.cfg and with 'VERDANDI_DENSE' defined for
 // river-diagonal-dense.cfg and river-operator-from-file.cfg.
 #define SELDON_WITH_CBLAS
 #define SELDON_WITH_LAPACK
@@ -8,6 +9,8 @@
 #define SELDON_DEBUG_LEVEL_4
 #define VERDANDI_WITH_ABORT
 #define GETPOT_ACTIVATE_EXCEPTION true
+//#define VERDANDI_DENSE
+#define VERDANDI_SPARSE
 
 #include "Verdandi.hxx"
 using namespace Verdandi;

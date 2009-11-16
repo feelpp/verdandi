@@ -40,8 +40,11 @@ namespace Verdandi
     class LinearObservationManager
     {
     public:
+#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+        typedef Matrix<T, General, RowSparse> tangent_operator_matrix;
+#else
         typedef Matrix<T> tangent_operator_matrix;
-        typedef Matrix<T, General, RowSparse> tangent_operator_sparse_matrix;
+#endif
         typedef Matrix<T, General, RowSparse> error_variance;
         typedef Vector<T> tangent_operator_row;
 
@@ -58,11 +61,6 @@ namespace Verdandi
 
         //! Tangent operator matrix (H).
         tangent_operator_matrix tangent_operator_matrix_;
-        DiagonalSparseMatrix<T> tangent_operator_sparse_matrix_;
-        //! Is the observation operator available in a dense matrix?
-        bool operator_dense_;
-        //! Is the observation operator available in a sparse matrix?
-        bool operator_sparse_;
         //! How is defined the observation operator?
         string operator_definition_;
         //! In case of a diagonal operator.
@@ -87,11 +85,7 @@ namespace Verdandi
         //! Observation error variance.
         T error_variance_value_;
         //! Observation error covariance matrix (R).
-        DiagonalSparseMatrix<T> error_variance_;
-        //! Is the observation error covariance matrix sparse?
-        bool error_sparse_;
-        //! Is the observation error covariance available in a matrix?
-        bool error_matrix_availability_;
+        error_variance error_variance_;
 
         /*** Model domain ***/
 
@@ -135,9 +129,7 @@ namespace Verdandi
         T GetTangentOperator(int i, int j) const;
         void GetTangentOperatorRow(int row, tangent_operator_row&
                                    tangent_operator_row) const;
-        const tangent_operator_sparse_matrix& GetTangentOperatorMatrix()
-            const;
-
+        const tangent_operator_matrix& GetTangentOperatorMatrix() const;
         template <class state_vector>
         void ApplyAdjointOperator(const state_vector& x, Vector<T>& y) const;
 

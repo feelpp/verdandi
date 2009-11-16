@@ -53,7 +53,7 @@ namespace Verdandi
     LinearObservationManager<T>
     ::LinearObservationManager(const Model& model,
                                string configuration_file):
-        operator_dense_(false), availability_(false)
+        availability_(false)
     {
         //   Initialize(model, configuration_file);
     }
@@ -106,11 +106,7 @@ namespace Verdandi
 
         configuration_stream.set("error/Variance", error_variance_value_,
                                  "> 0");
-        configuration_stream.set("error/Sparse", error_sparse_);
-        configuration_stream.set("error/Matrix_availability",
-                                 error_matrix_availability_);
 
-        configuration_stream.set("operator/Sparse", operator_sparse_);
         configuration_stream.set("operator/Definition",
                                  operator_definition_, "'diagonal'| 'file'");
         configuration_stream.set("operator/Diagonal_value",
@@ -122,18 +118,20 @@ namespace Verdandi
 
         /*** Building the matrices ***/
 
-        if (operator_sparse_)
-            tangent_operator_sparse_matrix_
-                .Initialize(Nobservation_, operator_diagonal_value_);
+#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+        build_diagonal_sparse_matrix(Nobservation_, operator_diagonal_value_,
+                                     tangent_operator_matrix_);
+#endif
 
-        if (error_sparse_)
-            error_variance_.Initialize(Nobservation_, error_variance_value_);
+#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        build_diagonal_sparse_matrix(Nobservation_, error_variance_value_,
+                                     error_variance_);
+#endif
 
+#ifdef VERDANDI_TANGENT_OPERATOR_DENSE
         if (strcmp(operator_definition_.c_str(), "file") == 0)
-        {
-            operator_dense_ = true;
             tangent_operator_matrix_.Read(operator_file_);
-        }
+#endif
     }
 
 
@@ -243,7 +241,11 @@ namespace Verdandi
     template <class T>
     bool LinearObservationManager<T>::IsOperatorSparse() const
     {
-        return operator_sparse_;
+#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+        return true;
+#else
+        return false;
+#endif
     }
 
 
@@ -255,7 +257,11 @@ namespace Verdandi
     template <class T>
     bool LinearObservationManager<T>::IsErrorSparse() const
     {
-        return error_sparse_;
+#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        return true;
+#else
+        return false;
+#endif
     }
 
 
@@ -268,7 +274,11 @@ namespace Verdandi
     template <class T>
     bool LinearObservationManager<T>::HasErrorMatrix() const
     {
-        return error_matrix_availability_;
+#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        return true;
+#else
+        return false;
+#endif
     }
 
 
@@ -382,12 +392,13 @@ namespace Verdandi
     ::tangent_operator_matrix& LinearObservationManager<T>
     ::GetTangentOperatorMatrix() const
     {
-        if (strcmp(operator_definition_.c_str(), "diagonal") == 0 and
-            operator_sparse_)
-            return tangent_operator_matrix_.GetMatrix();
+#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+            return tangent_operator_matrix_;
 
         // Dense operator or operator defined in a file.
         else
+#endif
             throw ErrorUndefined("LinearObservationManager"
                                  "::GetTangentOperatorMatrix()");
     }
@@ -483,11 +494,12 @@ namespace Verdandi
     ::error_variance& LinearObservationManager<T>
     ::GetObservationErrorVariance() const
     {
-        if (error_matrix_availability_)
-            return error_variance_.GetMatrix();
-        else
-            throw ErrorUndefined("LinearObservationManager"
-                                 "::GetObservationErrorVariance()");
+#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        return error_variance_;
+#else
+        throw ErrorUndefined("LinearObservationManager"
+                             "::GetObservationErrorVariance()");
+#endif
     }
 
 

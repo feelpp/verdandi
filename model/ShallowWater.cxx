@@ -149,13 +149,11 @@ namespace Verdandi
                                  background_error_variance_value_, ">= 0");
         configuration_stream.set("Background_error_scale",
                                  Balgovind_scale_background_, "> 0");
-        configuration_stream.set("Error_sparse", error_sparse_);
-        if (error_sparse_)
-            background_error_variance_
-                .Initialize(Nx_ * Ny_, background_error_variance_value_);
-
-        configuration_stream.set("Error_dense_diagonal",
-                                 error_dense_diagonal_);
+#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+        build_diagonal_sparse_matrix(Nx_ * Ny_,
+                                     background_error_variance_value_,
+                                     background_error_variance_);
+#endif
 
         configuration_stream.set("Model_error_variance",
                                  model_error_variance_, ">= 0");
@@ -644,19 +642,22 @@ namespace Verdandi
     ::GetBackgroundErrorCovarianceRow(int row, error_covariance_row&
                                       error_covariance_row)
     {
-        if (error_sparse_)
-            background_error_variance_.GetRow(row, error_covariance_row);
-
-        else
+#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
         {
-            if (error_dense_diagonal_)
+            error_covariance_row.Reallocate(Nx_ * Ny_);
+            error_covariance_row.Zero();
+            error_covariance_row(row) = background_error_variance_value_;
+        }
+# else
+        {
+#ifdef VERDANDI_BACKGROUND_ERROR_DENSE
             {
                 error_covariance_row.Reallocate(Nx_ * Ny_);
                 error_covariance_row.Zero();
                 error_covariance_row(row)
                     = background_error_variance_value_;
             }
-            else
+#else
             {
                 // The row has already been computed.
                 if (row == current_row_)
@@ -689,7 +690,9 @@ namespace Verdandi
                     error_covariance_row = error_covariance_row_;
                 }
             }
+#endif
         }
+#endif
     }
 
 
@@ -702,12 +705,13 @@ namespace Verdandi
     const typename ShallowWater<T>::background_error_variance& ShallowWater<T>
     ::GetBackgroundErrorVarianceMatrix() const
     {
-        if (error_sparse_)
-            return background_error_variance_.GetMatrix();
-        else
-            throw ErrorUndefined(
-                "ShallowWater::GetBackgroundErrorVarianceMatrix()",
-                "the background error covariance matrix is not available!");
+#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+        return background_error_variance_;
+#else
+        throw ErrorUndefined(
+            "ShallowWater::GetBackgroundErrorVarianceMatrix()",
+            "the background error covariance matrix is not available!");
+#endif
     }
 
 
@@ -718,7 +722,11 @@ namespace Verdandi
     template <class T>
     bool ShallowWater<T>::IsErrorSparse() const
     {
-        return error_sparse_;
+#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+        return true;
+#else
+        return false;
+#endif
     }
 
 

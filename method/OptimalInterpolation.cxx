@@ -201,6 +201,7 @@ namespace Verdandi
                   OptimalInterpolation<T, ClassModel, ClassObservationManager>
                   ::state_vector& state_vector)
     {
+#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
         // B, R and H are sparse.
         if (model_.IsErrorSparse() and observation_manager_.IsErrorSparse()
             and observation_manager_.IsOperatorSparse())
@@ -213,23 +214,25 @@ namespace Verdandi
             ComputeBLUESparse(state_vector);
 
         // At least one matrix is sparse.
-        else if (model_.IsErrorSparse()
-                 or observation_manager_.IsErrorSparse()
-                 or observation_manager_.IsOperatorSparse())
-        {
-#ifdef SELDON_DEBUG_LEVEL_4
-            cout << "Warning! At least one sparse matrix is used (either in"
-                 << " the model or in the observation manager), but not all"
-                 << " matrices are sparse. Therefore the computation will use"
-                 << " dense operations, leading to a potential loss of"
-                 << " performance." << endl;
+        else
 #endif
-            ComputeBLUEDense(state_vector);
-        }
+            if (model_.IsErrorSparse()
+                or observation_manager_.IsErrorSparse()
+                or observation_manager_.IsOperatorSparse())
+            {
+#ifdef SELDON_DEBUG_LEVEL_4
+                cout << "Warning! At least one sparse matrix is used (either"
+                     << " in the model or in the observation manager), but"
+                     << " not all matrices are sparse. Therefore the"
+                     << " computation will use dense operations, leading to a"
+                     << " potential loss of performance." << endl;
+#endif
+                ComputeBLUEDense(state_vector);
+            }
 
         // B, R and H are not sparse.
-        else
-            ComputeBLUEDense(state_vector);
+            else
+                ComputeBLUEDense(state_vector);
     }
 
 
@@ -330,6 +333,7 @@ namespace Verdandi
         typename OptimalInterpolation<T, ClassModel, ClassObservationManager>
         ::state_vector& state_vector)
     {
+#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
         // Number of observations at current date.
         Nobservation_ = observation_manager_.GetNobservation();
 
@@ -380,6 +384,7 @@ namespace Verdandi
 
         // Computes new state.
         Add(T(1), working_vector, state_vector);
+#endif
     }
 
 

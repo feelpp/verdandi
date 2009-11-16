@@ -55,8 +55,7 @@ namespace Verdandi
     GridToNetworkObservationManager<T>
     ::GridToNetworkObservationManager(const ClassModel& model,
                                       string configuration_file):
-        operator_sparse_(false), availability_(false), error_sparse_(false),
-        error_matrix_availability_(false)
+        availability_(false)
     {
         //   Initialize(model, configuration_file);
     }
@@ -283,7 +282,7 @@ namespace Verdandi
     template <class T>
     bool GridToNetworkObservationManager<T>::IsOperatorSparse() const
     {
-        return operator_sparse_;
+        return false;
     }
 
 
@@ -295,7 +294,7 @@ namespace Verdandi
     template <class T>
     bool GridToNetworkObservationManager<T>::IsErrorSparse() const
     {
-        return error_sparse_;
+        return false;
     }
 
 
@@ -308,7 +307,11 @@ namespace Verdandi
     template <class T>
     bool GridToNetworkObservationManager<T>::HasErrorMatrix() const
     {
-        return error_matrix_availability_;
+#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        return true;
+#else
+        return false;
+#endif
     }
 
 
