@@ -40,7 +40,7 @@ namespace Verdandi
       \tparam T the type of floating-point numbers.
     */
     template <class T>
-    class ClampedBar
+    class ClampedBar: public VerdandiBase
     {
     public:
         typedef T value_type;

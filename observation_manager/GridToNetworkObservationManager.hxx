@@ -35,7 +35,7 @@ namespace Verdandi
       \tparam T the type of floating-point numbers.
     */
     template <class T>
-    class GridToNetworkObservationManager
+    class GridToNetworkObservationManager: public VerdandiBase
     {
     public:
         typedef Matrix<T, General, RowSparse> tangent_operator_matrix;

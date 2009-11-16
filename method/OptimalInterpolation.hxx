@@ -30,7 +30,7 @@ namespace Verdandi
 
 
     template <class T, class ClassModel, class ClassObservationManager>
-    class OptimalInterpolation
+    class OptimalInterpolation: public VerdandiBase
     {
 
     public:

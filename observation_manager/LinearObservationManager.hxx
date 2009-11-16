@@ -34,7 +34,7 @@ namespace Verdandi
       \tparam T the type of floating-point numbers.
     */
     template <class T>
-    class LinearObservationManager
+    class LinearObservationManager: public VerdandiBase
     {
     public:
 #ifdef VERDANDI_TANGENT_OPERATOR_SPARSE

@@ -37,7 +37,7 @@ namespace Verdandi
       \tparam T the type of floating-point numbers.
     */
     template <class T>
-    class ShallowWater
+    class ShallowWater: public VerdandiBase
     {
     public:
         typedef T value_type;

@@ -55,6 +55,7 @@ namespace Verdandi
 #include "share/Error.hxx"
 #include "share/UsefulFunction.hxx"
 #include "share/MessageHandler.hxx"
+#include "share/VerdandiBase.hxx"
 
 #include "output_saver/OutputSaver.hxx"
 

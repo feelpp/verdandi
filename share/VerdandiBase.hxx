@@ -1,5 +1,5 @@
-// Copyright (C) 2008-2009 INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Copyright (C) 2009 INRIA
+// Author(s): Claire Mouton
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -17,23 +17,37 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_VERDANDI_HXX
+#ifndef VERDANDI_FILE_VERDANDIBASE_HXX
 
 
-#include "VerdandiHeader.hxx"
+namespace Verdandi
+{
 
 
-#include "seldon/Seldon.hxx"
-#include "getpot/GetPot.cpp"
+    //////////////////
+    // VERDANDIBASE //
+    //////////////////
 
 
-#include "share/Error.cxx"
-#include "share/UsefulFunction.cxx"
-#include "share/MessageHandler.cxx"
-#include "share/VerdandiBase.cxx"
+    //! Base class for Verdandi objects.
+    /*!
+      \tparam T the type of floating-point numbers.
+    */
+    class VerdandiBase
+    {
+    public:
+        // Constructor and destructor.
+        VerdandiBase();
+        virtual ~VerdandiBase();
 
-#include "output_saver/OutputSaver.cxx"
+        virtual string GetName() const;
+        virtual void Message(string message);
+        static void StaticMessage(void* object, string message);
+    };
 
 
-#define VERDANDI_FILE_VERDANDI_HXX
+} // namespace Verdandi.
+
+
+#define VERDANDI_FILE_VERDANDIBASE_HXX
 #endif
