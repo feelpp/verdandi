@@ -1,6 +1,7 @@
 // Program to write a matrix in a file.
 #define SELDON_DEBUG_LEVEL_4
 #define VERDANDI_WITH_ABORT
+#define VERDANDI_IGNORE_MESSAGE
 
 #include "Verdandi.hxx"
 using namespace Verdandi;

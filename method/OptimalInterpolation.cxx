@@ -50,6 +50,16 @@ namespace Verdandi
         model_.Initialize(configuration_file);
         data_to_save_ = true;
         observation_manager_.Initialize(model_, configuration_file);
+        MessageHandler::AddRecipient("model",
+                                     reinterpret_cast<void*>(&model_),
+                                     ClassModel::StaticMessage);
+        MessageHandler::AddRecipient("observation_manager",
+                                     reinterpret_cast<void*>
+                                     (&observation_manager_),
+                                     ClassObservationManager::StaticMessage);
+        MessageHandler::AddRecipient("driver",
+                                     reinterpret_cast<void*>(this),
+                                     OptimalInterpolation::StaticMessage);
 
 
         /***********************
@@ -185,6 +195,9 @@ namespace Verdandi
 
             if (option_display_["show_date"])
                 cout << " done." << endl;
+
+            MessageHandler::Send("model", "Analysis computed.");
+            MessageHandler::Send("observation_manager", "Analysis computed.");
         }
 
     }

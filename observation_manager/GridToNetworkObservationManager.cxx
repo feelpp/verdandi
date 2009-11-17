@@ -86,6 +86,11 @@ namespace Verdandi
     {
         GetPot configuration_stream(configuration_file);
 
+        MessageHandler::AddRecipient("grid_to_network_observation_manager",
+                                     reinterpret_cast<void*>(this),
+                                     GridToNetworkObservationManager
+                                     ::StaticMessage);
+
         //! First abscissa.
         double x_min_model = model.GetXMin();
         //! First ordinate.
@@ -229,6 +234,11 @@ namespace Verdandi
 
             for (int i = 0; i < Nobservation_; i++)
                 observation_(i) = input_data(location_x_(i), location_y_(i));
+
+            MessageHandler::Send(*this, "all",
+                                 "Loaded the observations in the OM.");
+            MessageHandler::Send("grid_to_network_observation_manager",
+                                 "Loaded the observations from GTN OM.");
         }
     }
 
