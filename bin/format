@@ -67,7 +67,7 @@ if not args:
 ### Checks the environment and the options.
 
 # Checks the availability of emacs for indentation.
-if options.indentation and commands.getstatusoutput("which emacs21")[0] != 0:
+if options.indentation and commands.getstatusoutput("which emacs")[0] != 0:
     print "[WARNING] Cannot find Emacs: indentation will be skipped."
     options.indentation = False
 
@@ -116,7 +116,7 @@ def indent(filename):
         langage = None
     if langage:
         import os
-        command = "emacs21 -batch " + filename + " -l " \
+        command = "emacs -batch " + filename + " -l " \
                   + os.path.join(local_directory, "indent.el ") \
                   + "-f indent_" + langage
         if options.interactive:
