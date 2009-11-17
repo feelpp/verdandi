@@ -503,6 +503,28 @@ namespace Verdandi
     }
 
 
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    template <class T>
+    string LinearObservationManager<T>::GetName() const
+    {
+        return "LinearObservationManager";
+    }
+
+
+    //! Receives and handles a message.
+    /*
+      \param[in] message the received message.
+    */
+    template <class T>
+    void LinearObservationManager<T>::Message(string message)
+    {
+        cout << "OM received: " << message << endl;
+    }
+
+
 } // namespace Verdandi.
 
 

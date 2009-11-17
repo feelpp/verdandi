@@ -771,6 +771,28 @@ namespace Verdandi
     }
 
 
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    template <class T>
+    string ShallowWater<T>::GetName() const
+    {
+        return "ShallowWater";
+    }
+
+
+    //! Receives and handles a message.
+    /*
+      \param[in] message the received message.
+    */
+    template <class T>
+    void ShallowWater<T>::Message(string message)
+    {
+        cout << "The model ShallowWater received: " << message << endl;
+    }
+
+
     ////////////////////////////
     // PRIVATE USEFUL METHODS //
     ////////////////////////////

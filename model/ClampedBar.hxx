@@ -120,6 +120,9 @@ namespace Verdandi
         bool HasFinished() const;
 
         string GetName() const;
+        void Message(string message);
+
+    private:
 
 
     };

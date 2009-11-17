@@ -447,6 +447,29 @@ namespace Verdandi
     }
 
 
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    template <class T, class ClassModel, class ClassObservationManager>
+    string OptimalInterpolation<T, ClassModel, ClassObservationManager>
+    ::GetName() const
+    {
+        return "OptimalInterpolation";
+    }
+
+
+    //! Receives and handles a message.
+    /*
+      \param[in] message the received message.
+    */
+    template <class T, class ClassModel, class ClassObservationManager>
+    void OptimalInterpolation<T, ClassModel, ClassObservationManager>
+    ::Message(string message)
+    {
+    }
+
+
 } // namespace Verdandi.
 
 

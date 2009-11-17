@@ -101,6 +101,9 @@ namespace Verdandi
         bool GetAnalyzedDataToSave() const;
         void ClearDataToSave();
 
+        string GetName() const;
+        void Message(string message);
+
     };
 
 

@@ -139,6 +139,9 @@ namespace Verdandi
 
         T GetObservationErrorCovariance(int i, int j) const;
         const error_variance& GetObservationErrorVariance() const;
+
+        string GetName() const;
+        void Message(string message);
     };
 
 

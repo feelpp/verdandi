@@ -380,6 +380,17 @@ namespace Verdandi
     }
 
 
+    //! Receives and handles a message.
+    /*
+      \param[in] message the received message.
+    */
+    template <class T>
+    void ClampedBar<T>::Message(string message)
+    {
+        cout << "The model ClampedBar received: " << message << endl;
+    }
+
+
 }
 
 #define VERDANDI_FILE_CLAMPEDBAR_HXX
