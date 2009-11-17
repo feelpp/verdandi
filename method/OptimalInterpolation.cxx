@@ -328,7 +328,7 @@ namespace Verdandi
                 observation_manager_
                     .GetTangentOperatorRow(c, tangent_operator_row);
                 BHt_row(c) = DotProd(error_covariance_row,
-				     tangent_operator_row);
+                                     tangent_operator_row);
             }
 
             state_vector(r) += DotProd(BHt_row, HBHR_inv_innovation);
