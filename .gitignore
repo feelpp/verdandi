@@ -1,0 +1,10 @@
+include/
+*.o
+*.os
+*.so
+*.cc
+*.pyc
+*.scon*
+*.log
+*~
+.gitignore
