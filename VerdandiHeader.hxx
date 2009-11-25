@@ -52,6 +52,7 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
+#include "share/Logger.hxx"
 #include "share/Error.hxx"
 #include "share/UsefulFunction.hxx"
 #include "share/MessageHandler.hxx"

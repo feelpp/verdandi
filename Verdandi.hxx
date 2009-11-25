@@ -27,6 +27,7 @@
 #include "getpot/GetPot.cpp"
 
 
+#include "share/Logger.cxx"
 #include "share/Error.cxx"
 #include "share/UsefulFunction.cxx"
 #include "share/MessageHandler.cxx"
