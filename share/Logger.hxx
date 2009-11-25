@@ -25,10 +25,10 @@
 
 
 #ifndef VERDANDI_LOG_FILENAME
-#define VERDANDI_LOG_FILENAME "verdandi_%{D}.log"
+#define VERDANDI_LOG_FILENAME "verdandi.log"
 #endif
 #ifndef VERDANDI_LOGGING_LEVEL
-#define VERDANDI_LOGGING_LEVEL 2
+#define VERDANDI_LOGGING_LEVEL 0
 #endif
 #ifndef VERDANDI_LOG_WIDTH
 #define VERDANDI_LOG_WIDTH 78
@@ -56,6 +56,9 @@ namespace Verdandi
     private :
 
         /*** Log file ***/
+
+        //! Boolean to check if the initialisation was done or not.
+        static bool is_initialized_;
 
         //! Characters per line.
         static const unsigned int width_ = VERDANDI_LOG_WIDTH;
@@ -125,6 +128,10 @@ namespace Verdandi
         static void InitializeLevel(string configuration_file,
                                     string section_name);
         static void InitializeCommand();
+        static void EmptyFile();
+
+        static void CheckInitialization();
+        static void CheckInitialization(int &options);
 
         template <class T>
         static void WriteMessage(const T& object, string message,

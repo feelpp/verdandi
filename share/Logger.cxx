@@ -30,7 +30,7 @@ namespace Verdandi
     // STATIC FIELDS //
     ///////////////////
 
-
+    bool Logger::is_initialized_ = false;
     string Logger::file_name_;
     int Logger::options_ = 0;
     int Logger::default_options_ = 0;
@@ -51,6 +51,8 @@ namespace Verdandi
         InitializeFilename();
         InitializeLevel();
         InitializeCommand();
+        EmptyFile();
+        is_initialized_ = true;
     }
 
 
@@ -68,6 +70,8 @@ namespace Verdandi
         InitializeFilename(configuration_file, section_name);
         InitializeLevel(configuration_file, section_name);
         InitializeCommand();
+        EmptyFile();
+        is_initialized_ = true;
     }
 
 
@@ -95,6 +99,7 @@ namespace Verdandi
     */
     void  Logger::SetOption(int option, bool value)
     {
+        CheckInitialization();
         if (value)
             options_ = options_ | option;
         else
@@ -108,6 +113,7 @@ namespace Verdandi
     */
     void  Logger::SetStdout(bool value)
     {
+        CheckInitialization();
         SetOption(stdout_, value);
     }
 
@@ -118,6 +124,7 @@ namespace Verdandi
     */
     void  Logger::SetFile(bool value)
     {
+        CheckInitialization();
         SetOption(file_, value);
     }
 
@@ -128,6 +135,7 @@ namespace Verdandi
     */
     void  Logger::SetUppercase(bool value)
     {
+        CheckInitialization();
         SetOption(uppercase_, value);
     }
 
@@ -138,6 +146,7 @@ namespace Verdandi
     */
     void Logger::SetLoggingLevel(int level)
     {
+        CheckInitialization();
         logging_level_ = level;
     }
 
@@ -151,6 +160,7 @@ namespace Verdandi
     template <int LEVEL, class T>
     void Logger::Log(const T& object, string message, int options)
     {
+        CheckInitialization(options);
         if (LEVEL >= logging_level_)
             WriteMessage(object, message, options);
     }
@@ -165,6 +175,7 @@ namespace Verdandi
     template <class T>
     void Logger::Log(const T& object, string message, int options)
     {
+        CheckInitialization(options);
         WriteMessage(object, message, options);
     }
 
@@ -179,6 +190,7 @@ namespace Verdandi
     void Logger::Command(string command,
                          string parameter, int options)
     {
+        CheckInitialization(options);
         CommandMap::const_iterator im;
         im = command_.find(command);
         LogCommand function_pointer;
@@ -300,6 +312,40 @@ namespace Verdandi
     }
 
 
+    //! Empties the log file.
+    void Logger::EmptyFile()
+    {
+        ofstream file(Logger::file_name_.c_str());
+        if (file)
+            file.close();
+        else
+            throw ErrorIO("WriteMessage",
+                          "Cannot open file " + file_name_ + " ." );
+    }
+
+
+    //! Checks if the initialization was done or not;
+    void Logger::CheckInitialization()
+    {
+        if (!(is_initialized_))
+            Initialize();
+    }
+
+
+    //! Checks if the initialization was done or not;
+    /*!
+      \param[out] options the new default options.
+    */
+    void Logger::CheckInitialization(int & options)
+    {
+        if (!(is_initialized_))
+        {
+            Initialize();
+            options = options_;
+        }
+    }
+
+
     //! Writes a message in the log file.
     /*!
       \param[in] object the object that sends the message.
@@ -329,6 +375,7 @@ namespace Verdandi
             object_name_parameter = upper_case(object_name_parameter);
 
         string result = FormatMessage(object_name_parameter, message);
+
         WriteMessage(result, options);
     }
 
@@ -352,6 +399,7 @@ namespace Verdandi
     */
     void Logger::WriteMessage(string message, int options)
     {
+
         if (options & stdout_)
             cout << message;
 
