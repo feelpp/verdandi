@@ -112,6 +112,8 @@ namespace Verdandi
         template <class T>
         static void Log(const T& object, string message,
                         int options = options_);
+        template <class T>
+        static void StdOut(const T& object, string message);
 
         static void Command(string command, string parameter,
                             int options = options_);

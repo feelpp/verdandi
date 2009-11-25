@@ -180,6 +180,23 @@ namespace Verdandi
     }
 
 
+    //! Writes a message in the standard output and in the log file.
+    /*! The message is always sent to the standard output, and it is possibly
+      written in a log file if the logging level is lower than or equal to
+      zero.
+      \tparam S type of the message, which must be convertible to a string.
+      \param[in] object the object that sends the message.
+      \param[in] message the message to be written.
+    */
+    template <class T>
+    void Logger::StdOut(const T& object, string message)
+    {
+        WriteMessage(object, message, stdout_);
+        if (0 >= logging_level_)
+            WriteMessage(object, message, options_ & ~stdout_);
+    }
+
+
     //! Reads a specific command and applies the corresponding treatment.
     /*!
       \param[in] command the specific command.
