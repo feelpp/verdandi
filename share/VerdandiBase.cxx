@@ -55,7 +55,6 @@ namespace Verdandi
     */
     void VerdandiBase::Message(string message)
     {
-        cout << "VerdandiBase received: " << message << endl;
     }
 
 
