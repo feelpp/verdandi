@@ -3,14 +3,13 @@
 #define SELDON_DEBUG_LEVEL_4
 #define VERDANDI_WITH_ABORT
 #define GETPOT_ACTIVATE_EXCEPTION true
-#define VERDANDI_IGNORE_MESSAGE
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
 
+#include "ForwardDriver.cxx"
+
 #include "ShallowWater.cxx"
-#include "OutputSaver.cxx"
-#include "newran.h"
 
 int main(int argc, char** argv)
 {
@@ -25,14 +24,14 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    ShallowWater<double> shallow_water(argv[1]);
-    shallow_water.Initialize(argv[1]);
+    ForwardDriver<ShallowWater<double> > driver(argv[1]);
 
-    while (!shallow_water.HasFinished())
+    driver.Initialize(argv[1]);
+
+    while (!driver.HasFinished())
     {
-        shallow_water.InitializeStep();
-
-        shallow_water.Forward();
+        driver.InitializeStep();
+        driver.Forward();
     }
 
     END;
