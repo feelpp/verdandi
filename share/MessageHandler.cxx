@@ -76,6 +76,9 @@ namespace Verdandi
     ::Send(string recipient, string message)
     {
 #ifndef VERDANDI_IGNORE_MESSAGE
+        Logger::Log<-10>(MessageHandler::GetName(), string("Message \"")
+                         + message + "\" is sent to \"" + recipient + "\".");
+
         if (recipient_map_.count(recipient) == 0)
             throw ErrorArgument("MessageHandler::Send",
                                 string("The object \"") + recipient +
@@ -99,6 +102,10 @@ namespace Verdandi
     ::Send(const Sender& sender, string recipient, string message)
     {
 #ifndef VERDANDI_IGNORE_MESSAGE
+        Logger::Log<-10>(MessageHandler::GetName(), string("Message \"")
+                         + message + "\" is sent to \"" + recipient
+                         + "\" by \"" + sender.GetName() + "\".");
+
         if (recipient_map_.count(recipient) == 0)
             throw ErrorArgument("MessageHandler::Send",
                                 string("The object \"") + recipient +
