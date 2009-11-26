@@ -45,6 +45,9 @@ namespace Verdandi
         template <class Sender>
         static void Send(const Sender& sender, string recipient,
                          string message);
+
+        static string GetName();
+
     private:
         static void SendToList(recipient_list& my_list, string message);
     };

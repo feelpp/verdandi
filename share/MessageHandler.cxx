@@ -111,6 +111,16 @@ namespace Verdandi
     }
 
 
+    //! Returns the name of the class, that is, "MessageHandler".
+    /*!
+      \return The name of the class.
+    */
+    string MessageHandler::GetName()
+    {
+        return "MessageHandler";
+    }
+
+
     //! Sends a message to a list of recipients.
     /*!
       \param[in] my_list the list of recipients.
