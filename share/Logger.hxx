@@ -34,7 +34,7 @@
 #define VERDANDI_LOG_WIDTH 78
 #endif
 #ifndef VERDANDI_LOG_OPTIONS
-#define VERDANDI_LOG_OPTIONS (stdout_ | file_)
+#define VERDANDI_LOG_OPTIONS file_
 #endif
 
 
