@@ -126,7 +126,7 @@ namespace Verdandi
             {
                 if (option_display_["show_date"])
                     cout << "Performing optimal interpolation at time step ["
-                         << model_.GetCurrentDate() << "]..." << endl;
+                         << model_.GetDate() << "]..." << endl;
 
                 model_.GetState(state_vector);
 
@@ -153,7 +153,7 @@ namespace Verdandi
     {
         if (option_display_["show_date"])
             cout << "Current step: "
-                 << model_.GetCurrentDate() << endl;
+                 << model_.GetDate() << endl;
         model_.InitializeStep();
     }
 
@@ -183,7 +183,7 @@ namespace Verdandi
         {
             if (option_display_["show_date"])
                 cout << "Performing optimal interpolation at time step ["
-                     << model_.GetCurrentDate() << "]..." << endl;
+                     << model_.GetDate() << "]..." << endl;
 
             model_.GetState(state_vector);
 

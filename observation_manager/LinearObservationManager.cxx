@@ -150,7 +150,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::LoadObservation(const Model& model)
     {
-        int step = model.GetCurrentDate();
+        int step = model.GetDate();
 
         availability_ = step % (period_observation_ * Nskip_) == 0;
 

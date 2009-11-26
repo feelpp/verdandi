@@ -199,7 +199,7 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::LoadObservation(const ClassModel& model)
     {
-        int step = model.GetCurrentDate();
+        int step = model.GetDate();
 
         availability_ = step % (period_observation_ * Nskip_) == 0;
 

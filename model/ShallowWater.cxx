@@ -434,7 +434,7 @@ namespace Verdandi
       \return The current time step.
     */
     template <class T>
-    int ShallowWater<T>::GetCurrentDate() const
+    int ShallowWater<T>::GetDate() const
     {
         return time_step_;
     }
