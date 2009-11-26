@@ -34,7 +34,27 @@ namespace Verdandi
 
     //! Adds a new object in the recipient list.
     /*!
+      \tparam R type of the recipient object.
       \param[in] recipient the string describing the object to add.
+      \param[in] object reference to the recipient object.
+      \param[in] pointer the pointer to the method to add.
+    */
+    template <class R>
+    void MessageHandler
+    ::AddRecipient(string recipient, R& object,
+                   MessageHandler::function_pointer pointer)
+    {
+        pair<void*, function_pointer>
+            pointer_pair(reinterpret_cast<void*>(&object), pointer);
+        recipient_map_[recipient].push_back(pointer_pair);
+        recipient_map_["all"].push_back(pointer_pair);
+    }
+
+
+    //! Adds a new object in the recipient list.
+    /*!
+      \param[in] recipient the string describing the object to add.
+      \param[in] object pointer to the recipient object.
       \param[in] pointer the pointer to the method to add.
     */
     void MessageHandler

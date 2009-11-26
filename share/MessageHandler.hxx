@@ -36,6 +36,9 @@ namespace Verdandi
         static recipient_map recipient_map_;
 
     public:
+        template <class R>
+        static void AddRecipient(string recipient, R& object,
+                                 function_pointer pointer);
         static void AddRecipient(string recipient, void* object,
                                  function_pointer pointer);
         static void Send(string recipient, string message);
