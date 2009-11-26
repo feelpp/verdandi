@@ -71,8 +71,8 @@ namespace Verdandi
 
         configuration_stream.set_prefix("display/");
         // Should iterations be displayed on screen?
-        configuration_stream.set("Show_iterations",
-                                 option_display_["show_iterations"]);
+        configuration_stream.set("Show_iteration",
+                                 option_display_["show_iteration"]);
         // Should current date be displayed on screen?
         configuration_stream.set("Show_date", option_display_["show_date"]);
 
