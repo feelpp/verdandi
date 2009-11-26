@@ -397,11 +397,6 @@ namespace Verdandi
         time_step_++;
 
         data_to_save_ = true;
-
-        MessageHandler::Send("observation_manager",
-                             "One step forward computed in the model.");
-        MessageHandler::Send("driver",
-                             "One step forward computed in the model.");
     }
 
 
@@ -794,7 +789,6 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>::Message(string message)
     {
-        cout << "The model ShallowWater received: " << message << endl;
     }
 
 
