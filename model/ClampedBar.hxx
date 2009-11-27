@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_CLAMPEDBAR_HXX
+#ifndef VERDANDI_FILE_MODEL_CLAMPEDBAR_HXX
 
 
 #include "seldon/SeldonSolver.hxx"
@@ -25,10 +25,9 @@
 #include "OutputSaver.cxx"
 
 
-
-
 namespace Verdandi
 {
+
 
     //////////////////////
     // CLAMPEDBAR MODEL //
@@ -56,7 +55,7 @@ namespace Verdandi
         double Delta_x_;
         //! Number of elements along x.
         int Nx_;
-        //! Number of degrees of freedom (dofs)
+        //! Number of degrees of freedom (dofs).
         int Ndof_;
 
         //! Simulation duration.
@@ -65,7 +64,7 @@ namespace Verdandi
         double Delta_t_;
         //! Current time step.
         int time_step_;
-        //! Time steps
+        //! Time steps.
         vector<double> time_instants_;
 
         //! Mass parameter.
@@ -74,7 +73,7 @@ namespace Verdandi
         double Young_modulus_;
 
 
-        //! FEM Vector
+        //! FEM Vector.
         Vector<T> disp_0_;
         Vector<T> velo_0_;
         Vector<T> disp_1_;
@@ -86,12 +85,10 @@ namespace Verdandi
         //! Stiffness FEM matrix.
         Matrix<T, General, RowMajor> Stiff_matrix_el_;
 
-        //! Newmark Global FEM matrix
+        //! Newmark Global FEM matrix.
         Matrix<T, Symmetric, RowSymSparse> Mass_matrix_;
         Matrix<T, Symmetric, RowSymSparse> Newmark_matrix_0_;
         Matrix<T, Symmetric, RowSymSparse> Newmark_matrix_1_;
-
-
 
 #if defined(SELDON_WITH_UMFPACK) && defined(VERDANDI_WITH_DIRECT_SOLVER)
         MatrixUmfPack<T> mat_lu;
@@ -102,9 +99,6 @@ namespace Verdandi
 #if defined(SELDON_WITH_MUMPS) && defined(VERDANDI_WITH_DIRECT_SOLVER)
         MatrixMumps<T> mat_lu;
 #endif
-
-
-
 
     public:
         // Constructor and destructor.
@@ -122,14 +116,11 @@ namespace Verdandi
         string GetName() const;
         void Message(string message);
 
-    private:
-
-
     };
 
 
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_CLAMPEDBAR_HXX
+#define VERDANDI_FILE_MODEL_CLAMPEDBAR_HXX
 #endif
