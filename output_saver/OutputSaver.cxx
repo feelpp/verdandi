@@ -48,6 +48,19 @@ namespace Verdandi
     OutputSaver::OutputSaver(string configuration_file, string section_name):
         save_period_(0), time_tolerance_(0)
     {
+        Initialize(configuration_file, section_name);
+    }
+
+
+    //! Initializes the output saver with a configuration file.
+    /*! Reads the configuration.
+      \param[in] configuration_file the configuration file.
+      \param[in] section_name the section in \a configuration_file where the
+      configuration is to be read.
+    */
+    void OutputSaver::Initialize(string configuration_file,
+                                 string section_name)
+    {
 
 
         /***********************

@@ -62,6 +62,8 @@ namespace Verdandi
 
         OutputSaver();
         OutputSaver(string configuration_file, string method_name);
+        void Initialize(string configuration_file, string method_name);
+
         ~OutputSaver();
 
         string GetName() const;
