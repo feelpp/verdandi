@@ -329,7 +329,7 @@ namespace Verdandi
       \param[in] default_mode default saving format.
       \param[in] variable_name variable name.
     */
-    void OutputSaver::SetVariable(GetPot configuration_stream,
+    void OutputSaver::SetVariable(GetPot& configuration_stream,
                                   string generic_path,
                                   string default_mode,
                                   string variable_name)

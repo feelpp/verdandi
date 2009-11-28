@@ -92,7 +92,7 @@ namespace Verdandi
 
     private:
 
-        void SetVariable(GetPot configuration_stream,
+        void SetVariable(GetPot& configuration_stream,
                          string generic_path,
                          string default_mode,
                          string variable_name);
