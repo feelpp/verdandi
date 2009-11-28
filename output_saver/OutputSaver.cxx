@@ -166,7 +166,7 @@ namespace Verdandi
 
         Variable& variable = im->second;
 
-        // In case the mode has been set yet.
+        // In case the mode has not been set yet.
         SetVariable<S>(variable);
 
         if (variable.GetMode() == "text")
