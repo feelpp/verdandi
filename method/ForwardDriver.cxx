@@ -94,6 +94,8 @@ namespace Verdandi
         model_.Initialize(configuration_file);
         iteration_ = 0;
 
+        MessageHandler::Send(*this, "model", "initial condition");
+
         MessageHandler::Send(*this, "all", "::Initialize end");
     }
 
