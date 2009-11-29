@@ -183,11 +183,10 @@ namespace Verdandi
         */
         bool with_positivity_requirement_;
 
-        //! Is there any data not saved yet?
-        bool data_to_save_;
+        /*** Output saver ***/
 
-        //! Is there any analyzed data not saved yet?
-        bool analyzed_data_to_save_;
+        //! Output saver.
+        OutputSaver output_saver_;
 
     public:
         // Constructor and destructor.
@@ -201,6 +200,7 @@ namespace Verdandi
         void Forward();
         bool HasFinished() const;
         void StepBack(const state_vector& state);
+        void Save();
 
         // Access methods.
         int GetDate() const;
@@ -226,11 +226,7 @@ namespace Verdandi
         GetBackgroundErrorVarianceMatrix() const;
         bool IsErrorSparse() const;
 
-        // Access methods useful for saving with the output saver.
         const ShallowWater<T>& GetModel() const;
-        bool GetDataToSave() const;
-        bool GetAnalyzedDataToSave() const;
-        void ClearDataToSave();
 
         string GetName() const;
         void Message(string message);

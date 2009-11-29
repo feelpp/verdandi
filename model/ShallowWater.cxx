@@ -36,8 +36,7 @@ namespace Verdandi
     template <class T>
     ShallowWater<T>::ShallowWater():
         time_step_(0), g_(9.81), urng_(0), current_row_(-1),
-        current_column_(-1),
-        data_to_save_(false), analyzed_data_to_save_(false)
+        current_column_(-1)
     {
     }
 
@@ -49,8 +48,7 @@ namespace Verdandi
     template <class T>
     ShallowWater<T>::ShallowWater(string configuration_file):
         time_step_(0), g_(9.81), urng_(0), current_row_(-1),
-        current_column_(-1),
-        data_to_save_(false), analyzed_data_to_save_(false)
+        current_column_(-1)
     {
         //Initialize(configuration_file);
     }
@@ -252,7 +250,12 @@ namespace Verdandi
 
         error_covariance_row_.Reallocate(Nx_ * Ny_);
 
-        data_to_save_ = true;
+        /*** Ouput saver ***/
+
+        output_saver_.Initialize(configuration_file, "output_saver/");
+        output_saver_.Empty("u");
+        output_saver_.Empty("v");
+        output_saver_.Empty("h");
     }
 
 
@@ -395,8 +398,6 @@ namespace Verdandi
         }
 
         time_step_++;
-
-        data_to_save_ = true;
     }
 
 
@@ -421,6 +422,18 @@ namespace Verdandi
     {
         time_step_--;
         SetFullState(state);
+    }
+
+
+    //! Saves the simulated data.
+    /*! It saves the velocities 'u' and 'v', and the height 'h'.
+     */
+    template <class T>
+    void ShallowWater<T>::Save()
+    {
+        output_saver_.Save(u_, double(time_step_), "u");
+        output_saver_.Save(v_, double(time_step_), "v");
+        output_saver_.Save(h_, double(time_step_), "h");
     }
 
 
@@ -740,37 +753,6 @@ namespace Verdandi
     }
 
 
-    //! Checks if there is data to be saved.
-    /*!
-      \return True if there is data to be saved, false otherwise.
-    */
-    template <class T>
-    bool ShallowWater<T>::GetDataToSave() const
-    {
-        return data_to_save_;
-    }
-
-
-    //! Checks if there is analyzed data to be saved.
-    /*!
-      \return True if there is analyzed data to be saved, false otherwise.
-    */
-    template <class T>
-    bool ShallowWater<T>::GetAnalyzedDataToSave() const
-    {
-        return analyzed_data_to_save_;
-    }
-
-
-    //! Stores that there is no more data to be saved.
-    template <class T>
-    void ShallowWater<T>::ClearDataToSave()
-    {
-        data_to_save_ = false;
-        analyzed_data_to_save_ = false;
-    }
-
-
     //! Returns the name of the class.
     /*!
       \return The name of the class.
@@ -789,6 +771,9 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>::Message(string message)
     {
+        if (message.find("initial condition") != string::npos
+            || message.find("forecast") != string::npos)
+            Save();
     }
 
 
