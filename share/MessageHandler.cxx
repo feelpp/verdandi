@@ -112,7 +112,7 @@ namespace Verdandi
                                 "\" is not part of the recipient list.");
 
         recipient_list my_list = recipient_map_[recipient];
-        SendToList(my_list, "Message from " + sender.GetName() + ": "
+        SendToList(my_list, string("[") + sender.GetName() + "] "
                    + message);
 #endif
     }
