@@ -316,6 +316,36 @@ namespace Verdandi
     }
 
 
+    //! Empties the output file associated with a variable.
+    /*!
+      \param[in] variable_name the name of the variable whose file should be
+      emptied.
+    */
+    void OutputSaver::Empty(string variable_name)
+    {
+        map<string, Variable>::iterator im;
+        im = variable_list_.find(variable_name);
+
+        if (im == variable_list_.end())
+            return;
+
+        ofstream output_stream(im->second.GetFile().c_str());
+        output_stream.close();
+    }
+
+
+    //! Empties the output files of all registered variables.
+    void OutputSaver::Empty()
+    {
+        map<string, Variable>::const_iterator im;
+        for (im = variable_list_.begin(); im != variable_list_.end(); im++)
+        {
+            ofstream output_stream(im->second.GetFile().c_str());
+            output_stream.close();
+        }
+    }
+
+
     //! Displays the variables parameters.
     void OutputSaver::DisplayVariableList() const
     {

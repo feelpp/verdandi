@@ -90,6 +90,9 @@ namespace Verdandi
         void WriteBinary(const Matrix<T, Prop, ColSparse, Allocator>& x,
                          string file_name) const;
 
+        void Empty(string variable_name);
+        void Empty();
+
         void DisplayVariableList() const;
 
     private:
