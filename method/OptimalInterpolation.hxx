@@ -66,12 +66,6 @@ namespace Verdandi
         //! Should an analysis be computed at the first step?
         bool analyze_first_step_;
 
-        //! Is there any data not saved yet?
-        bool data_to_save_;
-
-        //! Is there any analyzed data not saved yet?
-        bool analyzed_data_to_save_;
-
     public:
 
         /*** Constructors and destructor ***/
@@ -97,9 +91,6 @@ namespace Verdandi
 
         // Access methods.
         const ClassModel& GetModel() const;
-        bool GetDataToSave() const;
-        bool GetAnalyzedDataToSave() const;
-        void ClearDataToSave();
 
         string GetName() const;
         void Message(string message);

@@ -40,15 +40,13 @@ namespace Verdandi
     OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::OptimalInterpolation(string configuration_file):
         model_(configuration_file),
-        observation_manager_(model_, configuration_file),
-        data_to_save_(false), analyzed_data_to_save_(false)
+        observation_manager_(model_, configuration_file)
     {
         GetPot configuration_stream(configuration_file);
 
         /*** Initializations ***/
 
         model_.Initialize(configuration_file);
-        data_to_save_ = true;
         observation_manager_.Initialize(model_, configuration_file);
         MessageHandler::AddRecipient("model",
                                      reinterpret_cast<void*>(&model_),
@@ -108,6 +106,8 @@ namespace Verdandi
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Initialize(string configuration_file)
     {
+        MessageHandler::Send(*this, "all", "::Initialize begin");
+
         cout.precision(20);
 
         state_vector state_vector;
@@ -134,13 +134,14 @@ namespace Verdandi
 
                 model_.SetState(state_vector);
 
-                data_to_save_ = true;
-                analyzed_data_to_save_ = true;
-
                 if (option_display_["show_date"])
                     cout << " done." << endl;
             }
         }
+
+        MessageHandler::Send(*this, "model", "initial condition");
+
+        MessageHandler::Send(*this, "all", "::Initialize end");
     }
 
 
@@ -151,10 +152,14 @@ namespace Verdandi
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::InitializeStep()
     {
+        MessageHandler::Send(*this, "all", "::InitializeStep begin");
+
         if (option_display_["show_date"])
             cout << "Current step: "
                  << model_.GetDate() << endl;
         model_.InitializeStep();
+
+        MessageHandler::Send(*this, "all", "::InitializeStep end");
     }
 
 
@@ -163,8 +168,14 @@ namespace Verdandi
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Forward()
     {
+        MessageHandler::Send(*this, "all", "::Forward begin");
+
         model_.Forward();
-        data_to_save_ = true;
+
+        MessageHandler::Send(*this, "model", "forecast");
+        MessageHandler::Send(*this, "observation_manager", "forecast");
+
+        MessageHandler::Send(*this, "all", "::Forward end");
     }
 
 
@@ -176,6 +187,8 @@ namespace Verdandi
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Analyze()
     {
+        MessageHandler::Send(*this, "all", "::Analyze begin");
+
         state_vector state_vector;
         observation_manager_.LoadObservation(model_);
 
@@ -190,16 +203,14 @@ namespace Verdandi
             ComputeBLUE(state_vector);
             model_.SetState(state_vector);
 
-            data_to_save_ = true;
-            analyzed_data_to_save_ = true;
-
             if (option_display_["show_date"])
                 cout << " done." << endl;
 
-            MessageHandler::Send("model", "Analysis computed.");
-            MessageHandler::Send("observation_manager", "Analysis computed.");
+            MessageHandler::Send(*this, "model", "analysis");
+            MessageHandler::Send(*this, "observation_manager", "analysis");
         }
 
+        MessageHandler::Send(*this, "all", "::Analyze end");
     }
 
 
@@ -423,40 +434,6 @@ namespace Verdandi
     ::GetModel() const
     {
         return model_;
-    }
-
-
-    //! Checks if there is data to be saved.
-    /*!
-      \return True if there is data to be saved, false otherwise.
-    */
-    template <class T, class ClassModel, class ClassObservationManager>
-    bool OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::GetDataToSave() const
-    {
-        return data_to_save_;
-    }
-
-
-    //! Checks if there is analyzed data to be saved.
-    /*!
-      \return True if there is analyzed data to be saved, false otherwise.
-    */
-    template <class T, class ClassModel, class ClassObservationManager>
-    bool OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::GetAnalyzedDataToSave() const
-    {
-        return analyzed_data_to_save_;
-    }
-
-
-    //! Stores that there is no more data to be saved.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ClearDataToSave()
-    {
-        data_to_save_ = false;
-        analyzed_data_to_save_ = false;
     }
 
 
