@@ -200,7 +200,7 @@ namespace Verdandi
     //! Writes a message in the standard output and in the log file.
     /*! The message is always sent to the standard output, and it is possibly
       written in a log file if the logging level is lower than or equal to
-      zero.
+      'VERDANDI_STDOUT_LOGGING_LEVEL'.
       \tparam S type of the message, which must be convertible to a string
       through 'ostringstream& operator << (ostringstream&, S& message)'.
       \param[in] object the object that sends the message.
@@ -216,7 +216,7 @@ namespace Verdandi
     //! Writes a message in the standard output and in the log file.
     /*! The message is always sent to the standard output, and it is possibly
       written in a log file if the logging level is lower than or equal to
-      zero.
+      'VERDANDI_STDOUT_LOGGING_LEVEL'.
       \param[in] object the object that sends the message.
       \param[in] message the message to be written.
     */
@@ -224,7 +224,7 @@ namespace Verdandi
     void Logger::StdOut(const T& object, string message)
     {
         WriteMessage(object, message, stdout_);
-        if (0 >= logging_level_)
+        if (VERDANDI_STDOUT_LOGGING_LEVEL >= logging_level_)
             WriteMessage(object, message, options_ & ~stdout_);
     }
 
