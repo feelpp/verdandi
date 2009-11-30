@@ -31,6 +31,7 @@ namespace Verdandi
     ///////////////////
 
     bool Logger::is_initialized_ = false;
+    bool Logger::is_active_ = VERDANDI_LOG_IS_ACTIVE;
     string Logger::file_name_;
     int Logger::options_ = 0;
     int Logger::default_options_ = 0;
@@ -99,7 +100,8 @@ namespace Verdandi
     */
     void  Logger::SetOption(int option, bool value)
     {
-        CheckInitialization();
+        if (!CheckStatus())
+            return;
         if (value)
             options_ = options_ | option;
         else
@@ -113,7 +115,8 @@ namespace Verdandi
     */
     void  Logger::SetStdout(bool value)
     {
-        CheckInitialization();
+        if (!CheckStatus())
+            return;
         SetOption(stdout_, value);
     }
 
@@ -124,7 +127,8 @@ namespace Verdandi
     */
     void  Logger::SetFile(bool value)
     {
-        CheckInitialization();
+        if (!CheckStatus())
+            return;
         SetOption(file_, value);
     }
 
@@ -135,7 +139,8 @@ namespace Verdandi
     */
     void  Logger::SetUppercase(bool value)
     {
-        CheckInitialization();
+        if (!CheckStatus())
+            return;
         SetOption(uppercase_, value);
     }
 
@@ -146,8 +151,23 @@ namespace Verdandi
     */
     void Logger::SetLoggingLevel(int level)
     {
-        CheckInitialization();
+        if (!CheckStatus())
+            return;
         logging_level_ = level;
+    }
+
+
+    //! Activates the Logger.
+    void Logger::Activate()
+    {
+        is_active_ = true;
+    }
+
+
+    //! Desactivates the Logger.
+    void Logger::Desactivate()
+    {
+        is_active_ = false;
     }
 
 
@@ -162,7 +182,8 @@ namespace Verdandi
     template <int LEVEL, class T, class S>
     void Logger::Log(const T& object, const S& message, int options)
     {
-        CheckInitialization(options);
+        if (!CheckStatus(options))
+            return;
         if (LEVEL >= logging_level_)
             Log(object, to_str(message), options);
     }
@@ -192,7 +213,8 @@ namespace Verdandi
     template <class T>
     void Logger::Log(const T& object, string message, int options)
     {
-        CheckInitialization(options);
+        if (!CheckStatus(options))
+            return;
         WriteMessage(object, message, options);
     }
 
@@ -239,7 +261,8 @@ namespace Verdandi
     void Logger::Command(string command,
                          string parameter, int options)
     {
-        CheckInitialization(options);
+        if (!CheckStatus(options))
+            return;
         CommandMap::const_iterator im;
         im = command_.find(command);
         LogCommand function_pointer;
@@ -374,24 +397,30 @@ namespace Verdandi
 
 
     //! Checks if the initialization was done or not;
-    void Logger::CheckInitialization()
+    /*!
+      \return The boolean is_active_.
+    */
+    bool Logger::CheckStatus()
     {
         if (!(is_initialized_))
             Initialize();
+        return is_active_;
     }
 
 
     //! Checks if the initialization was done or not;
     /*!
       \param[out] options the new default options.
+      \return The boolean is_active_.
     */
-    void Logger::CheckInitialization(int & options)
+    bool Logger::CheckStatus(int & options)
     {
         if (!(is_initialized_))
         {
             Initialize();
             options = options_;
         }
+        return is_active_;
     }
 
 

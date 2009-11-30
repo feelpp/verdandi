@@ -39,7 +39,9 @@
 #ifndef VERDANDI_LOG_OPTIONS
 #define VERDANDI_LOG_OPTIONS file_
 #endif
-
+#ifndef VERDANDI_LOG_IS_ACTIVE
+#define VERDANDI_LOG_IS_ACTIVE true
+#endif
 
 namespace Verdandi
 {
@@ -62,6 +64,8 @@ namespace Verdandi
 
         //! Boolean to check if the initialisation was done or not.
         static bool is_initialized_;
+        //! Boolean to check if the Logger is active or not.
+        static bool is_active_;
 
         //! Characters per line.
         static const unsigned int width_ = VERDANDI_LOG_WIDTH;
@@ -109,6 +113,9 @@ namespace Verdandi
 
         static void SetLoggingLevel(int level);
 
+        static void Activate();
+        static void Desactivate();
+
         template <int LEVEL, class T, class S>
         static void Log(const T& object, const S& message,
                         int options = options_);
@@ -140,8 +147,8 @@ namespace Verdandi
         static void InitializeCommand();
         static void EmptyFile();
 
-        static void CheckInitialization();
-        static void CheckInitialization(int &options);
+        static bool CheckStatus();
+        static bool CheckStatus(int &options);
 
         template <class T>
         static void WriteMessage(const T& object, string message,
