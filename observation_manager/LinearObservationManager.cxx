@@ -89,6 +89,7 @@ namespace Verdandi
 
         configuration_stream.set_prefix("observation/");
         configuration_stream.set("File", observation_file_);
+        configuration_stream.set("Type", observation_type_, "", "state");
         configuration_stream.set("Period_observation",
                                  period_observation_,  "> 0");
         configuration_stream.set("Nskip", Nskip_, "> 0");
@@ -170,8 +171,13 @@ namespace Verdandi
                               "Unable to open file \""
                               + observation_file_ + "\".");
 #endif
-            streampos position =  step / (period_observation_ * Nskip_)
-                * (Nstate_model_ * sizeof(T) + sizeof(int));
+            streampos position;
+            if (observation_type_ == "state")
+                position = step / (period_observation_ * Nskip_)
+                    * (Nstate_model_ * sizeof(T) + sizeof(int));
+            if (observation_type_ == "observation")
+                position =  step / (period_observation_ * Nskip_)
+                    * (Nobservation_ * sizeof(T) + sizeof(int));
             file_stream.seekg(position);
             input_data.Read(file_stream);
             file_stream.close();

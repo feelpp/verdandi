@@ -51,6 +51,8 @@ namespace Verdandi
 
         //! File that stores the observations.
         string observation_file_;
+        //! How are stored the observations.
+        string observation_type_;
         //! Period with which observations are available.
         int period_observation_;
         //! Period with which available observations are actually loaded.
