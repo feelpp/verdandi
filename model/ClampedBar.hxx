@@ -19,7 +19,6 @@
 
 #ifndef VERDANDI_FILE_MODEL_CLAMPEDBAR_HXX
 
-
 #include "seldon/SeldonSolver.hxx"
 
 #include "OutputSaver.cxx"
@@ -47,6 +46,10 @@ namespace Verdandi
         typedef const T* const_pointer;
         typedef T& reference;
         typedef const T& const_reference;
+        typedef Matrix<T, General, RowSparse> background_error_variance;
+        typedef Vector<T> error_covariance_row;
+        typedef Vector<T> state_vector;
+        typedef Matrix<T, General, RowSparse> crossed_matrix;
 
     protected:
         //! Bar length.
@@ -60,6 +63,8 @@ namespace Verdandi
 
         //! Simulation duration.
         double time_simu_;
+        //! Number of time steps.
+        int Nt_;
         //! Time step.
         double Delta_t_;
         //! Current time step.
@@ -71,7 +76,6 @@ namespace Verdandi
         double mass_density_;
         //! Young's Modulus.
         double Young_modulus_;
-
 
         //! FEM Vector.
         Vector<T> disp_0_;
@@ -100,6 +104,21 @@ namespace Verdandi
         MatrixMumps<T> mat_lu;
 #endif
 
+        //! Balgovind scale for background covariance.
+        double Balgovind_scale_background_;
+        //! Background error variance.
+        double background_error_variance_value_;
+
+        //! Background error covariance matrix (B).
+        background_error_variance background_error_variance_;
+
+        //! Number of the row of B currently stored.
+        int current_row_;
+        //! Number of the column of Q currently stored.
+        int current_column_;
+        //! Value of the row of B currently stored.
+        error_covariance_row error_covariance_row_;
+
     public:
         // Constructor and destructor.
         ClampedBar();
@@ -112,6 +131,24 @@ namespace Verdandi
         // Processing.
         void Forward();
         bool HasFinished() const;
+
+        // Access methods.
+        int GetDate() const;
+        int GetNt() const;
+
+        int GetNstate() const;
+
+        void GetState(state_vector& state) const;
+        void SetState(state_vector& state);
+        void GetFullState(state_vector& state) const;
+        void SetFullState(const state_vector& state);
+
+        void GetBackgroundErrorCovarianceRow(int row,
+                                             error_covariance_row&
+                                             error_covariance_row);
+        const background_error_variance&
+        GetBackgroundErrorVarianceMatrix() const;
+        bool IsErrorSparse() const;
 
         string GetName() const;
         void Message(string message);

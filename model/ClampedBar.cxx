@@ -74,21 +74,30 @@ namespace Verdandi
         GetPot configuration_stream(configuration_file);
 
         configuration_stream.set_prefix("domain/");
-
         configuration_stream.set("bar_length", bar_length_);
         configuration_stream.set("Nx", Nx_);
-
-        configuration_stream.set_prefix("time/");
-
         configuration_stream.set("Delta_t", Delta_t_);
         configuration_stream.set("time_simu", time_simu_);
 
-        configuration_stream.set_prefix("physics/");
+        Nt_ = floor(time_simu_/Delta_t_);
 
+
+        // Error statistics.
+        configuration_stream.set_prefix("error_statistics/");
+        configuration_stream.set("Background_error_variance",
+                                 background_error_variance_value_, ">= 0");
+        configuration_stream.set("Background_error_scale",
+                                 Balgovind_scale_background_, "> 0");
+
+#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+        build_diagonal_sparse_matrix(Nx_,
+                                     background_error_variance_value_,
+                                     background_error_variance_);
+#endif
+
+        configuration_stream.set_prefix("physics/");
         configuration_stream.set("Young_modulus", Young_modulus_);
         configuration_stream.set("mass_density", mass_density_);
-
-        configuration_stream.set_prefix("solver/");
 
         /*** Allocation ***/
 
@@ -342,6 +351,187 @@ namespace Verdandi
     bool ClampedBar<T>::HasFinished() const
     {
         return time_instants_[time_step_] >= time_simu_;
+    }
+
+
+    //! Returns the current time step.
+    /*!
+      \return The current time step.
+    */
+    template <class T>
+    int ClampedBar<T>::GetDate() const
+    {
+        return time_step_;
+    }
+
+
+    //! Returns the number of time steps.
+    /*!
+      \return The number of time steps.
+    */
+    template <class T>
+    int ClampedBar<T>::GetNt() const
+    {
+        return floor(time_simu_ / Delta_t_);
+    }
+
+
+    //! Returns the number of points in the grid.
+    /*!
+      \return The number of points in the grid.
+    */
+    template <class T>
+    int ClampedBar<T>::GetNstate() const
+    {
+        return Nx_;
+    }
+
+
+    //! Provides the reduced state vector.
+    /*!
+      \param[out] state the reduced state vector.
+    */
+    template <class T>
+    void ClampedBar<T>::GetState(state_vector& state) const
+    {
+        int position = 0;
+        state.Reallocate(Nx_);
+        for (int i = 0; i < Nx_; i++)
+            state(position++) = disp_0_(i+1);
+    }
+
+
+    //! Sets the reduced state vector.
+    /*! Before setting the reduced state vector, special requirements can be
+      enforced; e.g. positivity requirement or inferior and superior limits.
+      \param[in] state the reduced state vector.
+    */
+    template <class T>
+    void ClampedBar<T>::SetState(state_vector& state)
+    {
+        int position = 0;
+        for (int i = 0; i < Nx_; i++)
+            disp_0_(i+1) = state(position++);
+    }
+
+
+    //! Provides the full state vector.
+    /*!
+      \param[out] state the full state vector.
+    */
+    template <class T>
+    void ClampedBar<T>::GetFullState(state_vector& state) const
+    {
+        throw ErrorUndefined("ClampedBar"
+                             "::GetFullState()");
+    }
+
+
+    //! Sets the full state vector.
+    /*!
+      \param[in] state the full state vector.
+    */
+    template <class T>
+    void ClampedBar<T>::SetFullState(const state_vector& state)
+    {
+        throw ErrorUndefined("ClampedBar"
+                             "::SetFullState()");
+    }
+
+
+    //! Computes a row of the background error covariance matrix B.
+    /*!
+      \param[in] row row index.
+      \param[out] error_covariance_row the value of row number \a row.
+    */
+    template <class T>
+    void ClampedBar<T>
+    ::GetBackgroundErrorCovarianceRow(int row, error_covariance_row&
+                                      error_covariance_row)
+    {
+#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+        {
+            error_covariance_row.Reallocate(Nx_);
+            error_covariance_row.Zero();
+            error_covariance_row(row) = background_error_variance_value_;
+        }
+# else
+        {
+#ifdef VERDANDI_BACKGROUND_ERROR_DENSE
+            {
+                error_covariance_row.Reallocate(Nx_);
+                error_covariance_row.Zero();
+                error_covariance_row(row)
+                    = background_error_variance_value_;
+            }
+#else
+            {
+                // The row has already been computed.
+                if (row == current_row_)
+                    error_covariance_row = error_covariance_row_;
+                else
+                {
+                    int i;
+                    current_row_ = row;
+                    current_column_ = -1;
+
+                    // Positions related to 'row'.
+                    int i_row = row;
+                    int j_row = row - i_row;
+
+                    T distance_x;
+                    T distance;
+                    int position = 0;
+                    for (i = 0; i < Nx_; i++)
+                    {
+                        distance_x = Delta_x_ * T(i - i_row);
+                        distance = sqrt(distance_x * distance_x)
+                            / Balgovind_scale_background_;
+                        error_covariance_row_(position++)
+                            = background_error_variance_value_
+                            * (1. + distance) * exp(-distance);
+                    }
+                    error_covariance_row = error_covariance_row_;
+                }
+            }
+#endif
+        }
+#endif
+    }
+
+
+    //! Returns the background error covariance matrix (B) if available.
+    /*! Returns the background error covariance matrix (B) if available,
+      raises an exception otherwise.
+      \return The matrix of the background error covariance.
+    */
+    template <class T>
+    const typename ClampedBar<T>::background_error_variance& ClampedBar<T>
+    ::GetBackgroundErrorVarianceMatrix() const
+    {
+#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+        return background_error_variance_;
+#else
+        throw ErrorUndefined(
+            "ShallowWater::GetBackgroundErrorVarianceMatrix()",
+            "the background error covariance matrix is not available!");
+#endif
+    }
+
+
+    //! Checks if the error covariance matrix is sparse.
+    /*!
+      \return True if there is a sparse error matrix, false otherwise.
+    */
+    template <class T>
+    bool ClampedBar<T>::IsErrorSparse() const
+    {
+#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+        return true;
+#else
+        return false;
+#endif
+
     }
 
 
