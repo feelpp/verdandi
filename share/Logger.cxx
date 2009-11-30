@@ -153,16 +153,33 @@ namespace Verdandi
 
     //! Writes a message in the log file.
     /*!
+      \tparam S type of the message, which must be convertible to a string
+      through 'ostringstream& operator << (ostringstream&, S& message)'.
       \param[in] object the object that sends the message.
       \param[in] message the message to be written.
       \param[in] options options.
     */
-    template <int LEVEL, class T>
-    void Logger::Log(const T& object, string message, int options)
+    template <int LEVEL, class T, class S>
+    void Logger::Log(const T& object, const S& message, int options)
     {
         CheckInitialization(options);
         if (LEVEL >= logging_level_)
-            WriteMessage(object, message, options);
+            Log(object, to_str(message), options);
+    }
+
+
+    //! Writes a message in the log file.
+    /*!
+      \tparam S type of the message, which must be convertible to a string
+      through 'ostringstream& operator << (ostringstream&, S& message)'.
+      \param[in] object the object that sends the message.
+      \param[in] message the message to be written.
+      \param[in] options options.
+    */
+    template <class T, class S>
+    void Logger::Log(const T& object, const S& message, int options)
+    {
+        Log(object, to_str(message), options);
     }
 
 
@@ -184,7 +201,22 @@ namespace Verdandi
     /*! The message is always sent to the standard output, and it is possibly
       written in a log file if the logging level is lower than or equal to
       zero.
-      \tparam S type of the message, which must be convertible to a string.
+      \tparam S type of the message, which must be convertible to a string
+      through 'ostringstream& operator << (ostringstream&, S& message)'.
+      \param[in] object the object that sends the message.
+      \param[in] message the message to be written.
+    */
+    template <class T, class S>
+    void Logger::StdOut(const T& object, const S& message)
+    {
+        StdOut(object, to_str(message));
+    }
+
+
+    //! Writes a message in the standard output and in the log file.
+    /*! The message is always sent to the standard output, and it is possibly
+      written in a log file if the logging level is lower than or equal to
+      zero.
       \param[in] object the object that sends the message.
       \param[in] message the message to be written.
     */

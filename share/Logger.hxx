@@ -106,12 +106,17 @@ namespace Verdandi
 
         static void SetLoggingLevel(int level);
 
-        template <int LEVEL, class T>
-        static void Log(const T& object, string message,
+        template <int LEVEL, class T, class S>
+        static void Log(const T& object, const S& message,
+                        int options = options_);
+        template <class T, class S>
+        static void Log(const T& object, const S& message,
                         int options = options_);
         template <class T>
         static void Log(const T& object, string message,
                         int options = options_);
+        template <class T, class S>
+        static void StdOut(const T& object, const S& message);
         template <class T>
         static void StdOut(const T& object, string message);
 
