@@ -48,15 +48,12 @@ namespace Verdandi
 
         model_.Initialize(configuration_file);
         observation_manager_.Initialize(model_, configuration_file);
-        MessageHandler::AddRecipient("model",
-                                     reinterpret_cast<void*>(&model_),
+        MessageHandler::AddRecipient("model", model_,
                                      ClassModel::StaticMessage);
         MessageHandler::AddRecipient("observation_manager",
-                                     reinterpret_cast<void*>
-                                     (&observation_manager_),
+                                     observation_manager_,
                                      ClassObservationManager::StaticMessage);
-        MessageHandler::AddRecipient("driver",
-                                     reinterpret_cast<void*>(this),
+        MessageHandler::AddRecipient("driver", *this,
                                      OptimalInterpolation::StaticMessage);
 
 
