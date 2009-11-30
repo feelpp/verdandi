@@ -23,8 +23,6 @@
 #include "ClampedBar.hxx"
 
 
-#define DBG_VERBOSE
-
 namespace Verdandi
 {
 
@@ -132,12 +130,9 @@ namespace Verdandi
         columns_0(3 * (Nx_ - 1) + 3) = Ndof_ - 1;
         rowindex_0(Ndof_) = 3 * (Nx_ - 1) + 4;
 
-#ifdef DBG_VERBOSE
-        DISP(values_0);
-        DISP(columns_0);
-        DISP(rowindex_0);
-#endif
-
+        Logger::StdOut("values_0", values_0);
+        Logger::StdOut("columns_0", columns_0);
+        Logger::StdOut("rowindex_0", rowindex_0);
 
         // Store the upper part of the Newmark
         // matrix in a symmetric sparse data structure.
@@ -241,12 +236,12 @@ namespace Verdandi
 
         }
 
-#ifdef DBG_VERBOSE
-        cout << "Assembled matrices" << endl;
-        DISP(Mass_matrix_);
-        DISP(Newmark_matrix_1_);
-        DISP(Newmark_matrix_0_);
-#endif
+
+        Logger::StdOut(*this, "Assembled matrices");
+        Logger::StdOut("Mass_matrix_", Mass_matrix_);
+        Logger::StdOut("Newmark_matrix_1_", Newmark_matrix_1_);
+        Logger::StdOut("Newmark_matrix_0_", Newmark_matrix_0_);
+
         // Dirichlet conditions (should be better to read in the skeleton).
         Newmark_matrix_1_.Val(0, 0) = 1;
         Newmark_matrix_1_.Val(0, 1) = 0;
@@ -272,9 +267,9 @@ namespace Verdandi
         GetLU(Newmark_matrix_1_, mat_lu, true);
 #endif
 
-        DISP(disp_0_);
-        DISP(velo_0_);
-        DISP(force_);
+        Logger::StdOut("disp_0_", disp_0_);
+        Logger::StdOut("velo_0_", velo_0_);
+        Logger::StdOut("force_", force_);
     }
 
 
@@ -297,12 +292,12 @@ namespace Verdandi
         // Update time.
         time_instants_.push_back(time_instants_[time_step_] + Delta_t_);
         time_step_ += 1;
-        cout <<
-            "===================================================="
-             << endl;
-        cout << "Iteration " << time_step_ <<
-            " corresponding to time " << time_instants_[time_step_] << endl;
-        cout << "--------------------------------------" << endl;
+
+        Logger::StdOutCommand("hline", "=");
+        Logger::Log("Iteration", to_str(time_step_) +
+                    " (corresponding to time " +
+                    to_str(time_instants_[time_step_]) + " )");
+        Logger::StdOutCommand("hline", "-");
 
         // Right hand side.
         force_.Fill(T(0.));
@@ -338,8 +333,9 @@ namespace Verdandi
         disp_0_ = disp_1_;
         velo_0_ = velo_1_;
 
-        DISP(disp_0_);
-        DISP(force_);
+        Logger::StdOut("disp_0_", disp_0_);
+        Logger::StdOut("velo_0_", velo_0_);
+        Logger::StdOut("force_", force_);
     }
 
 
@@ -550,7 +546,7 @@ namespace Verdandi
     template <class T>
     void ClampedBar<T>::Message(string message)
     {
-        cout << "The model ClampedBar received: " << message << endl;
+        Logger::StdOut( "The model ClampedBar received ", message);
     }
 
 
