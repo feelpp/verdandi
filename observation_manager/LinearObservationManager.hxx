@@ -68,11 +68,6 @@ namespace Verdandi
         //! Observation data.
         Vector<T> observation_;
 
-        //! Index along x.
-        Vector<T> location_x_;
-        //! Index along y.
-        Vector<T> location_y_;
-
         //! Number of total observations at current date.
         int Nobservation_;
 
@@ -86,10 +81,7 @@ namespace Verdandi
 
         /*** Model domain ***/
 
-        //! Number of points along x in the model.
-        int Nx_model_;
-        //! Number of points along y in the model.
-        int Ny_model_;
+        int Nstate_model_;
 
 
     public:

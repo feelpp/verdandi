@@ -85,18 +85,7 @@ namespace Verdandi
     {
         GetPot configuration_stream(configuration_file);
 
-        //! First abscissa.
-        double x_min_model = model.GetXMin();
-        //! First ordinate.
-        double y_min_model = model.GetYMin();
-
-        //! Space step along x.
-        double Delta_x_model = model.GetDeltaX();
-        //! Space step along y.
-        double Delta_y_model = model.GetDeltaY();
-
-        Nx_model_ = model.GetNx();
-        Ny_model_ = model.GetNy();
+        Nstate_model_ = model.GetNstate();
 
         configuration_stream.set_prefix("observation/");
         configuration_stream.set("File", observation_file_);
@@ -113,24 +102,37 @@ namespace Verdandi
                                  operator_diagonal_value_);
         configuration_stream.set("operator/File", operator_file_);
 
-        Nobservation_ = Nx_model_ * Ny_model_;
-        observation_.Reallocate(Nobservation_);
-
         /*** Building the matrices ***/
 
 #ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+        Nobservation_ = Nstate_model_;
+        observation_.Reallocate(Nobservation_);
         build_diagonal_sparse_matrix(Nobservation_, operator_diagonal_value_,
                                      tangent_operator_matrix_);
 #endif
 
 #ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        Nobservation_ = Nstate_model_;
+        observation_.Reallocate(Nobservation_);
         build_diagonal_sparse_matrix(Nobservation_, error_variance_value_,
                                      error_variance_);
 #endif
 
 #ifdef VERDANDI_TANGENT_OPERATOR_DENSE
-        if (strcmp(operator_definition_.c_str(), "file") == 0)
-            tangent_operator_matrix_.Read(operator_file_);
+        tangent_operator_matrix_.Read(operator_file_);
+
+        if (tangent_operator_matrix_.GetN() != model.GetNstate())
+            throw ErrorArgument("LinearObservationManager::Initialize()",
+                                "The number of columns of the tangent "
+                                "operator matrix ("
+                                + to_str(tangent_operator_matrix_.GetN())
+                                + ") defined in the file \"" +
+                                operator_file_ + "\" is inconsistent with the"
+                                " dimension of the model state("
+                                + to_str(model.GetNstate())  + ").");
+
+        Nobservation_ = tangent_operator_matrix_.GetM();
+        observation_.Reallocate(Nobservation_);
 #endif
     }
 
@@ -154,14 +156,9 @@ namespace Verdandi
 
         availability_ = step % (period_observation_ * Nskip_) == 0;
 
-        // If assimilation is finished (in prediction), no observation are
-        // loaded.
-        if (step > model.GetNtAssimilation())
-            availability_ = false;
-
         if (availability_)
         {
-            Matrix<double> input_data(Nx_model_, Ny_model_);
+            Vector<T> input_data(Nstate_model_);
             ifstream file_stream;
             file_stream.open(observation_file_.c_str());
 
@@ -170,25 +167,15 @@ namespace Verdandi
             if (!file_stream.is_open())
                 throw IOError("LinearObservationManager"
                               "::LoadObservation(model)",
-                              string("Unable to open file \"")
+                              "Unable to open file \""
                               + observation_file_ + "\".");
 #endif
-
-            streampos position = step / period_observation_
-                * Nx_model_ * Ny_model_ * sizeof(double);
+            streampos position =  step / (period_observation_ * Nskip_)
+                * (Nstate_model_ * sizeof(T) + sizeof(int));
             file_stream.seekg(position);
-
-            // To be optimized: use a method reading only one step instead.
-            input_data.Read(file_stream, false);
-
+            input_data.Read(file_stream);
             file_stream.close();
-
-            for (int i = 0; i < Nobservation_; i++)
-            {
-                div_t division;
-                division = div(i, Ny_model_);
-                observation_(i) = input_data(division.quot, division.rem);
-            }
+            ApplyOperator(input_data, observation_);
         }
     }
 
@@ -297,7 +284,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::ApplyOperator(const state_vector& x, Vector<T>& y) const
     {
-        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+        if (operator_definition_ == "diagonal")
         {
             y = x;
             Mlt(operator_diagonal_value_, y);
@@ -333,7 +320,7 @@ namespace Verdandi
     T LinearObservationManager<T>
     ::GetTangentOperator(int i, int j) const
     {
-        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+        if (operator_definition_ == "diagonal")
         {
             if (i == j)
                 return operator_diagonal_value_;
@@ -359,7 +346,7 @@ namespace Verdandi
                             ::tangent_operator_row& tangent_operator_row)
         const
     {
-        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+        if (operator_definition_ == "diagonal")
         {
             // if (operator_sparse_)
             // {
@@ -392,15 +379,7 @@ namespace Verdandi
     ::tangent_operator_matrix& LinearObservationManager<T>
     ::GetTangentOperatorMatrix() const
     {
-#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
-        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
-            return tangent_operator_matrix_;
-
-        // Dense operator or operator defined in a file.
-        else
-#endif
-            throw ErrorUndefined("LinearObservationManager"
-                                 "::GetTangentOperatorMatrix()");
+        return tangent_operator_matrix_;
     }
 
 
@@ -414,7 +393,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::ApplyAdjointOperator(const state_vector& x, Vector<T>& y) const
     {
-        if (strcmp(operator_definition_.c_str(), "diagonal") == 0)
+        if (operator_definition_ == "diagonal")
         {
             y = x;
             Mlt(operator_diagonal_value_, y);
