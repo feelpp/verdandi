@@ -27,8 +27,9 @@
 #include "Verdandi.hxx"
 using namespace Verdandi;
 
+#include "ForwardDriver.cxx"
+
 #include "ClampedBar.cxx"
-#include "newran/newran.h"
 
 int main(int argc, char** argv)
 {
@@ -43,20 +44,14 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    ClampedBar<double> clamped_bar(argv[1]);
-    clamped_bar.Initialize(argv[1]);
-    clamped_bar.InitializeFirstStep();
-    /*
-      OutputSaver<double, ClampedBar<double> > output_saver(argv[1],
-      clamped_bar);
-      output_saver.Initialize(argv[1], clamped_bar);
-    */
-    while (!clamped_bar.HasFinished())
+    ForwardDriver<ClampedBar<double> > driver(argv[1]);
+
+    driver.Initialize(argv[1]);
+
+    while (!driver.HasFinished())
     {
-        clamped_bar.InitializeStep();
-        //output_saver.InitializeStep();
-        clamped_bar.Forward();
-        //output_saver.Save(clamped_bar);
+        driver.InitializeStep();
+        driver.Forward();
     }
 
     END;
