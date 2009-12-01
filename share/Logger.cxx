@@ -275,6 +275,23 @@ namespace Verdandi
     }
 
 
+    //! Reads a specific command and applies the corresponding treatment.
+    /*! The message is always sent to the standard output, and it is possibly
+      written in a log file if the logging level is lower than or equal to
+      'VERDANDI_STDOUT_LOGGING_LEVEL'.
+      \param[in] command the specific command.
+      \param[in] parameter the parameter of the command.
+      \param[in] options options.
+      \note Only 'hline' command is yet supported.
+    */
+    void Logger::StdOutCommand(string command, string parameter)
+    {
+        Command(command, parameter, stdout_);
+        if (VERDANDI_STDOUT_LOGGING_LEVEL >= logging_level_)
+            Command(command, parameter, options_ & ~stdout_);
+    }
+
+
     ////////////////////////////
     // PRIVATE STATIC METHODS //
     ////////////////////////////

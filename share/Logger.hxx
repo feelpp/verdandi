@@ -132,6 +132,7 @@ namespace Verdandi
 
         static void Command(string command, string parameter,
                             int options = options_);
+        static void StdOutCommand(string command, string parameter);
 
     private :
 
