@@ -42,6 +42,9 @@
 #ifndef VERDANDI_LOG_IS_ACTIVE
 #define VERDANDI_LOG_IS_ACTIVE true
 #endif
+#ifndef VERDANDI_EXCEPTION_LOGGING_LEVEL
+#define VERDANDI_EXCEPTION_LOGGING_LEVEL 15
+#endif
 
 namespace Verdandi
 {

@@ -48,7 +48,11 @@ namespace Verdandi
     {
 #ifdef VERDANDI_WITH_ABORT
         this->CoutWhat();
+        Logger::SetStdout(false);
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
         abort();
+#else
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
 #endif
     }
 
@@ -137,7 +141,11 @@ namespace Verdandi
     {
 #ifdef VERDANDI_WITH_ABORT
         this->CoutWhat();
+        Logger::SetStdout(false);
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
         abort();
+#else
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
 #endif
     }
 
@@ -168,7 +176,11 @@ namespace Verdandi
     {
 #ifdef VERDANDI_WITH_ABORT
         this->CoutWhat();
+        Logger::SetStdout(false);
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
         abort();
+#else
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
 #endif
     }
 
@@ -199,7 +211,11 @@ namespace Verdandi
     {
 #ifdef VERDANDI_WITH_ABORT
         this->CoutWhat();
+        Logger::SetStdout(false);
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
         abort();
+#else
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
 #endif
     }
 
@@ -230,7 +246,11 @@ namespace Verdandi
     {
 #ifdef VERDANDI_WITH_ABORT
         this->CoutWhat();
+        Logger::SetStdout(false);
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
         abort();
+#else
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
 #endif
     }
 
@@ -277,7 +297,11 @@ namespace Verdandi
     {
 #ifdef VERDANDI_WITH_ABORT
         this->CoutWhat();
+        Logger::SetStdout(false);
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
         abort();
+#else
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
 #endif
     }
 
