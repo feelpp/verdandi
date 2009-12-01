@@ -45,6 +45,7 @@ namespace Verdandi
         // Destructor.
         virtual ~Error() throw();
 
+        virtual  string GetName() const;
         virtual string What();
         void CoutWhat();
     };
@@ -57,6 +58,8 @@ namespace Verdandi
     public:
         // Constructor.
         ErrorConfiguration(string function, string comment) throw();
+
+        string GetName() const;
     };
 
 
@@ -67,6 +70,8 @@ namespace Verdandi
     public:
         // Constructor.
         ErrorIO(string function, string comment) throw();
+
+        string GetName() const;
     };
 
 
@@ -77,6 +82,8 @@ namespace Verdandi
     public:
         // Constructor.
         ErrorProcessing(string function, string comment) throw();
+
+        string GetName() const;
     };
 
 
@@ -89,6 +96,7 @@ namespace Verdandi
         ErrorUndefined(string function, string comment) throw();
 
         virtual string What();
+        string GetName() const;
     };
 
 
@@ -99,6 +107,8 @@ namespace Verdandi
     public:
         // Constructor.
         ErrorArgument(string function, string comment) throw();
+
+        string GetName() const;
     };
 
 

@@ -84,6 +84,16 @@ namespace Verdandi
      ***********/
 
 
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    string Error::GetName() const
+    {
+        return "Error";
+    }
+
+
     //! Delivers information about the error.
     /*! Displays available information, i.e. the error description, the
       function and/or the comment.
@@ -132,6 +142,16 @@ namespace Verdandi
     }
 
 
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    string ErrorConfiguration::GetName() const
+    {
+        return "ErrorConfiguration";
+    }
+
+
     /////////////
     // ERRORIO //
     /////////////
@@ -153,6 +173,16 @@ namespace Verdandi
     }
 
 
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    string ErrorIO::GetName() const
+    {
+        return "ErrorIO";
+    }
+
+
     /////////////////////
     // ERRORPROCESSING //
     /////////////////////
@@ -171,6 +201,16 @@ namespace Verdandi
         this->CoutWhat();
         abort();
 #endif
+    }
+
+
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    string ErrorProcessing::GetName() const
+    {
+        return "ErrorProcessing";
     }
 
 
@@ -211,6 +251,16 @@ namespace Verdandi
     }
 
 
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    string ErrorUndefined::GetName() const
+    {
+        return "ErrorUndefined";
+    }
+
+
     ///////////////////
     // ERRORARGUMENT //
     ///////////////////
@@ -229,6 +279,16 @@ namespace Verdandi
         this->CoutWhat();
         abort();
 #endif
+    }
+
+
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    string ErrorArgument::GetName() const
+    {
+        return "ErrorArgument";
     }
 
 
