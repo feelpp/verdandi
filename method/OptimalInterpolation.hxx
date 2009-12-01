@@ -66,6 +66,9 @@ namespace Verdandi
         //! Should an analysis be computed at the first step?
         bool analyze_first_step_;
 
+        //! Computation mode for BLUE: "vector" or "matrix".
+        string blue_computation_;
+
     public:
 
         /*** Constructors and destructor ***/
@@ -84,8 +87,8 @@ namespace Verdandi
         void Analyze();
 
         void ComputeBLUE(state_vector& state_vector);
-        void ComputeBLUEDense(state_vector& state_vector);
-        void ComputeBLUESparse(state_vector& state_vector);
+        void ComputeBLUE_vector(state_vector& state_vector);
+        void ComputeBLUE_matrix(state_vector& state_vector);
 
         bool HasFinished() const;
 
@@ -93,8 +96,6 @@ namespace Verdandi
         const ClassModel& GetModel() const;
 
         string GetName() const;
-        void Message(string message);
-
     };
 
 

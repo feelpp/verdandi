@@ -46,8 +46,6 @@ namespace Verdandi
 
         /*** Initializations ***/
 
-        model_.Initialize(configuration_file);
-        observation_manager_.Initialize(model_, configuration_file);
         MessageHandler::AddRecipient("model", model_,
                                      ClassModel::StaticMessage);
         MessageHandler::AddRecipient("observation_manager",
@@ -57,9 +55,9 @@ namespace Verdandi
                                      OptimalInterpolation::StaticMessage);
 
 
-        /***********************
-         * Reads configuration *
-         ***********************/
+        /***************************
+         * Reads the configuration *
+         ***************************/
 
 
         /*** Display options ***/
@@ -73,11 +71,12 @@ namespace Verdandi
 
         /*** Assimilation options ***/
 
-        Nstate_ = model_.GetNstate();
-
         configuration_stream.set_prefix("data_assimilation/");
         configuration_stream.set("Analyze_first_step", analyze_first_step_);
 
+        configuration_stream.set_prefix("optimal_interpolation/");
+        configuration_stream.set("BLUE_computation", blue_computation_,
+                                 "'vector' | 'matrix'");
     }
 
 
@@ -105,36 +104,15 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
-        cout.precision(20);
-
-        state_vector state_vector;
-
         /*** Initializations ***/
 
-        // model_.Initialize(configuration_file);
-        // observation_manager_.Initialize(model_, configuration_file);
+        model_.Initialize(configuration_file);
+        observation_manager_.Initialize(model_, configuration_file);
+
+        /*** Assimilation ***/
 
         if (analyze_first_step_)
-        {
-            // Retrieves observations.
-            observation_manager_.LoadObservation(model_);
-
-            if (observation_manager_.HasObservation())
-            {
-                if (option_display_["show_date"])
-                    cout << "Performing optimal interpolation at time step ["
-                         << model_.GetDate() << "]..." << endl;
-
-                model_.GetState(state_vector);
-
-                ComputeBLUE(state_vector);
-
-                model_.SetState(state_vector);
-
-                if (option_display_["show_date"])
-                    cout << " done." << endl;
-            }
-        }
+            Analyze();
 
         MessageHandler::Send(*this, "model", "initial condition");
 
@@ -160,7 +138,7 @@ namespace Verdandi
     }
 
 
-    //! Performs a step forward without optimal interpolation.
+    //! Performs a step forward, with optimal interpolation at the end.
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Forward()
@@ -172,21 +150,21 @@ namespace Verdandi
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
 
+        Analyze();
+
         MessageHandler::Send(*this, "all", "::Forward end");
     }
 
 
-    //! Computes the analysis.
-    /*! To be called after the Forward method. Whenever observations are
-      available, it assimilates them using optimal interpolation.
-    */
+    //! Computes an analysis.
+    /*! Whenever observations are available, it computes BLUE.
+     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Analyze()
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
 
-        state_vector state_vector;
         observation_manager_.LoadObservation(model_);
 
         if (observation_manager_.HasObservation())
@@ -195,9 +173,12 @@ namespace Verdandi
                 cout << "Performing optimal interpolation at time step ["
                      << model_.GetDate() << "]..." << endl;
 
+            state_vector state_vector;
             model_.GetState(state_vector);
+            Nstate_ = model_.GetNstate();
 
             ComputeBLUE(state_vector);
+
             model_.SetState(state_vector);
 
             if (option_display_["show_date"])
@@ -222,38 +203,10 @@ namespace Verdandi
                   OptimalInterpolation<T, ClassModel, ClassObservationManager>
                   ::state_vector& state_vector)
     {
-#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
-        // B, R and H are sparse.
-        if (model_.IsErrorSparse() and observation_manager_.IsErrorSparse()
-            and observation_manager_.IsOperatorSparse())
-            ComputeBLUESparse(state_vector);
-
-        // B and H are sparse, R is not sparse.
-        else if (model_.IsErrorSparse()
-                 and observation_manager_.IsOperatorSparse()
-                 and not observation_manager_.IsErrorSparse())
-            ComputeBLUESparse(state_vector);
-
-        // At least one matrix is sparse.
+        if (blue_computation_ == "vector")
+            ComputeBLUE_vector(state_vector);
         else
-#endif
-            if (model_.IsErrorSparse()
-                or observation_manager_.IsErrorSparse()
-                or observation_manager_.IsOperatorSparse())
-            {
-#ifdef SELDON_DEBUG_LEVEL_4
-                cout << "Warning! At least one sparse matrix is used (either"
-                     << " in the model or in the observation manager), but"
-                     << " not all matrices are sparse. Therefore the"
-                     << " computation will use dense operations, leading to a"
-                     << " potential loss of performance." << endl;
-#endif
-                ComputeBLUEDense(state_vector);
-            }
-
-        // B, R and H are not sparse.
-            else
-                ComputeBLUEDense(state_vector);
+            ComputeBLUE_matrix(state_vector);
     }
 
 
@@ -263,10 +216,11 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUEDense(
+    ::ComputeBLUE_vector(
         typename OptimalInterpolation<T, ClassModel, ClassObservationManager>
         ::state_vector& state_vector)
     {
+#ifdef VERDANDI_DENSE
         int r, c;
 
         // Number of observations at current date.
@@ -341,20 +295,26 @@ namespace Verdandi
 
             state_vector(r) += DotProd(BHt_row, HBHR_inv_innovation);
         }
+#else
+        throw ErrorUndefined("OptimalInterpolation::ComputeBLUE_vector");
+#endif
     }
 
 
-    //! Computes BLUE for optimal interpolation with sparse matrices.
-    /*!
+    //! Computes BLUE using operations on matrices.
+    /*! This method is mainly intended for cases where the covariance matrices
+      are sparse matrices. Otherwise, the manipulation of the matrices may
+      lead to unreasonable memory requirements and to high computational
+      costs.
       \param[in] state_vector the state vector to analyze.
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUESparse(
+    ::ComputeBLUE_matrix(
         typename OptimalInterpolation<T, ClassModel, ClassObservationManager>
         ::state_vector& state_vector)
     {
-#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+#ifdef VERDANDI_SPARSE
         // Number of observations at current date.
         Nobservation_ = observation_manager_.GetNobservation();
 
@@ -374,21 +334,11 @@ namespace Verdandi
             working_matrix_so, working_matrix_oo);
 
         // Computes (HBH' + R).
-        if (observation_manager_.HasErrorMatrix())
-            Add(T(1),
-                observation_manager_.GetObservationErrorVariance(),
-                working_matrix_oo);
+        Add(T(1),
+            observation_manager_.GetObservationErrorVariance(),
+            working_matrix_oo);
 
-        else
-            // B and H are sparse, R is not sparse.
-            throw ErrorUndefined(
-                "OptimalInterpolation::ComputeBLUESparse(state_vector)");
-        // for (int r = 0; r < Nobservation_; r++)
-        //     for (int c = 0; c < Nobservation_; c++)
-        //         working_matrix_oo(r, c) += observation_manager_
-        //             .GetObservationErrorCovariance(r, c);
-
-        // Computes innovation in working_vector.
+        // Puts the innovation in 'working_vector'.
         Vector<T> working_vector(Nobservation_);
         observation_manager_.GetInnovation(state_vector, working_vector);
 
@@ -405,6 +355,8 @@ namespace Verdandi
 
         // Computes new state.
         Add(T(1), working_vector, state_vector);
+#else
+        throw ErrorUndefined("OptimalInterpolation::ComputeBLUE_matrix");
 #endif
     }
 
@@ -443,17 +395,6 @@ namespace Verdandi
     ::GetName() const
     {
         return "OptimalInterpolation";
-    }
-
-
-    //! Receives and handles a message.
-    /*
-      \param[in] message the received message.
-    */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::Message(string message)
-    {
     }
 
 
