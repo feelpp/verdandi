@@ -1,10 +1,14 @@
+// You may use 'LinearObservationManager' or 'GridToNetworkObservationManager'
+// as observation operator.
+#ifndef OBSERVATION_OPERATOR
+#define OBSERVATION_OPERATOR LinearObservationManager
+#endif
+
+
 #define SELDON_WITH_CBLAS
 #define SELDON_WITH_LAPACK
 #define SELDON_WITH_SUPERLU
-#define SELDON_DEBUG_LEVEL_4
-#define VERDANDI_WITH_ABORT
-#define GETPOT_ACTIVATE_EXCEPTION true
-#define VERDANDI_IGNORE_MESSAGE
+#define VERDANDI_SPARSE
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
@@ -12,9 +16,12 @@ using namespace Verdandi;
 #include "seldon/SeldonSolver.hxx"
 
 #include "OptimalInterpolation.cxx"
-#include "GridToNetworkObservationManager.cxx"
 #include "ShallowWater.cxx"
-#include "newran.h"
+
+#define _QUOTE(x) #x
+#define QUOTE(x) _QUOTE(x)
+#include QUOTE(OBSERVATION_OPERATOR.cxx)
+
 
 int main(int argc, char** argv)
 {
@@ -30,11 +37,9 @@ int main(int argc, char** argv)
     }
 
     typedef double real;
-    typedef ShallowWater<real> ClassModel;
-    typedef OptimalInterpolation<real, ClassModel,
-        GridToNetworkObservationManager<real> > ClassOptimalInterpolation;
 
-    ClassOptimalInterpolation driver(argv[1]);
+    OptimalInterpolation<real, ShallowWater<real>,
+        OBSERVATION_OPERATOR<real> > driver(argv[1]);
 
     driver.Initialize(argv[1]);
 
