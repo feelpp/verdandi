@@ -119,6 +119,11 @@ namespace Verdandi
         //! Value of the row of B currently stored.
         error_covariance_row error_covariance_row_;
 
+        /*** Output saver ***/
+
+        //! Output saver.
+        OutputSaver output_saver_;
+
     public:
         // Constructor and destructor.
         ClampedBar();
@@ -131,6 +136,7 @@ namespace Verdandi
         // Processing.
         void Forward();
         bool HasFinished() const;
+        void Save();
 
         // Access methods.
         int GetDate() const;

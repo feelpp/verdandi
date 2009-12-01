@@ -97,6 +97,12 @@ namespace Verdandi
         configuration_stream.set("Young_modulus", Young_modulus_);
         configuration_stream.set("mass_density", mass_density_);
 
+        /*** Ouput saver ***/
+
+        output_saver_.Initialize(configuration_file, "output_saver/");
+        output_saver_.Empty("disp_0");
+        output_saver_.Empty("velo_0");
+
         /*** Allocation ***/
 
         Delta_x_ = bar_length_ / Nx_;
@@ -350,6 +356,17 @@ namespace Verdandi
     }
 
 
+    //! Saves the simulated data.
+    /*! It saves the displacement 'disp_0_' and  the velocity 'velo_0_'.
+     */
+    template <class T>
+    void ClampedBar<T>::Save()
+    {
+        output_saver_.Save(disp_0_, double(time_step_), "disp_0");
+        output_saver_.Save(velo_0_, double(time_step_), "velo_0");
+    }
+
+
     //! Returns the current time step.
     /*!
       \return The current time step.
@@ -546,7 +563,9 @@ namespace Verdandi
     template <class T>
     void ClampedBar<T>::Message(string message)
     {
-        Logger::StdOut( "The model ClampedBar received ", message);
+        if (message.find("initial condition") != string::npos
+            || message.find("forecast") != string::npos)
+            Save();
     }
 
 
