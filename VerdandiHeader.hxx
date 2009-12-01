@@ -34,6 +34,10 @@ namespace Verdandi
 #include <list>
 
 #include "seldon/SeldonHeader.hxx"
+
+#ifndef GETPOT_ACTIVATE_EXCEPTION
+#define GETPOT_ACTIVATE_EXCEPTION true
+#endif
 #include "getpot/GetPot.hpp"
 
 
