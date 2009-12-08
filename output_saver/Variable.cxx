@@ -43,8 +43,8 @@ namespace Verdandi
       \param string mode saving format (e.g., "binary", "text").
       \param string file path to the output file.
     */
-    Variable::Variable(string mode, string file):
-        mode_(mode), file_(file)
+    Variable::Variable(string mode, string file, bool has_to_empty_file):
+        mode_(mode), file_(file), has_to_empty_file_(has_to_empty_file)
     {
     }
 
@@ -91,6 +91,16 @@ namespace Verdandi
     }
 
 
+    //! Empty accessor.
+    /*! Sets the value of the boolean empty.
+      \param empty boolean that indicates if the file has to be emptied.
+    */
+    void Variable::HasToEmptyFile(bool has_to_empty_file)
+    {
+        has_to_empty_file_ = has_to_empty_file;
+    }
+
+
     //! Mode accessor.
     /*! Returns the saving mode.
       \return The saving format.
@@ -108,6 +118,16 @@ namespace Verdandi
     string Variable::GetFile() const
     {
         return file_;
+    }
+
+
+    //! Empty accessor.
+    /*! Indicates if the file has to be emptied.
+      \return Boolean that indicates if the file has to be emptied.
+    */
+    bool Variable::HasToEmptyFile() const
+    {
+        return has_to_empty_file_;
     }
 
 

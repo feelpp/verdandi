@@ -40,13 +40,15 @@ namespace Verdandi
         string mode_;
         //! Path to the output file.
         string file_;
+        //! Boolean to indicate if the file has to be emptied.
+        bool has_to_empty_file_;
 
     public:
 
         /*** Constructors and destructor ***/
 
         Variable();
-        Variable(string mode, string file);
+        Variable(string mode, string file, bool has_to_empty_file = false);
         Variable(const Variable& variable);
         ~Variable();
 
@@ -54,9 +56,11 @@ namespace Verdandi
 
         void SetMode(string mode);
         void SetFile(string file);
+        void HasToEmptyFile(bool has_to_empty_file);
 
         string GetMode() const;
         string GetFile() const;
+        bool  HasToEmptyFile() const;
 
         void Display() const;
 

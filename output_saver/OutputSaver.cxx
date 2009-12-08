@@ -182,6 +182,9 @@ namespace Verdandi
         // In case the mode has not been set yet.
         SetVariable<S>(variable);
 
+        if (variable.HasToEmptyFile())
+            Empty(variable_name);
+
         if (variable.GetMode() == "text")
             WriteText(x, variable.GetFile());
         else if (variable.GetMode() == "binary")
@@ -321,6 +324,7 @@ namespace Verdandi
       \param[in] variable_name the name of the variable whose file should be
       emptied.
     */
+    template <class S>
     void OutputSaver::Empty(string variable_name)
     {
         map<string, Variable>::iterator im;
@@ -329,19 +333,54 @@ namespace Verdandi
         if (im == variable_list_.end())
             return;
 
+        if (im->second.GetMode().empty())
+            SetVariable<S>(im->second);
+
         ofstream output_stream(im->second.GetFile().c_str());
         output_stream.close();
+        im->second.HasToEmptyFile(false);
+    }
+
+
+    //! Empties the output file associated with a variable.
+    /*!
+      \param[in] variable_name the name of the variable whose file should be
+      emptied.
+    */
+    void OutputSaver::Empty(string variable_name)
+    {
+        map<string, Variable>::iterator im;
+        im = variable_list_.find(variable_name);
+
+        if (im == variable_list_.end())
+            return;
+
+        if (im->second.GetMode().empty())
+        {
+            im->second.HasToEmptyFile(true);
+            return;
+        }
+
+        ofstream output_stream(im->second.GetFile().c_str());
+        output_stream.close();
+        im->second.HasToEmptyFile(false);
     }
 
 
     //! Empties the output files of all registered variables.
     void OutputSaver::Empty()
     {
-        map<string, Variable>::const_iterator im;
+        map<string, Variable>::iterator im;
         for (im = variable_list_.begin(); im != variable_list_.end(); im++)
         {
-            ofstream output_stream(im->second.GetFile().c_str());
-            output_stream.close();
+            if (im->second.GetMode().empty())
+                im->second.HasToEmptyFile(true);
+            else
+            {
+                ofstream output_stream(im->second.GetFile().c_str());
+                output_stream.close();
+                im->second.HasToEmptyFile(false);
+            }
         }
     }
 
