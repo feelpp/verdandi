@@ -300,9 +300,9 @@ namespace Verdandi
         time_step_ += 1;
 
         Logger::StdOutCommand("hline", "=");
-        Logger::Log("Iteration", to_str(time_step_) +
-                    " (corresponding to time " +
-                    to_str(time_instants_[time_step_]) + " )");
+        Logger::StdOut("Iteration", to_str(time_step_) +
+                       " (corresponding to time " +
+                       to_str(time_instants_[time_step_]) + " )");
         Logger::StdOutCommand("hline", "-");
 
         // Right hand side.
