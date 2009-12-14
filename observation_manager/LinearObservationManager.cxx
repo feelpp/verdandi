@@ -506,7 +506,6 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>::Message(string message)
     {
-        cout << "OM received: " << message << endl;
     }
 
 

@@ -544,7 +544,6 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::Message(string message)
     {
-        cout << "OM received: " << message << endl;
     }
 
 
