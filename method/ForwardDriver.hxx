@@ -34,6 +34,9 @@ namespace Verdandi
     class ForwardDriver: public VerdandiBase
     {
 
+    public:
+        typedef typename ClassModel::state_vector state_vector;
+
     protected:
 
         //! Underlying model.
@@ -48,6 +51,11 @@ namespace Verdandi
         bool show_iteration_;
         //! Should the current date be displayed?
         bool show_date_;
+
+        /*** Output saver ***/
+
+        //! Output saver.
+        OutputSaver output_saver_;
 
     public:
 
@@ -67,6 +75,7 @@ namespace Verdandi
         // Access methods.
         const ClassModel& GetModel() const;
         string GetName() const;
+        void Message(string message);
     };
 
 

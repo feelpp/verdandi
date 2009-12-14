@@ -56,6 +56,11 @@ namespace Verdandi
         configuration_stream.set("Show_iteration", show_iteration_);
         // Should the date be displayed on screen?
         configuration_stream.set("Show_date", show_date_);
+
+        /*** Ouput saver ***/
+
+        output_saver_.Initialize(configuration_file, "forward/output_saver/");
+        output_saver_.Empty("state_forecast");
     }
 
 
@@ -134,6 +139,7 @@ namespace Verdandi
         iteration_++;
 
         MessageHandler::Send(*this, "model", "forecast");
+        MessageHandler::Send(*this, "driver", "forecast");
 
         MessageHandler::Send(*this, "all", "::Forward end");
     }
@@ -170,6 +176,23 @@ namespace Verdandi
     string ForwardDriver<ClassModel>::GetName() const
     {
         return "ForwardDriver";
+    }
+
+
+    //! Receives and handles a message.
+    /*
+      \param[in] message the received message.
+    */
+    template <class ClassModel>
+    void  ForwardDriver<ClassModel>::Message(string message)
+    {
+        state_vector state;
+        if (message.find("forecast") != string::npos)
+        {
+            model_.GetState(state);
+            output_saver_.Save(state, double(model_.GetDate()),
+                               "state_forecast");
+        }
     }
 
 
