@@ -51,7 +51,7 @@ namespace Verdandi
 
         /*** Display options ***/
 
-        configuration_stream.set_prefix("display/");
+        configuration_stream.set_prefix("forward/display/");
         // Should the iteration be displayed on screen?
         configuration_stream.set("Show_iteration", show_iteration_);
         // Should the date be displayed on screen?

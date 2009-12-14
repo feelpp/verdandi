@@ -69,6 +69,11 @@ namespace Verdandi
         //! Computation mode for BLUE: "vector" or "matrix".
         string blue_computation_;
 
+        /*** Output saver ***/
+
+        //! Output saver.
+        OutputSaver output_saver_;
+
     public:
 
         /*** Constructors and destructor ***/
@@ -96,6 +101,7 @@ namespace Verdandi
         const ClassModel& GetModel() const;
 
         string GetName() const;
+        void Message(string message);
     };
 
 

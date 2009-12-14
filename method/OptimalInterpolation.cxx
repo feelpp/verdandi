@@ -62,7 +62,7 @@ namespace Verdandi
 
         /*** Display options ***/
 
-        configuration_stream.set_prefix("display/");
+        configuration_stream.set_prefix("optimal_interpolation/display/");
         // Should iterations be displayed on screen?
         configuration_stream.set("Show_iteration",
                                  option_display_["show_iteration"]);
@@ -71,12 +71,20 @@ namespace Verdandi
 
         /*** Assimilation options ***/
 
-        configuration_stream.set_prefix("data_assimilation/");
+        configuration_stream.
+            set_prefix("optimal_interpolation/data_assimilation/");
         configuration_stream.set("Analyze_first_step", analyze_first_step_);
 
         configuration_stream.set_prefix("optimal_interpolation/");
         configuration_stream.set("BLUE_computation", blue_computation_,
                                  "'vector' | 'matrix'");
+
+        /*** Ouput saver ***/
+
+        output_saver_.Initialize(configuration_file,
+                                 "optimal_interpolation/output_saver/");
+        output_saver_.Empty("state_forecast");
+        output_saver_.Empty("state_analysis");
     }
 
 
@@ -149,8 +157,12 @@ namespace Verdandi
 
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
+        MessageHandler::Send(*this, "driver", "forecast");
+
 
         Analyze();
+
+        MessageHandler::Send(*this, "driver", "analysis");
 
         MessageHandler::Send(*this, "all", "::Forward end");
     }
@@ -395,6 +407,32 @@ namespace Verdandi
     ::GetName() const
     {
         return "OptimalInterpolation";
+    }
+
+
+    //! Receives and handles a message.
+    /*
+      \param[in] message the received message.
+    */
+    template <class T, class ClassModel, class ClassObservationManager>
+    void OptimalInterpolation<T, ClassModel, ClassObservationManager>
+    ::Message(string message)
+    {
+        state_vector state;
+        if (message.find("forecast") != string::npos)
+        {
+            model_.GetState(state);
+            output_saver_.Save(state, double(model_.GetDate()),
+                               "state_forecast");
+        }
+
+        if (message.find("analysis") != string::npos)
+        {
+            model_.GetState(state);
+            output_saver_.Save(state, double(model_.GetDate()),
+                               "state_analysis");
+        }
+
     }
 
 

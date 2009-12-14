@@ -83,7 +83,7 @@ namespace Verdandi
 
         GetPot configuration_stream(configuration_file);
 
-        configuration_stream.set_prefix("domain/");
+        configuration_stream.set_prefix("shallow_water/domain/");
 
         configuration_stream.set("x_min", x_min_);
         configuration_stream.set("y_min", y_min_);
@@ -96,11 +96,11 @@ namespace Verdandi
         configuration_stream.set("Nt", Nt_);
 
         // Departure from the uniform initial condition.
-        configuration_stream.set_prefix("initial_condition/");
+        configuration_stream.set_prefix("shallow_water/initial_condition/");
         configuration_stream.set("Value", value_);
 
         // Perturbations.
-        configuration_stream.set_prefix("model_error/");
+        configuration_stream.set_prefix("shallow_water/model_error/");
         configuration_stream.set("Standard_deviation_bc",
                                  model_error_std_bc_, ">= 0");
         configuration_stream.set("Standard_deviation_ic",
@@ -140,7 +140,7 @@ namespace Verdandi
         }
 
         // Error statistics.
-        configuration_stream.set_prefix("error_statistics/");
+        configuration_stream.set_prefix("shallow_water/error_statistics/");
 
         configuration_stream.set("Background_error_variance",
                                  background_error_variance_value_, ">= 0");
@@ -189,7 +189,7 @@ namespace Verdandi
                                            value_top_, amplitude_top_,
                                            frequency_top_);
 
-        configuration_stream.set_prefix("data_assimilation/");
+        configuration_stream.set_prefix("shallow_water/data_assimilation/");
 
         configuration_stream.set("Nt_assimilation", Nt_assimilation_);
 
@@ -212,7 +212,7 @@ namespace Verdandi
         h_.Fill(1.);
         NEWRAN::Random::Set(*urng_);
         value_ += max(-2., min(2., normal_.Next())) * model_error_std_ic_;
-        configuration_stream.set_prefix("initial_condition/");
+        configuration_stream.set_prefix("shallow_water/initial_condition/");
         bool source;
         configuration_stream.set("Center", source);
         if (source)
@@ -252,7 +252,8 @@ namespace Verdandi
 
         /*** Ouput saver ***/
 
-        output_saver_.Initialize(configuration_file, "output_saver/");
+        output_saver_.
+            Initialize(configuration_file, "shallow_water/output_saver/");
         output_saver_.Empty("u");
         output_saver_.Empty("v");
         output_saver_.Empty("h");
@@ -805,7 +806,7 @@ namespace Verdandi
                                          int& type, T& value,
                                          T& amplitude, T& frequency)
     {
-        configuration_stream.set_prefix("boundary_condition/");
+        configuration_stream.set_prefix("shallow_water/boundary_condition/");
         string description;
         configuration_stream.set(side, description);
         if (description == "free")
