@@ -1,0 +1,22 @@
+/*! \file models.dox
+    \brief Models.
+*/
+
+/*!
+\page models Models
+
+\section shallow_water Shallow Water
+
+An oceonographic model is implemented in <code>ShallowWater.hxx</code> and
+<code>ShallowWater.cxx</code>. The class <code>ShallowWater</code> is
+a template class: <code>ShallowWater<T></code>. <code>T</code> is the type of the elements to
+be stored (e.g. <code>double</code>).
+
+The state contains the information concerning:
+<ul>
+<li> water height stored in matrix <code>h_</code>; </li>
+<li> vertical velocity along x stored in matrix <code>u_</code>; </li>
+<li> vertical velocity along y stored in matrix <code>v_</code>. </li>
+
+\section clamped_bar Clamped Bar
+*/

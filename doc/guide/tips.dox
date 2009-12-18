@@ -1,0 +1,41 @@
+/*! \file tips.dox
+    \brief Tips.
+*/
+
+/*!
+\page tips Tips
+
+\section options Options
+
+Here is the list of %Verdandi flags you may define.
+
+Defining <code>VERDANDI_WITH_ABORT</code> makes the program abort if a
+%Verdandi exception is raised (see explanation below in section \ref
+exceptions_and_debugging of page \ref debugging).
+
+Defining <code>VERDANDI_IGNORE_MESSAGE</code> skips the processing of messages
+sent between the objects.
+
+You may define either <code>VERDANDI_DENSE</code> or
+<code>VERDANDI_SPARSE</code>, respectively to work with dense or sparse
+matrices for the error variance and the observation tangent operator.  If none
+of these flags is defined, the data is not stored in a matrix, and the
+computation is made row by row.
+
+A level of priority for the logger messages can be set by defining
+<code>VERDANDI_LOGGING_LEVEL</code>.
+
+Setting <code>GETPOT_ACTIVATE_EXCEPTION</code> at <code>true</code> activates
+the raising of exceptions related to GetPot, the configuration file parser.
+
+\section configuration_file Building a configuration file
+
+Configuration files are read by <a
+href="http://getpot.sourceforge.net/">GetPot</a>. Here are some tips to help
+you to build your configuration file: 
+<ul>
+<li> how to use substitution with <code>$</code> expressions; </li>
+<li> how to build a list; </li>
+<li> what happens if you do not provide a value for a variable.</li>
+</ul>
+*/

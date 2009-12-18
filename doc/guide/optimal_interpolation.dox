@@ -1,0 +1,55 @@
+/*! \file optimal_interpolation.dox
+    \brief Optimal Interpolation.
+*/
+
+/*!
+\page optimal_interpolation Optimal Interpolation
+
+The sequential data assimilation algorithm of optimal interpolation is
+implemented in <code>OptimalInterpolation.hxx</code> and
+<code>OptimalInterpolation.cxx</code>. The class <code>OptimalInterpolation</code>
+is a template class: <code>OptimalInterpolation<T, ClassModel,
+ClassObservationManager></code>. <code>T</code> is the type of the elements to
+be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of
+the model (e.g. <code>ShallowWater<double></code>),
+<code>ClassObservationManager</code> is the type of the observation manager
+(e.g. <code>GridToNetworkObservationManager<double></code>).
+
+Here is how you may use the <code>OptimalInterpolation</code> class:
+
+<ul>
+
+  <li> First build the <code>OptimalInterpolation</code> driver and read
+  option keys in the configuration file with the method
+  <code>OptimalInterpolation(configuration_file)</code>. </li>
+
+  <li> Then initialize the driver, the model and the observation manager with the
+  method <code>Initialize(configuration_file)</code>. This optionally computes
+  the analysis of the first step. </li>
+
+  <li> Optionnally intialize a step for the optimal interpolation with the
+  method <code>InitializeStep</code>. This initializes a step for the model.
+
+  <li> Perform a step forward without optimal interpolation with the method
+  <code>Forward</code>. </li>
+
+  <li> Compute the analysis with the method <code>Analyze</code>. Whenever
+  observations are available, it assimilates them using optimal
+  interpolation. The appropriate implementation of <code>ComputeBLUE</code>
+  will be called (see explanation above). </li>
+
+  <li> Compute the data assimilation until the model has finished: the method
+  <code>HasFinished</code> returns true if no more data assimilation is
+  required, false otherwise. </li>
+
+</ul>
+
+\section algorithm Optimal interpolation algorithm
+
+\section notes Notes 
+Advantages and drawbacks of the optimal interpolation
+method; in which case to use or not to use it.
+
+\section configuration How to build the configuration file
+
+*/

@@ -1,0 +1,15 @@
+/*! \file linear_observation_manager.dox
+    \brief Linear Observation Manager.
+*/
+
+/*!
+\page linear_observation_manager Linear Observation Manager
+
+An observation manager is implemented in
+<code>LinearObservationManager.hxx</code> and
+<code>LinearObservationManager.cxx</code>. The class
+<code>LinearObservationManager</code> is a template class:
+<code>LinearObservationManager<T></code>. <code>T</code> is the type of the
+elements to be stored (e.g. <code>double</code>).
+
+*/
