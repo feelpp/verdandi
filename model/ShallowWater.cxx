@@ -35,7 +35,7 @@ namespace Verdandi
     //! Constructor.
     template <class T>
     ShallowWater<T>::ShallowWater():
-        time_step_(0), g_(9.81), urng_(0), current_row_(-1),
+        date_(0.), g_(9.81), urng_(0), current_row_(-1),
         current_column_(-1)
     {
     }
@@ -47,7 +47,7 @@ namespace Verdandi
     */
     template <class T>
     ShallowWater<T>::ShallowWater(string configuration_file):
-        time_step_(0), g_(9.81), urng_(0), current_row_(-1),
+        date_(0.), g_(9.81), urng_(0), current_row_(-1),
         current_column_(-1)
     {
         //Initialize(configuration_file);
@@ -93,7 +93,8 @@ namespace Verdandi
         configuration_stream.set("Ny", Ny_);
 
         configuration_stream.set("Delta_t", Delta_t_);
-        configuration_stream.set("Nt", Nt_);
+        configuration_stream.set("Final_date", final_date_);
+
 
         // Departure from the uniform initial condition.
         configuration_stream.set_prefix("shallow_water/initial_condition/");
@@ -190,13 +191,6 @@ namespace Verdandi
                                            frequency_top_);
 
         configuration_stream.set_prefix("shallow_water/data_assimilation/");
-
-        configuration_stream.set("Nt_assimilation", Nt_assimilation_);
-
-        Nt_prediction_ = Nt_ - Nt_assimilation_;
-        if (Nt_prediction_ < 0)
-            throw string("Error: the assimilation window is longer")
-                + " than the simulation period.";
 
         configuration_stream.set("With_positivity_requirement",
                                  with_positivity_requirement_);
@@ -398,7 +392,7 @@ namespace Verdandi
             abort();
         }
 
-        time_step_++;
+        date_ += Delta_t_;
     }
 
 
@@ -409,7 +403,7 @@ namespace Verdandi
     template <class T>
     bool ShallowWater<T>::HasFinished() const
     {
-        return time_step_ >= Nt_;
+        return date_ >= final_date_;
     }
 
 
@@ -421,7 +415,7 @@ namespace Verdandi
     void ShallowWater<T>::StepBack(const typename ShallowWater<T>
                                    ::state_vector& state)
     {
-        time_step_--;
+        date_ -= Delta_t_;
         SetFullState(state);
     }
 
@@ -432,9 +426,9 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>::Save()
     {
-        output_saver_.Save(u_, double(time_step_), "u");
-        output_saver_.Save(v_, double(time_step_), "v");
-        output_saver_.Save(h_, double(time_step_), "h");
+        output_saver_.Save(u_, date_, "u");
+        output_saver_.Save(v_, date_, "v");
+        output_saver_.Save(h_, date_, "h");
     }
 
 
@@ -443,25 +437,14 @@ namespace Verdandi
     ///////////////////
 
 
-    //! Returns the current time step.
+    //! Returns the current date.
     /*!
-      \return The current time step.
+      \return The current date.
     */
     template <class T>
-    int ShallowWater<T>::GetDate() const
+    double ShallowWater<T>::GetDate() const
     {
-        return time_step_;
-    }
-
-
-    //! Returns the number of time steps.
-    /*!
-      \return The number of time steps.
-    */
-    template <class T>
-    int ShallowWater<T>::GetNt() const
-    {
-        return Nt_;
+        return date_;
     }
 
 
@@ -557,17 +540,6 @@ namespace Verdandi
     int ShallowWater<T>::GetNstate() const
     {
         return Nx_ * Ny_;
-    }
-
-
-    //! Returns the number of assimilation time steps.
-    /*!
-      \return The number of assimilation time steps.
-    */
-    template <class T>
-    int ShallowWater<T>::GetNtAssimilation() const
-    {
-        return Nt_assimilation_;
     }
 
 

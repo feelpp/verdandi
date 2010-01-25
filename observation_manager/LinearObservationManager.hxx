@@ -19,6 +19,8 @@
 
 #ifndef VERDANDI_FILE_LINEAROBSERVATIONMANAGER_HXX
 
+#include <iostream>
+#include <list>
 
 namespace Verdandi
 {
@@ -53,10 +55,33 @@ namespace Verdandi
         string observation_file_;
         //! How are stored the observations.
         string observation_type_;
+        //! Size in bytes of one observations vector.
+        int observation_size_;
         //! Period with which observations are available.
-        int period_observation_;
+        double Delta_t_;
         //! Period with which available observations are actually loaded.
         int Nskip_;
+        //! Indicates if observation has been loaded yet.
+        bool observation_loaded_;
+        //! Duration during which observations are assimilated.
+        double final_date_;
+
+        //! Observation data.
+        Vector<T> observation_;
+        //! Observation date.
+        Vector<double> observation_date_;
+        //! Lower bound of the last observation time interval.
+        double date_inf_;
+        //! Upper bound of the last observation time interval.
+        double date_sup_;
+
+        //! Number total of observations at current date.
+        int Nobservation_;
+        //! Number total of observations date.
+        int Nobservation_date_;
+
+        //! Availability of observations at current date.
+        bool availability_;
 
         //! Tangent operator matrix (H).
         tangent_operator_matrix tangent_operator_matrix_;
@@ -67,14 +92,6 @@ namespace Verdandi
         //! In case of an operator defined in a file.
         string operator_file_;
 
-        //! Observation data.
-        Vector<T> observation_;
-
-        //! Number of total observations at current date.
-        int Nobservation_;
-
-        //! Availability of observations at current date.
-        bool availability_;
 
         //! Observation error variance.
         T error_variance_value_;
@@ -100,7 +117,15 @@ namespace Verdandi
 
         // Loads the observations at a given date.
         template <class Model>
-        void LoadObservation(const Model& model);
+        void SetDate(const Model& model, double date);
+        // Loads the observations at a given date.
+        template <class Model>
+        void SetDate(const Model& model, double date_inf, double date_sup,
+                     bool left_closed = true, bool right_closed = false);
+        // Loads the observations at a given date.
+        void LoadObservation();
+        // Loads the observations at a given date.
+        void LoadObservation(double date, Vector<T>& observation);
 
         bool HasObservation() const;
 

@@ -121,6 +121,8 @@ namespace Verdandi
     template <class ClassModel>
     void ForwardDriver<ClassModel>::Forward()
     {
+        date_.PushBack(model_.GetDate());
+
         MessageHandler::Send(*this, "all", "::Forward begin");
 
         if (show_date_)
@@ -190,9 +192,9 @@ namespace Verdandi
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetDate()),
-                               "state_forecast");
+            output_saver_.Save(state, model_.GetDate(), "state_forecast");
         }
+
     }
 
 

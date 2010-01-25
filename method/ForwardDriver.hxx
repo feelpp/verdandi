@@ -44,6 +44,8 @@ namespace Verdandi
 
         //! Iteration.
         int iteration_;
+        //! Date vector.
+        Vector<double> date_;
 
         /*** Configuration ***/
 

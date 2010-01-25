@@ -89,12 +89,10 @@ namespace Verdandi
 
         //! Time step.
         double Delta_t_;
-
-        //! Number of time steps.
-        int Nt_;
-
-        //! Current time step.
-        int time_step_;
+        //! Current date.
+        double date_;
+        //! Simulation duration.
+        double final_date_;
 
         //! Gravitational acceleration.
         const double g_;
@@ -174,10 +172,6 @@ namespace Verdandi
 
         /*** Experiment settings ***/
 
-        //! Assimilation interval in number of forward integrations.
-        int Nt_assimilation_;
-        //! Prediction interval in number of forward integrations.
-        int Nt_prediction_;
         /*! \brief Flag that indicates whether the positivity of the analyzed
           data is required.
         */
@@ -203,8 +197,7 @@ namespace Verdandi
         void Save();
 
         // Access methods.
-        int GetDate() const;
-        int GetNt() const;
+        double GetDate() const;
         int GetNx() const;
         int GetNy() const;
         int GetNz() const;
@@ -214,7 +207,6 @@ namespace Verdandi
         int GetDeltaX() const;
         int GetDeltaY() const;
         int GetNstate() const;
-        int GetNtAssimilation() const;
         void GetState(state_vector& state) const;
         void SetState(state_vector& state);
         void GetFullState(state_vector& state) const;

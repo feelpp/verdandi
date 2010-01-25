@@ -103,13 +103,20 @@ namespace Verdandi
 
         Nx_model_ = model.GetNx();
         Ny_model_ = model.GetNy();
-
+        observation_size_ = Nx_model_ * Ny_model_ * sizeof(double);
 
         configuration_stream.set_prefix("observation/");
         configuration_stream.set("File", observation_file_);
-        configuration_stream.set("Period_observation",
-                                 period_observation_, "> 0");
+        configuration_stream.set("Delta_t",
+                                 Delta_t_,  "> 0");
         configuration_stream.set("Nskip", Nskip_, "> 0");
+        configuration_stream.set("Final_date", final_date_, "",
+                                 numeric_limits<double>::max());
+
+        date_inf_ = -1.;
+        date_sup_ = -1.;
+        Nobservation_date_ = 0;
+
         configuration_stream.set("error/Variance", error_variance_value_,
                                  "> 0");
 
@@ -172,6 +179,34 @@ namespace Verdandi
 
         // Sets all active by default.
         SetAllActive();
+
+        int expected_file_size;
+        expected_file_size = observation_size_ *
+            int(final_date_ / (Delta_t_ * Nskip_));
+
+        int file_size;
+        ifstream file_stream;
+        file_stream.open(observation_file_.c_str());
+
+#ifdef SELDON_CHECK_IO
+        // Checks if the file was opened.
+        if (!file_stream.is_open())
+            throw IOError("LinearObservationManager"
+                          "::Initialize(model, configuration_file)",
+                          "Unable to open file \""
+                          + observation_file_ + "\".");
+#endif
+
+        file_stream.seekg( 0 , ios_base::end );
+        file_size = file_stream.tellg() ;
+        file_stream.close();
+
+        if (expected_file_size > file_size)
+            throw IOError("LinearObservationManager"
+                          "::Initialize(model, configuration_file)",
+                          "Too few available observations, the size of \""
+                          + observation_file_ + "\" must be greater than "
+                          + to_str(expected_file_size) + ".");
     }
 
 
@@ -189,28 +224,111 @@ namespace Verdandi
     /////////////////////////////
 
 
-    //! Loads observations if they are available.
+    //! Sets the date of observations to be loaded.
     /*!
-      \param[in] model model.
-      \tparam ClassModel the model type; e.g. ShallowWater<double>
+      \param[in] model the model.
+      \param[in] date a double.
     */
     template <class T>
-    template <class ClassModel>
+    template <class Model>
     void GridToNetworkObservationManager<T>
-    ::LoadObservation(const ClassModel& model)
+    ::SetDate(const Model& model, double date)
     {
-        int step = model.GetDate();
+        if (Nobservation_date_ == 1)
+            if (observation_date_(0) == date)
+                return;
 
-        availability_ = step % (period_observation_ * Nskip_) == 0;
+        observation_date_.Clear();
+        observation_date_.PushBack(date);
+        observation_.Clear();
+        observation_loaded_ = false;
+    }
 
-        // If assimilation is finished (in prediction), no observation are
-        // loaded.
-        if (step > model.GetNtAssimilation())
-            availability_ = false;
+
+    //! Sets the date of observations to be loaded.
+    /*!
+      \param[in] model the model.
+      \param[in] date_inf lower bound of time interval.
+      \param[in] date_inf upper bound of time interval.
+      \param[in] left_closed left_closed interval.
+      \param[in] right_closed right_closed interval.
+    */
+    template <class T>
+    template <class Model>
+    void GridToNetworkObservationManager<T>
+    ::SetDate(const Model& model, double date_inf, double date_sup,
+              bool left_closed, bool right_closed)
+    {
+        // If the time interval has changed.
+        if ((date_inf_ != date_inf) || (date_sup_ != date_sup))
+        {
+            date_inf_ = date_inf;
+            date_sup_ = date_sup;
+
+            observation_date_.Clear();
+            observation_.Clear();
+            observation_loaded_ = false;
+
+            double t0;
+            t0 = int (date_inf / Delta_t_) * Delta_t_;
+            if ((t0 == date_inf) && (left_closed))
+                observation_date_.PushBack(t0);
+
+            double t;
+            t0 += Delta_t_;
+            for (t = t0; t < date_sup; t += Delta_t_)
+                observation_date_.PushBack(t);
+
+            t += Delta_t_;
+            if ((t == date_sup) && (right_closed))
+                observation_date_.PushBack(t);
+
+            Nobservation_date_ = observation_date_.GetSize();
+        }
+    }
+
+
+    //! Loads observations if they are available.
+    template <class T>
+    void GridToNetworkObservationManager<T>
+    ::LoadObservation()
+    {
+        if (!observation_loaded_)
+        {
+            availability_ = Nobservation_date_ != 0;
+
+            Vector<T> tmp(Nobservation_);
+            for (int i = 0; i < Nobservation_date_; i++)
+            {
+                LoadObservation(observation_date_(i), tmp);
+                observation_.PushBack(tmp);
+            }
+
+            observation_loaded_ = true;
+        }
+    }
+
+
+    //! Loads observations if they are available.
+    /*!
+      \param[in] date the date.
+      \param[out] observation the observations.
+    */
+    template <class T>
+    void GridToNetworkObservationManager<T>
+    ::LoadObservation(double date, Vector<T>& observation)
+    {
+        availability_ = is_multiple(date, Delta_t_ * Nskip_);
+
+        availability_ &= date < final_date_;
 
         if (availability_)
         {
-            Matrix<double> input_data(Nx_model_, Ny_model_);
+            Matrix<T> input_data(Nx_model_, Ny_model_);
+            int iteration;
+
+            iteration = int(date / (Delta_t_ * Nskip_));
+
             ifstream file_stream;
             file_stream.open(observation_file_.c_str());
 
@@ -223,8 +341,7 @@ namespace Verdandi
                               + observation_file_ + "\".");
 #endif
 
-            streampos position = step / period_observation_
-                * Nx_model_ * Ny_model_ * sizeof(double);
+            streampos position = iteration * observation_size_;
             file_stream.seekg(position);
 
             // To be optimized: use a method reading only one step instead.
@@ -233,7 +350,7 @@ namespace Verdandi
             file_stream.close();
 
             for (int i = 0; i < Nobservation_; i++)
-                observation_(i) = input_data(location_x_(i), location_y_(i));
+                observation(i) = input_data(location_x_(i), location_y_(i));
 
             MessageHandler::Send(*this, "all",
                                  "Loaded the observations in the OM.");

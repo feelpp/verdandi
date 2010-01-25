@@ -74,6 +74,11 @@ namespace Verdandi
         configuration_stream.
             set_prefix("optimal_interpolation/data_assimilation/");
         configuration_stream.set("Analyze_first_step", analyze_first_step_);
+        time_tolerance_.Reallocate(2);
+        configuration_stream.set("Time_tolerance_inf",
+                                 time_tolerance_(0), "", 0.);
+        configuration_stream.set("Time_tolerance_sup",
+                                 time_tolerance_(1), "", 0.);
 
         configuration_stream.set_prefix("optimal_interpolation/");
         configuration_stream.set("BLUE_computation", blue_computation_,
@@ -151,6 +156,8 @@ namespace Verdandi
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Forward()
     {
+        date_.PushBack(model_.GetDate());
+
         MessageHandler::Send(*this, "all", "::Forward begin");
 
         model_.Forward();
@@ -177,7 +184,11 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
 
-        observation_manager_.LoadObservation(model_);
+        observation_manager_.SetDate(model_,
+                                     model_.GetDate() - time_tolerance_(0),
+                                     model_.GetDate() + time_tolerance_(1));
+
+        observation_manager_.LoadObservation();
 
         if (observation_manager_.HasObservation())
         {
@@ -422,15 +433,13 @@ namespace Verdandi
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetDate()),
-                               "state_forecast");
+            output_saver_.Save(state, model_.GetDate(), "state_forecast");
         }
 
         if (message.find("analysis") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetDate()),
-                               "state_analysis");
+            output_saver_.Save(state, model_.GetDate(), "state_analysis");
         }
 
     }

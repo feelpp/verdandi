@@ -75,12 +75,8 @@ namespace Verdandi
         configuration_stream.set("bar_length", bar_length_);
         configuration_stream.set("Nx", Nx_);
         configuration_stream.set("Delta_t", Delta_t_);
-        configuration_stream.set("time_simu", time_simu_);
+        configuration_stream.set("Final_date", final_date_);
 
-        Nt_ = floor(time_simu_/Delta_t_);
-
-
-        // Error statistics.
         configuration_stream.set_prefix("clamped_bar/error_statistics/");
         configuration_stream.set("Background_error_variance",
                                  background_error_variance_value_, ">= 0");
@@ -107,9 +103,9 @@ namespace Verdandi
         /*** Allocation ***/
 
         Delta_x_ = bar_length_ / Nx_;
-        time_instants_.reserve(floor(time_simu_/Delta_t_));
-        time_instants_ = vector<double>(1, 0.);
-        time_step_ = 0;
+        date_vector_.reserve(floor(final_date_ / Delta_t_));
+        date_vector_ = vector<double>(1, 0.);
+        date_ = 0.;
         Ndof_ = Nx_ + 1;
 
         // Skeleton.
@@ -297,13 +293,11 @@ namespace Verdandi
     void ClampedBar<T>::Forward()
     {
         // Update time.
-        time_instants_.push_back(time_instants_[time_step_] + Delta_t_);
-        time_step_ += 1;
+        date_ += Delta_t_;
+        date_vector_.push_back(date_);
 
         Logger::StdOutCommand("hline", "=");
-        Logger::StdOut("Iteration", to_str(time_step_) +
-                       " (corresponding to time " +
-                       to_str(time_instants_[time_step_]) + " )");
+        Logger::StdOut("Time", date_);
         Logger::StdOutCommand("hline", "-");
 
         // Right hand side.
@@ -353,7 +347,7 @@ namespace Verdandi
     template <class T>
     bool ClampedBar<T>::HasFinished() const
     {
-        return time_instants_[time_step_] >= time_simu_;
+        return date_ >= final_date_;
     }
 
 
@@ -363,30 +357,19 @@ namespace Verdandi
     template <class T>
     void ClampedBar<T>::Save()
     {
-        output_saver_.Save(disp_0_, double(time_step_), "disp_0");
-        output_saver_.Save(velo_0_, double(time_step_), "velo_0");
+        output_saver_.Save(disp_0_, date_, "disp_0");
+        output_saver_.Save(velo_0_, date_, "velo_0");
     }
 
 
-    //! Returns the current time step.
+    //! Returns the current date.
     /*!
-      \return The current time step.
+      \return The current date.
     */
     template <class T>
-    int ClampedBar<T>::GetDate() const
+    double ClampedBar<T>::GetDate() const
     {
-        return time_step_;
-    }
-
-
-    //! Returns the number of time steps.
-    /*!
-      \return The number of time steps.
-    */
-    template <class T>
-    int ClampedBar<T>::GetNt() const
-    {
-        return floor(time_simu_ / Delta_t_);
+        return date_;
     }
 
 

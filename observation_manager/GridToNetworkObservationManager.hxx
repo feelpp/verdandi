@@ -19,6 +19,8 @@
 
 #ifndef VERDANDI_FILE_GRIDTONETWORKOBSERVATIONMANAGER_HXX
 
+#include <iostream>
+#include <list>
 
 namespace Verdandi
 {
@@ -48,11 +50,28 @@ namespace Verdandi
 
         //! File that stores the observations.
         string observation_file_;
+        //! Size in bytes of one observations vector.
+        int observation_size_;
         //! Period with which observations are available.
-        int period_observation_;
+        double Delta_t_;
         //! Period with which available observations are actually loaded.
         int Nskip_;
+        //! Indicates if observation has been loaded yet.
+        bool observation_loaded_;
+        //! Duration during which observations are assimilated.
+        double final_date_;
 
+        //! Number total of observations date.
+        int Nobservation_date_;
+        //! Observation date.
+        Vector<double> observation_date_;
+        //! Lower bound of the last observation time interval.
+        double date_inf_;
+        //! Upper bound of the last observation time interval.
+        double date_sup_;
+
+        //! Number of total observations at current date.
+        int Nobservation_;
         //! Observation data.
         Vector<T> observation_;
 
@@ -60,9 +79,6 @@ namespace Verdandi
         Vector<T> location_x_;
         //! Index along y.
         Vector<T> location_y_;
-
-        //! Number of total observations at current date.
-        int Nobservation_;
 
         //! Interpolation indices for all locations.
         Matrix<int> interpolation_index_;
@@ -103,9 +119,16 @@ namespace Verdandi
 
         void SetAllActive();
 
+        template <class Model>
+        void SetDate(const Model& model, double date);
+        template <class Model>
+        void SetDate(const Model& model, double date_inf, double date_sup,
+                     bool left_closed = true, bool right_closed = false);
+
+        // Loads the observations.
+        void LoadObservation();
         // Loads the observations at a given date.
-        template <class ClassModel>
-        void LoadObservation(const ClassModel& model);
+        void LoadObservation(double date, Vector<T>& observation);
 
         bool HasObservation() const;
 

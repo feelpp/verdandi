@@ -61,16 +61,14 @@ namespace Verdandi
         //! Number of degrees of freedom (dofs).
         int Ndof_;
 
-        //! Simulation duration.
-        double time_simu_;
-        //! Number of time steps.
-        int Nt_;
         //! Time step.
         double Delta_t_;
-        //! Current time step.
-        int time_step_;
-        //! Time steps.
-        vector<double> time_instants_;
+        //! Current date.
+        double date_;
+        //! Simulation duration.
+        double final_date_;
+        //! Simulation dates.
+        vector<double> date_vector_;
 
         //! Mass parameter.
         double mass_density_;
@@ -139,11 +137,8 @@ namespace Verdandi
         void Save();
 
         // Access methods.
-        int GetDate() const;
-        int GetNt() const;
-
+        double GetDate() const;
         int GetNstate() const;
-
         void GetState(state_vector& state) const;
         void SetState(state_vector& state);
         void GetFullState(state_vector& state) const;

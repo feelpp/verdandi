@@ -69,6 +69,15 @@ namespace Verdandi
         //! Computation mode for BLUE: "vector" or "matrix".
         string blue_computation_;
 
+        //! Date vector.
+        Vector<double> date_;
+
+        /*** Observations ***/
+
+        //! Time tolerance.
+        Vector<double> time_tolerance_;
+     
+     
         /*** Output saver ***/
 
         //! Output saver.
