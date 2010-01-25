@@ -72,7 +72,7 @@ namespace Verdandi
         GetPot configuration_stream(configuration_file);
 
         configuration_stream.set_prefix("clamped_bar/domain/");
-        configuration_stream.set("bar_length", bar_length_);
+        configuration_stream.set("Bar_length", bar_length_);
         configuration_stream.set("Nx", Nx_);
         configuration_stream.set("Delta_t", Delta_t_);
         configuration_stream.set("Final_date", final_date_);

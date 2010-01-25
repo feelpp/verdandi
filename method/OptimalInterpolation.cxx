@@ -166,7 +166,6 @@ namespace Verdandi
         MessageHandler::Send(*this, "observation_manager", "forecast");
         MessageHandler::Send(*this, "driver", "forecast");
 
-
         Analyze();
 
         MessageHandler::Send(*this, "driver", "analysis");
