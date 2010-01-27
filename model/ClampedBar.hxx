@@ -46,10 +46,18 @@ namespace Verdandi
         typedef const T* const_pointer;
         typedef T& reference;
         typedef const T& const_reference;
+#ifdef VERDANDI_SPARSE
         typedef Matrix<T, General, RowSparse> background_error_variance;
+        typedef Matrix<T, General, RowSparse> crossed_matrix;
+        typedef Matrix<T, General, RowSparse> tangent_operator_matrix;
+#else
+        typedef Matrix<T> background_error_variance;
+        typedef Matrix<T> crossed_matrix;
+        typedef Matrix<T> tangent_operator_matrix;
+#endif
         typedef Vector<T> error_covariance_row;
         typedef Vector<T> state_vector;
-        typedef Matrix<T, General, RowSparse> crossed_matrix;
+
 
     protected:
         //! Bar length.
@@ -92,14 +100,14 @@ namespace Verdandi
         Matrix<T, Symmetric, RowSymSparse> Newmark_matrix_0_;
         Matrix<T, Symmetric, RowSymSparse> Newmark_matrix_1_;
 
-#if defined(SELDON_WITH_UMFPACK) && defined(VERDANDI_WITH_DIRECT_SOLVER)
+#if defined(VERDANDI_WITH_DIRECT_SOLVER)
+#if defined(SELDON_WITH_UMFPACK)
         MatrixUmfPack<T> mat_lu;
-#endif
-#if defined(SELDON_WITH_SUPERLU) && defined(VERDANDI_WITH_DIRECT_SOLVER)
+#elif defined(SELDON_WITH_SUPERLU)
         MatrixSuperLU<T> mat_lu;
-#endif
-#if defined(SELDON_WITH_MUMPS) && defined(VERDANDI_WITH_DIRECT_SOLVER)
+#elif defined(SELDON_WITH_MUMPS)
         MatrixMumps<T> mat_lu;
+#endif
 #endif
 
         //! Balgovind scale for background covariance.

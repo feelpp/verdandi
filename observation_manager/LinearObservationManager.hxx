@@ -38,6 +38,7 @@ namespace Verdandi
     template <class T>
     class LinearObservationManager: public VerdandiBase
     {
+
     public:
 #ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
         typedef Matrix<T, General, RowSparse> tangent_operator_matrix;

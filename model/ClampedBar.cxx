@@ -263,8 +263,8 @@ namespace Verdandi
         force_.Fill(T(0.));
 
         // Initial condition.
-        for (int i=0; i<Ndof_; i++)
-            disp_0_(i) = T(i)/T(Ndof_-1);
+        for (int i = 0; i < Ndof_; i++)
+            disp_0_(i) = T(i) / T(Ndof_ - 1);
 
 #ifdef VERDANDI_WITH_DIRECT_SOLVER
         GetLU(Newmark_matrix_1_, mat_lu, true);
@@ -310,10 +310,10 @@ namespace Verdandi
         force_(0) = 0;
 
 #ifdef VERDANDI_WITH_DIRECT_SOLVER
-        Vector<T> x_(Ndof_);
-        x_=force_;
-        SolveLU(mat_lu, x_);
-        disp_1_ = x_;
+        Vector<T> tmp(Ndof_);
+        tmp = force_;
+        SolveLU(mat_lu, tmp);
+        disp_1_ = tmp;
 #else
         // Initialization of the Gmres parameters.
         int nb_max_iter = 1000;
@@ -373,9 +373,9 @@ namespace Verdandi
     }
 
 
-    //! Returns the number of points in the grid.
+    //! Returns the state vector size.
     /*!
-      \return The number of points in the grid.
+      \return The state vector size.
     */
     template <class T>
     int ClampedBar<T>::GetNstate() const
