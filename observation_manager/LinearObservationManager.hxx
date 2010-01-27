@@ -44,7 +44,12 @@ namespace Verdandi
 #else
         typedef Matrix<T> tangent_operator_matrix;
 #endif
+
+#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
         typedef Matrix<T, General, RowSparse> error_variance;
+#else
+        typedef Matrix<T> error_variance;
+#endif
         typedef Vector<T> tangent_operator_row;
 
     protected:

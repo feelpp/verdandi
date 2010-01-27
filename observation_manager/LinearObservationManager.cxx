@@ -117,16 +117,7 @@ namespace Verdandi
         observation_.Reallocate(Nobservation_);
         build_diagonal_sparse_matrix(Nobservation_, operator_diagonal_value_,
                                      tangent_operator_matrix_);
-#endif
-
-#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
-        Nobservation_ = Nstate_model_;
-        observation_.Reallocate(Nobservation_);
-        build_diagonal_sparse_matrix(Nobservation_, error_variance_value_,
-                                     error_variance_);
-#endif
-
-#ifdef VERDANDI_TANGENT_OPERATOR_DENSE
+#else
         tangent_operator_matrix_.Read(operator_file_);
 
         if (tangent_operator_matrix_.GetN() != model.GetNstate())
@@ -141,6 +132,15 @@ namespace Verdandi
 
         Nobservation_ = tangent_operator_matrix_.GetM();
         observation_.Reallocate(Nobservation_);
+#endif
+
+#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        build_diagonal_sparse_matrix(Nobservation_, error_variance_value_,
+                                     error_variance_);
+#else
+        error_variance_.Reallocate(Nobservation_, Nobservation_);
+        error_variance_.SetIdentity();
+        Mlt(error_variance_value_, error_variance_);
 #endif
 
         if (observation_type_ == "state")
@@ -605,12 +605,7 @@ namespace Verdandi
     ::error_variance& LinearObservationManager<T>
     ::GetObservationErrorVariance() const
     {
-#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
         return error_variance_;
-#else
-        throw ErrorUndefined("LinearObservationManager"
-                             "::GetObservationErrorVariance()");
-#endif
     }
 
 
