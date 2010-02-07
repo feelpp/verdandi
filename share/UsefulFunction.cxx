@@ -123,6 +123,35 @@ namespace Verdandi
     }
 
 
+    /*! \brief Returns the coordinate of a point identified with a global
+      index in a multidimensional grid. */
+    /*! A global index gives the position in a grid with a single integer. For
+      example, in 2D, the global index of the grid point \f$(i, j)\f$ is \f$i
+      \times N + j\f$ if there are N points along the second dimension. This
+      function would return the coordinates \f$(x, y)\f$ of the point: $x =
+      x_0 + i \times \Delta_x$ and $y = y_0 + j \times \Delta_y$. It is
+      assumed that the grid has a constant space step along each direction.
+      \param[in] index the global index.
+      \param[in] minimum coordinates of the lower left corner of the grid.
+      \param[in] step space step along each dimension.
+      \param[in] shape dimensions of the grid.
+      \param[out] coordinate coordinates.
+    */
+    template <class T>
+    void get_coordinate(int index, const Vector<T>& minimum,
+                        const Vector<T>& step, const Vector<int>& shape,
+                        Vector<T>& coordinate)
+    {
+        int Ndimension = shape.GetLength();
+        Vector<int> position(Ndimension);
+        get_position(index, shape, position);
+
+        coordinate.Reallocate(Ndimension);
+        for (int i = 0; i < Ndimension; i++)
+            coordinate(i) = minimum(i) + T(position(i)) * step(i);
+    }
+
+
     //! Converts strings to most types.
     /*!
       \param[in] s string to be converted.

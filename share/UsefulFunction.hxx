@@ -34,6 +34,10 @@ namespace Verdandi
 
     void get_position(int index, const Vector<int>& shape,
                       Vector<int>& position);
+    template <class T>
+    void get_coordinate(int index, const Vector<T>& minimum,
+                        const Vector<T>& step, const Vector<int>& shape,
+                        Vector<T>& coordinate);
 
     /*** From Talos library ***/
 
