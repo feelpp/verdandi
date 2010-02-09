@@ -166,9 +166,6 @@ namespace Verdandi
         MessageHandler::Send(*this, "observation_manager", "forecast");
         MessageHandler::Send(*this, "driver", "forecast");
 
-        Analyze();
-
-        MessageHandler::Send(*this, "driver", "analysis");
 
         MessageHandler::Send(*this, "all", "::Forward end");
     }
@@ -208,6 +205,7 @@ namespace Verdandi
 
             MessageHandler::Send(*this, "model", "analysis");
             MessageHandler::Send(*this, "observation_manager", "analysis");
+            MessageHandler::Send(*this, "driver", "analysis");
         }
 
         MessageHandler::Send(*this, "all", "::Analyze end");
