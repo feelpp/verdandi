@@ -82,9 +82,11 @@ namespace Verdandi
                                  background_error_variance_value_, ">= 0");
         configuration_stream.set("Background_error_scale",
                                  Balgovind_scale_background_, "> 0");
+        
+        Ndof_ = Nx_ + 1;
 
 #ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
-        build_diagonal_sparse_matrix(Nx_,
+        build_diagonal_sparse_matrix(GetNstate(),
                                      background_error_variance_value_,
                                      background_error_variance_);
 #endif
@@ -106,7 +108,6 @@ namespace Verdandi
         date_vector_.reserve(floor(final_date_ / Delta_t_));
         date_vector_ = vector<double>(1, 0.);
         date_ = 0.;
-        Ndof_ = Nx_ + 1;
 
         // Skeleton.
         int NvalSkel = 3 * (Nx_- 1) + 4;
@@ -380,7 +381,7 @@ namespace Verdandi
     template <class T>
     int ClampedBar<T>::GetNstate() const
     {
-        return Nx_;
+        return 2 * Ndof_;
     }
 
 
@@ -392,9 +393,11 @@ namespace Verdandi
     void ClampedBar<T>::GetState(state_vector& state) const
     {
         int position = 0;
-        state.Reallocate(Nx_);
-        for (int i = 0; i < Nx_; i++)
-            state(position++) = disp_0_(i+1);
+        state.Reallocate(2 * Ndof_);
+        for (int i = 0; i < Ndof_; i++)
+            state(position++) = disp_0_(i);
+        for (int i = 0; i < Ndof_; i++)
+            state(position++) = velo_0_(i);
     }
 
 
@@ -407,8 +410,10 @@ namespace Verdandi
     void ClampedBar<T>::SetState(state_vector& state)
     {
         int position = 0;
-        for (int i = 0; i < Nx_; i++)
-            disp_0_(i+1) = state(position++);
+        for (int i = 0; i < Ndof_; i++)
+            disp_0_(i) = state(position++);
+        for (int i = 0; i < Ndof_; i++)
+            velo_0_(i) = state(position++);
     }
 
 
@@ -448,7 +453,7 @@ namespace Verdandi
     {
 #ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
         {
-            error_covariance_row.Reallocate(Nx_);
+            error_covariance_row.Reallocate(GetNstate());
             error_covariance_row.Zero();
             error_covariance_row(row) = background_error_variance_value_;
         }
@@ -456,7 +461,7 @@ namespace Verdandi
         {
 #ifdef VERDANDI_BACKGROUND_ERROR_DENSE
             {
-                error_covariance_row.Reallocate(Nx_);
+                error_covariance_row.Reallocate(GetNstate());
                 error_covariance_row.Zero();
                 error_covariance_row(row)
                     = background_error_variance_value_;
