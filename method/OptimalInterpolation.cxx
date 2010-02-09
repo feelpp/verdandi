@@ -364,7 +364,14 @@ namespace Verdandi
 
         // Computes x = (HBH' + R)^{-1} * innovation by solving the linear
         // system (HBH' + R) * x = innovation.
+#if defined(SELDON_WITH_UMFPACK)
+        MatrixUmfPack<T> matrix_super_lu;
+#elif defined(SELDON_WITH_SUPERLU)
         MatrixSuperLU<T> matrix_super_lu;
+#elif defined(SELDON_WITH_MUMPS)
+        MatrixMumps<T> matrix_super_lu;
+#endif
+
         GetLU(working_matrix_oo, matrix_super_lu);
         Vector<T> x(Nobservation_);
         x = working_vector;
