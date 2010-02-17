@@ -11,13 +11,17 @@
 
 \section exceptions Exceptions raised
 
-The objects that may be launched by %Verdandi are of type:
-<code>ErrorConfiguration</code>, <code>ErrorIO</code>,
-<code>ErrorProcessing</code>, <code>ErrorUndefined</code>,
-<code>ErrorArgument</code>. They all derive from <code>Error</code>. They
-provide the method \link Verdandi::Error::What() What() \endlink that returns a string explaining the
-error, and the method \link Verdandi::Error::CoutWhat() CoutWhat() \endlink that displays on screen this
-explanation.
+
+The objects that may be launched by %Verdandi are of type: \link
+Verdandi::ErrorConfiguration ErrorConfiguration\endlink, \link
+Verdandi::ErrorIO ErrorIO\endlink, \link Verdandi::ErrorProcessing
+ErrorProcessing\endlink, \link Verdandi::ErrorUndefined
+ErrorUndefined\endlink, \link Verdandi::ErrorArgument
+ErrorArgument\endlink. They all derive from \link Verdandi::Error
+Error\endlink. They provide the method \link Verdandi::Error::What()
+What()\endlink that returns a string explaining the error, and the method
+\link Verdandi::Error::CoutWhat() CoutWhat()\endlink that displays on screen
+this explanation.
 
 \section exceptions_and_debugging Exceptions and debugging
 
