@@ -5,6 +5,9 @@
 /*!
 \page linear_observation_manager Linear Observation Manager
 
+In practice, the observation operator is often a linear operator that
+interpolates the state variables at the observations locations.
+
 An observation manager is implemented in
 <code>LinearObservationManager.hxx</code> and
 <code>LinearObservationManager.cxx</code>. The class \link
