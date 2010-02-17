@@ -49,13 +49,13 @@ that the executable <code>scons</code> is available.
 To compile and run the examples provided with %Verdandi, execute the following
 commands in the directory <code>example/shallow_water</code>:
 
-\prescreen
+\precode
 $ scons
 $ write_matrix
 
 $ forward configuration/river-truth.cfg
 $ optimal_interpolation configuration/river.cfg
-\endprescreen
+\endprecode
 
 In <code>optimal_interpolation.cpp</code> for example, one of the first lines
 includes %Verdandi through
@@ -65,9 +65,9 @@ expanded from the downloaded file. If you compile your own code on top of
 %Verdandi, just provide the path to <code>Verdandi-[version]</code> to the
 compiler, e.g.:
 
-\prescreen $ g++ -I/path/to/Verdandi-[version] your_code.cpp &&
+\precode $ g++ -I/path/to/Verdandi-[version] your_code.cpp &&
 $ ./a.out
-\endprescreen
+\endprecode
 
 \section macos MacOS
 

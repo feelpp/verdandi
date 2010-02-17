@@ -38,7 +38,7 @@ In <code>python</code> directory, or in any place if
 It is recommended to use <a href="http://ipython.scipy.org/">IPython</a>
 instead of the regular Python shell, for convenience:
 
-\prescreen
+\precode
 $ ipython -pylab
 
 In  [1]: import seldon
@@ -50,12 +50,12 @@ In  [4]: method.Initialize(''configuration_file.cfg'')
 In  [5]: model = method.GetModel()
 In  [6]: model.GetDate()
 Out [6]: 0
-\endprescreen
+\endprecode
 
 <code>Forward()</code> can be processed either by calling the driver method or
 directly by calling the model method:
 
-\prescreen
+\precode
 In  [7]: method.Forward()
 In  [8]: model.GetDate()
 Out [9]: 1
@@ -67,12 +67,12 @@ In [13]: for i in range(1008):
    ....:      model.Forward()
 In [14]: model.GetDate()
 Out[14]: 1010
-\endprescreen
+\endprecode
 
 Here is an example of the computation of an analysis. You may want to check
 its effect by printing the state vector before and after the analysis:
 
-\prescreen
+\precode
 In [15]: state_vector = seldon.VectorDouble()
 
 In [16]: model.GetState(state_vector)
@@ -83,29 +83,29 @@ In [18]: method.Analyze()
 In [19]: model.GetState(state_vector)
 In [20]: state_vector.Print()
 1.0167882075200211922   1.0150381458769643928  ...
-\endprescreen
+\endprecode
 
 Here is an example of the interactivity of the high-level interface: the first
 element of the state vector is set to an arbitrary value:
-\prescreen
+\precode
 In [21]: state_vector[0] = 0
 In [22]: model.SetState(state_vector)
 In [23]: model.GetState(state_vector)
 In [24]: state_vector.Print()
 0  1.0150381458769643928  ...
-\endprescreen
+\endprecode
 
 \section example Visualization example with ipython
 
 To load the results, you can launch:
 
-\prescreen
+\precode
 $ ipython -pylab 
-\endprescreen
+\endprecode
 
 and then
 
-\prescreen
+\precode
 In  [1]: run load.py result/river-truth
 In  [2]: h_t = h
 In  [3]: run load.py result/river
@@ -114,6 +114,6 @@ In  [4]: plot(time_evolution(h_t - h, rms))
          
 In  [5]: plot(h_t[100])
 In  [6]: plot(h[100])
-\endprescreen
+\endprecode
 
 */

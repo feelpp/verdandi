@@ -12,7 +12,7 @@
 <link rel="stylesheet" type="text/css" href="<?php echo $root?>/content.css">
 <link rel="stylesheet" href="tabs.css" type="text/css">
 <link rel="stylesheet" href="guide.css" type="text/css">
-<script type="text/javascript" src="<?php echo $root.'/';?>prettify.js"></script>
+<script type="text/javascript" src="prettify.js"></script>
 </head>
 
 <body onload="prettyPrint()">
