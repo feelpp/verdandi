@@ -27,9 +27,11 @@ should contain the name of the function. But you probably want to know the
 exact line where the error occurred and the sequence of calls. Then, you have
 two options, using a debugger.
 
-One option is to place a breakpoint in <code>Error::Error(string function =
-"", string comment = "")</code> (see file <code>share/Error.cxx</code>) because this
-constructor should be called before the exception is actually raised.
+One option is to place a breakpoint in 
+\link Verdandi::Error::Error(string function = "", string comment = "")
+ Error::Error(string function = "", string comment = "")\endlink (see file
+ <code>share/Error.cxx</code>) because this constructor should be called
+ before the exception is actually raised.
 
 Another option, more convenient because no breakpoint is to be placed, is
 to define <code>VERDANDI_WITH_ABORT</code>. With that flag activated, if a

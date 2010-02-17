@@ -194,6 +194,8 @@ ALIASES                = includeexample{1}="\htmlonly <div style=\"text-align:ri
                        endprecode="\endverbatim \htmlonly</pre>\endhtmlonly" \
                        prescreen="\verbatim" \
                        endprescreen="\endverbatim"
+                       link="<code> \link" \
+                       endlink="\endlink</code>"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 

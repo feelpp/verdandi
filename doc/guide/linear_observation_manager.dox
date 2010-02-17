@@ -7,9 +7,9 @@
 
 An observation manager is implemented in
 <code>LinearObservationManager.hxx</code> and
-<code>LinearObservationManager.cxx</code>. The class
-<code>LinearObservationManager</code> is a template class:
-<code>LinearObservationManager<T></code>. <code>T</code> is the type of the
-elements to be stored (e.g. <code>double</code>).
+<code>LinearObservationManager.cxx</code>. The class \link
+Verdandi::LinearObservationManager LinearObservationManager\endlink is a
+template class: <code>LinearObservationManager<T></code>. <code>T</code> is
+the type of the elements to be stored (e.g. <code>double</code>).
 
 */
