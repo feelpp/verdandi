@@ -389,6 +389,14 @@ input.search {
 	background-color: #e8eef2;
 }
 
+/* To deal with a strange behavior of Doxygen: when the search engine is
+   activated, useless code appears at the bottom of every page. This code is
+   inside a div with id "MSearchSelectWindow". It is removed thanks to the
+   lines below. */
+#MSearchSelectWindow {
+    display: none;
+}
+
 td.tiny {
 	font-size: 75%;
 }
