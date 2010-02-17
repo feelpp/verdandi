@@ -64,9 +64,51 @@ while (!driver.HasFinished()) [6]
 
 
 \section algorithm Optimal interpolation algorithm
+The optimal interpolation method is a sequential data assimilation method
+implementing the BLUE (Best Linear Unbiased Estimator) analysis. The BLUE
+analysis is so-called since it is linearly deduced from the innovation, its
+error is unbiased and it is optimal in the sense that it has the lowest total
+variance. Each time observations are available, the BLUE analysis is
+performed, with prescribed background matrices B and R. Here is the algorithm:
+<br/>
+
+<ol>
+        <li>At time \f$t_0\f$, the initial condition \f$x^{b}_{0}\f$ is available. </li>
+        <li>For every time \f$t_n, n \in \mathnormal{N}\f$,
+               - if observations \f$y_n\f$ are available, <br/>
+                 the analysis takes the BLUE value <br/>
+                 \f$x_{n}^{a} = x_{n}^{b} + K(y_n -
+                 \mathcal{H}(x_{n}^{b}))\f$, <br/>
+                  with <br/>
+                   \f$K = BH^{T}(HBH^{T} + R)^{-1}\f$, <br/>
+                 and the forecast is <br/>
+                  \f$x_{n+1}^{b} = \mathcal{M}_{n}(x_{n}^{a})\f$;
+               - if there are no observations, <br/>
+                 the forecast is <br/>
+                 \f$x_{n+1}^{b} = \mathcal{M}_{n}(x_{n}^{b})\f$. </li>
+</ol>
+With: <br/>
+\f$x\f$ model state vector; <br/>
+\f$x^{t}\f$ true value of the model i.e. perfect analysis; <br/>
+\f$x^{b}\f$ background model state; <br/>
+\f$x^{a}\f$ analysed model state; <br/>
+\f$y\f$ observation vector; <br/>
+\f$\mathcal{H}\f$ observation operator (maps \f$x\f$ into the \f$y\f$ space by
+providing model equivalents of the observed values); <br/>
+\f$H\f$ linearized observation operator (in the vicinity of a predefined model
+state); <br/>
+\f$B\f$ background error covariances (estimation error covariance matrix of \f$x^{b}\f$); <br/>
+\f$R\f$ observation error covariances (error covariance matrix of \f$ y -
+H(x^{t})\f$); <br/>
+\f$K\f$ analysis gain matrix; <br/>
+\f$\mathcal{M}\f$ model.
 
 \section notes Notes 
 
+Advantages and drawbacks of optimal interpolation.
+In which case to use or not to use the optimal interpolation method.
+
 \section configuration How to build the configuration file
+
 
 */
