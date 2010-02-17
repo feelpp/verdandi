@@ -5,50 +5,67 @@
 /*!
 \page optimal_interpolation Optimal Interpolation
 
-The sequential data assimilation algorithm of optimal interpolation is
+The optimal interpolation is a sequential data assimilation method. It is
 implemented in <code>OptimalInterpolation.hxx</code> and
-<code>OptimalInterpolation.cxx</code>. The class <code>OptimalInterpolation</code>
-is a template class: <code>OptimalInterpolation<T, ClassModel,
+<code>OptimalInterpolation.cxx</code>. The class \link
+Verdandi::OptimalInterpolation OptimalInterpolation\endlink is a template class:
+<code>OptimalInterpolation<T, ClassModel,
 ClassObservationManager></code>. <code>T</code> is the type of the elements to
 be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of
 the model (e.g. <code>ShallowWater<double></code>),
 <code>ClassObservationManager</code> is the type of the observation manager
 (e.g. <code>GridToNetworkObservationManager<double></code>).
 
-Here is how you may use the <code>OptimalInterpolation</code> class:
+Here is how you may use the \link Verdandi::OptimalInterpolation
+  OptimalInterpolation\endlink class:
 
-<ul>
+\precode
+OptimalInterpolation<double,  ShallowWater<double>,
+         GridToNetworkObservationManager<double> > driver(configuration_file); [1]
 
-  <li> First build the <code>OptimalInterpolation</code> driver and read
-  option keys in the configuration file with the method
-  <code>OptimalInterpolation(configuration_file)</code>. </li>
+driver.Initialize(configuration_file); [2]
 
-  <li> Then initialize the driver, the model and the observation manager with the
-  method <code>Initialize(configuration_file)</code>. This optionally computes
-  the analysis of the first step. </li>
+while (!driver.HasFinished()) [6]
+{
+    driver.InitializeStep(); [3]
+    driver.Forward(); [4]
+    driver.Analyze(); [5]
+}
+\endprecode
+
+\comment
+  <li> First build the \link Verdandi::OptimalInterpolation
+  OptimalInterpolation\endlink driver and read option keys in the
+  configuration file with the method \link
+  Verdandi::OptimalInterpolation::OptimalInterpolation(string c_f)
+  OptimalInterpolation(configuration_file)\endlink. </li>
+
+  <li> Then initialize the driver, the model and the observation manager with
+  the method \link Verdandi::OptimalInterpolation::Initialize(string configuration_file)
+  Initialize(configuration_file)\endlink. This optionally computes the
+  analysis of the first step. </li>
 
   <li> Optionnally intialize a step for the optimal interpolation with the
-  method <code>InitializeStep</code>. This initializes a step for the model.
+  method \link Verdandi::OptimalInterpolation::InitializeStep()
+  InitializeStep()\endlink. This initializes a step for the model. </li>
 
   <li> Perform a step forward without optimal interpolation with the method
-  <code>Forward</code>. </li>
+  \link Verdandi::OptimalInterpolation::Forward() Forward()\endlink. </li>
 
-  <li> Compute the analysis with the method <code>Analyze</code>. Whenever
+  <li> Compute the analysis with the method \link
+  Verdandi::OptimalInterpolation::Analyze() Analyze()\endlink. Whenever
   observations are available, it assimilates them using optimal
-  interpolation. The appropriate implementation of <code>ComputeBLUE</code>
-  will be called (see explanation above). </li>
+  interpolation. </li>
 
   <li> Compute the data assimilation until the model has finished: the method
-  <code>HasFinished</code> returns true if no more data assimilation is
-  required, false otherwise. </li>
+  \link Verdandi::OptimalInterpolation::HasFinished() HasFinished()\endlink
+  returns true if no more data assimilation is required, false otherwise. </li>
+\endcomment
 
-</ul>
 
 \section algorithm Optimal interpolation algorithm
 
 \section notes Notes 
-Advantages and drawbacks of the optimal interpolation
-method; in which case to use or not to use it.
 
 \section configuration How to build the configuration file
 

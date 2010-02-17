@@ -193,7 +193,9 @@ ALIASES                = includeexample{1}="\htmlonly <div style=\"text-align:ri
                        precode="\htmlonly <pre class=\"prettyprint\"> \endhtmlonly \verbatim" \
                        endprecode="\endverbatim \htmlonly</pre>\endhtmlonly" \
                        prescreen="\verbatim" \
-                       endprescreen="\endverbatim"
+                       endprescreen="\endverbatim" \
+                       comment="<HR> \htmlonly <EM> \endhtmlonly <ol>" \
+                       endcomment="</ol> \htmlonly </EM> \endhtmlonly <HR>" \
                        link="<code> \link" \
                        endlink="\endlink</code>"
 
