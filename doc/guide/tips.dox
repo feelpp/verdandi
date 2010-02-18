@@ -5,6 +5,30 @@
 /*!
 \page tips Tips
 
+\section getting_started Getting started
+
+For the installation, see the section \ref installation.
+
+Edit your program to add the following lines (the second one is optional):
+\precode
+#include "Verdandi.hxx"
+using namespace Verdandi;
+\endprecode
+
+In the directory containing your program, copy the <code>SConstruct</code>
+file provided in the examples. Edit the <code>SConstruct</code> file to
+specify your <code>verdandi_path</code>.
+
+Compile your program with:
+\prescreen
+scons
+\endprescreen
+
+If you want to compile one specific program:
+\prescreen
+scons my_executable_program
+\endprescreen
+
 \section options Options
 
 Here is the list of %Verdandi flags you may define.
