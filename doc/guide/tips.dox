@@ -55,11 +55,21 @@ the raising of exceptions related to GetPot, the configuration file parser.
 \section configuration_file Building a configuration file
 
 Configuration files are read by <a
-href="http://getpot.sourceforge.net/">GetPot</a>. Here are some tips to help
-you to build your configuration file: 
+href="http://getpot.sourceforge.net/">GetPot</a>. Here is an <a
+href="http://getpot.sourceforge.net/example.html"> example of a
+GetPot configuration file</a>.
+
+Here are some tips to help you to build your configuration file: 
 <ul>
 <li> how to use substitution with <code>$</code> expressions; </li>
 <li> how to build a list; </li>
 <li> what happens if you do not provide a value for a variable.</li>
 </ul>
+
+\section matrix_vector Seldon matrices and vectors
+
+The structures manipulated in %Verdandi are Seldon <a
+href="http://seldon.sourceforge.net/doc-dev/vectors.php">vectors</a> and
+<a href="http://seldon.sourceforge.net/doc-dev/matrices.php">matrices</a>.
+
 */
