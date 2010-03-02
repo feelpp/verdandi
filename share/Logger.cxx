@@ -547,7 +547,7 @@ namespace Verdandi
             unsigned int tmp_size = tmp.size();
             // If the message was cut in the middle of a word, we return to
             // the last blank.
-            while (tmp[tmp_size-1] != ' ' && tmp_size != 0)
+            while (tmp_size != 0 && tmp[tmp_size-1] != ' ')
             {
                 tmp_size--;
                 read--;
