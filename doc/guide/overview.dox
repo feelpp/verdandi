@@ -5,7 +5,7 @@
 /*!
 \page overview Overview
 
-Currently, %Verdandi contains the following classes.
+Below is a summary of %Verdandi contents.
 
 \section methods Methods
 
@@ -20,35 +20,37 @@ OptimalInterpolation.cxx
 
 \section overview_models Models
 
-Two sample <b>models</b> in the directory <code>model</code>: shallow
-water (oceanography) and clamped bar (mechanics).
+Two sample <b>models</b> in the directory <code>model</code>: clamped bar
+(mechanics), shallow water (oceanography).
 
 <h3>Source code</h3> 
-class ShallowWater<T> <br/>
-ShallowWater.hxx <br/>
-ShallowWater.cxx <br/>
 class ClampedBar<T> <br/>
 ClampedBar.hxx <br/>
-ClampedBar.cxx
+ClampedBar.cxx <br/>
+class ShallowWater<T> <br/>
+ShallowWater.hxx <br/>
+ShallowWater.cxx
 
 \section overview_observations Observation managers
 
-An <b>observation manager</b> in the directory
-<code>observation_manager</code>: a linear observation manager, including the
-case of a diagonal operator and the case of a model grid to an observation
-network (observations taken at a list of locations). Synthetic observations
-can be generated (at a list of locations, for instance) based on a model,
-possibly with perturbations.
+Two (linear) <b>observation managers</b> in the directory
+<code>observation_manager</code>: an observation manager whose observation
+operator is simply defined with a matrix, and an observation manager with an
+observation operator that maps from a model grid to an observation
+network.
 
 <h3>Source code</h3> 
 class LinearObservationManager<T> <br/>
 LinearObservationManager.hxx <br/>
-LinearObservationManager.cxx
+LinearObservationManager.cxx <br/>
+class GridToNetworkObservationManager<T> <br/>
+GridToNetworkObservationManager.hxx <br/>
+GridToNetworkObservationManager.cxx
 
 \section error Error statistics
 
 <b>Error statistics</b> in the directory <code>error</code>: classical error
-covariance matrices such as diagonal and Balgovind form (isotropic or not).
+covariance matrices in diagonal form and in Balgovind form (isotropic or not).
 
 <h3>Source code</h3>
 class BalgovindMatrix<T> <br/>
@@ -61,34 +63,36 @@ class IsotropicBalgovindMatrix<T> <br/>
 IsotropicBalgovindMatrix.hxx <br/>
 IsotropicBalgovindMatrix.cxx
 
-\section scripts Scripts
-
-Useful <b>scripts</b> in the directory <code>bin</code>. 
-
-The script <code>format</code> partially formats source files according to Verdandi's
-rules: it removes trailing spaces and indents the code; it finally checks that
-no line goes beyond the 78th column.
-
 \section miscellaneous Miscellaneous
 
-A class to save several kinds of output in the directory <code>output_saver</code>.
+In the directory <code>output_saver</code>, one may find a class to save
+several kinds of output.
 
 <h3>Source code</h3>
 class OutputSaver <br/>
 OutputSaver.hxx <br/>
 OutputSaver.cxx
 
-A class for objects to communicate in the directory <code>share</code>.
+In the directory <code>share</code>, one may find a class for objects to
+communicate.
 
 <h3>Source code</h3>
 class MessageHandler <br/>
 MessageHandler.hxx <br/>
 MessageHandler.cxx
 
-<b>Twin experiments</b> can be processed.
+<b>Twin experiments</b> can be carried out.
 
-<b>Sparse matrices</b> (for error variance and observation operator
-matrices) are managed.
+<b>Sparse matrices</b> (for error variances and linear observation operators)
+are managed.
+
+\section scripts Scripts
+
+Useful <b>scripts</b> may be found in the directory <code>bin</code>.
+
+The script <code>format</code> partially formats source files according to Verdandi's
+rules: it removes trailing spaces and indents the code; it finally checks that
+no line goes beyond the 78th column.
 
 \section directories Verdandi directories
 
@@ -97,16 +101,15 @@ matrices) are managed.
 <ul>
 
   <li> <code>bin</code>: useful scripts; </li>
-  <li> <code>error</code>: error matrices; </li>
+  <li> <code>error</code>: error variances; </li>
   <li> <code>example</code>: example programs for several models and
   configurations; </li>  
-  <li> <code>method</code>: the data assimilation drivers; </li>
-  <li> <code>model</code>: several models giving examples of how the
-  interface should be implemented; </li>
-  <li> <code>observation_manager</code>: linear observation
+  <li> <code>method</code>: the data assimilation algorithms; </li>
+  <li> <code>model</code>: several example models; </li>
+  <li> <code>observation_manager</code>: example observation
   managers; </li>
-  <li> <code>output_saver</code>: a class allowing to save several
-  kinds of output;</li>
+  <li> <code>output_saver</code>: a convenient class to save (on disk)
+  different kinds of variables;</li>
   <li> <code>share</code>: functionalities shared between the objects,
   such as the handling of messages, the error management and some useful
   functions.</li>

@@ -5,8 +5,6 @@
 /*!
 \page installation Installation
 
-\section compiler The compiler
-
 %Verdandi is supposed to be fully compliant with the <b>C++
 standard</b>. This ensures portability on many platforms. It compiles at least
 on \ref linux, \ref macos and \ref windows. It is compatible with IDEs such as
@@ -65,7 +63,7 @@ expanded from the downloaded file. If you compile your own code on top of
 %Verdandi, just provide the path to <code>Verdandi-[version]</code> to the
 compiler, e.g.:
 
-\precode $ g++ -I/path/to/Verdandi-[version] your_code.cpp &&
+\precode $ g++ -I/path/to/Verdandi-[version] your_code.cpp
 $ ./a.out
 \endprecode
 

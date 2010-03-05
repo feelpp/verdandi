@@ -7,7 +7,7 @@
 
 \section logger Logger
 %Verdandi offers the ability to save messages in a log file. To do so, one may
-call the method \link Verdandi::Logger::StdOut() Logger::StdOut() \endlink.
+call the method \link Verdandi::Logger::StdOut() Logger::StdOut()\endlink.
 
 There are several options available:
 <ul>

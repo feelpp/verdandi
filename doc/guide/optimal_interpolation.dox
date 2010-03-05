@@ -36,16 +36,16 @@ while (!driver.HasFinished()) [6]
 \comment
   <li> First build the \link Verdandi::OptimalInterpolation
   OptimalInterpolation\endlink driver and read option keys in the
-  configuration file with the method \link
+  configuration file with the construction \link
   Verdandi::OptimalInterpolation::OptimalInterpolation(string c_f)
   OptimalInterpolation(configuration_file)\endlink. </li>
 
   <li> Then initialize the driver, the model and the observation manager with
   the method \link Verdandi::OptimalInterpolation::Initialize(string configuration_file)
-  Initialize(configuration_file)\endlink. This optionally computes the
-  analysis of the first step. </li>
+  Initialize(configuration_file)\endlink. This optionally computes an
+  analysis (BLUE) with the model initial condition. </li>
 
-  <li> Optionnally intialize a step for the optimal interpolation with the
+  <li> Optionally intialize a step for the optimal interpolation with the
   method \link Verdandi::OptimalInterpolation::InitializeStep()
   InitializeStep()\endlink. This initializes a step for the model. </li>
 
@@ -54,54 +54,51 @@ while (!driver.HasFinished()) [6]
 
   <li> Compute the analysis with the method \link
   Verdandi::OptimalInterpolation::Analyze() Analyze()\endlink. Whenever
-  observations are available, it assimilates them using optimal
-  interpolation. </li>
+  observations are available, it assimilates them through the computation of
+  BLUE. </li>
 
   <li> Compute the data assimilation until the model has finished: the method
   \link Verdandi::OptimalInterpolation::HasFinished() HasFinished()\endlink
-  returns true if no more data assimilation is required, false otherwise. </li>
+  returns true if the simulation is done, false otherwise. </li>
 \endcomment
 
 
 \section algorithm Optimal interpolation algorithm
 The optimal interpolation method is a sequential data assimilation method
 implementing the BLUE (Best Linear Unbiased Estimator) analysis. The BLUE
-analysis is so-called since it is linearly deduced from the innovation, its
+is so-called since it is linearly deduced from the innovation, its
 error is unbiased and it is optimal in the sense that it has the lowest total
-variance. Each time observations are available, the BLUE analysis is
-performed, with prescribed background matrices B and R. Here is the algorithm:
+variance. Each time observations are available, BLUE is computed, with
+prescribed variance matrices B and R. Here is the algorithm:
 <br/>
 
 <ol>
-        <li>At time \f$t_0\f$, the initial condition \f$x^{b}_{0}\f$ is available. </li>
-        <li>For every time \f$t_n, n \in \mathnormal{N}\f$,
+        <li>At time \f$t_0\f$, the initial condition \f$x^{f}_{0}\f$ is available. </li>
+        <li>For every time \f$t_n, n \ge 0\f$,
                - if observations \f$y_n\f$ are available, <br/>
                  the analysis takes the BLUE value <br/>
-                 \f$x_{n}^{a} = x_{n}^{b} + K(y_n -
-                 \mathcal{H}(x_{n}^{b}))\f$, <br/>
+                 \f$x_n^a = x_n^f + K_n(y_n -
+                 \mathcal{H}_n(x_n^f))\f$, <br/>
                   with <br/>
-                   \f$K = BH^{T}(HBH^{T} + R)^{-1}\f$, <br/>
+                   \f$K_n = B_nH_n^{T}(H_nB_nH_n^{T} + R_n)^{-1}\f$, <br/>
                  and the forecast is <br/>
-                  \f$x_{n+1}^{b} = \mathcal{M}_{n}(x_{n}^{a})\f$;
+                  \f$x_{n+1}^f = \mathcal{M}_n(x_n^a)\f$;
                - if there are no observations, <br/>
                  the forecast is <br/>
-                 \f$x_{n+1}^{b} = \mathcal{M}_{n}(x_{n}^{b})\f$. </li>
+                 \f$x_{n+1}^f = \mathcal{M}_n(x_n^f)\f$. </li>
 </ol>
 With: <br/>
-\f$x\f$ model state vector; <br/>
-\f$x^{t}\f$ true value of the model i.e. perfect analysis; <br/>
-\f$x^{b}\f$ background model state; <br/>
-\f$x^{a}\f$ analysed model state; <br/>
-\f$y\f$ observation vector; <br/>
-\f$\mathcal{H}\f$ observation operator (maps \f$x\f$ into the \f$y\f$ space by
-providing model equivalents of the observed values); <br/>
-\f$H\f$ linearized observation operator (in the vicinity of a predefined model
-state); <br/>
-\f$B\f$ background error covariances (estimation error covariance matrix of \f$x^{b}\f$); <br/>
-\f$R\f$ observation error covariances (error covariance matrix of \f$ y -
-H(x^{t})\f$); <br/>
-\f$K\f$ analysis gain matrix; <br/>
-\f$\mathcal{M}\f$ model.
+\f$x_n^f\f$ background model state; <br/>
+\f$x_n^a\f$ analyzed model state; <br/>
+\f$y_n\f$ observation vector; <br/>
+\f$\mathcal{H}_n\f$ observation operator that maps from state space to
+observation space; <br/>
+\f$H_n\f$ linearized observation operator; <br/>
+\f$B_n\f$ background error covariance matrix (error variance of \f$x_n^f\f$);
+<br/>
+\f$R_n\f$ observation error covariance matrix; <br/>
+\f$K_n\f$ analysis gain matrix; <br/>
+\f$\mathcal{M}_n\f$ model.
 
 \section notes Notes 
 

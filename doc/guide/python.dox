@@ -27,7 +27,7 @@ swig</code> if you have <a href="http://www.scons.org/">SCons</a> installed
 This should generate the Python module <code>verdandi.py</code> and the
 shared library <code>_verdandi.so</code>.  You may want to place these two files
 in a directory of your <code>$PYTHONPATH</code>, where Python searches for
-modules (in addition to the local directory <code>.</code>).
+modules (in addition to the local directory <code>./</code>).
 
 \subsection interface Using the interface
 
@@ -44,8 +44,8 @@ $ ipython -pylab
 In  [1]: import seldon
 In  [2]: import verdandi
 
-In  [3]: method = verdandi.AssimilationMethod(''configuration_file.cfg'')
-In  [4]: method.Initialize(''configuration_file.cfg'')
+In  [3]: method = verdandi.AssimilationMethod("configuration_file.cfg")
+In  [4]: method.Initialize("configuration_file.cfg")
 
 In  [5]: model = method.GetModel()
 In  [6]: model.GetDate()
