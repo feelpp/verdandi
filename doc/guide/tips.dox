@@ -17,7 +17,7 @@ using namespace Verdandi;
 
 In the directory containing your program, copy the <code>SConstruct</code>
 file provided in the examples. Edit the <code>SConstruct</code> file to
-specify your <code>verdandi_path</code>.
+specify your <code>verdandi_path/</code>.
 
 Compile your program with:
 \prescreen

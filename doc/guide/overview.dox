@@ -10,7 +10,7 @@ Below is a summary of %Verdandi contents.
 \section methods Methods
 
 One basic <b>data assimilation method</b> in the directory
-<code>method</code>: the optimal interpolation.
+<code>method/</code>: the optimal interpolation.
 
 <h3>Source code</h3>
 class OptimalInterpolation<T, ClassModel, ClassObservationManager> <br/>
@@ -20,7 +20,7 @@ OptimalInterpolation.cxx
 
 \section overview_models Models
 
-Two sample <b>models</b> in the directory <code>model</code>: clamped bar
+Two sample <b>models</b> in the directory <code>model/</code>: clamped bar
 (mechanics), shallow water (oceanography).
 
 <h3>Source code</h3> 
@@ -34,7 +34,7 @@ ShallowWater.cxx
 \section overview_observations Observation managers
 
 Two (linear) <b>observation managers</b> in the directory
-<code>observation_manager</code>: an observation manager whose observation
+<code>observation_manager/</code>: an observation manager whose observation
 operator is simply defined with a matrix, and an observation manager with an
 observation operator that maps from a model grid to an observation
 network.
@@ -49,7 +49,7 @@ GridToNetworkObservationManager.cxx
 
 \section error Error statistics
 
-<b>Error statistics</b> in the directory <code>error</code>: classical error
+<b>Error statistics</b> in the directory <code>error/</code>: classical error
 covariance matrices in diagonal form and in Balgovind form (isotropic or not).
 
 <h3>Source code</h3>
@@ -65,7 +65,7 @@ IsotropicBalgovindMatrix.cxx
 
 \section miscellaneous Miscellaneous
 
-In the directory <code>output_saver</code>, one may find a class to save
+In the directory <code>output_saver/</code>, one may find a class to save
 several kinds of output.
 
 <h3>Source code</h3>
@@ -73,7 +73,7 @@ class OutputSaver <br/>
 OutputSaver.hxx <br/>
 OutputSaver.cxx
 
-In the directory <code>share</code>, one may find a class for objects to
+In the directory <code>share/</code>, one may find a class for objects to
 communicate.
 
 <h3>Source code</h3>
@@ -88,7 +88,7 @@ are managed.
 
 \section scripts Scripts
 
-Useful <b>scripts</b> may be found in the directory <code>bin</code>.
+Useful <b>scripts</b> may be found in the directory <code>bin/</code>.
 
 The script <code>format</code> partially formats source files according to Verdandi's
 rules: it removes trailing spaces and indents the code; it finally checks that
@@ -100,17 +100,17 @@ no line goes beyond the 78th column.
 
 <ul>
 
-  <li> <code>bin</code>: useful scripts; </li>
-  <li> <code>error</code>: error variances; </li>
-  <li> <code>example</code>: example programs for several models and
+  <li> <code>bin/</code>: useful scripts; </li>
+  <li> <code>error/</code>: error variances; </li>
+  <li> <code>example/</code>: example programs for several models and
   configurations; </li>  
-  <li> <code>method</code>: the data assimilation algorithms; </li>
-  <li> <code>model</code>: several example models; </li>
-  <li> <code>observation_manager</code>: example observation
+  <li> <code>method/</code>: the data assimilation algorithms; </li>
+  <li> <code>model/</code>: several example models; </li>
+  <li> <code>observation_manager/</code>: example observation
   managers; </li>
-  <li> <code>output_saver</code>: a convenient class to save (on disk)
+  <li> <code>output_saver/</code>: a convenient class to save (on disk)
   different kinds of variables;</li>
-  <li> <code>share</code>: functionalities shared between the objects,
+  <li> <code>share/</code>: functionalities shared between the objects,
   such as the handling of messages, the error management and some useful
   functions.</li>
 

@@ -20,20 +20,20 @@ In addition to a C++ compiler, one needs Swig 1.3.x. Swig 1.1 cannot
 generate the interface. You will also need Python (say, 2.5 or 2.6, but
 previous versions should work too) and its headers.
 
-In <code>python</code> directory, you may simply launch <code>scons
+In <code>python/</code> directory, you may simply launch <code>scons
 swig</code> if you have <a href="http://www.scons.org/">SCons</a> installed
 (version &gt;=1.0).
 
 This should generate the Python module <code>verdandi.py</code> and the
 shared library <code>_verdandi.so</code>.  You may want to place these two files
-in a directory of your <code>$PYTHONPATH</code>, where Python searches for
+in a directory of your <code>$PYTHONPATH/</code>, where Python searches for
 modules (in addition to the local directory <code>./</code>).
 
 \subsection interface Using the interface
 
-In <code>python</code> directory, or in any place if
+In <code>python/</code> directory, or in any place if
 <code>verdandi.py</code> and <code>_verdandi.so</code> are in a directory of
-<code>$PYTHONPATH</code>, you may launch Python and load the module.
+<code>$PYTHONPATH/</code>, you may launch Python and load the module.
 
 It is recommended to use <a href="http://ipython.scipy.org/">IPython</a>
 instead of the regular Python shell, for convenience:

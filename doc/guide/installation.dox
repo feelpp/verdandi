@@ -37,7 +37,7 @@ href="http://verdandi.gforge.inria.fr/">Verdandi
 homepage</a>), usually available in a compressed file,
 e.g. Verdandi-[version].tar.bz2. Uncompress the file, e.g. in command line:
 <code>tar -xvjf Verdandi-[version].tar.bz2</code>. This will create the
-directory <code>Verdandi-[version]</code> in which you will find %Verdandi.
+directory <code>Verdandi-[version]/</code> in which you will find %Verdandi.
 
 \subsection tests_linux Testing the installation
 
@@ -45,7 +45,7 @@ In order to start with %Verdandi, it is sufficient to install SCons. Make sure
 that the executable <code>scons</code> is available.
 
 To compile and run the examples provided with %Verdandi, execute the following
-commands in the directory <code>example/shallow_water</code>:
+commands in the directory <code>example/shallow_water/</code>:
 
 \precode
 $ scons
@@ -58,9 +58,9 @@ $ optimal_interpolation configuration/river.cfg
 In <code>optimal_interpolation.cpp</code> for example, one of the first lines
 includes %Verdandi through
 <code>Verdandi.hxx</code>. <code>Verdandi.hxx</code> is the only file to be
-included and it is located in the directory <code>Verdandi-[version]</code>
+included and it is located in the directory <code>Verdandi-[version]/</code>
 expanded from the downloaded file. If you compile your own code on top of
-%Verdandi, just provide the path to <code>Verdandi-[version]</code> to the
+%Verdandi, just provide the path to <code>Verdandi-[version]/</code> to the
 compiler, e.g.:
 
 \precode $ g++ -I/path/to/Verdandi-[version] your_code.cpp
