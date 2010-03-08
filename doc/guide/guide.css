@@ -18,6 +18,13 @@ h2 {
         padding: 0px;
         margin: 0px 0px 10px 0px;
 }
+h3 {
+	font: normal 1.5em arial;
+        font-weight: bold;
+	color: #8b2;
+        padding: 0px;
+        margin: 0px 0px 10px 0px;
+}
 
 .doc {
     overflow: hidden;
@@ -172,12 +179,15 @@ PRE.fragment {
 }
 
 .doxygen h3 {
-	font-size: 100%;
+	font-size: 70%;
 }
 
 .doxygen h3 a {
         font-weight: bold;
-	color: #06c;
+	color: #8b2;
+}
+
+.doxygen h3 a:hover {
 	text-decoration: none;
 }
 
