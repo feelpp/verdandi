@@ -5,19 +5,9 @@
 /*!
 \page optimal_interpolation Optimal Interpolation
 
-The optimal interpolation is a sequential data assimilation method. It is
-implemented in <code>OptimalInterpolation.hxx</code> and
-<code>OptimalInterpolation.cxx</code>. The class \link
-Verdandi::OptimalInterpolation OptimalInterpolation\endlink is a template class:
-<code>OptimalInterpolation<T, ClassModel,
-ClassObservationManager></code>. <code>T</code> is the type of the elements to
-be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of
-the model (e.g. <code>ShallowWater<double></code>),
-<code>ClassObservationManager</code> is the type of the observation manager
-(e.g. <code>GridToNetworkObservationManager<double></code>).
+The optimal interpolation is a sequential data assimilation method. It is implemented in <code>OptimalInterpolation.hxx</code> and <code>OptimalInterpolation.cxx</code>. The class \link Verdandi::OptimalInterpolation OptimalInterpolation\endlink is a template class: <code>OptimalInterpolation<T, ClassModel, ClassObservationManager></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of the model (e.g. <code>ShallowWater<double></code>), <code>ClassObservationManager</code> is the type of the observation manager (e.g. <code>GridToNetworkObservationManager<double></code>).
 
-Here is how you may use the \link Verdandi::OptimalInterpolation
-  OptimalInterpolation\endlink class:
+Here is how you may use the \link Verdandi::OptimalInterpolation OptimalInterpolation\endlink class:
 
 \precode
 OptimalInterpolation<double,  ShallowWater<double>,
@@ -34,78 +24,52 @@ while (!driver.HasFinished()) [6]
 \endprecode
 
 \comment
-  <li> First build the \link Verdandi::OptimalInterpolation
-  OptimalInterpolation\endlink driver and read option keys in the
-  configuration file with the construction \link
-  Verdandi::OptimalInterpolation::OptimalInterpolation(string c_f)
-  OptimalInterpolation(configuration_file)\endlink. </li>
+  <li> First build the \link Verdandi::OptimalInterpolation OptimalInterpolation\endlink driver and read option keys in the configuration file with the construction \link Verdandi::OptimalInterpolation::OptimalInterpolation(string c_f) OptimalInterpolation(configuration_file)\endlink. </li>
 
-  <li> Then initialize the driver, the model and the observation manager with
-  the method \link Verdandi::OptimalInterpolation::Initialize(string configuration_file)
-  Initialize(configuration_file)\endlink. This optionally computes an
-  analysis (BLUE) with the model initial condition. </li>
+  <li> Then initialize the driver, the model and the observation manager with the method \link Verdandi::OptimalInterpolation::Initialize(string configuration_file) Initialize(configuration_file)\endlink. This optionally computes an analysis (BLUE) with the model initial condition. </li>
 
-  <li> Optionally intialize a step for the optimal interpolation with the
-  method \link Verdandi::OptimalInterpolation::InitializeStep()
-  InitializeStep()\endlink. This initializes a step for the model. </li>
+  <li> Optionally intialize a step for the optimal interpolation with the method \link Verdandi::OptimalInterpolation::InitializeStep() InitializeStep()\endlink. This initializes a step for the model. </li>
 
-  <li> Perform a step forward without optimal interpolation with the method
-  \link Verdandi::OptimalInterpolation::Forward() Forward()\endlink. </li>
+  <li> Perform a step forward without optimal interpolation with the method \link Verdandi::OptimalInterpolation::Forward() Forward()\endlink. </li>
 
-  <li> Compute the analysis with the method \link
-  Verdandi::OptimalInterpolation::Analyze() Analyze()\endlink. Whenever
-  observations are available, it assimilates them through the computation of
-  BLUE. </li>
+  <li> Compute the analysis with the method \link Verdandi::OptimalInterpolation::Analyze() Analyze()\endlink. Whenever observations are available, it assimilates them through the computation of BLUE. </li>
 
-  <li> Compute the data assimilation until the model has finished: the method
-  \link Verdandi::OptimalInterpolation::HasFinished() HasFinished()\endlink
-  returns true if the simulation is done, false otherwise. </li>
+  <li> Compute the data assimilation until the model has finished: the method \link Verdandi::OptimalInterpolation::HasFinished() HasFinished()\endlink returns true if the simulation is done, false otherwise. </li>
 \endcomment
 
 
 \section algorithm Optimal interpolation algorithm
-The optimal interpolation method is a sequential data assimilation method
-implementing the BLUE (Best Linear Unbiased Estimator) analysis. The BLUE
-is so-called since it is linearly deduced from the innovation, its
-error is unbiased and it is optimal in the sense that it has the lowest total
-variance. Each time observations are available, BLUE is computed, with
-prescribed variance matrices B and R. Here is the algorithm:
-<br/>
+The optimal interpolation method is a sequential data assimilation method implementing the BLUE (Best Linear Unbiased Estimator) analysis. The BLUE is so-called since it is linearly deduced from the innovation, its error is unbiased and it is optimal in the sense that it has the lowest total variance. Each time observations are available, BLUE is computed, with prescribed variance matrices B and R. Here is the algorithm: <br/>
 
 <ol>
         <li>At time \f$t_0\f$, the initial condition \f$x^{f}_{0}\f$ is available. </li>
-        <li>For every time \f$t_n, n \ge 0\f$,
-               - if observations \f$y_n\f$ are available, <br/>
+        <li>For every time \f$t_n, n \ge 0\f$, 
+                - if observations \f$y_n\f$ are available, <br/>
                  the analysis takes the BLUE value <br/>
-                 \f$x_n^a = x_n^f + K_n(y_n -
-                 \mathcal{H}_n(x_n^f))\f$, <br/>
+                 \f$x_n^a = x_n^f + K_n(y_n - \mathcal{H}_n(x_n^f))\f$, <br/>
                   with <br/>
                    \f$K_n = B_nH_n^{T}(H_nB_nH_n^{T} + R_n)^{-1}\f$, <br/>
                  and the forecast is <br/>
                   \f$x_{n+1}^f = \mathcal{M}_n(x_n^a)\f$;
-               - if there are no observations, <br/>
-                 the forecast is <br/>
-                 \f$x_{n+1}^f = \mathcal{M}_n(x_n^f)\f$. </li>
+                - if there are no observations, <br/>
+                  the forecast is <br/>
+                  \f$x_{n+1}^f = \mathcal{M}_n(x_n^f)\f$. </li>
 </ol>
 With: <br/>
 \f$x_n^f\f$ background model state; <br/>
 \f$x_n^a\f$ analyzed model state; <br/>
 \f$y_n\f$ observation vector; <br/>
-\f$\mathcal{H}_n\f$ observation operator that maps from state space to
-observation space; <br/>
+\f$\mathcal{H}_n\f$ observation operator that maps from state space to observation space; <br/>
 \f$H_n\f$ linearized observation operator; <br/>
-\f$B_n\f$ background error covariance matrix (error variance of \f$x_n^f\f$);
-<br/>
+\f$B_n\f$ background error covariance matrix (error variance of \f$x_n^f\f$); <br/>
 \f$R_n\f$ observation error covariance matrix; <br/>
 \f$K_n\f$ analysis gain matrix; <br/>
 \f$\mathcal{M}_n\f$ model.
 
 \section notes Notes 
 
-Advantages and drawbacks of optimal interpolation.
-In which case to use or not to use the optimal interpolation method.
+Advantages and drawbacks of optimal interpolation. In which case to use or not to use the optimal interpolation method.
 
 \section configuration How to build the configuration file
-
 
 */

@@ -5,14 +5,8 @@
 /*!
 \page linear_observation_manager Linear Observation Manager
 
-This observation manager defines a linear observation operator \f$\mathcal{H}
-= H\f$, where \f$H\f$ is a matrix. It is time independent.
+This observation manager defines a linear observation operator \f$\mathcal{H} = H\f$, where \f$H\f$ is a matrix. It is time independent.
 
-An observation manager is implemented in
-<code>LinearObservationManager.hxx</code> and
-<code>LinearObservationManager.cxx</code>. The class \link
-Verdandi::LinearObservationManager LinearObservationManager\endlink is a
-template class: <code>LinearObservationManager<T></code>. <code>T</code> is
-the numerical type (e.g., <code>double</code>).
+An observation manager is implemented in <code>LinearObservationManager.hxx</code> and <code>LinearObservationManager.cxx</code>. The class \link Verdandi::LinearObservationManager LinearObservationManager\endlink is a template class: <code>LinearObservationManager<T></code>. <code>T</code> is the numerical type (e.g., <code>double</code>).
 
 */

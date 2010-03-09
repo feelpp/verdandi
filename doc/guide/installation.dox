@@ -5,47 +5,31 @@
 /*!
 \page installation Installation
 
-%Verdandi is supposed to be fully compliant with the <b>C++
-standard</b>. This ensures portability on many platforms. It compiles at least
-on \ref linux, \ref macos and \ref windows. It is compatible with IDEs such as
-Xcode and Microsoft Visual Studio.
+%Verdandi is supposed to be fully compliant with the <b>C++ standard</b>. This ensures portability on many platforms. It compiles at least on \ref linux, \ref macos and \ref windows. It is compatible with IDEs such as Xcode and Microsoft Visual Studio.
 
 \section dependencies Dependencies
 %Verdandi requires:
 <ul>
-  <li> the software construction tool <a
-  href="http://www.scons.org/">SCons</a> (version 1.0 or higher) for
-  compilation; </li>
-  <li> Python for both SCons and the optional Python interface
-    (see page \ref python) to the C++ code; the generation of the interface
-    also requires <a href="http://www.swig.org/">SWIG</a>. </li>
+  <li> the software construction tool <a href="http://www.scons.org/">SCons</a> (version 1.0 or higher) for compilation; </li>
+  <li> Python for both SCons and the optional Python interface (see page \ref python) to the C++ code; the generation of the interface also requires <a href="http://www.swig.org/">SWIG</a>. </li>
 </ul>
 
 Note that in %Verdandi tarball, you will also find:
 <ul>
-  <li> the linear algebra library <a
-  href="http://seldon.sourceforge.net/">Seldon</a>.
-  </li>
+  <li> the linear algebra library <a href="http://seldon.sourceforge.net/">Seldon</a>. </li>
 </ul>
 
 \section linux Linux
 
 \subsection installation_linux Installation
 
-Download the source code (<a
-href="http://verdandi.gforge.inria.fr/">Verdandi
-homepage</a>), usually available in a compressed file,
-e.g. Verdandi-[version].tar.bz2. Uncompress the file, e.g. in command line:
-<code>tar -xvjf Verdandi-[version].tar.bz2</code>. This will create the
-directory <code>Verdandi-[version]/</code> in which you will find %Verdandi.
+Download the source code (<a href="http://verdandi.gforge.inria.fr/">Verdandi homepage</a>), usually available in a compressed file, e.g. Verdandi-[version].tar.bz2. Uncompress the file, e.g. in command line: <code>tar -xvjf Verdandi-[version].tar.bz2</code>. This will create the directory <code>Verdandi-[version]/</code> in which you will find %Verdandi.
 
 \subsection tests_linux Testing the installation
 
-In order to start with %Verdandi, it is sufficient to install SCons. Make sure
-that the executable <code>scons</code> is available.
+In order to start with %Verdandi, it is sufficient to install SCons. Make sure that the executable <code>scons</code> is available.
 
-To compile and run the examples provided with %Verdandi, execute the following
-commands in the directory <code>example/shallow_water/</code>:
+To compile and run the examples provided with %Verdandi, execute the following commands in the directory <code>example/shallow_water/</code>:
 
 \precode
 $ scons
@@ -55,13 +39,7 @@ $ forward configuration/river-truth.cfg
 $ optimal_interpolation configuration/river.cfg
 \endprecode
 
-In <code>optimal_interpolation.cpp</code> for example, one of the first lines
-includes %Verdandi through
-<code>Verdandi.hxx</code>. <code>Verdandi.hxx</code> is the only file to be
-included and it is located in the directory <code>Verdandi-[version]/</code>
-expanded from the downloaded file. If you compile your own code on top of
-%Verdandi, just provide the path to <code>Verdandi-[version]/</code> to the
-compiler, e.g.:
+In <code>optimal_interpolation.cpp</code> for example, one of the first lines includes %Verdandi through <code>Verdandi.hxx</code>. <code>Verdandi.hxx</code> is the only file to be included and it is located in the directory <code>Verdandi-[version]/</code> expanded from the downloaded file. If you compile your own code on top of %Verdandi, just provide the path to <code>Verdandi-[version]/</code> to the compiler, e.g.:
 
 \precode $ g++ -I/path/to/Verdandi-[version] your_code.cpp
 $ ./a.out

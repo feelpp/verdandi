@@ -6,62 +6,32 @@
 \page debugging Debugging
 
 \section logger Logger
-%Verdandi offers the ability to save messages in a log file. To do so, one may
-call the method \link Verdandi::Logger::StdOut() Logger::StdOut()\endlink.
+%Verdandi offers the ability to save messages in a log file. To do so, one may call the method \link Verdandi::Logger::StdOut() Logger::StdOut()\endlink.
 
 There are several options available:
 <ul>
-        <li> <code>VERDANDI_LOG_FILENAME</code> specifies the name of the log
-        file (<code>verdandi.log</code> by default); </li>
-        <li> <code>VERDANDI_LOGGING_LEVEL</code> defines the level of
-        verbosity (0 by default); </li>
-        <li> <code>VERDANDI_STDOUT_LOGGING_LEVEL</code> defines the level of
-        verbosity for messages sent to the standard output (7 by
-        default). When a message is sent to the standard output, it is
-        possibly written in a log file if the logging level is lower than or
-        equal to <code>VERDANDI_STDOUT_LOGGING_LEVEL</code>; </li>
-        <li> <code>VERDANDI_LOG_WIDTH</code> defines the number of characters
-        per line (78 by default); </li>
-        <li> <code>VERDANDI_LOG_IS_ACTIVE</code> to (de)activate the logger
-        (active by default). </li>
+        <li> <code>VERDANDI_LOG_FILENAME</code> specifies the name of the log file (<code>verdandi.log</code> by default); </li>
+        <li> <code>VERDANDI_LOGGING_LEVEL</code> defines the level of verbosity (0 by default); </li>
+        <li> <code>VERDANDI_STDOUT_LOGGING_LEVEL</code> defines the level of verbosity for messages sent to the standard output (7 by default). When a message is sent to the standard output, it is possibly written in a log file if the logging level is lower than or equal to <code>VERDANDI_STDOUT_LOGGING_LEVEL</code>; </li>
+        <li> <code>VERDANDI_LOG_WIDTH</code> defines the number of characters per line (78 by default); </li>
+        <li> <code>VERDANDI_LOG_IS_ACTIVE</code> to (de)activate the logger (active by default). </li>
 </ul>
 
-For example, to change the number of characters per line, you may write:
-\precode #define VERDANDI_LOG_WIDTH 80 \endprecode
+For example, to change the number of characters per line, you may write: \precode #define VERDANDI_LOG_WIDTH 80 \endprecode
 
 \section message_handler Message handler
 
 \section exceptions Exceptions raised
 
 
-The objects that may be launched by %Verdandi are of type: \link
-Verdandi::ErrorConfiguration ErrorConfiguration\endlink, \link
-Verdandi::ErrorIO ErrorIO\endlink, \link Verdandi::ErrorProcessing
-ErrorProcessing\endlink, \link Verdandi::ErrorUndefined
-ErrorUndefined\endlink, \link Verdandi::ErrorArgument
-ErrorArgument\endlink. They all derive from \link Verdandi::Error
-Error\endlink. They provide the method \link Verdandi::Error::What()
-What()\endlink that returns a string explaining the error, and the method
-\link Verdandi::Error::CoutWhat() CoutWhat()\endlink that displays on screen
-this explanation.
+The objects that may be launched by %Verdandi are of type: \link Verdandi::ErrorConfiguration ErrorConfiguration\endlink, \link Verdandi::ErrorIO ErrorIO\endlink, \link Verdandi::ErrorProcessing ErrorProcessing\endlink, \link Verdandi::ErrorUndefined ErrorUndefined\endlink, \link Verdandi::ErrorArgument ErrorArgument\endlink. They all derive from \link Verdandi::Error Error\endlink. They provide the method \link Verdandi::Error::What() What()\endlink that returns a string explaining the error, and the method \link Verdandi::Error::CoutWhat() CoutWhat()\endlink that displays on screen this explanation.
 
 \section exceptions_and_debugging Exceptions and debugging
 
-Suppose your code contains an error and raises an exception. You probably
-want to identify the function that raised the exception. The error message
-should contain the name of the function. But you probably want to know the
-exact line where the error occurred and the sequence of calls. Then, you have
-two options, using a debugger.
+Suppose your code contains an error and raises an exception. You probably want to identify the function that raised the exception. The error message should contain the name of the function. But you probably want to know the exact line where the error occurred and the sequence of calls. Then, you have two options, using a debugger.
 
-One option is to place a breakpoint in 
-\link Verdandi::Error::Error(string function = "", string comment = "")
- Error::Error(string function = "", string comment = "")\endlink (see file
- <code>share/Error.cxx</code>) because this constructor should be called
- before the exception is actually raised.
+One option is to place a breakpoint in \link Verdandi::Error::Error(string function = "", string comment = "") Error::Error(string function = "", string comment = "")\endlink (see file <code>share/Error.cxx</code>) because this constructor should be called before the exception is actually raised.
 
-Another option, more convenient because no breakpoint is to be placed, is
-to define <code>VERDANDI_WITH_ABORT</code>. With that flag activated, if a
-%Verdandi exception is raised, the program will simply abort. The call stack is
-then at hand.
+Another option, more convenient because no breakpoint is to be placed, is to define <code>VERDANDI_WITH_ABORT</code>. With that flag activated, if a %Verdandi exception is raised, the program will simply abort. The call stack is then at hand.
 
 */
