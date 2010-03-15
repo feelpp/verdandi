@@ -64,6 +64,16 @@ Here are some tips to help you to build your configuration file:
 
 \section matrix_vector Seldon matrices and vectors
 
-The structures manipulated in %Verdandi are Seldon <a href="http://seldon.sourceforge.net/doc-dev/vectors.php">vectors</a> and <a href="http://seldon.sourceforge.net/doc-dev/matrices.php">matrices</a>.
+The structures manipulated in %Verdandi are <a href="http://seldon.sourceforge.net/">Seldon</a> vectors and matrices.
+
+Vectors are instances of the class <code>Vector</code>. Class <code>Vector</code> is a template class: <code>Vector&lt;T, Storage, Allocator&gt;</code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>). <code>Storage</code> defines how the vector is stored.  <code>Storage</code> is equal to <code>VectFull</code> by default for full vectors, you can set it to <code>VectSparse</code> for sparse vectors. Finally, <code>Allocator</code> defines the way memory is managed. It is close to STL allocators. See the section "Allocators" for further details.
+
+Matrices are instances of the class <code>Matrix</code>. Class <code>Matrix</code> is a template class: <code>Matrix&lt;T, Prop, Storage, Allocator&gt;</code>. As for vectors, <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>).
+
+<code>Prop</code> indicates that the matrix has given properties (symmetric, hermitian, positive definite or whatever). This template parameter is never used by Seldon; so the user may define its own properties. Thanks to this template parameter, the user may overload some functions based on the properties of the matrix. Seldon defines two properties: <code>General</code> (default) and <code>Symmetric</code>.
+
+<code>Storage</code> defines how the matrix is stored. Matrices may be stored in several ways. <code>RowMajor</code> is the default storage.
+
+Finally, <code>Allocator</code> defines the way memory is managed. It is close to STL allocators.
 
 */
