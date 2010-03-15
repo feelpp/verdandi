@@ -2,7 +2,6 @@
 // conditions (river-truth.cfg).
 #define SELDON_DEBUG_LEVEL_4
 #define VERDANDI_WITH_ABORT
-#define GETPOT_ACTIVATE_EXCEPTION true
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
