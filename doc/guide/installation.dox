@@ -29,21 +29,24 @@ Download the source code (<a href="http://verdandi.gforge.inria.fr/">Verdandi ho
 
 In order to start with %Verdandi, it is sufficient to install SCons. Make sure that the executable <code>scons</code> is available.
 
-To compile and run the examples provided with %Verdandi, execute the following commands in the directory <code>example/shallow_water/</code>:
+To compile the examples provided with %Verdandi, run <code>scons</code> in the directory <code>example/shallow_water/</code>:
 
 \precode
 $ scons
-$ write_matrix
-
-$ forward configuration/river-truth.cfg
-$ optimal_interpolation configuration/river.cfg
 \endprecode
 
-In <code>optimal_interpolation.cpp</code> for example, one of the first lines includes %Verdandi through <code>Verdandi.hxx</code>. <code>Verdandi.hxx</code> is the only file to be included and it is located in the directory <code>Verdandi-[version]/</code> expanded from the downloaded file. If you compile your own code on top of %Verdandi, just provide the path to <code>Verdandi-[version]/</code> to the compiler, e.g.:
-
-\precode $ g++ -I/path/to/Verdandi-[version] your_code.cpp
-$ ./a.out
+Then to run the examples, execute the following commands:
+\precode
+$ write_matrix [1]
+$ forward configuration/river-truth.cfg [2]
+$ optimal_interpolation configuration/river.cfg [3]
 \endprecode
+
+\comment
+        <li>This program writes a matrix in the file <code>configuration/matrix.dat</code>. This matrix is used to define the observation operator. In this example, it is the identity. </li>
+        <li>This program generates the true observations by running the model with the true initial conditions described in <code>river-truth.cfg</code>, without any error. It performs steps forward with the shallow-water model without data assimilation.</li>
+        <li>This program applies the optimal interpolation, starting from erroneous initial conditions described in <code>river.cfg</code>. The observations are those generated above by <code>forward</code>.</li>
+\endcomment
 
 \section macos MacOS
 
