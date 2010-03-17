@@ -51,16 +51,66 @@ A level of priority for the logger messages can be set by defining <code>VERDAND
 
 Setting <code>GETPOT_ACTIVATE_EXCEPTION</code> at <code>true</code> activates the raising of exceptions related to GetPot, the configuration file parser.
 
-\section configuration_file Building a configuration file
+\section configuration_file Building and reading a configuration file
 
-Configuration files are read by <a href="http://getpot.sourceforge.net/">GetPot</a>. Here is an <a href="http://getpot.sourceforge.net/example.html"> example of a GetPot configuration file</a>.
+Configuration files are read by <a href="http://getpot.sourceforge.net/">GetPot</a>. The following shows you some example, that you could write in your configuration file <code>my_configuration.cfg</code>:
 
-Here are some tips to help you to build your configuration file: 
-<ul>
-<li> how to use substitution with <code>$</code> expressions; </li>
-<li> how to build a list; </li>
-<li> what happens if you do not provide a value for a variable.</li>
-</ul>
+\precode
+# Double value.
+Delta_t = 0.03
+
+# Integer value. 
+Nx = 100
+
+[common] [1]
+
+    [common/output_saver] [2]
+
+    Mode = binary
+  
+  
+[shallow_water]
+
+    [shallow_water/domain]
+
+    # Variable replacement.
+    Mode = ${common/output_saver/Mode} [3]
+   
+    # Numeric expressions.
+    Final_date = '${* 1500 ${Delta_t}}' [4]
+\endprecode
+
+To read these values from the configuration file, you may use:
+
+\precode
+GetPot configuration_stream("my_configuration.cfg"); [5]
+
+double Delta_t_;
+configuration_stream.set("Delta_t", Delta_t_); [6]
+
+int Nx_;
+configuration_stream.set("Nx", Nx_, "", 100); [7]
+
+configuration_stream.set_prefix("shallow_water/domain/"); [8]
+string mode_;
+configuration_stream.set("Mode", mode_, "'text' | 'binary'"); [9]
+
+double final_date_;
+configuration_stream.set("Final_date", final_date_);
+\endprecode
+
+
+\comment
+<li>To make things easier, variables can be sorted into sections ... </li>
+<li>... and subsections. </li>
+<li>This variable <code>Mode</code> takes the value of the variable <code>Mode</code> defined in the section <code>common/output_saver</code>. </li>
+<li>The <code>Final_date</code> is <code>1500</code> times the value of the variable <code>Delta_t</code>. </li>
+<li>A <code>GetPot</code> object called <code>configuration_stream</code> is built to parse the file <code>my_configuration.cfg</code>. </li>
+<li>Here is the simplest way to read from a configuration file: the value of the variable <code>Delta_t</code> is stored in <code>Delta_t_</code>. </li>
+<li>The variable <code>Nx</code> is read from the configuration file and stored in <code>Nx_</code>. If it is wrongly typed or inexistent, the default value <code>100</code> will be returned in <code>Nx_</code>. Default values can also be specified for double values and strings. </li>
+<li>Here is set the prefix <code>shallow_water/domain/</code>: the values will be read in this section until another prefix is provided to GetPot. </li>
+<li>The variable <code>Mode</code> is read in the configuration file. It has to meet the constraint of being either <code>"text"</code> or <code>"binary"</code>; if not, an exception will be thrown. Constraints can also be expressed for numerical values, for instance: <code>"<= 16 & % 2 | > 16 & ! % 2"</code>. To meet this constraint, an even number has to be inferior or equal to 16; otherwise, an odd number has to be superior to 16. </li>
+\endcomment
 
 \section matrix_vector Seldon matrices and vectors
 
