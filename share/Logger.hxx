@@ -117,7 +117,7 @@ namespace Verdandi
         static void SetLoggingLevel(int level);
 
         static void Activate();
-        static void Desactivate();
+        static void Deactivate();
 
         template <int LEVEL, class T, class S>
         static void Log(const T& object, const S& message,

@@ -93,7 +93,7 @@ namespace Verdandi
     }
 
 
-    //! Activates or desactivates a specific option.
+    //! Activates or deactivates a specific option.
     /*!
       \param[in] option option to (des)activate.
       \param[in] value value.
@@ -109,7 +109,7 @@ namespace Verdandi
     }
 
 
-    //! Activates or desactivates "stdout" option.
+    //! Activates or deactivates "stdout" option.
     /*!
       \param[in] value value.
     */
@@ -121,7 +121,7 @@ namespace Verdandi
     }
 
 
-    //! Activates or desactivates "file" option.
+    //! Activates or deactivates "file" option.
     /*!
       \param[in] value value.
     */
@@ -133,7 +133,7 @@ namespace Verdandi
     }
 
 
-    //! Activates or desactivates "uppercase" option.
+    //! Activates or deactivates "uppercase" option.
     /*!
       \param[in] value value.
     */
@@ -164,8 +164,8 @@ namespace Verdandi
     }
 
 
-    //! Desactivates the Logger.
-    void Logger::Desactivate()
+    //! Deactivates the Logger.
+    void Logger::Deactivate()
     {
         is_active_ = false;
     }
