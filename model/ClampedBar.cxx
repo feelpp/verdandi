@@ -515,7 +515,7 @@ namespace Verdandi
         return background_error_variance_;
 #else
         throw ErrorUndefined(
-            "ShallowWater::GetBackgroundErrorVarianceMatrix()",
+            "ClampedBar::GetBackgroundErrorVarianceMatrix()",
             "the background error covariance matrix is not available!");
 #endif
     }
