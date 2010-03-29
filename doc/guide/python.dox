@@ -18,7 +18,15 @@ In <code>python/</code> directory, you may simply launch <code>scons swig</code>
 
 This should generate the Python module <code>verdandi.py</code> and the shared library <code>_verdandi.so</code>.  You may want to place these two files in a directory of your <code>$PYTHONPATH/</code>, where Python searches for modules (in addition to the local directory <code>./</code>).
 
-\subsection interface Using the interface
+\subsection using_interface Using the interface
+
+To manipulate vectors from the Python interface, you need Seldon module. To build this module, run <code>scons</code> from <code>seldon/src</code> directory. This will build the <code>Swig</code> interface to Python:
+
+\prescreen
+$ scons
+\endprescreen
+
+<code>seldon.py</code> and <code>_seldon.so</code> have been generated. Make sure these files are in a directory of <code>$PYTHONPATH/</code> to be able to launch <code>Seldon</code> Python module.
 
 In <code>python/</code> directory, or in any place if <code>verdandi.py</code> and <code>_verdandi.so</code> are in a directory of <code>$PYTHONPATH/</code>, you may launch Python and load the module.
 
