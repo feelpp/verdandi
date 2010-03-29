@@ -78,25 +78,4 @@ In [24]: state_vector.Print()
 0  1.0150381458769643928  ...
 \endprecode
 
-\section example Visualization example with ipython
-
-To load the results, you can launch:
-
-\precode
-$ ipython -pylab 
-\endprecode
-
-and then
-
-\precode
-In  [1]: run load.py result/river-truth
-In  [2]: h_t = h
-In  [3]: run load.py result/river
-         
-In  [4]: plot(time_evolution(h_t - h, rms))
-         
-In  [5]: plot(h_t[100])
-In  [6]: plot(h[100])
-\endprecode
-
 */
