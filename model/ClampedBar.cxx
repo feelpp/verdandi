@@ -560,5 +560,5 @@ namespace Verdandi
 
 }
 
-#define VERDANDI_FILE_MODEL_CLAMPEDBAR_HXX
+#define VERDANDI_FILE_MODEL_CLAMPEDBAR_CXX
 #endif
