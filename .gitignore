@@ -1,4 +1,6 @@
 include/
+*.dat
+*.bin
 *.o
 *.os
 *.so
@@ -8,3 +10,5 @@ include/
 *.log
 *~
 .gitignore
+doc/html/
+doc/latex/
