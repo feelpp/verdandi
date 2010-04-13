@@ -21,6 +21,7 @@
 
 
 #include "OutputSaver.hxx"
+#include "Variable.cxx"
 
 
 namespace Verdandi

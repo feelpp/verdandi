@@ -20,7 +20,7 @@
 #ifndef VERDANDI_FILE_OUTPUTSAVER_OUTPUTSAVER_HXX
 
 
-#include "Variable.cxx"
+#include "Variable.hxx"
 
 #include <iostream>
 #include <fstream>
