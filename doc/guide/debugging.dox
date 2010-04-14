@@ -10,7 +10,7 @@
 
 \subsection logger_status Logger status
 
-It is possible to change the logger status using the methods \link Verdandi::Logger::Activate() \endlink and \link Verdandi::Logger::Desactivate() \endlink. These methods enable to activate or deactivate the logger.
+It is possible to change the logger status using the methods \link Verdandi::Logger::Activate() \endlink and \link Verdandi::Logger::Deactivate() \endlink. These methods enable to activate or deactivate the logger.
 
 <code>VERDANDI_LOG_IS_ACTIVE</code> specifies the logger status (active by default).
 
