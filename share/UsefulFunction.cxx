@@ -123,6 +123,30 @@ namespace Verdandi
     }
 
 
+    /*! \brief Returns the global index in a multidimensional grid that is
+      associated with a local position. */
+    /*! A global index gives the position in a grid with a single integer. For
+      example, in 2D, the global index of the grid point \f$(i, j)\f$ is \f$i
+      \times N + j\f$ if there are N points along the second dimension. This
+      function returns \f$i \times N + j\f$ from \a position set to \f$(i,
+      j)\f$, if \a shape is \f$(M, N)\f$.
+      \param[in] shape dimensions of the grid.
+      \param[in] position position in the grid.
+      \return index The global index.
+    */
+    int get_position(const Vector<int>& shape, const Vector<int>& position)
+    {
+        if (position.GetLength() == 0)
+            return 0;
+
+        int index = position(0);
+        for (int d = 1; d < position.GetLength(); d++)
+            index = shape(d) * index + position(d);
+
+        return index;
+    }
+
+
     /*! \brief Returns the coordinate of a point identified with a global
       index in a multidimensional grid. */
     /*! A global index gives the position in a grid with a single integer. For
