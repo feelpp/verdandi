@@ -200,7 +200,7 @@ if fortran_compiler is not None:
 # In case of GNU compilers, a few options may be added.
 if "g++" in env["CXX"] and ARGUMENTS["mode_cpp"] == "strict":
     cpp_compilation_option += " -Wall -ansi -pedantic -Wno-unused" \
-        + " -Wno-parentheses"
+        + " -Wno-parentheses -Wno-variadic-macros"
     # For latest GCC versions.
     import commands
     s, o = commands.getstatusoutput(env["CXX"] + " -dumpversion")
