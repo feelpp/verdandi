@@ -481,13 +481,6 @@ namespace Verdandi
     }
 
 
-    template <class T>
-    int ShallowWater<T>::GetNs() const
-    {
-        return 3;
-    }
-
-
     //! Returns the first abscissa.
     /*!
       \return The first abscissa.

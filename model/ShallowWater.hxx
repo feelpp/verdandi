@@ -201,7 +201,6 @@ namespace Verdandi
         int GetNx() const;
         int GetNy() const;
         int GetNz() const;
-        int GetNs() const;
         int GetXMin() const;
         int GetYMin() const;
         int GetDeltaX() const;
