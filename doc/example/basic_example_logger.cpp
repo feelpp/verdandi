@@ -8,13 +8,21 @@ using namespace Verdandi;
 #include "Logger.cxx"
 
 
+//! This class is a test class to run an example.
 class ClassTest
 {
 public:
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
     string GetName() const
     {
         return "ClassTest";
     }
+
+
+    //! Calls the logger with an "ok" message.
     void MemberFunction()
     {
         Logger::Log(*this, "ok");
