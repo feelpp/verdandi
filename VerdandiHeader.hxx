@@ -32,8 +32,11 @@ namespace Verdandi
 #include <fstream>
 #include <map>
 #include <list>
+#include <cmath>
 
 #include "seldon/SeldonHeader.hxx"
+#include "seldon/vector/Vector2.hxx"
+#include "seldon/vector/Vector3.hxx"
 
 #ifndef GETPOT_ACTIVATE_EXCEPTION
 #define GETPOT_ACTIVATE_EXCEPTION true

@@ -74,11 +74,6 @@ namespace Verdandi
         configuration_stream.
             set_prefix("optimal_interpolation/data_assimilation/");
         configuration_stream.set("Analyze_first_step", analyze_first_step_);
-        time_tolerance_.Reallocate(2);
-        configuration_stream.set("Time_tolerance_inf",
-                                 time_tolerance_(0), "", 0.);
-        configuration_stream.set("Time_tolerance_sup",
-                                 time_tolerance_(1), "", 0.);
 
         configuration_stream.set_prefix("optimal_interpolation/");
         configuration_stream.set("BLUE_computation", blue_computation_,
@@ -156,8 +151,6 @@ namespace Verdandi
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Forward()
     {
-        date_.PushBack(model_.GetDate());
-
         MessageHandler::Send(*this, "all", "::Forward begin");
 
         model_.Forward();
@@ -180,11 +173,7 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
 
-        observation_manager_.SetDate(model_,
-                                     model_.GetDate() - time_tolerance_(0),
-                                     model_.GetDate() + time_tolerance_(1));
-
-        observation_manager_.LoadObservation();
+        observation_manager_.SetDate(model_, model_.GetDate());
 
         if (observation_manager_.HasObservation())
         {
@@ -192,13 +181,17 @@ namespace Verdandi
                 cout << "Performing optimal interpolation at time step ["
                      << model_.GetDate() << "]..." << endl;
 
-            state_vector state_vector;
-            model_.GetState(state_vector);
+            state_vector state;
+            model_.GetState(state);
             Nstate_ = model_.GetNstate();
 
-            ComputeBLUE(state_vector);
+            observation_vector innovation;
+            observation_manager_.GetInnovation(state, innovation);
+            Nobservation_ = innovation.GetSize();
 
-            model_.SetState(state_vector);
+            ComputeBLUE(innovation, state);
+
+            model_.SetState(state);
 
             if (option_display_["show_date"])
                 cout << " done." << endl;
@@ -219,14 +212,12 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE(typename
-                  OptimalInterpolation<T, ClassModel, ClassObservationManager>
-                  ::state_vector& state_vector)
+    ::ComputeBLUE(const observation_vector& innovation, state_vector& state)
     {
         if (blue_computation_ == "vector")
-            ComputeBLUE_vector(state_vector);
+            ComputeBLUE_vector(innovation, state);
         else
-            ComputeBLUE_matrix(state_vector);
+            ComputeBLUE_matrix(innovation, state);
     }
 
 
@@ -236,15 +227,13 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE_vector(
-        typename OptimalInterpolation<T, ClassModel, ClassObservationManager>
-        ::state_vector& state_vector)
+    ::ComputeBLUE_vector(const observation_vector& innovation,
+                         state_vector& state)
     {
 #ifdef VERDANDI_DENSE
-        int r, c;
-
-        // Number of observations at current date.
         Nobservation_ = observation_manager_.GetNobservation();
+
+        int r, c;
 
         // One row of background matrix B.
         background_error_covariance_vector error_covariance_row(Nstate_);
@@ -290,10 +279,6 @@ namespace Verdandi
         // Computes (HBH' + R)^{-1}.
         GetInverse(HBHR_inv);
 
-        // Computes innovation.
-        Vector<T> innovation(Nobservation_);
-        observation_manager_.GetInnovation(state_vector, innovation);
-
         // Computes HBHR_inv * innovation.
         Vector<T> HBHR_inv_innovation(Nobservation_);
         MltAdd(T(1), HBHR_inv, innovation, T(0), HBHR_inv_innovation);
@@ -313,7 +298,7 @@ namespace Verdandi
                                      tangent_operator_row);
             }
 
-            state_vector(r) += DotProd(BHt_row, HBHR_inv_innovation);
+            state(r) += DotProd(BHt_row, HBHR_inv_innovation);
         }
 #else
         throw ErrorUndefined("OptimalInterpolation::ComputeBLUE_vector");
@@ -326,23 +311,20 @@ namespace Verdandi
       are sparse matrices. Otherwise, the manipulation of the matrices may
       lead to unreasonable memory requirements and to high computational
       costs.
-      \param[in] state_vector the state vector to analyze.
+      \param[in] state the state vector to analyze.
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE_matrix(
-        typename OptimalInterpolation<T, ClassModel, ClassObservationManager>
-        ::state_vector& state_vector)
+    ::ComputeBLUE_matrix(const observation_vector& innovation,
+                         state_vector& state)
     {
 #ifdef VERDANDI_SPARSE
-        // Number of observations at current date.
         Nobservation_ = observation_manager_.GetNobservation();
 
         // Temporary matrix and vector.
         crossed_matrix working_matrix_so(Nstate_, Nobservation_);
         tangent_operator_matrix working_matrix_oo(Nobservation_,
                                                   Nobservation_);
-
         // Computes BH'.
         MltAdd(T(1), SeldonNoTrans,
                model_.GetBackgroundErrorVarianceMatrix(), SeldonTrans,
@@ -358,10 +340,6 @@ namespace Verdandi
             observation_manager_.GetObservationErrorVariance(),
             working_matrix_oo);
 
-        // Puts the innovation in 'working_vector'.
-        Vector<T> working_vector(Nobservation_);
-        observation_manager_.GetInnovation(state_vector, working_vector);
-
         // Computes x = (HBH' + R)^{-1} * innovation by solving the linear
         // system (HBH' + R) * x = innovation.
 #if defined(SELDON_WITH_UMFPACK)
@@ -371,17 +349,11 @@ namespace Verdandi
 #elif defined(SELDON_WITH_MUMPS)
         MatrixMumps<T> matrix_super_lu;
 #endif
-
         GetLU(working_matrix_oo, matrix_super_lu);
-        Vector<T> x(Nobservation_);
-        x = working_vector;
-        SolveLU(matrix_super_lu, x);
-
-        // Computes BH' * (HBH' + R)^{-1} * innovation.
-        Mlt(working_matrix_so, x, working_vector);
-
-        // Computes new state.
-        Add(T(1), working_vector, state_vector);
+        observation_vector working_vector(Nobservation_);
+        working_vector = innovation;
+        SolveLU(matrix_super_lu, working_vector);
+        MltAdd(T(1.), working_matrix_so, working_vector, T(1.), state);
 #else
         throw ErrorUndefined("OptimalInterpolation::ComputeBLUE_matrix");
 #endif

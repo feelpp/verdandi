@@ -42,6 +42,8 @@ namespace Verdandi
         ::tangent_operator_matrix tangent_operator_matrix;
         typedef typename ClassObservationManager::tangent_operator_row
         tangent_operator_vector;
+        typedef typename ClassObservationManager::observation_vector
+        observation_vector;
 
     protected:
 
@@ -69,15 +71,6 @@ namespace Verdandi
         //! Computation mode for BLUE: "vector" or "matrix".
         string blue_computation_;
 
-        //! Date vector.
-        Vector<double> date_;
-
-        /*** Observations ***/
-
-        //! Time tolerance.
-        Vector<double> time_tolerance_;
-     
-     
         /*** Output saver ***/
 
         //! Output saver.
@@ -100,9 +93,12 @@ namespace Verdandi
 
         void Analyze();
 
-        void ComputeBLUE(state_vector& state_vector);
-        void ComputeBLUE_vector(state_vector& state_vector);
-        void ComputeBLUE_matrix(state_vector& state_vector);
+        void ComputeBLUE(const observation_vector& innovation,
+                         state_vector& state);
+        void ComputeBLUE_vector(const observation_vector& innovation,
+                                state_vector& state);
+        void ComputeBLUE_matrix(const observation_vector& innovation,
+                                state_vector& state);
 
         bool HasFinished() const;
 
