@@ -42,7 +42,7 @@ namespace Verdandi
         model_(configuration_file),
         observation_manager_(model_, configuration_file)
     {
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
 
         /*** Initializations ***/
 

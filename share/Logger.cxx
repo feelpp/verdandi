@@ -320,7 +320,7 @@ namespace Verdandi
         valid_options["file"] = file_;
         valid_options["uppercase"] = uppercase_;
 
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
         configuration_stream.set_prefix(section_name);
         string tmp;
         configuration_stream.set("Default_options", tmp, "", "");
@@ -362,7 +362,7 @@ namespace Verdandi
     void Logger::InitializeFilename(string configuration_file,
                                     string section_name)
     {
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
         configuration_stream.set_prefix(section_name);
         configuration_stream.set("File", file_name_, "",
                                  VERDANDI_LOG_FILENAME);
@@ -386,7 +386,7 @@ namespace Verdandi
     void Logger::InitializeLevel(string configuration_file,
                                  string section_name)
     {
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
         configuration_stream.set_prefix(section_name);
         configuration_stream.set("Logging_level", logging_level_, "",
                                  default_logging_level);

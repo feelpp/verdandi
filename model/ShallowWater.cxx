@@ -80,8 +80,7 @@ namespace Verdandi
     {
 
         /*** Configuration ***/
-
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
 
         configuration_stream.set_prefix("shallow_water/domain/");
 

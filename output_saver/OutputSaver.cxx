@@ -69,7 +69,7 @@ namespace Verdandi
          ***********************/
 
 
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
         configuration_stream.set_prefix(section_name.c_str());
 
         configuration_stream.set("Mode", mode_, "", "binary");

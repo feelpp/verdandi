@@ -85,7 +85,7 @@ namespace Verdandi
     {
         observation_aggregator_.Initialize(configuration_file);
 
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
 
         Nstate_model_ = model.GetNstate();
 

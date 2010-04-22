@@ -69,7 +69,7 @@ namespace Verdandi
 
         /*** Configuration ***/
 
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
 
         configuration_stream.set_prefix("clamped_bar/domain/");
         configuration_stream.set("Bar_length", bar_length_);

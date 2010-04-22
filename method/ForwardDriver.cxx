@@ -40,7 +40,7 @@ namespace Verdandi
     ForwardDriver<ClassModel>::ForwardDriver(string configuration_file):
         model_(configuration_file), iteration_(-1)
     {
-        GetPot configuration_stream(configuration_file);
+        GetPot configuration_stream(configuration_file, "#", "\n");
 
         /*** Initializations ***/
 
