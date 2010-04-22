@@ -151,6 +151,23 @@ namespace Verdandi
         for (int i = 0; i < Ndimension_; i++)
             to_num(x_0_vector[i], x_0_(i));
 
+        string R;
+        configuration_stream.set("R", R);
+        vector<string> R_vector = split(R);
+        if (int(R_vector.size()) != Ndimension_ * Ndimension_)
+            throw ErrorConfiguration("HamiltonJacobiBellman::"
+                                     "HamiltonJacobiBellman",
+                                     "The entry \"R\" should be "
+                                     "a matrix with "
+                                     + to_str(Ndimension_ * Ndimension_)
+                                     + " elements, but "
+                                     + to_str(R_vector.size()) + " elements"
+                                     " were provided.");
+        R_.Reallocate(Ndimension_, Ndimension_);
+        for (int i = 0; i <  Ndimension_; i++)
+            for (int j = 0; j <  Ndimension_; j++)
+                to_num(R_vector[i * Ndimension_ + j], R_(i, j));
+
         /*** Solver ***/
 
         configuration_stream.set_prefix("HJB/solver/");
@@ -243,7 +260,7 @@ namespace Verdandi
         /*** Initializations ***/
 
         model_.Initialize(configuration_file);
-        // observation_manager_.Initialize(model_, configuration_file);
+        observation_manager_.Initialize(model_, configuration_file);
 
         /*** Initial value function ***/
 
@@ -357,6 +374,46 @@ namespace Verdandi
             AdvectionBrysonLevyForward();
         else
             AdvectionGodunov();
+
+        /*** Source term (norm of the innovation) ***/
+
+        double date = initial_date_ + T(time_step_) * Delta_t_;
+        model_.SetDate(date);
+        observation_manager_.SetDate(model_, date);
+        if (observation_manager_.HasObservation())
+        {
+            Vector<T> x(Ndimension_);
+
+            int Nobservation = observation_manager_.GetNobservation();
+            Vector<T> y(Nobservation), innovation(Nobservation),
+                Rinnovation(Nobservation);
+
+            observation_manager_.GetObservation(y);
+
+            x = x_min_;
+            Vector<int> position(Ndimension_);
+            position.Fill(0);
+            for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+            {
+                observation_manager_.ApplyOperator(x, innovation);
+                Mlt(T(-1), innovation);
+                Add(T(1), y, innovation);
+                Mlt(R_, innovation, Rinnovation);
+                V_(i_cell) += Delta_t_ * DotProd(Rinnovation, innovation);
+
+                int d = Ndimension_ - 1;
+                while (d != 0 && position(d) == Nx_(d) - 1)
+                {
+                    position(d) = 0;
+                    x(d) = x_min_(d);
+                    d--;
+                }
+                position(d)++;
+                x(d) = x_min_(d) + T(position(d)) * Delta_x_(d);
+            }
+        }
+
+        time_step_++;
 
         MessageHandler::Send(*this, "all", "forecast value");
 
@@ -513,8 +570,6 @@ namespace Verdandi
                 time_delta = Delta_t_;
         }
 
-        time_step_++;
-
         MessageHandler::Send(*this, "all", "::AdvectionLxFForward end");
     }
 
@@ -637,8 +692,6 @@ namespace Verdandi
                     * (V_x_p(i_cell, d) - V_x_m(i_cell, d))
                     - .5 * Mx_(i_cell, d)
                     * (V_x_m(i_cell, d) + V_x_p(i_cell, d));
-
-        time_step_++;
 
         MessageHandler::Send(*this, "all",
                              "::AdvectionBrysonLevyForward end");
@@ -765,8 +818,6 @@ namespace Verdandi
                 }
             }
         }
-
-        time_step_++;
 
         MessageHandler::Send(*this, "all", "::AdvectionGodunov end");
     }
