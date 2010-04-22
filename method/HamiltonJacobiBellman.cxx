@@ -137,6 +137,20 @@ namespace Verdandi
             for (int j = 0; j <  Ndimension_; j++)
                 to_num(Q_0_vector[i * Ndimension_ + j], Q_0_(i, j));
 
+        string x_0;
+        configuration_stream.set("x_0", x_0);
+        vector<string> x_0_vector = split(x_0);
+        if (int(x_0_vector.size()) != Ndimension_)
+            throw ErrorConfiguration("HamiltonJacobiBellman::"
+                                     "HamiltonJacobiBellman",
+                                     "The entry \"x_0\" should contain "
+                                     + to_str(Ndimension_) + " elements, but "
+                                     + to_str(x_0_vector.size())
+                                     + " elements were provided.");
+        x_0_.Reallocate(Ndimension_);
+        for (int i = 0; i < Ndimension_; i++)
+            to_num(x_0_vector[i], x_0_(i));
+
         /*** Solver ***/
 
         configuration_stream.set_prefix("HJB/solver/");
@@ -240,6 +254,7 @@ namespace Verdandi
         for (int i = 0; i < Npoint_; i++)
         {
             get_coordinate(i, x_min_, Delta_x_, Nx_, x);
+            Add(T(-1.), x_0_, x);
             Mlt(Q_0_, x, Qx);
             V_(i) = DotProd(Qx, x);
         }

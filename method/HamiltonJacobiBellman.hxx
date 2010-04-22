@@ -66,6 +66,8 @@ namespace Verdandi
 
         //! Q_0.
         Matrix<T> Q_0_;
+        //! Position of the minimum of the initial parabola.
+        Vector<T> x_0_;
 
         /*** Value function ***/
 
