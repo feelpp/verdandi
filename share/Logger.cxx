@@ -281,7 +281,6 @@ namespace Verdandi
       'VERDANDI_STDOUT_LOGGING_LEVEL'.
       \param[in] command the specific command.
       \param[in] parameter the parameter of the command.
-      \param[in] options options.
       \note Only 'hline' command is yet supported.
     */
     void Logger::StdOutCommand(string command, string parameter)

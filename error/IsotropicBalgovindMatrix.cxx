@@ -75,7 +75,7 @@ namespace Verdandi
       \param z_min applicate of the center of the bottom grid cells.
       \param delta_z step along z.
       \param Nz number of cells along z.
-      \param length decorrelation length.
+      \param length_scale decorrelation length.
       \param variance variance.
     */
     template <class T>

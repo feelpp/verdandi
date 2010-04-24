@@ -40,8 +40,10 @@ namespace Verdandi
 
     //! Main constructor.
     /*!
-      \param string mode saving format (e.g., "binary", "text").
-      \param string file path to the output file.
+      \param[in] mode saving format (e.g., "binary", "text").
+      \param[in] file path to the output file.
+      \param[in] has_to_empty_file Boolean that indicates if the file has to
+      be emptied.
     */
     Variable::Variable(string mode, string file, bool has_to_empty_file):
         mode_(mode), file_(file), has_to_empty_file_(has_to_empty_file)
@@ -51,7 +53,7 @@ namespace Verdandi
 
     //! Copy constructor.
     /*!
-      \param variable instance to be copied.
+      \param[in] variable instance to be copied.
     */
     Variable::Variable(const Variable& variable)
     {
@@ -73,7 +75,7 @@ namespace Verdandi
 
     //! Mode accessor.
     /*! Sets the saving mode.
-      \param mode saving format (e.g., "binary", "text").
+      \param[in] mode saving format (e.g., "binary", "text").
     */
     void Variable::SetMode (string mode)
     {
@@ -83,7 +85,7 @@ namespace Verdandi
 
     //! Filename accessor.
     /*! Sets the path to the output file.
-      \param file path to the output file.
+      \param[in] file path to the output file.
     */
     void Variable::SetFile(string file)
     {
@@ -93,7 +95,8 @@ namespace Verdandi
 
     //! Empty accessor.
     /*! Sets the value of the boolean empty.
-      \param empty boolean that indicates if the file has to be emptied.
+      \param[in] has_to_empty_file Boolean that indicates if the file has to be
+      emptied.
     */
     void Variable::HasToEmptyFile(bool has_to_empty_file)
     {

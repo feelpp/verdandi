@@ -128,8 +128,8 @@ namespace Verdandi
     /*! A global index gives the position in a grid with a single integer. For
       example, in 2D, the global index of the grid point \f$(i, j)\f$ is \f$i
       \times N + j\f$ if there are N points along the second dimension. This
-      function would return the coordinates \f$(x, y)\f$ of the point: $x =
-      x_0 + i \times \Delta_x$ and $y = y_0 + j \times \Delta_y$. It is
+      function would return the coordinates \f$(x, y)\f$ of the point: \f$x =
+      x_0 + i \times \Delta_x\f$ and \f$y = y_0 + j \times \Delta_y\f$. It is
       assumed that the grid has a constant space step along each direction.
       \param[in] index the global index.
       \param[in] minimum coordinates of the lower left corner of the grid.

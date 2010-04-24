@@ -73,8 +73,8 @@ namespace Verdandi
 
     //! Initializes the observation manager.
     /*!
-      param[in] model model.
-      param[in] configuration_file configuration_file.
+      \param[in] model model.
+      \param[in] configuration_file configuration file.
       \tparam ClassModel the model type; e.g. ShallowWater<double>
     */
     template <class T>
