@@ -54,6 +54,8 @@ namespace Verdandi
 #ifdef VERDANDI_SPARSE
         //! Type of the background error covariance matrix.
         typedef Matrix<T, General, RowSparse> background_error_variance;
+        //! Type of a row of the background error variance.
+        typedef Vector<T, VectSparse> error_covariance_row;
         //! Type of the model/observation crossed matrix.
         typedef Matrix<T, General, RowSparse> crossed_matrix;
         //! Type of the tangent linear operator.
@@ -61,13 +63,13 @@ namespace Verdandi
 #else
         //! Type of the background error covariance matrix.
         typedef Matrix<T> background_error_variance;
+        //! Type of a row of the background error variance.
+        typedef Vector<T> error_covariance_row;
         //! Type of the model/observation crossed matrix.
         typedef Matrix<T> crossed_matrix;
         //! Type of the tangent linear operator.
         typedef Matrix<T> tangent_operator_matrix;
 #endif
-        //! Type of a row of the background error variance.
-        typedef Vector<T> error_covariance_row;
         //! Type of the model state vector.
         typedef Vector<T> state_vector;
 
