@@ -40,14 +40,23 @@ namespace Verdandi
     class ShallowWater: public VerdandiBase
     {
     public:
+        //! The numerical type (e.g., double).
         typedef T value_type;
+        //! Pointer to the numerical type.
         typedef T* pointer;
+        //! Const pointer to the numerical type.
         typedef const T* const_pointer;
+        //! Reference to the numerical type.
         typedef T& reference;
+        //! Const reference to the numerical type.
         typedef const T& const_reference;
+        //! Type of the background error covariance matrix.
         typedef Matrix<T, General, RowSparse> background_error_variance;
+        //! Type of a row of the background error variance.
         typedef Vector<T> error_covariance_row;
+        //! Type of the model state vector.
         typedef Vector<T> state_vector;
+        //! Type of the model/observation crossed matrix.
         typedef Matrix<T, General, RowSparse> crossed_matrix;
 
     protected:

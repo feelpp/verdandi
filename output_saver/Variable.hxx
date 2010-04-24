@@ -29,6 +29,7 @@ namespace Verdandi
     /////////////
 
 
+    //! This class enables to define a variable for the output saver.
     class Variable
     {
 

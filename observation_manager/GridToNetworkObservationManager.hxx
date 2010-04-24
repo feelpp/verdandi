@@ -49,8 +49,11 @@ namespace Verdandi
     class GridToNetworkObservationManager: public VerdandiBase
     {
     public:
+        //! Type of the tangent linear operator.
         typedef Matrix<T, General, RowSparse> tangent_operator_matrix;
+        //! Type of the observation error covariance matrix.
         typedef Matrix<T, General, RowSparse> error_variance;
+        //! Type of a row of the tangent linear operator.
         typedef Vector<T> tangent_operator_row;
 
         typedef Vector<T> observation_vector;

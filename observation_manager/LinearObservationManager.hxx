@@ -50,16 +50,21 @@ namespace Verdandi
 
     public:
 #ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+        //! Type of the tangent linear operator.
         typedef Matrix<T, General, RowSparse> tangent_operator_matrix;
 #else
+        //! Type of the tangent linear operator.
         typedef Matrix<T> tangent_operator_matrix;
 #endif
 
 #ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        //! Type of the observation error covariance matrix.
         typedef Matrix<T, General, RowSparse> error_variance;
 #else
+        //! Type of the observation error covariance matrix.
         typedef Matrix<T> error_variance;
 #endif
+        //! Type of a row of the tangent linear operator.
         typedef Vector<T> tangent_operator_row;
 
         typedef Vector<T> observation_vector;
@@ -124,6 +129,7 @@ namespace Verdandi
 
         /*** Model domain ***/
 
+        //! The size of a model state.
         int Nstate_model_;
 
     public:

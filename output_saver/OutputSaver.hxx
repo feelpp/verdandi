@@ -37,6 +37,7 @@ namespace Verdandi
 
 
 
+    //! This class provides convenient methods to save variables on disk.
     class OutputSaver
     {
 

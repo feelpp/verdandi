@@ -59,7 +59,12 @@ namespace Verdandi
         // Flags associated with the requested logger options. Each flag is a
         // mask to be applied to 'options_' in order to extract the bit
         // associated with the flag's option.
-        static const int stdout_ = 1, file_ = 2, uppercase_ = 4;
+        //! Stdout flag.
+        static const int stdout_ = 1;
+        //! File flag.
+        static const int file_ = 2;
+        //! Uppercase flag.
+        static const int uppercase_ = 4;
 
     private :
 

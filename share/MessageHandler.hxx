@@ -28,11 +28,15 @@ namespace Verdandi
     class MessageHandler
     {
     public:
+        //! Function pointer.
         typedef void (* function_pointer)(void*, string);
+        //! Recipient list.
         typedef list<pair<void*, function_pointer> > recipient_list;
+        //! Recipient map.
         typedef map<string, recipient_list> recipient_map;
 
     protected:
+        //! Static recipient map.
         static recipient_map recipient_map_;
 
     public:

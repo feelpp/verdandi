@@ -41,21 +41,34 @@ namespace Verdandi
     class ClampedBar: public VerdandiBase
     {
     public:
+        //! The numerical type (e.g., double).
         typedef T value_type;
+        //! Pointer to the numerical type.
         typedef T* pointer;
+        //! Const pointer to the numerical type.
         typedef const T* const_pointer;
+        //! Reference to the numerical type.
         typedef T& reference;
+        //! Const reference to the numerical type.
         typedef const T& const_reference;
 #ifdef VERDANDI_SPARSE
+        //! Type of the background error covariance matrix.
         typedef Matrix<T, General, RowSparse> background_error_variance;
+        //! Type of the model/observation crossed matrix.
         typedef Matrix<T, General, RowSparse> crossed_matrix;
+        //! Type of the tangent linear operator.
         typedef Matrix<T, General, RowSparse> tangent_operator_matrix;
 #else
+        //! Type of the background error covariance matrix.
         typedef Matrix<T> background_error_variance;
+        //! Type of the model/observation crossed matrix.
         typedef Matrix<T> crossed_matrix;
+        //! Type of the tangent linear operator.
         typedef Matrix<T> tangent_operator_matrix;
 #endif
+        //! Type of a row of the background error variance.
         typedef Vector<T> error_covariance_row;
+        //! Type of the model state vector.
         typedef Vector<T> state_vector;
 
 
@@ -83,11 +96,15 @@ namespace Verdandi
         //! Young's Modulus.
         double Young_modulus_;
 
-        //! FEM Vector.
+        //! FEM Vector (disp 0).
         Vector<T> disp_0_;
+        //! FEM Vector (velo 0).
         Vector<T> velo_0_;
+        //! FEM Vector (disp 1).
         Vector<T> disp_1_;
+        //! FEM Vector (velo 1).
         Vector<T> velo_1_;
+        //! FEM Vector (force).
         Vector<T> force_;
 
         //! Mass FEM matrix.
@@ -95,9 +112,11 @@ namespace Verdandi
         //! Stiffness FEM matrix.
         Matrix<T, General, RowMajor> Stiff_matrix_el_;
 
-        //! Newmark Global FEM matrix.
+        //! Newmark Global FEM matrix (mass matrix).
         Matrix<T, Symmetric, RowSymSparse> Mass_matrix_;
+        //! Newmark Global FEM matrix (Newmark matrix 0).
         Matrix<T, Symmetric, RowSymSparse> Newmark_matrix_0_;
+        //! Newmark Global FEM matrix (Newmark matrix 1).
         Matrix<T, Symmetric, RowSymSparse> Newmark_matrix_1_;
 
 #if defined(VERDANDI_WITH_DIRECT_SOLVER)

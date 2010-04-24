@@ -29,17 +29,23 @@ namespace Verdandi
     //////////////////////////
 
 
+    //! This class performs optimal interpolation.
     template <class T, class ClassModel, class ClassObservationManager>
     class OptimalInterpolation: public VerdandiBase
     {
 
     public:
+        //! Type of a row of the background error variance.
         typedef typename ClassModel::error_covariance_row
         background_error_covariance_vector;
+        //! Type of the model state vector.
         typedef typename ClassModel::state_vector state_vector;
+        //! Type of the model/observation crossed matrix.
         typedef typename ClassModel::crossed_matrix crossed_matrix;
+        //! Type of the tangent linear observation operator.
         typedef typename ClassObservationManager
         ::tangent_operator_matrix tangent_operator_matrix;
+        //! Type of a row of the tangent linear observation operator.
         typedef typename ClassObservationManager::tangent_operator_row
         tangent_operator_vector;
         typedef typename ClassObservationManager::observation_vector
