@@ -34,6 +34,47 @@ namespace Verdandi
 #include <list>
 #include <cmath>
 
+
+// Convenient macros to catch exceptions.
+#ifndef TRY
+#define TRY try {
+#endif
+#ifndef END
+#define END                                                     \
+  }                                                             \
+    catch(Verdandi::Error& Err)                                 \
+      {                                                         \
+        Err.CoutWhat();                                         \
+        return 1;                                               \
+      }                                                         \
+    catch(Seldon::Error& Err)                                   \
+      {                                                         \
+        Err.CoutWhat();                                         \
+        return 1;                                               \
+      }                                                         \
+    catch (std::exception& Err)                                 \
+      {                                                         \
+        cout << "C++ exception: " << Err.what() << endl;        \
+        return 1;                                               \
+      }                                                         \
+    catch (std::string& str)                                    \
+      {                                                         \
+        cout << str << endl;                                    \
+        return 1;                                               \
+      }                                                         \
+    catch (const char* str)                                     \
+      {                                                         \
+        cout << str << endl;                                    \
+        return 1;                                               \
+      }                                                         \
+    catch(...)                                                  \
+      {                                                         \
+        cout << "Unknown exception..." << endl;                 \
+        return 1;                                               \
+      }
+#endif
+
+
 #include "seldon/SeldonHeader.hxx"
 #include "seldon/vector/Vector2.hxx"
 #include "seldon/vector/Vector3.hxx"
