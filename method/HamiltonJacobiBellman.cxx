@@ -113,12 +113,17 @@ namespace Verdandi
         configuration_stream.set("Delta_t", Delta_t_);
         configuration_stream.set("Nt", Nt_);
 
-        configuration_stream.set("Model_time_dependent",
-                                 model_time_dependent_);
-
         /*** Equation coefficients ***/
 
         configuration_stream.set_prefix("HJB/equation_coefficients/");
+
+        configuration_stream.set("With_quadratic_term", with_quadratic_term_);
+        configuration_stream.set("With_advection_term", with_advection_term_);
+        configuration_stream.set("With_source_term", with_source_term_);
+
+        if (with_advection_term_)
+            configuration_stream.set("Model_time_dependent",
+                                     model_time_dependent_);
 
         string Q_0;
         configuration_stream.set("Q_0", Q_0);
@@ -151,22 +156,67 @@ namespace Verdandi
         for (int i = 0; i < Ndimension_; i++)
             to_num(x_0_vector[i], x_0_(i));
 
-        string R;
-        configuration_stream.set("R", R);
-        vector<string> R_vector = split(R);
-        if (int(R_vector.size()) != Ndimension_ * Ndimension_)
-            throw ErrorConfiguration("HamiltonJacobiBellman::"
-                                     "HamiltonJacobiBellman",
-                                     "The entry \"R\" should be "
-                                     "a matrix with "
-                                     + to_str(Ndimension_ * Ndimension_)
-                                     + " elements, but "
-                                     + to_str(R_vector.size()) + " elements"
-                                     " were provided.");
-        R_.Reallocate(Ndimension_, Ndimension_);
-        for (int i = 0; i <  Ndimension_; i++)
-            for (int j = 0; j <  Ndimension_; j++)
-                to_num(R_vector[i * Ndimension_ + j], R_(i, j));
+        if (with_quadratic_term_)
+        {
+            string Q;
+            configuration_stream.set("Q", Q);
+            vector<string> Q_vector = split(Q);
+            if (int(Q_vector.size()) != Ndimension_ * Ndimension_)
+                throw ErrorConfiguration("HamiltonJacobiBellman::"
+                                         "HamiltonJacobiBellman",
+                                         "The entry \"Q\" should be "
+                                         "a matrix with "
+                                         + to_str(Ndimension_ * Ndimension_)
+                                         + " elements, but "
+                                         + to_str(Q_vector.size())
+                                         + " elements were provided.");
+            Q_inv_.Reallocate(Ndimension_, Ndimension_);
+            for (int i = 0; i <  Ndimension_; i++)
+                for (int j = 0; j <  Ndimension_; j++)
+                    to_num(Q_vector[i * Ndimension_ + j], Q_inv_(i, j));
+            // Q must be diagonal, and its inverse is therefore trivial to
+            // compute.
+            for (int i = 0; i <  Ndimension_; i++)
+                for (int j = 0; j <  Ndimension_; j++)
+                    if (i != j && Q_inv_(i, j) != T(0))
+                        throw ErrorConfiguration("HamiltonJacobiBellman::"
+                                                 "HamiltonJacobiBellman",
+                                                 "The entry \"Q\" should be "
+                                                 "a diagonal matrix. Non-"
+                                                 "diagonal matrix is not"
+                                                 " supported.");
+                    else if (Q_inv_(i, j) != T(0))
+                        Q_inv_(i, j) = Delta_t_
+                            / (Q_inv_(i, j) * Delta_x_(i) * Delta_x_(i));
+        }
+        else
+        {
+            // Even when the quadratic term is not taken into account,
+            // 'Q_inv_' is still needed. Deactivation of the quadratic term is
+            // achieved with a diagonal of zeros in 'Q_inv_'.
+            Q_inv_.Reallocate(Ndimension_, Ndimension_);
+            Q_inv_.Zero();
+        }
+
+        if (with_source_term_)
+        {
+            string R;
+            configuration_stream.set("R", R);
+            vector<string> R_vector = split(R);
+            if (int(R_vector.size()) != Ndimension_ * Ndimension_)
+                throw ErrorConfiguration("HamiltonJacobiBellman::"
+                                         "HamiltonJacobiBellman",
+                                         "The entry \"R\" should be "
+                                         "a matrix with "
+                                         + to_str(Ndimension_ * Ndimension_)
+                                         + " elements, but "
+                                         + to_str(R_vector.size())
+                                         + "  elements were provided.");
+            R_.Reallocate(Ndimension_, Ndimension_);
+            for (int i = 0; i <  Ndimension_; i++)
+                for (int j = 0; j <  Ndimension_; j++)
+                    to_num(R_vector[i * Ndimension_ + j], R_(i, j));
+        }
 
         /*** Solver ***/
 
@@ -174,6 +224,11 @@ namespace Verdandi
 
         configuration_stream.set("Scheme", scheme_,
                                  "'LxF' | 'BrysonLevy' | 'Godunov'");
+        if (with_quadratic_term_ && scheme_ != "Godunov")
+            throw ErrorConfiguration("HamiltonJacobiBellman::"
+                                     "HamiltonJacobiBellman",
+                                     "The quadratic term can only be taken "
+                                     "into account in Godunov scheme.");
 
         /*** Boundary condition ***/
 
@@ -259,8 +314,10 @@ namespace Verdandi
 
         /*** Initializations ***/
 
-        model_.Initialize(configuration_file);
-        observation_manager_.Initialize(model_, configuration_file);
+        if (with_advection_term_)
+            model_.Initialize(configuration_file);
+        if (with_source_term_)
+            observation_manager_.Initialize(model_, configuration_file);
 
         /*** Initial value function ***/
 
@@ -279,8 +336,9 @@ namespace Verdandi
         /*** Model ***/
 
         Vector<T> Mx;
-        Mx_.Reallocate(Npoint_, Ndimension_);
-        if (!model_time_dependent_)
+        if (with_advection_term_)
+            Mx_.Reallocate(Npoint_, Ndimension_);
+        if (with_advection_term_ && !model_time_dependent_)
         {
             courant_number_ = 0.;
             double date, time_step;
@@ -304,13 +362,13 @@ namespace Verdandi
 
                 SetRow(Mx, i_cell, Mx_);
             }
-        }
 
-        Logger::Log(*this, "Courant number: " + to_str(courant_number_));
+            Logger::Log(*this, "Courant number: " + to_str(courant_number_));
+        }
 
         /*** Evolution points ***/
 
-        if (scheme_ == "BrysonLevy")
+        if (with_advection_term_ && scheme_ == "BrysonLevy")
         {
             // Location of the evolution points: (a, a, a, ..., a).
             T a = 0;
@@ -355,7 +413,8 @@ namespace Verdandi
             Logger::Log<-3>(*this, "Iteration " + to_str(time_step_) + " -> "
                             + to_str(time_step_ + 1));
 
-        model_.InitializeStep();
+        if (with_advection_term_)
+            model_.InitializeStep();
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
     }
@@ -368,19 +427,23 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
-        if (scheme_ == "LxF")
-            AdvectionLxFForward();
-        else if (scheme_ == "BrysonLevy")
-            AdvectionBrysonLevyForward();
-        else
-            AdvectionGodunov();
+        if (with_advection_term_ || with_quadratic_term_)
+            if (scheme_ == "LxF")
+                AdvectionLxFForward();
+            else if (scheme_ == "BrysonLevy")
+                AdvectionBrysonLevyForward();
+            else
+                AdvectionGodunov();
 
         /*** Source term (norm of the innovation) ***/
 
         double date = initial_date_ + T(time_step_) * Delta_t_;
-        model_.SetDate(date);
-        observation_manager_.SetDate(model_, date);
-        if (observation_manager_.HasObservation())
+        if (with_source_term_)
+        {
+            model_.SetDate(date);
+            observation_manager_.SetDate(model_, date);
+        }
+        if (with_source_term_ && observation_manager_.HasObservation())
         {
             Vector<T> x(Ndimension_);
 
@@ -713,7 +776,8 @@ namespace Verdandi
         // Coordinates.
         Vector<T> x;
         // M(x).
-        Vector<T> Mx;
+        Vector<T> Mx(Ndimension_);
+        Mx.Zero();
 
         int i_left, i_right, i_cell;
 
@@ -724,7 +788,7 @@ namespace Verdandi
         double date, time_step;
 
         T time_delta = 0.;
-        if (model_time_dependent_)
+        if (with_advection_term_ && model_time_dependent_)
         {
             courant_number_ = 0.;
             for (int i_cell = 0; i_cell < Npoint_; i_cell++)
@@ -753,7 +817,8 @@ namespace Verdandi
         {
             get_position(i_cell, Nx_, position);
 
-            GetRow(Mx_, i_cell, Mx);
+            if (with_advection_term_)
+                GetRow(Mx_, i_cell, Mx);
 
             for (int d = 0; d < Ndimension_; d++)
             {
@@ -772,12 +837,9 @@ namespace Verdandi
                         i_right = get_position(Nx_, position_right);
                         boundary_condition_ = V_cur(i_right);
                     }
-                    if (Mx(d) < 0.)
-                        V_(i_cell) -=
-                            Mx(d) * (boundary_condition_ - V_cur(i_cell));
-                    else
-                        V_(i_cell) -=
-                            Mx(d) * (V_cur(i_cell) - V_cur(i_left));
+                    V_(i_cell) -= GodunovFlux(Q_inv_(d, d), Mx(d),
+                                              V_cur(i_left), V_cur(i_cell),
+                                              boundary_condition_);
                 }
                 else if (position(d) == 0)
                 {
@@ -794,12 +856,9 @@ namespace Verdandi
                         i_left = get_position(Nx_, position_left);
                         boundary_condition_ = V_cur(i_left);
                     }
-                    if (Mx(d) < 0.)
-                        V_(i_cell) -=
-                            Mx(d) * (V_cur(i_right) - V_cur(i_cell));
-                    else
-                        V_(i_cell) -=
-                            Mx(d) * (V_cur(i_cell) - boundary_condition_);
+                    V_(i_cell) -= GodunovFlux(Q_inv_(d, d), Mx(d),
+                                              boundary_condition_,
+                                              V_cur(i_cell), V_cur(i_right));
                 }
                 else
                 {
@@ -809,17 +868,50 @@ namespace Verdandi
                     position_right = position;
                     position_right(d)++;
                     i_right = get_position(Nx_, position_right);
-                    if (Mx(d) < 0.)
-                        V_(i_cell) -=
-                            Mx(d) * (V_cur(i_right) - V_cur(i_cell));
-                    else
-                        V_(i_cell) -=
-                            Mx(d) * (V_cur(i_cell) - V_cur(i_left));
+                    V_(i_cell) -= GodunovFlux(Q_inv_(d, d), Mx(d),
+                                              V_cur(i_left), V_cur(i_cell),
+                                              V_cur(i_right));
                 }
             }
         }
 
         MessageHandler::Send(*this, "all", "::AdvectionGodunov end");
+    }
+
+
+    //! Computes the Godunov flux along a given dimension.
+    /*!
+      \param[in] q value of Q along the given dimension.
+      \param[in] M value of the model M(x) along the given dimension.
+      \param[in] v_l value in the left cell.
+      \param[in] v value in the center cell.
+      \param[in] v_r value in the right cell.
+      \return The Godunov flux.
+    */
+    template <class T, class ClassModel, class ClassObservationManager>
+    inline T HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    ::GodunovFlux(T q, T M, T v_l, T v, T v_r) const
+    {
+        if (q == T(0))
+            if (M < 0.)
+                return M * (v_r - v);
+            else
+                return M * (v - v_l);
+        else
+        {
+            T v_p = v_r - v;
+            T v_m = v - v_l;
+            if (v_m < v_p)
+                if (.5 * q * v_m > -M)
+                    return (.25 * q * v_m + M) * v_m;
+                else if (.5 * q * v_p < -M)
+                    return (.25 * q * v_p + M) * v_p;
+                else
+                    return -M * M / q;
+            else
+                return max((.25 * q * v_m + M) * v_m,
+                           (.25 * q * v_p + M) * v_p);
+        }
     }
 
 

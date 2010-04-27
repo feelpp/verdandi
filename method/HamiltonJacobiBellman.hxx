@@ -64,10 +64,19 @@ namespace Verdandi
 
         /*** Equation coefficients ***/
 
+        //! Should the quadratic term be taken into account?
+        bool with_quadratic_term_;
+        //! Should the advection term be taken into account?
+        bool with_advection_term_;
+        //! Should the source term be taken into account?
+        bool with_source_term_;
+
         //! Q_0.
         Matrix<T> Q_0_;
         //! Position of the minimum of the initial parabola.
         Vector<T> x_0_;
+        //! Inverse of Q.
+        Matrix<T> Q_inv_;
         //! R.
         Matrix<T> R_;
 
@@ -146,6 +155,8 @@ namespace Verdandi
         void AdvectionLxFForward();
         void AdvectionBrysonLevyForward();
         void AdvectionGodunov();
+
+        T GodunovFlux(T q, T M, T v_l, T v, T v_r) const;
 
         bool HasFinished() const;
 
