@@ -1323,7 +1323,7 @@ namespace Verdandi
         if (date == date_)
             return HasObservation();
         date_vector available_date;
-        SetDate(date, available_date);
+        SetAvailableDate(date, available_date);
         return available_date.GetSize() != 0;
     }
 
