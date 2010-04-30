@@ -681,7 +681,7 @@ namespace Verdandi
       \param[in] date the given date.
       \param[out] observation_variable variables associated with the
       observations.
-      \param[out] observation the aggregated observations.
+      \param[out] observation2 the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -704,7 +704,7 @@ namespace Verdandi
       \param[in] date_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
-      \param[out] observation the aggregated observations.
+      \param[out] observation2 the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -725,7 +725,7 @@ namespace Verdandi
       aggregated.
       \param[out] observation_variable variables associated with the
       observations.
-      \param[out] observation the aggregated observations.
+      \param[out] observation2 the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -744,7 +744,7 @@ namespace Verdandi
       \param[in] available_date the given observation date vector.
       \param[out] observation_variable variables associated with the
       observations.
-      \param[out] observation the aggregated observations.
+      \param[out] observation2 the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -775,8 +775,8 @@ namespace Verdandi
       \param[in] date the given date.
       \param[out] observation_variable variables associated with the
       observations.
-      \param[out] observation_index indexes associated with the observations.
-      \param[out] observation the aggregated observations.
+      \param[out] observation_index2 indexes associated with the observations.
+      \param[out] observation2 the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -800,8 +800,8 @@ namespace Verdandi
       \param[in] date_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
-      \param[out] observation_index indexes associated with the observations.
-      \param[out] observation the aggregated observations.
+      \param[out] observation_index2 indexes associated with the observations.
+      \param[out] observation2 the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -823,8 +823,8 @@ namespace Verdandi
       aggregated.
       \param[out] observation_variable variables associated with the
       observations.
-      \param[out] observation_index indexes associated with the observations.
-      \param[out] observation the aggregated observations.
+      \param[out] observation_index2 indexes associated with the observations.
+      \param[out] observation2 the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -844,8 +844,8 @@ namespace Verdandi
       \param[in] available_date the given observation date vector.
       \param[out] observation_variable variables associated with the
       observations.
-      \param[out] observation_index indexes associated with the observations.
-      \param[out] observation the aggregated observations.
+      \param[out] observation_index2 indexes associated with the observations.
+      \param[out] observation2 the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -882,7 +882,7 @@ namespace Verdandi
     //! Gets available observations at a given date.
     /*!
       \param[in] date the given date.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -900,7 +900,7 @@ namespace Verdandi
     /*!
       \param[in] date_inf lower_bound of the given interval.
       \param[in] date_sup upper_bound of the given interval.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -916,7 +916,7 @@ namespace Verdandi
 
     //! Gets observations at the current date.
     /*!
-      \param[out] observation the observation to be loaded.
+      \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -930,7 +930,7 @@ namespace Verdandi
     //! Gets observations of a list of dates.
     /*!
       \param[in] available_date the given observation date vector.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -948,9 +948,9 @@ namespace Verdandi
     //! Gets available observations at a given date.
     /*!
       \param[in] date the given date.
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation3 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -970,9 +970,9 @@ namespace Verdandi
     /*!
       \param[in] date_inf lower_bound of the given interval.
       \param[in] date_sup upper_bound of the given interval.
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation3 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -991,9 +991,9 @@ namespace Verdandi
 
     //! Gets observations at the current date.
     /*!
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation3 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -1009,9 +1009,9 @@ namespace Verdandi
     //! Gets observations of a list of dates.
     /*!
       \param[in] available_date the given observation date vector.
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation3 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -1031,10 +1031,10 @@ namespace Verdandi
     //! Gets available observations at a given date.
     /*!
       \param[in] date the given date.
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
-      \param[out] observation_index indexes associated with the observations.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation_index3 indexes associated with the observations.
+      \param[out] observation3 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -1055,10 +1055,10 @@ namespace Verdandi
     /*!
       \param[in] date_inf lower_bound of the given interval.
       \param[in] date_sup upper_bound of the given interval.
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
-      \param[out] observation_index indexes associated with the observations.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation_index3 indexes associated with the observations.
+      \param[out] observation3 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -1078,10 +1078,10 @@ namespace Verdandi
 
     //! Gets observations at the current date.
     /*!
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
-      \param[out] observation_index indexes associated with the observations.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation_index3 indexes associated with the observations.
+      \param[out] observation3 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -1098,10 +1098,10 @@ namespace Verdandi
     //! Gets observations of a list of dates.
     /*!
       \param[in] available_date the given observation date vector.
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
-      \param[out] observation_index indexes associated with the observations.
-      \param[out] observation the observation to be loaded.
+      \param[out] observation_index3 indexes associated with the observations.
+      \param[out] observation3 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -1126,7 +1126,7 @@ namespace Verdandi
     //! Builds variables vector associated with given observations.
     /*!
       \param[in] available_date the given observation date vector.
-      \param[out] observation_variable variables associated with the
+      \param[out] observation_variable2 variables associated with the
       observations.
     */
     template <class T>
@@ -1146,9 +1146,9 @@ namespace Verdandi
     //! Builds observations associated with given dates and variables.
     /*!
       \param[in] available_date the given observation date vector.
-      \param[in] observation_variable variables associated with the
+      \param[in] observation_variable2 variables associated with the
       observations.
-      \param[out] observation the observations.
+      \param[out] observation3 the observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -1176,7 +1176,7 @@ namespace Verdandi
     //! Builds observations associated with given dates.
     /*!
       \param[in] available_date the given observation date vector.
-      \param[out] observation the observations.
+      \param[out] observation2 the observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
@@ -1235,9 +1235,9 @@ namespace Verdandi
     //! Reads observations indexes.
     /*!
       \param[in] available_date the available date.
-      \param[in] observation_variable variable associated with the
+      \param[in] observation_variable2 variable associated with the
       observations.
-      \param[out] observation_index the indexes associated with the
+      \param[out] observation_index3 the indexes associated with the
       observations.
     */
     template <class T>
