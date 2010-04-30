@@ -318,7 +318,7 @@ namespace Verdandi
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetFlattenedObservation(available_date, observation);
     }
@@ -337,7 +337,7 @@ namespace Verdandi
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetFlattenedObservation(available_date, observation);
     }
@@ -394,7 +394,7 @@ namespace Verdandi
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetFlattenedObservation(available_date, observation_variable,
                                 observation);
@@ -418,7 +418,7 @@ namespace Verdandi
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetFlattenedObservation(available_date, observation_variable,
                                 observation);
@@ -490,7 +490,7 @@ namespace Verdandi
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetFlattenedObservation(available_date, observation_variable,
                                 observation_index, observation);
@@ -517,7 +517,7 @@ namespace Verdandi
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetFlattenedObservation(available_date, observation_variable,
                                 observation_index, observation);
@@ -591,7 +591,7 @@ namespace Verdandi
         double date,
         LinearObservationManager<T>::observation_vector& observation)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetAggregatedObservation(available_date, observation);
     }
@@ -610,7 +610,7 @@ namespace Verdandi
         double date_inf, double date_sup,
         LinearObservationManager<T>::observation_vector& observation)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetAggregatedObservation(available_date, observation);
     }
@@ -667,7 +667,7 @@ namespace Verdandi
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetAggregatedObservation(available_date, observation_variable,
                                  observation2);
@@ -690,7 +690,7 @@ namespace Verdandi
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetAggregatedObservation(available_date, observation_variable,
                                  observation2);
@@ -763,7 +763,7 @@ namespace Verdandi
         LinearObservationManager<T>::index_vector2& observation_index2,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetAggregatedObservation(available_date, observation_variable,
                                  observation_index2, observation2);
@@ -788,7 +788,7 @@ namespace Verdandi
         LinearObservationManager<T>::index_vector2& observation_index2,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetAggregatedObservation(available_date, observation_variable,
                                  observation_index2, observation2);
@@ -867,7 +867,7 @@ namespace Verdandi
         double date,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetRawObservation(available_date, observation2);
     }
@@ -885,7 +885,7 @@ namespace Verdandi
         double date_inf, double date_sup,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetRawObservation(available_date, observation2);
     }
@@ -936,7 +936,7 @@ namespace Verdandi
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetRawObservation(available_date, observation_variable2,
                           observation3);
@@ -958,7 +958,7 @@ namespace Verdandi
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetRawObservation(available_date, observation_variable2,
                           observation3);
@@ -1021,7 +1021,7 @@ namespace Verdandi
         LinearObservationManager<T>::index_vector3& observation_index3,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date, available_date);
         GetRawObservation(available_date, observation_variable2,
                           observation_index3, observation3);
@@ -1045,7 +1045,7 @@ namespace Verdandi
         LinearObservationManager<T>::index_vector3& observation_index3,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector& available_date;
+        date_vector available_date;
         SetAvailableDate(date_inf, date_sup, available_date);
         GetRawObservation(available_date, observation_variable2,
                           observation_index3, observation3);
