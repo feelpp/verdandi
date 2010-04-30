@@ -67,20 +67,32 @@ namespace Verdandi
         //! Type of a row of the tangent linear operator.
         typedef Vector<T> tangent_operator_row;
 
+        //! Type of the observation vector.
         typedef Vector<T> observation_vector;
+        //! Type of the observation vector 2.
         typedef Vector2<T> observation_vector2;
+        //! Type of the observation vector 3.
         typedef Vector3<T> observation_vector3;
 
+        //! Type of the variable vector.
         typedef Vector<int> variable_vector;
+        //! Type of the variable vector 2.
         typedef Vector2<int> variable_vector2;
+        //! Type of the variable vector 3.
         typedef Vector3<int> variable_vector3;
 
+        //! Type of the index vector.
         typedef Vector<int> index_vector;
+        //! Type of the index vector 2.
         typedef Vector2<int> index_vector2;
+        //! Type of the index vector 3.
         typedef Vector3<int> index_vector3;
 
+        //! Type of the date vector.
         typedef Vector<double> date_vector;
+        //! Type of the date vector 2.
         typedef Vector2<double> date_vector2;
+        //! Type of the date vector 3.
         typedef Vector3<double> date_vector3;
 
     protected:

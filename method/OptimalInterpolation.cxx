@@ -208,7 +208,8 @@ namespace Verdandi
     //! Computes BLUE for optimal interpolation.
     /*! The state is updated by the combination of background state and
       innovation. It computes the BLUE (best linear unbiased estimator).
-      \param[in] state_vector the state vector to analyze.
+      \param[in] innovation the innovation vector.
+      \param[in] state the state vector to analyze.
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
@@ -223,7 +224,8 @@ namespace Verdandi
 
     //! Computes BLUE for optimal interpolation with dense matrices.
     /*!
-      \param[in] state_vector the state vector to analyze.
+      \param[in] innovation the innovation vector.
+      \param[in] state the state vector to analyze.
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
@@ -311,6 +313,7 @@ namespace Verdandi
       are sparse matrices. Otherwise, the manipulation of the matrices may
       lead to unreasonable memory requirements and to high computational
       costs.
+      \param[in] innovation the innovation vector.
       \param[in] state the state vector to analyze.
     */
     template <class T, class ClassModel, class ClassObservationManager>

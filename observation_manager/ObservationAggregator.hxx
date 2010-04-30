@@ -29,6 +29,10 @@ namespace Verdandi
     ///////////////////////////
 
 
+    //! Observation manager which computes an aggregated observation vector.
+    /*!
+      \tparam T the type of floating-point numbers.
+    */
     template <class T>
     class ObservationAggregator
     {

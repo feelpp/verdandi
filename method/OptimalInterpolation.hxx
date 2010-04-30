@@ -48,6 +48,7 @@ namespace Verdandi
         //! Type of a row of the tangent linear observation operator.
         typedef typename ClassObservationManager::tangent_operator_row
         tangent_operator_vector;
+        //! Type of the observation vector.
         typedef typename ClassObservationManager::observation_vector
         observation_vector;
 
