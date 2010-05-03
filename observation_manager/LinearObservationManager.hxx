@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_LINEAROBSERVATIONMANAGER_HXX
+#ifndef VERDANDI_FILE_OBSERVATION_MANAGER_LINEAROBSERVATIONMANAGER_HXX
 
 #include <iostream>
 #include <list>
@@ -406,5 +406,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_LINEAROBSERVATIONMANAGER_HXX
+#define VERDANDI_FILE_OBSERVATION_MANAGER_LINEAROBSERVATIONMANAGER_HXX
 #endif

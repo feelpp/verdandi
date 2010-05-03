@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_VERDANDIBASE_CXX
+#ifndef VERDANDI_FILE_SHARE_VERDANDIBASE_CXX
 
 
 #include "VerdandiBase.hxx"
@@ -71,5 +71,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_VERDANDIBASE_CXX
+#define VERDANDI_FILE_SHARE_VERDANDIBASE_CXX
 #endif

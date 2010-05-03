@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_SHALLOWWATER_CXX
+#ifndef VERDANDI_FILE_MODEL_SHALLOWWATER_CXX
 
 
 #include "ShallowWater.hxx"
@@ -969,5 +969,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_SHALLOWWATER_CXX
+#define VERDANDI_FILE_MODEL_SHALLOWWATER_CXX
 #endif

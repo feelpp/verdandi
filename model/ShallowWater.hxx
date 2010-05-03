@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_SHALLOWWATER_HXX
+#ifndef VERDANDI_FILE_MODEL_SHALLOWWATER_HXX
 
 
 #include "newran/newran.h"
@@ -251,5 +251,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_SHALLOWWATER_HXX
+#define VERDANDI_FILE_MODEL_SHALLOWWATER_HXX
 #endif

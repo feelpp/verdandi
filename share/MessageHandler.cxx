@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_MESSAGEHANDLER_CXX
+#ifndef VERDANDI_FILE_SHARE_MESSAGEHANDLER_CXX
 
 
 #include "MessageHandler.hxx"
@@ -150,5 +150,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_MESSAGEHANDLER_CXX
+#define VERDANDI_FILE_SHARE_MESSAGEHANDLER_CXX
 #endif

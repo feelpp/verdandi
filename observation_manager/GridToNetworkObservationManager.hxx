@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_GRIDTONETWORKOBSERVATIONMANAGER_HXX
+#ifndef VERDANDI_FILE_OBSERVATION_MANAGER_GRIDTONETWORKOBSERVATIONMANAGER_HXX
 
 #include <iostream>
 #include <list>
@@ -396,5 +396,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_GRIDTONETWORKOBSERVATIONMANAGER_HXX
+#define VERDANDI_FILE_OBSERVATION_MANAGER_GRIDTONETWORKOBSERVATIONMANAGER_HXX
 #endif

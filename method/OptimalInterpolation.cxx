@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_OPTIMALINTERPOLATION_CXX
+#ifndef VERDANDI_FILE_METHOD_OPTIMALINTERPOLATION_CXX
 
 
 #include "OptimalInterpolation.hxx"
@@ -440,5 +440,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_OPTIMALINTERPOLATION_CXX
+#define VERDANDI_FILE_METHOD_OPTIMALINTERPOLATION_CXX
 #endif
