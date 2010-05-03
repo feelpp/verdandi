@@ -21,6 +21,7 @@
 
 
 #include "GridToNetworkObservationManager.hxx"
+#include QUOTE(OBSERVATION_AGGREGATOR.cxx)
 
 
 namespace Verdandi

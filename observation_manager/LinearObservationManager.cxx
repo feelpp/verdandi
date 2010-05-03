@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <limits>
 #include "LinearObservationManager.hxx"
+#include QUOTE(OBSERVATION_AGGREGATOR.cxx)
 
 
 namespace Verdandi

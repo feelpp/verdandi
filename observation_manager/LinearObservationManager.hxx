@@ -28,7 +28,7 @@
 
 #define _QUOTE(x) #x
 #define QUOTE(x) _QUOTE(x)
-#include QUOTE(OBSERVATION_AGGREGATOR.cxx)
+#include QUOTE(OBSERVATION_AGGREGATOR.hxx)
 
 
 namespace Verdandi
