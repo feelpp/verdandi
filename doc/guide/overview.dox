@@ -12,8 +12,8 @@ Below is a summary of %Verdandi contents.
 One basic <b>data assimilation method</b> in the directory <code>method/</code>: the optimal interpolation.
 
 <h3>Source code</h3>
-class OptimalInterpolation<T, ClassModel, ClassObservationManager> <br/>
-OptimalInterpolation.hxx <br/>
+class OptimalInterpolation<T, ClassModel, ClassObservationManager> <br>
+OptimalInterpolation.hxx <br>
 OptimalInterpolation.cxx
 
 
@@ -22,11 +22,11 @@ OptimalInterpolation.cxx
 Two sample <b>models</b> in the directory <code>model/</code>: clamped bar (mechanics), shallow water (oceanography).
 
 <h3>Source code</h3> 
-class ClampedBar<T> <br/>
-ClampedBar.hxx <br/>
-ClampedBar.cxx <br/>
-class ShallowWater<T> <br/>
-ShallowWater.hxx <br/>
+class ClampedBar<T> <br>
+ClampedBar.hxx <br>
+ClampedBar.cxx <br>
+class ShallowWater<T> <br>
+ShallowWater.hxx <br>
 ShallowWater.cxx
 
 \section overview_observations Observation managers
@@ -34,11 +34,11 @@ ShallowWater.cxx
 Two (linear) <b>observation managers</b> in the directory <code>observation_manager/</code>: an observation manager whose observation operator is simply defined with a matrix, and an observation manager with an observation operator that maps from a model grid to an observation network.
 
 <h3>Source code</h3> 
-class LinearObservationManager<T> <br/>
-LinearObservationManager.hxx <br/>
-LinearObservationManager.cxx <br/>
-class GridToNetworkObservationManager<T> <br/>
-GridToNetworkObservationManager.hxx <br/>
+class LinearObservationManager<T> <br>
+LinearObservationManager.hxx <br>
+LinearObservationManager.cxx <br>
+class GridToNetworkObservationManager<T> <br>
+GridToNetworkObservationManager.hxx <br>
 GridToNetworkObservationManager.cxx
 
 \section error Error statistics
@@ -46,14 +46,14 @@ GridToNetworkObservationManager.cxx
 <b>Error statistics</b> in the directory <code>error/</code>: classical error covariance matrices in diagonal form and in Balgovind form (isotropic or not).
 
 <h3>Source code</h3>
-class BalgovindMatrix<T> <br/>
-BalgovindMatrix.hxx <br/>
-BalgovindMatrix.cxx <br/> 
-class DiagonalMatrix<T> <br/>
-DiagonalMatrix.hxx <br/>
-DiagonalMatrix.cxx <br/>
-class IsotropicBalgovindMatrix<T> <br/>
-IsotropicBalgovindMatrix.hxx <br/>
+class BalgovindMatrix<T> <br>
+BalgovindMatrix.hxx <br>
+BalgovindMatrix.cxx <br>
+class DiagonalMatrix<T> <br>
+DiagonalMatrix.hxx <br>
+DiagonalMatrix.cxx <br>
+class IsotropicBalgovindMatrix<T> <br>
+IsotropicBalgovindMatrix.hxx <br>
 IsotropicBalgovindMatrix.cxx
 
 \section miscellaneous Miscellaneous
@@ -61,15 +61,15 @@ IsotropicBalgovindMatrix.cxx
 In the directory <code>output_saver/</code>, one may find a class to save several kinds of output.
 
 <h3>Source code</h3>
-class OutputSaver <br/>
-OutputSaver.hxx <br/>
+class OutputSaver <br>
+OutputSaver.hxx <br>
 OutputSaver.cxx
 
 In the directory <code>share/</code>, one may find a class for objects to communicate.
 
 <h3>Source code</h3>
-class MessageHandler <br/>
-MessageHandler.hxx <br/>
+class MessageHandler <br>
+MessageHandler.hxx <br>
 MessageHandler.cxx
 
 <b>Twin experiments</b> can be carried out.

@@ -6,12 +6,12 @@
 \page models Models
 
 \section shallow_water Shallow-water
-The shallow-water equations (also called Saint Venant equations) are a set of hyperbolic partial differential equations that describe the flow below a pressure surface in a fluid. It is suitable for flows with a free surface and small depth. For instance, these equations can be applied to model the behavior of a lake or a river. The model describes the evolution of the water height \f$h(x,y)\f$ and the horizontal velocity \f$(u(x,y),v(x,y))\f$. A simplified expression of the model is: <br/>
+The shallow-water equations (also called Saint Venant equations) are a set of hyperbolic partial differential equations that describe the flow below a pressure surface in a fluid. It is suitable for flows with a free surface and small depth. For instance, these equations can be applied to model the behavior of a lake or a river. The model describes the evolution of the water height \f$h(x,y)\f$ and the horizontal velocity \f$(u(x,y),v(x,y))\f$. A simplified expression of the model is: <br>
 
 <center>
-\f$\partial_th + \partial_x(hu) + \partial_y(hv) = 0\f$;  <br/>
-\f$\partial_t(hu) + \partial_x(huu) + \partial_y(huv) +\frac{1}2g\partial_xh^2 = 0\f$;  <br/>
-\f$\partial_t(hv) + \partial_x(huv) + \partial_y(hvv) +\frac{1}2g\partial_yh^2 = 0\f$.  <br/>
+\f$\partial_th + \partial_x(hu) + \partial_y(hv) = 0\f$;  <br>
+\f$\partial_t(hu) + \partial_x(huu) + \partial_y(huv) +\frac{1}2g\partial_xh^2 = 0\f$;  <br>
+\f$\partial_t(hv) + \partial_x(huv) + \partial_y(hvv) +\frac{1}2g\partial_yh^2 = 0\f$.  <br>
 </center>
 
 One can define several boundary conditions:
@@ -32,4 +32,5 @@ The state contains:
 </ul>
 
 \section clamped_bar Clamped Bar
+
 */
