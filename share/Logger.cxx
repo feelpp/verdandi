@@ -418,7 +418,7 @@ namespace Verdandi
     */
     bool Logger::CheckStatus()
     {
-        if (!(is_initialized_))
+        if (!is_initialized_ && is_active_)
             Initialize();
         return is_active_;
     }
@@ -431,7 +431,7 @@ namespace Verdandi
     */
     bool Logger::CheckStatus(int & options)
     {
-        if (!(is_initialized_))
+        if (!is_initialized_ && is_active_)
         {
             Initialize();
             options = options_;
