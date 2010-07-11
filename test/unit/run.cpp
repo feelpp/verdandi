@@ -18,7 +18,7 @@
 
 
 #define SELDON_DEBUG_LEVEL_4
-#define SELDON_WITH_ABORT
+#define VERDANDI_WITH_ABORT
 
 #include "blue.hpp"
 #include <cppunit/TestResult.h>

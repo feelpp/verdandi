@@ -74,6 +74,10 @@ namespace Verdandi
       }
 #endif
 
+#ifdef VERDANDI_WITH_ABORT
+#define SELDON_WITH_ABORT
+#endif
+
 
 #include "seldon/SeldonHeader.hxx"
 #include "seldon/vector/Vector2.hxx"
