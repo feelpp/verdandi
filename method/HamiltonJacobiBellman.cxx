@@ -43,7 +43,7 @@ namespace Verdandi
         observation_manager_(model_, configuration_file),
         time_step_(0)
     {
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
         /*** Initializations ***/
 
@@ -63,27 +63,26 @@ namespace Verdandi
 
         /*** Display options ***/
 
-        configuration_stream.set_prefix("HJB/display/");
+        configuration.SetPrefix("hjb.display.");
         // Should iterations be displayed on screen?
-        configuration_stream.set("Show_iteration",
-                                 option_display_["show_iteration"]);
+        configuration.Set("show_iteration",
+                          option_display_["show_iteration"]);
         // Should current date be displayed on screen?
-        configuration_stream.set("Show_date", option_display_["show_date"]);
+        configuration.Set("show_date", option_display_["show_date"]);
 
         /*** Domain definition ***/
 
-        configuration_stream.set_prefix("HJB/domain/");
+        configuration.SetPrefix("hjb.domain.");
 
         // Discretization along all dimensions. A regular grid is assumed. In
         // every dimension, the format is x_min, delta_x, Nx for every
         // dimension.
-        string discretization;
-        configuration_stream.set("Discretization", discretization);
-        vector<string> discretization_vector = split(discretization);
+        vector<string> discretization_vector;
+        configuration.Set("discretization", discretization_vector);
         if (discretization_vector.size() % 3 != 0)
             throw ErrorConfiguration("HamiltonJacobiBellman::"
                                      "HamiltonJacobiBellman",
-                                     "The entry \"Discretization\" should be "
+                                     "The entry \"discretization\" should be "
                                      "in format \"x_min delta_x Nx\" for "
                                      "every dimension.");
         Ndimension_ = discretization_vector.size() / 3;
@@ -109,25 +108,23 @@ namespace Verdandi
                                      " the HJB solver (" + to_str(Ndimension_)
                                      + ").");
 
-        configuration_stream.set("Initial_date", initial_date_);
-        configuration_stream.set("Delta_t", Delta_t_);
-        configuration_stream.set("Nt", Nt_);
+        configuration.Set("initial_date", initial_date_);
+        configuration.Set("Delta_t", Delta_t_);
+        configuration.Set("Nt", Nt_);
 
         /*** Equation coefficients ***/
 
-        configuration_stream.set_prefix("HJB/equation_coefficients/");
+        configuration.SetPrefix("hjb.equation_coefficient.");
 
-        configuration_stream.set("With_quadratic_term", with_quadratic_term_);
-        configuration_stream.set("With_advection_term", with_advection_term_);
-        configuration_stream.set("With_source_term", with_source_term_);
+        configuration.Set("with_quadratic_term", with_quadratic_term_);
+        configuration.Set("with_advection_term", with_advection_term_);
+        configuration.Set("with_source_term", with_source_term_);
 
         if (with_advection_term_)
-            configuration_stream.set("Model_time_dependent",
-                                     model_time_dependent_);
+            configuration.Set("model_time_dependent", model_time_dependent_);
 
-        string Q_0;
-        configuration_stream.set("Q_0", Q_0);
-        vector<string> Q_0_vector = split(Q_0);
+        vector<string> Q_0_vector;
+        configuration.Set("Q_0", Q_0_vector);
         if (int(Q_0_vector.size()) != Ndimension_ * Ndimension_)
             throw ErrorConfiguration("HamiltonJacobiBellman::"
                                      "HamiltonJacobiBellman",
@@ -142,9 +139,8 @@ namespace Verdandi
             for (int j = 0; j <  Ndimension_; j++)
                 to_num(Q_0_vector[i * Ndimension_ + j], Q_0_(i, j));
 
-        string x_0;
-        configuration_stream.set("x_0", x_0);
-        vector<string> x_0_vector = split(x_0);
+        vector<string> x_0_vector;
+        configuration.Set("x_0", x_0_vector);
         if (int(x_0_vector.size()) != Ndimension_)
             throw ErrorConfiguration("HamiltonJacobiBellman::"
                                      "HamiltonJacobiBellman",
@@ -158,9 +154,8 @@ namespace Verdandi
 
         if (with_quadratic_term_)
         {
-            string Q;
-            configuration_stream.set("Q", Q);
-            vector<string> Q_vector = split(Q);
+            vector<string> Q_vector;
+            configuration.Set("Q", Q_vector);
             if (int(Q_vector.size()) != Ndimension_ * Ndimension_)
                 throw ErrorConfiguration("HamiltonJacobiBellman::"
                                          "HamiltonJacobiBellman",
@@ -200,9 +195,8 @@ namespace Verdandi
 
         if (with_source_term_)
         {
-            string R;
-            configuration_stream.set("R", R);
-            vector<string> R_vector = split(R);
+            vector<string> R_vector;
+            configuration.Set("R", R_vector);
             if (int(R_vector.size()) != Ndimension_ * Ndimension_)
                 throw ErrorConfiguration("HamiltonJacobiBellman::"
                                          "HamiltonJacobiBellman",
@@ -220,10 +214,11 @@ namespace Verdandi
 
         /*** Solver ***/
 
-        configuration_stream.set_prefix("HJB/solver/");
+        configuration.SetPrefix("hjb.solver.");
 
-        configuration_stream.set("Scheme", scheme_,
-                                 "'LxF' | 'BrysonLevy' | 'Godunov'");
+        configuration.Set("scheme",
+                          "ops_in(v, {'LxF', 'BrysonLevy', 'Godunov'})",
+                          scheme_);
         if (with_quadratic_term_ && scheme_ != "Godunov")
             throw ErrorConfiguration("HamiltonJacobiBellman::"
                                      "HamiltonJacobiBellman",
@@ -232,32 +227,33 @@ namespace Verdandi
 
         /*** Boundary condition ***/
 
-        configuration_stream.set_prefix("HJB/boundary_condition/");
+        configuration.SetPrefix("hjb.boundary_condition.");
 
-        configuration_stream.set("Type", boundary_condition_type_,
-                                 "'Dirichlet' | 'Extrapolation' "
-                                 "| 'Periodic'");
+        configuration.Set("type",
+                          "ops_in(v, {'Dirichlet', "
+                          "'Extrapolation', 'Periodic'})",
+                          boundary_condition_type_);
         if (boundary_condition_type_ == "Dirichlet")
             boundary_condition_index_ = 0;
         else if (boundary_condition_type_ == "Extrapolation")
             boundary_condition_index_ = 1;
         else
             boundary_condition_index_ = 2;
-        configuration_stream.set("Value", boundary_condition_, ">= 0");
+        configuration.Set("value", "v >= 0", boundary_condition_);
 
         /*** Lax-Friedrichs scheme ***/
 
         if (scheme_ == "LxF")
         {
-            configuration_stream.set_prefix("HJB/lax_friedrichs/");
+            configuration.SetPrefix("hjb.lax_friedrichs.");
 
             string upper_bound_model;
-            configuration_stream.set("Upper_bound_model", upper_bound_model);
+            configuration.Set("Upper_bound_model", upper_bound_model);
             vector<string> bound_vector = split(upper_bound_model);
             if (int(bound_vector.size()) != Ndimension_)
                 throw ErrorConfiguration("HamiltonJacobiBellman::"
                                          "HamiltonJacobiBellman",
-                                         "The entry \"Upper_bound_model\" "
+                                         "The entry \"upper_bound_model\" "
                                          "should contain "
                                          + to_str(Ndimension_)
                                          + " elements, but "
@@ -270,7 +266,7 @@ namespace Verdandi
 
         /*** Ouput saver ***/
 
-        output_saver_.Initialize(configuration_file, "HJB/output_saver/");
+        output_saver_.Initialize(configuration_file, "hjb.output_saver.");
         output_saver_.Empty("value_function");
     }
 

@@ -233,10 +233,11 @@ namespace Verdandi
 
     private:
         // Configuration.
-        void ReadConfigurationBoundaryCondition(string side,
-                                                GetPot& configuration_stream,
-                                                int& type, T& value,
-                                                T& amplitude, T& frequency);
+        void
+        ReadConfigurationBoundaryCondition(string side,
+                                           Ops::Ops& configuration,
+                                           int& type, T& value,
+                                           T& amplitude, T& frequency);
 
         //Processing.
         void ComputeGhostCellValue(int type, T value, T amplitude,

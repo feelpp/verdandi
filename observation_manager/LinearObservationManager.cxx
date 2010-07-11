@@ -86,27 +86,26 @@ namespace Verdandi
     {
         observation_aggregator_.Initialize(configuration_file);
 
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
         Nstate_model_ = model.GetNstate();
 
-        configuration_stream.set_prefix("observation/");
-        configuration_stream.set("File", observation_file_);
-        configuration_stream.set("Type", observation_type_, "", "state");
-        configuration_stream.set("Delta_t",
-                                 Delta_t_,  "> 0");
-        configuration_stream.set("Nskip", Nskip_, "> 0");
-        configuration_stream.set("Final_date", final_date_, "",
-                                 numeric_limits<double>::max());
+        configuration.SetPrefix("observation.");
+        configuration.Set("file", observation_file_);
+        configuration.Set("type", "", "state", observation_type_);
+        configuration.Set("Delta_t", "v > 0", Delta_t_);
+        configuration.Set("Nskip", "v > 0", Nskip_);
+        configuration.Set("final_date", "", numeric_limits<double>::max(),
+                          final_date_);
 
-        configuration_stream.set("error/Variance", error_variance_value_,
-                                 "> 0");
+        configuration.Set("error.variance", "v > 0", error_variance_value_);
 
-        configuration_stream.set("operator/Definition",
-                                 operator_definition_, "'diagonal'| 'file'");
-        configuration_stream.set("operator/Diagonal_value",
-                                 operator_diagonal_value_);
-        configuration_stream.set("operator/File", operator_file_);
+        configuration.Set("operator.definition",
+                          "ops_in(v, {'diagonal', 'file'})",
+                          operator_definition_);
+        configuration.Set("operator.diagonal_value",
+                          operator_diagonal_value_);
+        configuration.Set("operator.file", operator_file_);
 
         date_ = numeric_limits<double>::min();
 

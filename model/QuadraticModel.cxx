@@ -72,32 +72,30 @@ namespace Verdandi
 
         /*** Configuration ***/
 
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
-        configuration_stream.set_prefix("quadratic_model/definition/");
+        configuration.SetPrefix("quadratic_model.definition.");
 
-        string state;
-        configuration_stream.set("Initial_state", state);
-        vector<string> state_vector = split(state);
+        vector<string> state_vector;
+        configuration.Set("initial_state", state_vector);
         Nstate_ = int(state_vector.size());
         state_.Reallocate(Nstate_);
         for (int i = 0; i < Nstate_; i++)
             to_num(state_vector[i], state_(i));
 
-        configuration_stream.set("With_quadratic_term", with_quadratic_term_);
-        configuration_stream.set("With_linear_term", with_linear_term_);
-        configuration_stream.set("With_constant_term", with_constant_term_);
+        configuration.Set("with_quadratic_term", with_quadratic_term_);
+        configuration.Set("with_linear_term", with_linear_term_);
+        configuration.Set("with_constant_term", with_constant_term_);
 
         if (with_quadratic_term_)
         {
-            string Q;
-            configuration_stream.set("Quadratic_term", Q);
-            vector<string> Q_vector = split(Q);
+            vector<string> Q_vector;
+            configuration.Set("quadratic_term", Q_vector);
             if (int(Q_vector.size()) != Nstate_ * Nstate_ * Nstate_)
                 throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                          "The initial state has "
                                          + to_str(Nstate_) + " elements, but "
-                                         "the entry \"Quadratic_term\" has "
+                                         "the entry \"quadratic_term\" has "
                                          + to_str(int(Q_vector.size()))
                                          + " elements, instead of "
                                          + to_str(Nstate_ * Nstate_ * Nstate_)
@@ -116,14 +114,13 @@ namespace Verdandi
 
         if (with_linear_term_)
         {
-            string L;
-            configuration_stream.set("Linear_term", L);
-            vector<string> L_vector = split(L);
+            vector<string> L_vector;
+            configuration.Set("linear_term", L_vector);
             if (int(L_vector.size()) != Nstate_ * Nstate_)
                 throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                          "The initial state has "
                                          + to_str(Nstate_) + " elements, but "
-                                         "the entry \"Linear_term\" has "
+                                         "the entry \"linear_term\" has "
                                          + to_str(int(L_vector.size()))
                                          + " elements, instead of "
                                          + to_str(Nstate_ * Nstate_) + ".");
@@ -135,14 +132,13 @@ namespace Verdandi
 
         if (with_constant_term_)
         {
-            string b;
-            configuration_stream.set("Constant", b);
-            vector<string> b_vector = split(b);
+            vector<string> b_vector;
+            configuration.Set("constant", b_vector);
             if (int(b_vector.size()) != Nstate_)
                 throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                          "The initial state has "
                                          + to_str(Nstate_) + " elements, but "
-                                         "the entry \"Constant\" has "
+                                         "the entry \"constant\" has "
                                          + to_str(int(b_vector.size()))
                                          + " elements, instead of "
                                          + to_str(Nstate_) + ".");
@@ -151,14 +147,14 @@ namespace Verdandi
                 to_num(b_vector[i], b_(i));
         }
 
-        configuration_stream.set("Delta_t", Delta_t_);
-        configuration_stream.set("Initial_date", date_);
-        configuration_stream.set("Final_date", final_date_);
+        configuration.Set("Delta_t", Delta_t_);
+        configuration.Set("initial_date", date_);
+        configuration.Set("final_date", final_date_);
 
         /*** Output saver ***/
 
         output_saver_.Initialize(configuration_file,
-                                 "quadratic_model/output_saver/");
+                                 "quadratic_model.output_saver.");
         if (with_quadratic_term_)
         {
             output_saver_.Empty("Q");

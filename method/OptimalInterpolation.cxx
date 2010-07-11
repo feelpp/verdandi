@@ -42,7 +42,7 @@ namespace Verdandi
         model_(configuration_file),
         observation_manager_(model_, configuration_file)
     {
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
         /*** Initializations ***/
 
@@ -62,27 +62,28 @@ namespace Verdandi
 
         /*** Display options ***/
 
-        configuration_stream.set_prefix("optimal_interpolation/display/");
+        configuration.SetPrefix("optimal_interpolation.display.");
         // Should iterations be displayed on screen?
-        configuration_stream.set("Show_iteration",
-                                 option_display_["show_iteration"]);
+        configuration.Set("show_iteration",
+                          option_display_["show_iteration"]);
         // Should current date be displayed on screen?
-        configuration_stream.set("Show_date", option_display_["show_date"]);
+        configuration.Set("show_date", option_display_["show_date"]);
 
         /*** Assimilation options ***/
 
-        configuration_stream.
-            set_prefix("optimal_interpolation/data_assimilation/");
-        configuration_stream.set("Analyze_first_step", analyze_first_step_);
+        configuration.
+            SetPrefix("optimal_interpolation.data_assimilation.");
+        configuration.Set("analyze_first_step", analyze_first_step_);
 
-        configuration_stream.set_prefix("optimal_interpolation/");
-        configuration_stream.set("BLUE_computation", blue_computation_,
-                                 "'vector' | 'matrix'");
+        configuration.SetPrefix("optimal_interpolation.");
+        configuration.Set("BLUE_computation",
+                          "ops_in(v, {'vector', 'matrix'})",
+                          blue_computation_);
 
         /*** Ouput saver ***/
 
         output_saver_.Initialize(configuration_file,
-                                 "optimal_interpolation/output_saver/");
+                                 "optimal_interpolation.output_saver.");
         output_saver_.Empty("state_forecast");
         output_saver_.Empty("state_analysis");
     }

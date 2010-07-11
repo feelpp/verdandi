@@ -26,7 +26,8 @@
 #include "seldon/Seldon.hxx"
 #include "seldon/vector/Vector2.cxx"
 #include "seldon/vector/Vector3.cxx"
-#include "getpot/GetPot.cpp"
+
+#include "ops/Ops.hxx"
 
 
 #include "share/Logger.cxx"

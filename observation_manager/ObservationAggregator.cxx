@@ -63,22 +63,21 @@ namespace Verdandi
     template <class T>
     void ObservationAggregator<T>::Initialize(string configuration_file)
     {
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
-        configuration_stream.
-            set_prefix("observation/observation_aggregator/");
+        configuration.SetPrefix("observation.aggregator.");
 
         string interpolation_type_str;
-        configuration_stream.set("Type", interpolation_type_str, "", "Step");
-        if (interpolation_type_str == "Step")
+        configuration.Set("type", "", "step", interpolation_type_str);
+        if (interpolation_type_str == "step")
             interpolation_type_ = type_step_;
-        else if (interpolation_type_str == "Triangle")
+        else if (interpolation_type_str == "triangle")
             interpolation_type_ = type_triangle_;
 
-        configuration_stream.set("Width_left", width_left_);
-        configuration_stream.set("Width_right", width_right_);
+        configuration.Set("width_left", width_left_);
+        configuration.Set("width_right", width_right_);
 
-        configuration_stream.set("Discard_observation", discard_observation_);
+        configuration.Set("discard_observation", discard_observation_);
 
         active_track_index_ = CreateTrack();
     }

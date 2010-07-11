@@ -72,29 +72,29 @@ namespace Verdandi
 
         /*** Configuration ***/
 
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
-        configuration_stream.set_prefix("lorenz/parameter/");
+        configuration.SetPrefix("lorenz.parameter.");
 
-        configuration_stream.set("Prandtl", Pr_);
-        configuration_stream.set("Rayleigh", Ra_);
-        configuration_stream.set("b", b_);
+        configuration.Set("Prandtl", Pr_);
+        configuration.Set("Rayleigh", Ra_);
+        configuration.Set("b", b_);
 
-        configuration_stream.set_prefix("lorenz/initial_condition/");
+        configuration.SetPrefix("lorenz.initial_condition.");
 
-        configuration_stream.set("X", X_);
-        configuration_stream.set("Y", Y_);
-        configuration_stream.set("Z", Z_);
+        configuration.Set("X", X_);
+        configuration.Set("Y", Y_);
+        configuration.Set("Z", Z_);
 
-        configuration_stream.set_prefix("lorenz/time/");
+        configuration.SetPrefix("lorenz.time.");
 
-        configuration_stream.set("Delta_t", Delta_t_);
-        configuration_stream.set("Initial_date", date_);
-        configuration_stream.set("Final_date", final_date_);
+        configuration.Set("Delta_t", Delta_t_);
+        configuration.Set("initial_date", date_);
+        configuration.Set("final_date", final_date_);
 
         /*** Output saver ***/
 
-        output_saver_.Initialize(configuration_file, "lorenz/output_saver/");
+        output_saver_.Initialize(configuration_file, "lorenz.output_saver.");
         output_saver_.Empty("X");
         output_saver_.Empty("Y");
         output_saver_.Empty("Z");

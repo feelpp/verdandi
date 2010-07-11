@@ -83,10 +83,7 @@ namespace Verdandi
 #include "seldon/vector/Vector2.hxx"
 #include "seldon/vector/Vector3.hxx"
 
-#ifndef GETPOT_ACTIVATE_EXCEPTION
-#define GETPOT_ACTIVATE_EXCEPTION true
-#endif
-#include "getpot/GetPot.hpp"
+#include "ops/OpsHeader.hxx"
 
 
 namespace Verdandi

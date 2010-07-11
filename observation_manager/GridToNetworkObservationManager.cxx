@@ -85,7 +85,7 @@ namespace Verdandi
     {
         observation_aggregator_.Initialize(configuration_file);
 
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
         MessageHandler::AddRecipient("grid_to_network_observation_manager",
                                      reinterpret_cast<void*>(this),
@@ -106,26 +106,21 @@ namespace Verdandi
         Ny_model_ = model.GetNy();
         Nbyte_observation_ = Nx_model_ * Ny_model_ * sizeof(double);
 
-        configuration_stream.set_prefix("observation/");
-        configuration_stream.set("File", observation_file_);
-        configuration_stream.set("Delta_t",
-                                 Delta_t_,  "> 0");
-        configuration_stream.set("Nskip", Nskip_, "> 0");
-        configuration_stream.set("Final_date", final_date_, "",
-                                 numeric_limits<double>::max());
+        configuration.SetPrefix("observation.");
+        configuration.Set("file", observation_file_);
+        configuration.Set("Delta_t", "v > 0", Delta_t_);
+        configuration.Set("Nskip", "v > 0", Nskip_);
+        configuration.Set("final_date", "", numeric_limits<double>::max(),
+                          final_date_);
 
         date_ = -numeric_limits<double>::max();
 
-        configuration_stream.set("error/Variance", error_variance_value_,
-                                 "> 0");
+        configuration.Set("error.variance", "v > 0", error_variance_value_);
 
-        configuration_stream.set_prefix("observation/location/");
+        configuration.SetPrefix("observation.location.");
 
-        string observation_location;
-        configuration_stream.set("Observation_location",
-                                 observation_location);
-        vector<string> observation_location_vector
-            = split(observation_location);
+        vector<string> observation_location_vector;
+        configuration.Set("observation_location", observation_location_vector);
         int value;
         for (int i = 0; i < int(observation_location_vector.size() - 1);
              i += 2)

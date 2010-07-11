@@ -69,20 +69,20 @@ namespace Verdandi
 
         /*** Configuration ***/
 
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
-        configuration_stream.set_prefix("clamped_bar/domain/");
-        configuration_stream.set("Bar_length", bar_length_);
-        configuration_stream.set("Nx", Nx_);
-        configuration_stream.set("Delta_t", Delta_t_);
-        configuration_stream.set("Final_date", final_date_);
+        configuration.SetPrefix("clamped_bar.domain.");
+        configuration.Set("bar_length", bar_length_);
+        configuration.Set("Nx", Nx_);
+        configuration.Set("Delta_t", Delta_t_);
+        configuration.Set("final_date", final_date_);
 
-        configuration_stream.set_prefix("clamped_bar/error_statistics/");
-        configuration_stream.set("Background_error_variance",
-                                 background_error_variance_value_, ">= 0");
-        configuration_stream.set("Background_error_scale",
-                                 Balgovind_scale_background_, "> 0");
-        
+        configuration.SetPrefix("clamped_bar.error_statistics.");
+        configuration.Set("background_error_variance", "v >= 0",
+                          background_error_variance_value_);
+        configuration.Set("background_error_scale", "v > 0",
+                          Balgovind_scale_background_);
+
         Ndof_ = Nx_ + 1;
 
 #ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
@@ -91,14 +91,14 @@ namespace Verdandi
                                      background_error_variance_);
 #endif
 
-        configuration_stream.set_prefix("clamped_bar/physics/");
-        configuration_stream.set("Young_modulus", Young_modulus_);
-        configuration_stream.set("mass_density", mass_density_);
+        configuration.SetPrefix("clamped_bar.physics.");
+        configuration.Set("Young_modulus", Young_modulus_);
+        configuration.Set("mass_density", mass_density_);
 
         /*** Ouput saver ***/
 
         output_saver_.Initialize(configuration_file,
-                                 "clamped_bar/output_saver/");
+                                 "clamped_bar.output_saver.");
         output_saver_.Empty("disp_0");
         output_saver_.Empty("velo_0");
 

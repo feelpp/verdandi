@@ -101,7 +101,7 @@ namespace Verdandi
 
     private:
 
-        void SetVariable(GetPot& configuration_stream,
+        void SetVariable(Ops::Ops& configuration,
                          string generic_path,
                          string default_mode,
                          string variable_name);

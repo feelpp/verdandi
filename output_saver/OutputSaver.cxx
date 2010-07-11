@@ -69,22 +69,21 @@ namespace Verdandi
          ***********************/
 
 
-        GetPot configuration_stream(configuration_file, "#", "\n");
-        configuration_stream.set_prefix(section_name.c_str());
+        Ops::Ops configuration(configuration_file);
+        configuration.SetPrefix(section_name);
 
-        configuration_stream.set("Mode", mode_, "", "binary");
-        configuration_stream.set("Mode_scalar", mode_scalar_, "", "text");
+        configuration.Set("mode", "", "binary", mode_);
+        configuration.Set("Mode_scalar", "", "text", mode_scalar_);
 
-        string tmp;
         vector<string> variable_vector;
-        configuration_stream.set("Variable_list", tmp);
-        variable_vector = split(tmp);
+        configuration.Set("variable_list", variable_vector);
 
         string generic_path;
-        configuration_stream.set("File", generic_path);
+        configuration.Set("file", generic_path);
 
+        string tmp;
         vector<string> time_vector;
-        configuration_stream.set("Time", tmp, "", "");
+        configuration.Set("time", "", "", tmp);
         time_vector = split(tmp);
         if ((time_vector.size() >= 1 && time_vector[0] != "step")
             || (time_vector.size() != 0 && time_vector.size() != 2
@@ -120,7 +119,7 @@ namespace Verdandi
 
 
         for (unsigned int i = 0; i < variable_vector.size(); i++)
-            SetVariable(configuration_stream, generic_path, mode_,
+            SetVariable(configuration, generic_path, mode_,
                         variable_vector[i]);
     }
 
@@ -406,24 +405,22 @@ namespace Verdandi
 
     //! Reads the parameters of the variable in a configuration file.
     /*!
-      \param[in] configuration_stream GetPot stream linked to the
-      configuration file.
+      \param[in] configuration Ops::Ops instance.
       \param[in] generic_path default output file for all variables.
       \param[in] default_mode default saving format.
       \param[in] variable_name variable name.
     */
-    void OutputSaver::SetVariable(GetPot& configuration_stream,
+    void OutputSaver::SetVariable(Ops::Ops& configuration,
                                   string generic_path,
                                   string default_mode,
                                   string variable_name)
     {
         string current_mode;
-        configuration_stream.set("Mode_" + variable_name, current_mode,
-                                 "", "");
+        configuration.Set("mode_" + variable_name, "", "", current_mode);
 
         string current_path;
-        configuration_stream.set("File_" + variable_name, current_path,
-                                 "", generic_path);
+        configuration.Set("file_" + variable_name, "", generic_path,
+                          current_path);
         current_path = find_replace(current_path, "%{name}", variable_name);
 
         variable_list_[variable_name] = Variable(current_mode, current_path);

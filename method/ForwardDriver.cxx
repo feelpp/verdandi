@@ -40,7 +40,7 @@ namespace Verdandi
     ForwardDriver<ClassModel>::ForwardDriver(string configuration_file):
         model_(configuration_file), iteration_(-1)
     {
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
         /*** Initializations ***/
 
@@ -51,15 +51,15 @@ namespace Verdandi
 
         /*** Display options ***/
 
-        configuration_stream.set_prefix("forward/display/");
+        configuration.SetPrefix("forward.display.");
         // Should the iteration be displayed on screen?
-        configuration_stream.set("Show_iteration", show_iteration_);
+        configuration.Set("show_iteration", show_iteration_);
         // Should the date be displayed on screen?
-        configuration_stream.set("Show_date", show_date_);
+        configuration.Set("show_date", show_date_);
 
         /*** Ouput saver ***/
 
-        output_saver_.Initialize(configuration_file, "forward/output_saver/");
+        output_saver_.Initialize(configuration_file, "forward.output_saver.");
         output_saver_.Empty("state_forecast");
     }
 

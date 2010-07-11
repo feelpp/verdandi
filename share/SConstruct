@@ -17,7 +17,7 @@
 # along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-import os, glob
+import os, sys, glob
 import distutils.sysconfig
 
 
@@ -143,6 +143,8 @@ if not os.path.isdir(verdandi_path):
 
 # Main environment variables.
 env = Environment(ENV = os.environ)
+# Environment for Lua library.
+env_lua = Environment(ENV = os.environ)
 
 # User-defined paths for includes.
 include_path = to_string_list("include_path")
@@ -163,7 +165,7 @@ env.Append(FORTRANPATH = include_path_list)
 # Verdandi paths for includes.
 env.Append(CPPPATH = [verdandi_path])
 for path in ["container", "error", "method", "model", "observation_manager",
-             "output_saver", "share", "include"]:
+             "output_saver", "share", "include", "include/lua/src"]:
     env.Append(CPPPATH = [os.path.join(verdandi_path, path)])
 
 # Libraries.
@@ -245,12 +247,35 @@ if ARGUMENTS["line"] == "no":
     env.Replace(SHLINKCOMSTR = "[Shared linking] $TARGET")
     env.Replace(SWIGCOMSTR = "[SWIG] $TARGET")
 
+    env_lua.Replace(CCCOMSTR = "[C] $SOURCE")
+    env_lua.Replace(ARCOMSTR = "[Archiving] $TARGET")
+    env_lua.Replace(RANLIBCOMSTR = "[Indexing] $TARGET")
+
 
 ################
 # THE PROGRAMS #
 ################
 
 
+# Dependency list.
+if os.name == "posix":
+    env_lua.Append(CFLAGS = "-DLUA_USE_POSIX")
+# For Lua 5.1.4.
+dependency_list = ["lapi", "lcode", "ldebug", "ldo", "ldump", "lfunc", "lgc",
+                   "llex", "lmem", "lobject", "lopcodes", "lparser", "lstate",
+                   "lstring", "ltable", "ltm", "lundump", "lvm", "lzio",
+                   "lauxlib", "lbaselib", "ldblib", "liolib", "lmathlib",
+                   "loslib", "ltablib", "lstrlib", "loadlib", "linit"]
+dependency_list_c = [os.path.join(verdandi_path, "include/lua/src/" + t + ".c")
+                     for t in dependency_list]
+# Makes sure that the library is compiled only if not already
+# available. Indeed, if the library was compiled using the Lua makefile or if
+# another version of Lua is used, it should not be combined by SCons. In
+# addition, "scons -c" should not remove the library.
+lua_library = os.path.join(verdandi_path, "include/lua/src/liblua.a")
+if not os.path.isfile(lua_library):
+    env_lua.StaticLibrary(lua_library, dependency_list_c)
+
 target_list = glob.glob("*.cpp")
 for filename in target_list:
-    env.Program(filename[:-4], [filename])
+    env.Program(filename[:-4], [filename, lua_library])

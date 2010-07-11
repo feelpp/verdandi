@@ -80,31 +80,31 @@ namespace Verdandi
     {
 
         /*** Configuration ***/
-        GetPot configuration_stream(configuration_file, "#", "\n");
+        Ops::Ops configuration(configuration_file);
 
-        configuration_stream.set_prefix("shallow_water/domain/");
+        configuration.SetPrefix("shallow_water.domain.");
 
-        configuration_stream.set("x_min", x_min_);
-        configuration_stream.set("y_min", y_min_);
-        configuration_stream.set("Delta_x", Delta_x_);
-        configuration_stream.set("Delta_y", Delta_y_);
-        configuration_stream.set("Nx", Nx_);
-        configuration_stream.set("Ny", Ny_);
+        configuration.Set("x_min", x_min_);
+        configuration.Set("y_min", y_min_);
+        configuration.Set("Delta_x", Delta_x_);
+        configuration.Set("Delta_y", Delta_y_);
+        configuration.Set("Nx", Nx_);
+        configuration.Set("Ny", Ny_);
 
-        configuration_stream.set("Delta_t", Delta_t_);
-        configuration_stream.set("Final_date", final_date_);
+        configuration.Set("Delta_t", Delta_t_);
+        configuration.Set("final_date", final_date_);
 
 
         // Departure from the uniform initial condition.
-        configuration_stream.set_prefix("shallow_water/initial_condition/");
-        configuration_stream.set("Value", value_);
+        configuration.SetPrefix("shallow_water.initial_condition.");
+        configuration.Set("value", value_);
 
         // Perturbations.
-        configuration_stream.set_prefix("shallow_water/model_error/");
-        configuration_stream.set("Standard_deviation_bc",
-                                 model_error_std_bc_, ">= 0");
-        configuration_stream.set("Standard_deviation_ic",
-                                 model_error_std_ic_, ">= 0");
+        configuration.SetPrefix("shallow_water.model_error.");
+        configuration.Set("standard_deviation_bc", "v >= 0",
+                          model_error_std_bc_);
+        configuration.Set("standard_deviation_ic", "v >= 0",
+                          model_error_std_ic_);
 
         if (value_ - 2. * model_error_std_ic_ <= T(0))
             throw "The model standard-deviation of "
@@ -112,7 +112,7 @@ namespace Verdandi
                 + " for initial conditions is too high to avoid negative "
                 + "water heights.";
 
-        configuration_stream.set("Random_seed", seed_);
+        configuration.Set("random_seed", seed_);
 
         if (is_num(seed_) && urng_ == 0)
         {
@@ -140,25 +140,25 @@ namespace Verdandi
         }
 
         // Error statistics.
-        configuration_stream.set_prefix("shallow_water/error_statistics/");
+        configuration.SetPrefix("shallow_water.error_statistics.");
 
-        configuration_stream.set("Background_error_variance",
-                                 background_error_variance_value_, ">= 0");
-        configuration_stream.set("Background_error_scale",
-                                 Balgovind_scale_background_, "> 0");
+        configuration.Set("background_error_variance", "v >= 0",
+                          background_error_variance_value_);
+        configuration.Set("background_error_scale", "v > 0",
+                          Balgovind_scale_background_);
 #ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
         build_diagonal_sparse_matrix(Nx_ * Ny_,
                                      background_error_variance_value_,
                                      background_error_variance_);
 #endif
 
-        configuration_stream.set("Model_error_variance",
-                                 model_error_variance_, ">= 0");
-        configuration_stream.set("Model_error_scale",
-                                 Balgovind_scale_model_, "> 0");
+        configuration.Set("model_error_variance", "v >= 0",
+                          model_error_variance_);
+        configuration.Set("model_error_scale", "v > 0",
+                          Balgovind_scale_model_);
 
         // Description of boundary conditions.
-        ReadConfigurationBoundaryCondition("Left", configuration_stream,
+        ReadConfigurationBoundaryCondition("left", configuration,
                                            boundary_condition_left_,
                                            value_left_, amplitude_left_,
                                            frequency_left_);
@@ -169,11 +169,11 @@ namespace Verdandi
             value_left_ *= -1;
             amplitude_left_ *= -1;
         }
-        ReadConfigurationBoundaryCondition("Right", configuration_stream,
+        ReadConfigurationBoundaryCondition("right", configuration,
                                            boundary_condition_right_,
                                            value_right_, amplitude_right_,
                                            frequency_right_);
-        ReadConfigurationBoundaryCondition("Bottom", configuration_stream,
+        ReadConfigurationBoundaryCondition("bottom", configuration,
                                            boundary_condition_bottom_,
                                            value_bottom_, amplitude_bottom_,
                                            frequency_bottom_);
@@ -184,15 +184,15 @@ namespace Verdandi
             value_bottom_ *= -1;
             amplitude_bottom_ *= -1;
         }
-        ReadConfigurationBoundaryCondition("Top", configuration_stream,
+        ReadConfigurationBoundaryCondition("top", configuration,
                                            boundary_condition_top_,
                                            value_top_, amplitude_top_,
                                            frequency_top_);
 
-        configuration_stream.set_prefix("shallow_water/data_assimilation/");
+        configuration.SetPrefix("shallow_water.data_assimilation.");
 
-        configuration_stream.set("With_positivity_requirement",
-                                 with_positivity_requirement_);
+        configuration.Set("with_positivity_requirement",
+                          with_positivity_requirement_);
 
 
         /*** Allocations ***/
@@ -205,9 +205,9 @@ namespace Verdandi
         h_.Fill(1.);
         NEWRAN::Random::Set(*urng_);
         value_ += max(-2., min(2., normal_.Next())) * model_error_std_ic_;
-        configuration_stream.set_prefix("shallow_water/initial_condition/");
+        configuration.SetPrefix("shallow_water.initial_condition.");
         bool source;
-        configuration_stream.set("Center", source);
+        configuration.Set("center", source);
         if (source)
         {
             int center_x = (Nx_ - 1) / 2;
@@ -222,7 +222,7 @@ namespace Verdandi
         u_.Fill(0.);
         v_.Fill(0.);
 
-        configuration_stream.set("Left", source);
+        configuration.Set("left", source);
         if (source)
         {
             int position_x = Nx_ / 10;
@@ -246,7 +246,7 @@ namespace Verdandi
         /*** Ouput saver ***/
 
         output_saver_.
-            Initialize(configuration_file, "shallow_water/output_saver/");
+            Initialize(configuration_file, "shallow_water.output_saver.");
         output_saver_.Empty("u");
         output_saver_.Empty("v");
         output_saver_.Empty("h");
@@ -756,8 +756,7 @@ namespace Verdandi
       for Dirichlet conditions on the height.
       \param[in] side side for the boundary condition (left, right, bottom or
       top).
-      \param[in] configuration_stream configuration stream built with the
-      configuration file.
+      \param[in] configuration Ops::Ops instance.
       \param[out] type type of the boundary condition (0, 1, 2 or 3).
       \param[out] inflow in-flow rate.
       \param[out] amplitude amplitude of the variations.
@@ -766,13 +765,13 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>
     ::ReadConfigurationBoundaryCondition(string side,
-                                         GetPot& configuration_stream,
+                                         Ops::Ops& configuration,
                                          int& type, T& value,
                                          T& amplitude, T& frequency)
     {
-        configuration_stream.set_prefix("shallow_water/boundary_condition/");
+        configuration.SetPrefix("shallow_water.boundary_condition.");
         string description;
-        configuration_stream.set(side, description);
+        configuration.Set(side, description);
         if (description == "free")
         {
             type = 0;
