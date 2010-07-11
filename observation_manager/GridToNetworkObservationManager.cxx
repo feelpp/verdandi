@@ -1204,7 +1204,7 @@ namespace Verdandi
         double date, int variable,
         GridToNetworkObservationManager<T>::observation_vector& observation) const
     {
-         observation.Reallocate(Nobservation_);
+        observation.Reallocate(Nobservation_);
         Matrix<T> input_data(Nx_model_, Ny_model_);
         int iteration;
 
