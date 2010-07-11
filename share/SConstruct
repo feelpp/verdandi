@@ -223,11 +223,15 @@ env.Replace(FORTRANFLAGS = fortran_compilation_option)
 env.Replace(LINK = linker)
 
 # Checks for the libraries, and sets the link flags.
+library_list = to_string_list("library_list")
+for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
+                "newran", "superlu", "cppunit"]:
+    if library not in library_list:
+        library_list += [library]
 for flag in to_string_list("link_flag"):
     env.Append(LINKFLAGS = flag)
 conf = Configure(env)
-for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
-                "newran", "superlu", "cppunit"]:
+for library in library_list:
     if conf.CheckLib(library):
         env.Append(LINKFLAGS = "-l" + library)
 
