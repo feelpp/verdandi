@@ -109,6 +109,8 @@ namespace Verdandi
         double date_;
         //! Available observation date of the time interval.
         date_vector available_date_;
+        //! Contribution associated with available observations.
+        Vector<double> contribution_;
         //! Observations aggregator.
         OBSERVATION_AGGREGATOR<T> observation_aggregator_;
 
@@ -354,7 +356,7 @@ namespace Verdandi
 
 
         bool HasObservation() const;
-        bool HasObservation(double date) const;
+        bool HasObservation(double date);
         int GetNobservation() const;
         bool IsOperatorSparse() const;
         bool IsErrorSparse() const;

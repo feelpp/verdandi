@@ -18,9 +18,21 @@ observation = {
 
    aggregator = {
 
+      -- The interpolation type may be "step", "triangle" or "interpolation".
       type = "step",
       width_left = 0.005,
       width_right = 0.005,
+
+      -- If the type is "triangle", the triangles widths may be the same for
+      -- all observations ("constant") or not ("per-observation").
+      width_property = "constant",
+
+      -- If the triangles widths are not constant, or in the case of
+      -- "interpolation", one should define an observation interval. It is
+      -- assumed that the observations outside this interval have no
+      -- contribution.
+      width_left_upper_bound = 1.,
+      width_right_upper_bound = 1.,
 
       -- If the value is true, each observation can be used only one time.
       discard_observation = true

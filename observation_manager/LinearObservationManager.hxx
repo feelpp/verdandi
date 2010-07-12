@@ -120,6 +120,9 @@ namespace Verdandi
         double date_;
         //! Available observation date of the time interval.
         date_vector available_date_;
+        //! Contribution associated with available observations.
+        Vector<double> contribution_;
+
         //! Observations aggregator.
         OBSERVATION_AGGREGATOR<T> observation_aggregator_;
 
@@ -138,6 +141,11 @@ namespace Verdandi
         T error_variance_value_;
         //! Observation error covariance matrix (R).
         error_variance error_variance_;
+
+        /*** Triangle interpolation ***/
+
+        //! File that stores the observations.
+        string width_file_;
 
         /*** Model domain ***/
 
@@ -162,9 +170,10 @@ namespace Verdandi
         template <class Model>
         void SetDate(const Model& model, double date);
         void SetDate(double date);
-        void SetAvailableDate(double date, date_vector& available_date) const;
-        void SetAvailableDate(double date_inf, double date_sup,
-                              date_vector& available_date) const;
+        void SetAvailableDate(double date, date_vector& available_date);
+        void SetAvailableDate(double date, double date_inf, double date_sup,
+                              int selection_policy,
+                              date_vector& available_date);
 
 
         ////////////////////////////
@@ -324,11 +333,14 @@ namespace Verdandi
                              observation_vector3& observation3) const;
         void ReadObservation(const date_vector& available_date,
                              observation_vector2& observation2) const;
-        void ReadObservation(double date, int variable,
+        void ReadObservation(ifstream& file_stream, double date, int variable,
                              observation_vector& observation) const;
         void ReadObservationIndex(const date_vector& available_date, const
                                   variable_vector2& observation_variable2,
                                   index_vector3& observation_index3) const;
+        void ReadObservationTriangleWidth(double date_inf, double date_sup,
+                                          Vector<double>& width_left,
+                                          Vector<double>& width_right) const;
 
 
         /////////////////
@@ -355,7 +367,7 @@ namespace Verdandi
 
 
         bool HasObservation() const;
-        bool HasObservation(double date) const;
+        bool HasObservation(double date);
         int GetNobservation() const;
         bool IsOperatorSparse() const;
         bool IsErrorSparse() const;

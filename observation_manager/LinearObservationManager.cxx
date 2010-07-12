@@ -98,6 +98,7 @@ namespace Verdandi
         configuration.Set("final_date", "", numeric_limits<double>::max(),
                           final_date_);
 
+        configuration.Set("width_file", "", "", width_file_);
         configuration.Set("error.variance", "v > 0", error_variance_value_);
 
         configuration.Set("operator.definition",
@@ -259,12 +260,15 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::SetAvailableDate(double date, LinearObservationManager<T>::date_vector&
-                       available_date) const
+                       available_date)
     {
         double date_inf, date_sup;
+        int selection_policy;
         observation_aggregator_.GetContributionInterval(date, date_inf,
-                                                        date_sup);
-        SetAvailableDate(date_inf, date_sup, available_date);
+                                                        date_sup,
+                                                        selection_policy);
+        SetAvailableDate(date, date_inf, date_sup, selection_policy,
+                         available_date);
 
         Logger::Log<3>(*this, to_str(date) + ", [" + to_str(date_inf) + " " +
                        to_str(date_sup) + "], {" + to_str(available_date) +
@@ -276,25 +280,117 @@ namespace Verdandi
     /*!
       \param[in] date_inf lower bound of the given time interval.
       \param[in] date_sup upper bound of the given time interval.
+      \param[in] selection_policy interval selection policy.
       \param[out] available_date the available observation dates.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::SetAvailableDate(double date_inf, double date_sup,
+    ::SetAvailableDate(double date, double date_inf, double date_sup,
+                       int selection_policy,
                        LinearObservationManager<T>::date_vector&
-                       available_date) const
+                       available_date)
     {
         available_date.Clear();
-
         date_sup = date_sup < final_date_ ? date_sup : final_date_;
 
         double period = Delta_t_ * Nskip_;
-        double available_date_0 = floor(date_inf / period) * period;
-        if (available_date_0 == date_inf)
-            available_date.PushBack(available_date_0);
-        available_date_0 += period;
-        for (double t = available_date_0; t < date_sup; t += period)
-            available_date.PushBack(t);
+
+        // All observations available in the given interval are considered.
+        if (selection_policy == 0)
+        {
+            double available_date_0 = floor(date_inf / period) * period;
+            if (available_date_0 == date_inf)
+                available_date.PushBack(available_date_0);
+            available_date_0 += period;
+            for (double t = available_date_0; t < date_sup; t += period)
+                available_date.PushBack(t);
+            observation_aggregator_.Contribution(date_, available_date_,
+                                                 contribution_);
+            return;
+        }
+
+        // Only the closest left observation and the closest right observation
+        // are requested.
+        if (selection_policy == 2)
+        {
+            double t1 = floor(date / period) * period;
+            double t2 = t1 + period;
+            if (t1 > date_inf)
+                available_date.PushBack(t1);
+            if (t2 < date_sup)
+                available_date.PushBack(t2);
+            observation_aggregator_.Contribution(date_, available_date_,
+                                                 contribution_);
+            return;
+        }
+
+        // All observations available in the given interval are considered
+        // taking into account non constant triangle widths associated with
+        // observations.
+        if (selection_policy == 3)
+        {
+            double available_date_0, available_date_1;
+            int Nobservation;
+
+            Vector<double> width_left, width_right, available_width_left,
+                available_width_right;
+            ReadObservationTriangleWidth(date_inf, date_sup, width_left,
+                                         width_right);
+
+            available_date_0 = floor(date_inf / period) * period;
+            if (!is_equal(available_date_0, date_inf))
+                available_date_0 += period;
+
+            available_date_1 = floor(date_sup / period) * period;
+            if (is_equal(available_date_1, date_sup))
+                available_date_1 -= period;
+
+            Nobservation = floor((available_date_1 - available_date_0)
+                                 / period) + 1;
+
+            double t = available_date_0;
+            for (int i = 0; i < Nobservation; i++, t += period)
+            {
+                if (t < date)
+                {
+                    if (t + width_right(i) > date)
+                    {
+                        available_date.PushBack(t);
+                        available_width_left.PushBack(width_left(i));
+                        available_width_right.PushBack(width_right(i));
+                    }
+                }
+                else if (t > date)
+                {
+                    if (t - width_left(i) < date)
+                    {
+                        available_date.PushBack(t);
+                        available_width_left.PushBack(width_left(i));
+                        available_width_right.PushBack(width_right(i));
+                    }
+                }
+                else
+                {
+                    available_date.PushBack(t);
+                    available_width_left.PushBack(width_left(i));
+                    available_width_right.PushBack(width_right(i));
+                }
+
+            }
+            observation_aggregator_.
+                Contribution(date_, available_date_,
+                             available_width_left, available_width_right,
+                             contribution_);
+            return;
+        }
+
+        throw ErrorArgument("void LinearObservationManager<T>"
+                            "::SetAvailableDate(double date,"
+                            " double date_inf, double date_sup,"
+                            " int selection_policy,"
+                            "LinearObservationManager<T>"
+                            "::date_vector&"
+                            "available_date) const");
     }
 
 
@@ -644,8 +740,8 @@ namespace Verdandi
     {
         observation_vector2 observation2;
         GetRawObservation(available_date, observation2);
-        observation_aggregator_.Aggregate(available_date, observation2, date_,
-                                          observation);
+        observation_aggregator_.Aggregate(available_date, contribution_,
+                                          observation2, date_, observation);
     }
 
 
@@ -735,6 +831,7 @@ namespace Verdandi
         GetRawObservation(available_date, observation_variable2,
                           observation3);
         observation_aggregator_.Aggregate(available_date,
+                                          contribution_,
                                           observation_variable2,
                                           observation3,
                                           date_,
@@ -838,6 +935,7 @@ namespace Verdandi
         GetRawObservation(available_date, observation_variable2,
                           observation_index3, observation3);
         observation_aggregator_.Aggregate(available_date,
+                                          contribution_,
                                           observation_variable2,
                                           observation_index3,
                                           observation3,
@@ -1135,6 +1233,17 @@ namespace Verdandi
         observation_variable2,
         LinearObservationManager<T>::observation_vector3& observation3) const
     {
+        ifstream file_stream;
+        file_stream.open(observation_file_.c_str());
+#ifdef SELDON_CHECK_IO
+        // Checks if the file was opened.
+        if (!file_stream.is_open())
+            throw IOError("LinearObservationManager"
+                          "::LoadObservation(model)",
+                          "Unable to open file \""
+                          + observation_file_ + "\".");
+#endif
+
         int Nvariable, Nt;
         Nt = available_date.GetSize();
         observation3.Reallocate(Nt);
@@ -1143,10 +1252,13 @@ namespace Verdandi
             Nvariable = observation_variable2(h).GetSize();
             observation3.Reallocate(h, Nvariable);
             for (int v = 0; v < Nvariable; v++)
-                ReadObservation(available_date(h),
+                ReadObservation(file_stream,
+                                available_date(h),
                                 observation_variable2(h, v),
                                 observation3.GetVector(h, v));
         }
+
+        file_stream.close();
     }
 
 
@@ -1161,27 +1273,6 @@ namespace Verdandi
         const LinearObservationManager<T>::date_vector& available_date,
         LinearObservationManager<T>::observation_vector2& observation2) const
     {
-        int Nt = available_date.GetSize();
-        observation2.Reallocate(Nt);
-        for (int h = 0; h < Nt; h++)
-            ReadObservation(available_date(h), 0, observation2(h));
-    }
-
-
-    //! Reads observation from observation file given a date and a variable.
-    /*!
-      \param[in] date the date.
-      \param[in] variable the variable.
-      \param[out] observation the observations.
-    */
-    template <class T>
-    void LinearObservationManager<T>
-    ::ReadObservation(
-        double date, int variable,
-        LinearObservationManager<T>::observation_vector& observation) const
-    {
-        observation.Reallocate(Nobservation_);
-        observation_vector input_data;
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
 #ifdef SELDON_CHECK_IO
@@ -1192,12 +1283,38 @@ namespace Verdandi
                           "Unable to open file \""
                           + observation_file_ + "\".");
 #endif
+
+        int Nt = available_date.GetSize();
+        observation2.Reallocate(Nt);
+        for (int h = 0; h < Nt; h++)
+            ReadObservation(file_stream, available_date(h), 0,
+                            observation2(h));
+
+        file_stream.close();
+    }
+
+
+    //! Reads observation from observation file given a date and a variable.
+    /*!
+      \param[in] file_stream the observation file stream.
+      \param[in] date the date.
+      \param[in] variable the variable.
+      \param[out] observation the observations.
+    */
+    template <class T>
+    void LinearObservationManager<T>
+    ::ReadObservation(ifstream& file_stream, double date, int variable,
+                      LinearObservationManager<T>::observation_vector&
+                      observation) const
+    {
+        observation.Reallocate(Nobservation_);
+        observation_vector input_data;
+
         streampos position;
-        position =  (int(date / (Delta_t_ * Nskip_)) + variable)
+        position =  (floor(date / (Delta_t_ * Nskip_) + 0.5) + variable)
             * Nbyte_observation_;
         file_stream.seekg(position);
         input_data.Read(file_stream);
-        file_stream.close();
 
         if (observation_type_ == "state")
             ApplyOperator(input_data, observation);
@@ -1233,6 +1350,61 @@ namespace Verdandi
                 observation_index3(h, v).Fill(0);
             }
         }
+    }
+
+
+    //! Reads triangle width associated with observations of a given interval.
+    /*!
+      \param[in] date_inf lower bound of a given interval.
+      \param[in] date_sup upper bound of a given interval.
+      \param[out] width_left left widths associated with observations.
+      \param[out] width_right right widths associated with observations.
+    */
+    template <class T>
+    void LinearObservationManager<T>
+    ::ReadObservationTriangleWidth(double date_inf, double date_sup,
+                                   Vector<double>& width_left,
+                                   Vector<double>& width_right) const
+    {
+        double period, available_date_0, available_date_1;
+        int Nwidth, Nbyte_width;
+        Vector<double> input_data;
+
+        ifstream file_stream;
+        file_stream.open(width_file_.c_str());
+        streampos position;
+#ifdef SELDON_CHECK_IO
+        // Checks if the file was opened.
+        if (!file_stream.is_open())
+            throw IOError("LinearObservationManager"
+                          "::ReadObservationTriangleWidth()",
+                          "Unable to open file \""
+                          + width_file_ + "\".");
+#endif
+        period = Delta_t_ * Nskip_;
+        available_date_0 = floor(date_inf / period) * period;
+        if (!is_equal(available_date_0, date_inf))
+            available_date_0 += period;
+        available_date_1 = floor(date_sup / period) * period;
+        if (is_equal(available_date_1, date_sup))
+            available_date_1 -= period;
+
+        Nwidth = floor((available_date_1 - available_date_0) / period) + 1;
+        Nbyte_width = 2 * sizeof(double) + sizeof(int);
+        width_left.Reallocate(Nwidth);
+        width_right.Reallocate(Nwidth);
+
+        position = floor(available_date_0 / Delta_t_) * Nbyte_width;
+        for (int i = 0; i < Nwidth; i++, position += Nskip_ * Nbyte_width)
+        {
+            file_stream.seekg(position);
+            input_data.Read(file_stream);
+            width_left(i) = input_data(0);
+            width_right(i) = input_data(1);
+            input_data.Clear();
+        }
+
+        file_stream.close();
     }
 
 
@@ -1290,13 +1462,11 @@ namespace Verdandi
       \param[in] date a given date.
     */
     template <class T>
-    bool LinearObservationManager<T>::HasObservation(double date) const
+    bool LinearObservationManager<T>::HasObservation(double date)
     {
-        if (date == date_)
-            return HasObservation();
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        return available_date.GetSize() != 0;
+        SetDate(date);
+        return available_date_.GetSize() != 0
+            && !is_equal(Norm1(contribution_), 0.);
     }
 
 
@@ -1304,7 +1474,8 @@ namespace Verdandi
     template <class T>
     bool LinearObservationManager<T>::HasObservation() const
     {
-        return available_date_.GetSize() != 0;
+        return available_date_.GetSize() != 0
+            && !is_equal(Norm1(contribution_), 0.);
     }
 
 
@@ -1386,6 +1557,9 @@ namespace Verdandi
     ::ApplyOperator(const state_vector& x,
                     LinearObservationManager<T>::observation_vector& y) const
     {
+        if (x.GetSize() == 0)
+            return;
+
         if (operator_definition_ == "diagonal")
         {
             Copy(x, y);

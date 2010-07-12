@@ -267,6 +267,8 @@ namespace Verdandi
 
         date_ = date;
         SetAvailableDate(date_, available_date_);
+        observation_aggregator_.
+            Contribution(date_, available_date_, contribution_);
     }
 
 
@@ -277,12 +279,15 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::SetAvailableDate(double date, GridToNetworkObservationManager<T>::date_vector&
+    ::SetAvailableDate(double date,
+                       GridToNetworkObservationManager<T>::date_vector&
                        available_date) const
     {
         double date_inf, date_sup;
+        int selection_policy;
         observation_aggregator_.GetContributionInterval(date, date_inf,
-                                                        date_sup);
+                                                        date_sup,
+                                                        selection_policy);
         SetAvailableDate(date_inf, date_sup, available_date);
 
         Logger::Log<3>(*this, to_str(date) + ", [" + to_str(date_inf) + " " +
@@ -687,8 +692,8 @@ namespace Verdandi
     {
         observation_vector2 observation2;
         GetRawObservation(available_date, observation2);
-        observation_aggregator_.Aggregate(available_date, observation2, date_,
-                                          observation);
+        observation_aggregator_.Aggregate(available_date, contribution_,
+                                          observation2, date_, observation);
     }
 
 
@@ -782,6 +787,7 @@ namespace Verdandi
         GetRawObservation(available_date, observation_variable2,
                           observation3);
         observation_aggregator_.Aggregate(available_date,
+                                          contribution_,
                                           observation_variable2,
                                           observation3,
                                           date_,
@@ -889,6 +895,7 @@ namespace Verdandi
         GetRawObservation(available_date, observation_variable2,
                           observation_index3, observation3);
         observation_aggregator_.Aggregate(available_date,
+                                          contribution_,
                                           observation_variable2,
                                           observation_index3,
                                           observation3,
@@ -1363,13 +1370,11 @@ namespace Verdandi
       \param[in] date a given date.
     */
     template <class T>
-    bool GridToNetworkObservationManager<T>::HasObservation(double date) const
+    bool GridToNetworkObservationManager<T>::HasObservation(double date)
     {
-        if (date == date_)
-            return HasObservation();
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        return available_date.GetSize() != 0;
+        SetDate(date);
+        return available_date_.GetSize() != 0
+            && !is_equal(Norm1(contribution_), 0.);
     }
 
 
@@ -1377,7 +1382,8 @@ namespace Verdandi
     template <class T>
     bool GridToNetworkObservationManager<T>::HasObservation() const
     {
-        return available_date_.GetSize() != 0;
+        return available_date_.GetSize() != 0
+            && !is_equal(Norm1(contribution_), 0.);
     }
 
 
