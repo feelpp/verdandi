@@ -146,6 +146,9 @@ env = Environment(ENV = os.environ)
 # Environment for Lua library.
 env_lua = Environment(ENV = os.environ)
 
+env.Replace(CONFIGURELOG = "#/.scons.log")
+env_lua.Replace(CONFIGURELOG = "#/.scons.log")
+
 # User-defined paths for includes.
 include_path = to_string_list("include_path")
 include_path_list = []
