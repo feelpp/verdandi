@@ -334,7 +334,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double date,
-                              GridToNetworkObservationManager<T>::observation_vector&
+                              GridToNetworkObservationManager<T>
+                              ::observation_vector&
                               observation)
     {
         date_vector available_date;
@@ -353,7 +354,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double date_inf, double date_sup,
-                              GridToNetworkObservationManager<T>::observation_vector&
+                              GridToNetworkObservationManager<T>
+                              ::observation_vector&
                               observation)
     {
         date_vector available_date;
@@ -383,9 +385,11 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(const GridToNetworkObservationManager<T>::date_vector&
+    ::GetFlattenedObservation(const GridToNetworkObservationManager<T>
+                              ::date_vector&
                               available_date,
-                              GridToNetworkObservationManager<T>::observation_vector&
+                              GridToNetworkObservationManager<T>
+                              ::observation_vector&
                               observation)
     {
         observation_vector2 observation2;
@@ -408,9 +412,11 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double date,
-                              GridToNetworkObservationManager<T>::variable_vector&
+                              GridToNetworkObservationManager<T>
+                              ::variable_vector&
                               observation_variable,
-                              GridToNetworkObservationManager<T>::observation_vector&
+                              GridToNetworkObservationManager<T>
+                              ::observation_vector&
                               observation)
     {
         date_vector available_date;
@@ -432,9 +438,11 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double date_inf, double date_sup,
-                              GridToNetworkObservationManager<T>::variable_vector&
+                              GridToNetworkObservationManager<T>
+                              ::variable_vector&
                               observation_variable,
-                              GridToNetworkObservationManager<T>::observation_vector&
+                              GridToNetworkObservationManager<T>
+                              ::observation_vector&
                               observation)
     {
         date_vector available_date;
@@ -453,8 +461,10 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::observation_vector& observation)
     {
         GetFlattenedObservation(available_date_, observation_variable,
                                 observation);
@@ -471,11 +481,14 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(const GridToNetworkObservationManager<T>::date_vector&
+    ::GetFlattenedObservation(const GridToNetworkObservationManager<T>
+                              ::date_vector&
                               available_date,
-                              GridToNetworkObservationManager<T>::variable_vector&
+                              GridToNetworkObservationManager<T>
+                              ::variable_vector&
                               observation_variable,
-                              GridToNetworkObservationManager<T>::observation_vector&
+                              GridToNetworkObservationManager<T>
+                              ::observation_vector&
                               observation)
     {
         observation_vector3 observation3;
@@ -502,11 +515,14 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double date,
-                              GridToNetworkObservationManager<T>::variable_vector&
+                              GridToNetworkObservationManager<T>
+                              ::variable_vector&
                               observation_variable,
-                              GridToNetworkObservationManager<T>::index_vector&
+                              GridToNetworkObservationManager<T>
+                              ::index_vector&
                               observation_index,
-                              GridToNetworkObservationManager<T>::observation_vector&
+                              GridToNetworkObservationManager<T>
+                              ::observation_vector&
                               observation)
     {
         date_vector available_date;
@@ -529,11 +545,14 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double date_inf, double date_sup,
-                              GridToNetworkObservationManager<T>::variable_vector&
+                              GridToNetworkObservationManager<T>
+                              ::variable_vector&
                               observation_variable,
-                              GridToNetworkObservationManager<T>::index_vector&
+                              GridToNetworkObservationManager<T>
+                              ::index_vector&
                               observation_index,
-                              GridToNetworkObservationManager<T>::observation_vector&
+                              GridToNetworkObservationManager<T>
+                              ::observation_vector&
                               observation)
     {
         date_vector available_date;
@@ -553,9 +572,12 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::index_vector& observation_index,
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::index_vector& observation_index,
+        GridToNetworkObservationManager<T>
+        ::observation_vector& observation)
     {
         GetFlattenedObservation(available_date_, observation_variable,
                                 observation_index, observation);
@@ -574,8 +596,10 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        const GridToNetworkObservationManager<T>
+        ::date_vector& available_date,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector& observation_index,
         GridToNetworkObservationManager<T>::observation_vector& observation)
     {
@@ -683,7 +707,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
         double date,
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
         date_vector available_date;
@@ -706,7 +731,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
         double date_inf, double date_sup,
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
         date_vector available_date;
@@ -726,7 +752,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
         GetAggregatedObservation(available_date_, observation_variable,
@@ -746,7 +773,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
         const GridToNetworkObservationManager<T>::date_vector& available_date,
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
         observation_vector3 observation3;
@@ -778,7 +806,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
         double date,
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector2& observation_index2,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
@@ -803,7 +832,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
         double date_inf, double date_sup,
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector2& observation_index2,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
@@ -825,7 +855,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector2& observation_index2,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
@@ -847,7 +878,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
         const GridToNetworkObservationManager<T>::date_vector& available_date,
-        GridToNetworkObservationManager<T>::variable_vector& observation_variable,
+        GridToNetworkObservationManager<T>
+        ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector2& observation_index2,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
@@ -952,7 +984,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
         double date,
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2,
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
         date_vector available_date;
@@ -974,7 +1007,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
         double date_inf, double date_sup,
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2,
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
         date_vector available_date;
@@ -994,7 +1028,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2,
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
         GetRawObservation(available_date_, observation_variable2,
@@ -1012,8 +1047,10 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2,
+        const GridToNetworkObservationManager<T>
+        ::date_vector& available_date,
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
         ReadObservationVariable(available_date, observation_variable2);
@@ -1036,9 +1073,12 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
         double date,
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>::index_vector3& observation_index3,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2,
+        GridToNetworkObservationManager<T>
+        ::index_vector3& observation_index3,
+        GridToNetworkObservationManager<T>
+        ::observation_vector3& observation3)
     {
         date_vector available_date;
         SetAvailableDate(date, available_date);
@@ -1060,7 +1100,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
         double date_inf, double date_sup,
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2,
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::index_vector3& observation_index3,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
@@ -1082,7 +1123,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2,
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::index_vector3& observation_index3,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
@@ -1103,7 +1145,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
         const GridToNetworkObservationManager<T>::date_vector& available_date,
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2,
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::index_vector3& observation_index3,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
@@ -1128,8 +1171,10 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::ReadObservationVariable(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
-        GridToNetworkObservationManager<T>::variable_vector2& observation_variable2)
+        const GridToNetworkObservationManager<T>
+        ::date_vector& available_date,
+        GridToNetworkObservationManager<T>
+        ::variable_vector2& observation_variable2)
         const
     {
         int Nt = available_date.GetSize();
@@ -1152,7 +1197,8 @@ namespace Verdandi
         const GridToNetworkObservationManager<T>::date_vector& available_date,
         const GridToNetworkObservationManager<T>::variable_vector2&
         observation_variable2,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3) const
+        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+        const
     {
         int Nvariable, Nt;
         Nt = available_date.GetSize();
@@ -1178,7 +1224,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::ReadObservation(
         const GridToNetworkObservationManager<T>::date_vector& available_date,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2) const
+        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+        const
     {
         int Nt = available_date.GetSize();
         observation2.Reallocate(Nt);
@@ -1197,7 +1244,8 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::ReadObservation(
         double date, int variable,
-        GridToNetworkObservationManager<T>::observation_vector& observation) const
+        GridToNetworkObservationManager<T>::observation_vector& observation)
+        const
     {
         observation.Reallocate(Nobservation_);
         Matrix<T> input_data(Nx_model_, Ny_model_);
@@ -1242,7 +1290,8 @@ namespace Verdandi
         const GridToNetworkObservationManager<T>::date_vector& available_date,
         const GridToNetworkObservationManager<T>::variable_vector2&
         observation_variable2,
-        GridToNetworkObservationManager<T>::index_vector3& observation_index3) const
+        GridToNetworkObservationManager<T>::index_vector3& observation_index3)
+        const
     {
         int Nvariable, Nt;
         Nt = available_date.GetSize();
