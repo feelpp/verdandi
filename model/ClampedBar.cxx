@@ -138,10 +138,6 @@ namespace Verdandi
         columns_0(3 * (Nx_ - 1) + 3) = Ndof_ - 1;
         rowindex_0(Ndof_) = 3 * (Nx_ - 1) + 4;
 
-        Logger::StdOut("values_0", values_0);
-        Logger::StdOut("columns_0", columns_0);
-        Logger::StdOut("rowindex_0", rowindex_0);
-
         // Store the upper part of the Newmark
         // matrix in a symmetric sparse data structure.
         int nnz = (NvalSkel + Ndof_) / 2;
@@ -244,12 +240,6 @@ namespace Verdandi
 
         }
 
-
-        Logger::StdOut(*this, "Assembled matrices");
-        Logger::StdOut("Mass_matrix_", Mass_matrix_);
-        Logger::StdOut("Newmark_matrix_1_", Newmark_matrix_1_);
-        Logger::StdOut("Newmark_matrix_0_", Newmark_matrix_0_);
-
         // Dirichlet conditions (should be better to read in the skeleton).
         Newmark_matrix_1_.Val(0, 0) = 1;
         Newmark_matrix_1_.Val(0, 1) = 0;
@@ -275,9 +265,6 @@ namespace Verdandi
         GetLU(Newmark_matrix_1_, mat_lu, true);
 #endif
 
-        Logger::StdOut("disp_0_", disp_0_);
-        Logger::StdOut("velo_0_", velo_0_);
-        Logger::StdOut("force_", force_);
     }
 
 
@@ -300,10 +287,6 @@ namespace Verdandi
         // Update time.
         date_ += Delta_t_;
         date_vector_.push_back(date_);
-
-        Logger::StdOutCommand("hline", "=");
-        Logger::StdOut("Time", date_);
-        Logger::StdOutCommand("hline", "-");
 
         // Right hand side.
         force_.Fill(T(0.));
@@ -338,10 +321,6 @@ namespace Verdandi
         // Update.
         disp_0_ = disp_1_;
         velo_0_ = velo_1_;
-
-        Logger::StdOut("disp_0_", disp_0_);
-        Logger::StdOut("velo_0_", velo_0_);
-        Logger::StdOut("force_", force_);
     }
 
 
