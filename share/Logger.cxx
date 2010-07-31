@@ -108,7 +108,7 @@ namespace Verdandi
       \param[in] option option to (des)activate.
       \param[in] value value.
     */
-    void  Logger::SetOption(int option, bool value)
+    void Logger::SetOption(int option, bool value)
     {
         if (!CheckStatus())
             return;
@@ -123,7 +123,7 @@ namespace Verdandi
     /*!
       \param[in] value value.
     */
-    void  Logger::SetStdout(bool value)
+    void Logger::SetStdout(bool value)
     {
         if (!CheckStatus())
             return;
@@ -135,7 +135,7 @@ namespace Verdandi
     /*!
       \param[in] value value.
     */
-    void  Logger::SetFile(bool value)
+    void Logger::SetFile(bool value)
     {
         if (!CheckStatus())
             return;
@@ -147,7 +147,7 @@ namespace Verdandi
     /*!
       \param[in] value value.
     */
-    void  Logger::SetUppercase(bool value)
+    void Logger::SetUppercase(bool value)
     {
         if (!CheckStatus())
             return;
