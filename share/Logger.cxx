@@ -93,6 +93,16 @@ namespace Verdandi
     }
 
 
+    //! Sets the name of the log file.
+    /*!
+      \param[in] file_name path to the log file.
+    */
+    void Logger::SetFileName(string file_name)
+    {
+        file_name_ = file_name;
+    }
+
+
     //! Activates or deactivates a specific option.
     /*!
       \param[in] option option to (des)activate.
@@ -347,8 +357,11 @@ namespace Verdandi
     //! Initializes the name of the log file.
     void Logger::InitializeFilename()
     {
-        file_name_ = find_replace(VERDANDI_LOG_FILENAME, "%{D}",
-                                  GenerateDate());
+        // If the file name is not empty, it has already been set using
+        // 'SetFileName' and it should not be overwritten.
+        if (file_name_.empty())
+            file_name_ = find_replace(VERDANDI_LOG_FILENAME, "%{D}",
+                                      GenerateDate());
     }
 
 

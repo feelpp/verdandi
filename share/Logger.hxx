@@ -114,6 +114,7 @@ namespace Verdandi
 
         static void InitializeOptions();
 
+        static void SetFileName(string file_name);
         static void SetOption(int option, bool value);
         static void SetStdout(bool value);
         static void SetFile(bool value);
