@@ -1,3 +1,9 @@
+----------------------------------- GLOBAL -----------------------------------
+
+
+output_directory = "result/"
+
+
 ----------------------------------- MODEL ------------------------------------
 
 
@@ -20,7 +26,7 @@ forward = {
    output_saver = {
 
       variable_list = {"state_forecast"},
-      file = "result/forward-%{name}.%{extension}",
+      file = output_directory .. "forward-%{name}.%{extension}",
       mode = "binary",
       mode_scalar = "text"
 

@@ -8,7 +8,7 @@ Nskip_save = 10
 
 observation_file = "result/river-truth/forward-state_forecast.bin"
 
-output_directory = "result/river"
+output_directory = "result/river/"
 output_mode = "binary"
 output_mode_scalar = "text"
 
@@ -53,7 +53,7 @@ optimal_interpolation = {
    output_saver = {
 
       variable_list = {"state_forecast", "state_analysis"},
-      file = output_directory .. "/oi-%{name}.%{extension}",
+      file = output_directory .. "oi-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
@@ -76,7 +76,7 @@ forward = {
    output_saver = {
 
       variable_list = {"state_forecast"},
-      file = output_directory .. "/forward-%{name}.%{extension}",
+      file = output_directory .. "forward-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
