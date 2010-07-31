@@ -37,6 +37,12 @@ forward = {
       show_iteration = false,
       show_date = false
 
+   },
+
+   output = {
+
+      log = output_directory .. "forward.log"
+
    }
 
 }

@@ -58,6 +58,12 @@ optimal_interpolation = {
       mode = output_mode,
       mode_scalar = output_mode_scalar
 
+   },
+
+   output = {
+
+      log = output_directory .. "oi.log"
+
    }
 
 }
@@ -80,6 +86,12 @@ forward = {
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
+
+   },
+
+   output = {
+
+      log = output_directory .. "forward.log"
 
    }
 

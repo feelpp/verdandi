@@ -37,6 +37,12 @@ forward = {
       mode = output_mode,
       mode_scalar = output_mode_scalar
 
+   },
+
+   output = {
+
+      log = output_directory .. "forward.log"
+
    }
 
 }

@@ -51,16 +51,21 @@ namespace Verdandi
 
         /*** Display options ***/
 
-        configuration.SetPrefix("forward.display.");
+        configuration.SetPrefix("forward.");
         // Should the iteration be displayed on screen?
-        configuration.Set("show_iteration", show_iteration_);
+        configuration.Set("display.show_iteration", show_iteration_);
         // Should the date be displayed on screen?
-        configuration.Set("show_date", show_date_);
+        configuration.Set("display.show_date", show_date_);
 
         /*** Ouput saver ***/
 
         output_saver_.Initialize(configuration_file, "forward.output_saver.");
         output_saver_.Empty("state_forecast");
+
+        /*** Logger and read configuration ***/
+
+        if (configuration.Exists("output.log"))
+            Logger::SetFileName(configuration.Get<string>("output.log"));
     }
 
 

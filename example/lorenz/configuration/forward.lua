@@ -30,6 +30,12 @@ forward = {
       mode = "binary",
       mode_scalar = "text"
 
+   },
+
+   output = {
+
+      log = output_directory .. "forward.log"
+
    }
 
 }

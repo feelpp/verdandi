@@ -268,6 +268,11 @@ namespace Verdandi
 
         output_saver_.Initialize(configuration_file, "hjb.output_saver.");
         output_saver_.Empty("value_function");
+
+        /*** Logger and read configuration ***/
+
+        if (configuration.Exists("output.log"))
+            Logger::SetFileName(configuration.Get<string>("output.log"));
     }
 
 

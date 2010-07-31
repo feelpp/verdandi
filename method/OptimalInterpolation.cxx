@@ -86,6 +86,11 @@ namespace Verdandi
                                  "optimal_interpolation.output_saver.");
         output_saver_.Empty("state_forecast");
         output_saver_.Empty("state_analysis");
+
+        /*** Logger and read configuration ***/
+
+        if (configuration.Exists("output.log"))
+            Logger::SetFileName(configuration.Get<string>("output.log"));
     }
 
 
