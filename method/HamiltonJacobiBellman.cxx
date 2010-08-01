@@ -266,13 +266,23 @@ namespace Verdandi
 
         /*** Ouput saver ***/
 
-        output_saver_.Initialize(configuration_file, "hjb.output_saver.");
+        configuration.SetPrefix("hjb.output_saver.");
+        output_saver_.Initialize(configuration);
         output_saver_.Empty("value_function");
 
         /*** Logger and read configuration ***/
 
+        configuration.SetPrefix("hjb.");
+
         if (configuration.Exists("output.log"))
             Logger::SetFileName(configuration.Get<string>("output.log"));
+
+        if (configuration.Exists("output.configuration"))
+        {
+            string output_configuration;
+            configuration.Set("output.configuration", output_configuration);
+            configuration.WriteLuaDefinition(output_configuration);
+        }
     }
 
 

@@ -62,6 +62,7 @@ optimal_interpolation = {
 
    output = {
 
+      configuration = output_directory .. "oi.lua",
       log = output_directory .. "oi.log"
 
    }
@@ -91,6 +92,7 @@ forward = {
 
    output = {
 
+      configuration = output_directory .. "forward.lua",
       log = output_directory .. "forward.log"
 
    }

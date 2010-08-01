@@ -82,15 +82,24 @@ namespace Verdandi
 
         /*** Ouput saver ***/
 
-        output_saver_.Initialize(configuration_file,
-                                 "optimal_interpolation.output_saver.");
+        configuration.SetPrefix("optimal_interpolation.output_saver.");
+        output_saver_.Initialize(configuration);
         output_saver_.Empty("state_forecast");
         output_saver_.Empty("state_analysis");
 
         /*** Logger and read configuration ***/
 
+        configuration.SetPrefix("optimal_interpolation.");
+
         if (configuration.Exists("output.log"))
             Logger::SetFileName(configuration.Get<string>("output.log"));
+
+        if (configuration.Exists("output.configuration"))
+        {
+            string output_configuration;
+            configuration.Set("output.configuration", output_configuration);
+            configuration.WriteLuaDefinition(output_configuration);
+        }
     }
 
 

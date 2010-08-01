@@ -34,6 +34,7 @@ forward = {
 
    output = {
 
+      configuration = output_directory .. "forward.lua",
       log = output_directory .. "forward.log"
 
    }
