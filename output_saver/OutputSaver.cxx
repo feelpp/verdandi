@@ -62,6 +62,20 @@ namespace Verdandi
     void OutputSaver::Initialize(string configuration_file,
                                  string section_name)
     {
+        Ops::Ops configuration(configuration_file);
+        configuration.SetPrefix(section_name);
+        Initialize(configuration);
+    }
+
+
+    //! Initializes the output saver with a configuration.
+    /*! Reads the configuration.
+      \param[in] configuration Ops::Ops instance with the configuration. The
+      prefix of \a configuration should already be set so that all entries are
+      accessible ("mode", "variable_list", "file", ...).
+    */
+    void OutputSaver::Initialize(Ops::Ops& configuration)
+    {
 
 
         /***********************
@@ -69,11 +83,8 @@ namespace Verdandi
          ***********************/
 
 
-        Ops::Ops configuration(configuration_file);
-        configuration.SetPrefix(section_name);
-
         configuration.Set("mode", "", "binary", mode_);
-        configuration.Set("Mode_scalar", "", "text", mode_scalar_);
+        configuration.Set("mode_scalar", "", "text", mode_scalar_);
 
         vector<string> variable_vector;
         configuration.Set("variable_list", variable_vector);
@@ -91,14 +102,14 @@ namespace Verdandi
             throw ErrorConfiguration("OutputSaver::OutputSaver(string,"
                                      " string)",
                                      "The variable \"Time\" in file \""
-                                     + configuration_file +
+                                     + configuration.GetFilePath() +
                                      "\" cannot be parsed:\n" + tmp);
         if (time_vector.size() >= 2)
             if (!is_num(time_vector[1]))
                 throw ErrorConfiguration("OutputSaver::OutputSaver(string,"
                                          " string)",
                                          "The variable \"Time\" in file \""
-                                         + configuration_file +
+                                         + configuration.GetFilePath() +
                                          "\" cannot be parsed:\n" + tmp);
             else
                 to_num(time_vector[1], save_period_);
@@ -107,7 +118,7 @@ namespace Verdandi
                 throw ErrorConfiguration("OutputSaver::OutputSaver(string,"
                                          " string)",
                                          "The variable \"Time\" in file \""
-                                         + configuration_file +
+                                         + configuration.GetFilePath() +
                                          "\" cannot be parsed:\n" + tmp);
             else
                 to_num(time_vector[2], time_tolerance_);
