@@ -1,5 +1,5 @@
 // Copyright (C) 2008, INRIA
-// Author(s): Vivien Mallet
+// Author(s): Vivien Mallet, Anne Tilloy
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -436,6 +436,34 @@ namespace Verdandi
         pointer(size) = size;
 
         matrix.SetData(size, size, value, pointer, column);
+    }
+
+
+    ////////////////////
+    // LINEAR ALGEBRA //
+    ////////////////////
+
+
+    //! Computes the Cholesky decomposition.
+    /*!
+      \param[in] A on entry, a symmetric definite positive matrix. On exit,
+      the square root \f$ S \f$ of A as given by the Cholesky decomposition:
+      \f$ A = S S^T \f$, with \a S is a lower triangular matrix.
+    */
+    template <class T>
+    void GetCholesky(Matrix<T, General, RowMajor>& A)
+    {
+        Matrix<T, General, RowSymPacked> A_sympacked(A.GetM(), A.GetN());
+        for (int i = 0; i < A.GetM(); i++)
+            for (int j = i; j < A.GetN(); j++)
+                A_sympacked(i, j) = A(i, j);
+
+        GetCholesky(A_sympacked);
+
+        A.Zero();
+        for (int i = 0; i < A.GetM(); i++)
+            for (int j = 0; j <= i; j++)
+                A(i, j) = A_sympacked(i, j);
     }
 
 

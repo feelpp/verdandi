@@ -61,6 +61,10 @@ namespace Verdandi
     void build_diagonal_sparse_matrix(int size, T diagonal_value,
                                       Matrix<T, General, RowSparse>& matrix);
 
+    /*** Linear algebra ***/
+
+    template <class T>
+    void GetCholesky(Matrix<T, General, RowMajor>& A);
 
 } // namespace Verdandi.
 

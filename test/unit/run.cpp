@@ -21,12 +21,14 @@
 #define VERDANDI_WITH_ABORT
 
 #include "blue.hpp"
+#include "cholesky.hpp"
 #include <cppunit/TestResult.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 using namespace CppUnit;
 
 CPPUNIT_TEST_SUITE_REGISTRATION(BLUETest);
+CPPUNIT_TEST_SUITE_REGISTRATION(CholeskyTest);
 
 
 int main()
