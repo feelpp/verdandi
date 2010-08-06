@@ -1,5 +1,5 @@
 // Copyright (C) 2010 INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Author(s): Marc Fragu, Vivien Mallet, Claire Mouton
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -35,20 +35,27 @@ namespace Verdandi
       costs.
       \param[in] B error variance associated with \a state.
       \param[in] H observation operator.
-      \param[in] y the vector of observations.
+      \param[in] y the vector of observations or innovations.
       \param[in] R error variance associated with \a observation.
       \param[in,out] x on entry, the background vector; on exit, the analysis.
+      \param[in] is_y_innovation Boolean to indicate if the parameter \a y is
+      a vector of observations or innovations.
+      \param[in] compute_variance Boolean to indicate if the covariance matrix
+      has to be updated.
     */
     template <class StateErrorVariance, class ObservationOperator,
               class ObservationVector, class ObservationErrorVariance,
               class StateVector>
-    void ComputeBLUE_matrix(const StateErrorVariance& B,
+    void ComputeBLUE_matrix(StateErrorVariance& B,
                             const ObservationOperator& H,
                             const ObservationVector& y,
                             const ObservationErrorVariance& R,
-                            StateVector& x)
+                            StateVector& x,
+                            bool is_y_innovation,
+                            bool compute_variance)
     {
-        ComputeBLUE_matrix(B, H, H, y, R, x);
+        ComputeBLUE_matrix(B, H, H, y, R, x, is_y_innovation,
+                           compute_variance);
     }
 
 
@@ -59,32 +66,38 @@ namespace Verdandi
       costs.
       \param[in] B error variance associated with \a state.
       \param[in] H observation operator.
-      \param[in] y the vector of observations.
-      \param[in] R error variance associated with \a observation.
-      \param[in,out] x on entry, the background vector; on exit, the analysis.
       \param[in] cm this parameter is only used to determine the type of an
       intermediate matrix in the computations. \a cm is not modified nor
       read. Its type CrossedMatrix will be the type of the intermediate matrix
       BH', whose size is Nx times Ny, if Nx is the length of \a x and Ny is
       the length of \a y.
+      \param[in] y the vector of observations or innovations.
+      \param[in] R error variance associated with \a observation.
+      \param[in,out] x on entry, the background vector; on exit, the analysis.
+      \param[in] is_y_innovation Boolean to indicate if the parameter \a y is
+      a vector of observations or innovations.
+      \param[in] compute_variance Boolean to indicate if the covariance matrix
+      has to be updated.
     */
     template <class StateErrorVariance,
               class ObservationOperator, class CrossedMatrix,
               class ObservationVector, class ObservationErrorVariance,
               class StateVector>
-    void ComputeBLUE_matrix(const StateErrorVariance& B,
+    void ComputeBLUE_matrix(StateErrorVariance& B,
                             const ObservationOperator& H,
                             const CrossedMatrix& cm,
                             const ObservationVector& y,
                             const ObservationErrorVariance& R,
-                            StateVector& x)
+                            StateVector& x,
+                            bool is_y_innovation,
+                            bool compute_variance)
     {
         typedef typename StateVector::value_type T;
 
         int Ny = y.GetLength();
         int Nx = x.GetLength();
 
-        // Temporary matrix and vector.
+        // Temporary matrices.
         CrossedMatrix working_matrix_xy(Nx, Ny);
 
         ObservationErrorVariance working_matrix_yy(Ny, Ny);
@@ -99,14 +112,42 @@ namespace Verdandi
         // Computes (HBH' + R).
         Add(T(1), R, working_matrix_yy);
 
-        // Computes inc = (HBH' + R)^{-1} * innovation by solving the linear
-        // system (HBH' + R) * inc = innovation.
-        ObservationVector innovation = y;
-        MltAdd(T(-1), H, x, T(1), innovation);
-        Solve(working_matrix_yy, innovation);
-        MltAdd(T(1.), working_matrix_xy, innovation, T(1.), x);
-    }
+        // Innovation.
+        ObservationVector innovation;
+        if (is_y_innovation)
+            innovation.SetData(y);
+        else
+        {
+            innovation = y;
+            MltAdd(T(-1), H, x, T(1), innovation);
+        }
 
+        if (!compute_variance)
+        {
+            // Computes inc = (HBH' + R)^{-1} * innovation by solving the
+            // linear system (HBH' + R) * inc = innovation.
+            GetAndSolveLU(working_matrix_yy, innovation);
+            MltAdd(T(1), working_matrix_xy, innovation, T(1), x);
+        }
+        else
+        {
+            // Kalman Gain.
+            CrossedMatrix K(Nx, Ny);
+            K.Fill(T(0));
+
+            GetInverse(working_matrix_yy);
+
+            MltAdd(T(1), working_matrix_xy, working_matrix_yy, T(0), K);
+
+            MltAdd(T(1), K, innovation, T(1), x);
+
+            MltAdd(T(-1), SeldonNoTrans, K, SeldonTrans,
+                   working_matrix_xy, T(1), B);
+        }
+
+        if (is_y_innovation)
+            innovation.Nullify();
+    }
 
 } // namespace Verdandi.
 

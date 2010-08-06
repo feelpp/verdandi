@@ -33,6 +33,7 @@ class BLUETest: public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(BLUETest);
     CPPUNIT_TEST(test_compute_BLUE);
+    CPPUNIT_TEST(test_compute_covariance);
     CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -99,6 +100,22 @@ public:
     }
 
 
+    void test_compute_covariance()
+    {
+        int Nx[3] = {10, 10,  1};
+        int Ny[3] = { 2, 10,  1};
+
+        for (int i = 0; i < 3; i++)
+        {
+            Nx_ = Nx[i];
+            Ny_ = Ny[i];
+
+            compute_covariance();
+        }
+
+    }
+
+
     template <class StateErrorVariance,
               class ObservationOperator, class CrossedMatrix,
               class ObservationVector, class ObservationErrorVariance,
@@ -158,4 +175,49 @@ public:
                                              1.e-6 * value);
         }
     }
+
+
+    void compute_covariance()
+    {
+
+        Matrix<double, General, RowSparse> B_sparse(Nx_, Nx_);
+        Matrix<double, General, RowSparse> H_sparse(Ny_, Nx_);
+        Matrix<double, General, RowSparse> R_sparse(Ny_, Ny_);
+        Matrix<double, General, RowSparse> tmp_sparse;
+        Vector<double> y_sparse(Ny_);
+        Vector<double> analysis_sparse(Nx_);
+
+        B_sparse.SetIdentity();
+        H_sparse.SetIdentity();
+        R_sparse.SetIdentity();
+        y_sparse.Fill();
+        analysis_sparse.Fill();
+
+        Matrix<double> B_dense(Nx_, Nx_);
+        Matrix<double> H_dense(Ny_, Nx_);
+        Matrix<double> R_dense(Ny_, Ny_);
+        Matrix<double> tmp_dense;
+        Vector<double> y_dense;
+        Vector<double> analysis_dense;
+
+        B_dense.SetIdentity();
+        H_dense.SetIdentity();
+        R_dense.SetIdentity();
+        y_dense = y_sparse;
+        analysis_dense = analysis_sparse;
+
+        ComputeBLUE_matrix(B_sparse, H_sparse, tmp_sparse, y_sparse, R_sparse,
+                           analysis_sparse, true);
+
+        ComputeBLUE_matrix(B_dense, H_dense, tmp_dense, y_dense, R_dense,
+                           analysis_dense, true);
+
+        for (int i = 0; i < Nx_; i++)
+            for (int j = 0; j < Nx_; j++)
+                CPPUNIT_ASSERT_DOUBLES_EQUAL(B_sparse(i, j), B_dense(i, j),
+                                             1.e-6 * B_dense(i, j));
+
+    }
+
+
 };

@@ -70,6 +70,46 @@ optimal_interpolation = {
 }
 
 
+-- Simulation with assimilation using EKF.
+extended_kalman_filter = {
+
+   -- Computation mode for BLUE: "vector" or "matrix".
+   BLUE_computation = "matrix",
+   -- Computation mode for covariance: "vector" or "matrix".
+   covariance_computation = "vector",
+
+   data_assimilation = {
+
+      analyze_first_step = false,
+
+   },
+
+   display = {
+
+      show_iteration = false,
+      show_date = true
+   },
+
+   output_saver = {
+
+      variable_list = {"state_forecast", "state_analysis"},
+      file = output_directory .. "ekf-%{name}.%{extension}",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
+      mode = output_mode,
+      mode_scalar = output_mode_scalar
+
+   },
+
+   output = {
+
+     configuration = output_directory .. "ekf.lua",
+     log = output_directory .. "ekf.log"
+
+  }
+
+}
+
+
 -- Forward simulation.
 forward = {
 

@@ -165,8 +165,16 @@ namespace Verdandi
         bool HasFinished() const;
         void Save();
 
+        // Operators.
+        void ApplyModel(state_vector& x, bool reinitialize_model = false);
+        void ApplyTangentLinearModel(state_vector& x,
+                                     bool reinitialize_model = false);
+        void GetTangentLinearModel(tangent_operator_matrix&) const;
+
+
         // Access methods.
         double GetDate() const;
+        void SetDate(double& date);
         int GetNstate() const;
         void GetState(state_vector& state) const;
         void SetState(state_vector& state);
@@ -176,6 +184,8 @@ namespace Verdandi
         void GetBackgroundErrorCovarianceRow(int row,
                                              error_covariance_row&
                                              error_covariance_row);
+        background_error_variance&
+        GetBackgroundErrorVarianceMatrix();
         const background_error_variance&
         GetBackgroundErrorVarianceMatrix() const;
         bool IsErrorSparse() const;

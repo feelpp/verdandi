@@ -467,6 +467,140 @@ namespace Verdandi
     }
 
 
+    //! Solves a sparse linear system using LU factorization.
+    /*! This function solves \f$ M X = Y \f$ where \f$ M \f$ is a matrix, and
+      \f$ X \f$ and \f$ Y \f$ are vectors.
+      \param[in] M the sparse matrix of the linear system, to be factorized in
+      LU form by UMFPACK, SuperLU or Mumps. On exit, \a M is cleared.
+      \param[in,out] Y on entry, the right-hand side \f$ Y \f$; on exit, the
+      solution \f$ X \f$ of the system.
+    */
+    template <class T, class Prop0, class Allocator0, class Allocator1>
+    void GetAndSolveLU(Matrix<T, Prop0, ColSparse, Allocator0>& M,
+                       Vector<T, VectFull, Allocator1>& Y)
+    {
+        Solve(M, Y);
+    }
+
+
+    //! Solves a sparse linear system using LU factorization.
+    /*! This function solves \f$ M X = Y \f$ where \f$ M \f$ is a matrix, and
+      \f$ X \f$ and \f$ Y \f$ are vectors.
+      \param[in] M the sparse matrix of the linear system, to be factorized in
+      LU form by UMFPACK, SuperLU or Mumps. On exit, \a M is cleared.
+      \param[in,out] Y on entry, the right-hand side \f$ Y \f$; on exit, the
+      solution \f$ X \f$ of the system.
+    */
+    template <class T, class Prop0, class Allocator0, class Allocator1>
+    void GetAndSolveLU(Matrix<T, Prop0, RowSparse, Allocator0>& M,
+                       Vector<T, VectFull, Allocator1>& Y)
+    {
+        Solve(M, Y);
+    }
+
+
+    //! This function overwrites a sparse matrix with its inverse.
+    /*!
+      \param[in,out] A the matrix to be inverted.
+    */
+    template <class T, class Allocator>
+    void GetInverse(Matrix<T, General, RowSparse, Allocator>& A)
+    {
+        Matrix<T, General, RowMajor, Allocator> A_dense;
+        ConvertRowSparseToDense(A, A_dense);
+
+        GetInverse(A_dense);
+
+        Matrix<T, General, ArrayRowSparse, Allocator> A_array;
+        ConvertDenseToArrayRowSparse(A_dense, A_array);
+
+        Copy(A_array, A);
+    }
+
+
+    //! Conversion from 'RowSparse' to 'RowMajor' format.
+    /*!
+      \param[in] A the 'RowSparse' matrix to be converted.
+      \param[out] A_dense the matrix \a A  stored in the 'RowMajor' format.
+    */
+    template <class T, class Allocator>
+    void ConvertRowSparseToDense(
+        Matrix<T, General, RowSparse, Allocator>& A,
+        Matrix<T, General, RowMajor, Allocator>& A_dense)
+    {
+        int m = A.GetM();
+        int n = A.GetN();
+
+        A_dense.Reallocate(m, n);
+
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                A_dense(i, j) = A(i, j);
+    }
+
+
+    //! Conversion from 'RowMajor' to 'ArrayRowSparse' format.
+    /*!
+      \param[in] A_dense the 'RowMajor' matrix to be converted.
+      \param[out] A_array the matrix \a A_dense  stored in the
+      'ArrayRowSparse' format.
+    */
+    template <class T, class Allocator>
+    void ConvertDenseToArrayRowSparse(
+        Matrix<T, General, RowMajor, Allocator>& A_dense,
+        Matrix<T, General, ArrayRowSparse, Allocator>& A_array)
+    {
+        int m = A_dense.GetM();
+        int n = A_dense.GetN();
+
+        A_array.Reallocate(m, n);
+
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+            {
+                T value = A_dense(i, j);
+                if (value != T(0))
+                    A_array.AddInteraction(i, j, value);
+            }
+    }
+
+
+    //! Conversion from 'VectSparse' to 'VectFull' format.
+    /*!
+      \param[in] V_sparse the 'VectSparse' vector to be converted.
+      \param[out] V_dense the vector \a V_sparse  stored in the 'VectFull'
+      format.
+    */
+    template <class T, class Allocator>
+    void ConvertSparseToDense(Vector<T, VectSparse, Allocator>& V_sparse,
+                              Vector<T, VectFull, Allocator>& V_dense)
+    {
+        V_dense.Fill(T(0.));
+        for (int k = 0; k < V_sparse.GetM(); k++)
+            V_dense(V_sparse.Index(k)) = V_sparse.Value(k);
+    }
+
+
+    //! Conversion from 'VectFull' to 'VectSparse' format.
+    /*!
+      \param[in] V_dense the 'VectFull' vector to be converted.
+      \param[out] V_sparse the vector \a V_dense  stored in the 'VectSparse'
+      format.
+    */
+    template <class T, class Allocator>
+    void ConvertDenseToSparse(Vector<T, VectFull, Allocator> V_dense,
+                              Vector<T, VectSparse, Allocator>& V_sparse)
+    {
+        V_sparse.Clear();
+        for (int k = 0; k < V_dense.GetLength(); k++)
+        {
+            T value = V_dense(k);
+            if (value != T(0.))
+                V_sparse.AddInteraction(k, value);
+        }
+    }
+
+
 } // namespace Verdandi.
 
 

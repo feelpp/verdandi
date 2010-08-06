@@ -89,6 +89,10 @@ namespace Verdandi
         build_diagonal_sparse_matrix(GetNstate(),
                                      background_error_variance_value_,
                                      background_error_variance_);
+#else
+        background_error_variance_.Reallocate(GetNstate(), GetNstate());
+        background_error_variance_.SetIdentity();
+        Mlt(T(background_error_variance_value_), background_error_variance_);
 #endif
 
         configuration.SetPrefix("clamped_bar.physics.");
@@ -363,6 +367,73 @@ namespace Verdandi
     }
 
 
+    ///////////////
+    // OPERATORS //
+    ///////////////
+
+
+    //! Applies the model to a given vector.
+    /*! The current state of the model is modified.
+      \param[in] x a vector.
+      \param[in] reinitialize_model boolean to indicate if the model has to
+      be reinitialized after the forward call.
+    */
+    template <class T>
+    void ClampedBar<T>::ApplyModel(state_vector& x, bool reinitialize_model)
+    {
+        double saved_date;
+        state_vector saved_state;
+        if (reinitialize_model)
+        {
+            saved_date = GetDate();
+            GetState(saved_state);
+        }
+
+        SetState(x);
+        Forward();
+        GetState(x);
+
+        if (reinitialize_model)
+        {
+            SetDate(saved_date);
+            SetState(saved_state);
+        }
+
+    }
+
+
+    //! Applies the tangent linear model to a given vector.
+    /*! The current state of the model is modified.
+      \param[in] x a vector.
+      \param[in] reinitialize_model boolean to indicate if the model has to
+      be reinitialized after the forward call.
+    */
+    template <class T>
+    void ClampedBar<T>::ApplyTangentLinearModel(state_vector& x,
+                                                bool reinitialize_model)
+    {
+        ApplyModel(x, reinitialize_model);
+    }
+
+
+    //! Gets the matrix of the tangent linear model.
+    /*!
+      \param[out] A the matrix of the tangent linear model.
+    */
+    template <class T>
+    void ClampedBar<T>
+    ::GetTangentLinearModel(tangent_operator_matrix& A) const
+    {
+        throw ErrorUndefined("ClampedBar::GetTangentLinearModel"
+                             "(tangent_operator_matrix& A) const");
+    }
+
+
+    ////////////////////
+    // ACCESS METHODS //
+    ////////////////////
+
+
     //! Returns the current date.
     /*!
       \return The current date.
@@ -371,6 +442,17 @@ namespace Verdandi
     double ClampedBar<T>::GetDate() const
     {
         return date_;
+    }
+
+
+    //! Sets the date of the model to a given date.
+    /*!
+      \param[in] date a given date.
+    */
+    template <class T>
+    void ClampedBar<T>::SetDate(double& date)
+    {
+        date_= date;
     }
 
 
@@ -508,16 +590,23 @@ namespace Verdandi
       \return The matrix of the background error covariance.
     */
     template <class T>
+    typename ClampedBar<T>::background_error_variance& ClampedBar<T>
+    ::GetBackgroundErrorVarianceMatrix()
+    {
+        return background_error_variance_;
+    }
+
+
+    //! Returns the background error covariance matrix (B) if available.
+    /*! Returns the background error covariance matrix (B) if available,
+      raises an exception otherwise.
+      \return The matrix of the background error covariance.
+    */
+    template <class T>
     const typename ClampedBar<T>::background_error_variance& ClampedBar<T>
     ::GetBackgroundErrorVarianceMatrix() const
     {
-#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
         return background_error_variance_;
-#else
-        throw ErrorUndefined(
-            "ClampedBar::GetBackgroundErrorVarianceMatrix()",
-            "the background error covariance matrix is not available!");
-#endif
     }
 
 

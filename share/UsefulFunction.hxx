@@ -66,6 +66,34 @@ namespace Verdandi
     template <class T>
     void GetCholesky(Matrix<T, General, RowMajor>& A);
 
+    template <class T, class Allocator>
+    void GetInverse(Matrix<T, General, RowSparse, Allocator>& A);
+
+    template <class T, class Prop0, class Allocator0, class Allocator1>
+    void GetAndSolveLU(Matrix<T, Prop0, ColSparse, Allocator0>& M,
+                       Vector<T, VectFull, Allocator1>& Y);
+
+    template <class T, class Prop0, class Allocator0, class Allocator1>
+    void GetAndSolveLU(Matrix<T, Prop0, RowSparse, Allocator0>& M,
+                       Vector<T, VectFull, Allocator1>& Y);
+
+    template <class T, class Allocator>
+    void ConvertRowSparseToDense(
+        Matrix<T, General, RowSparse, Allocator>& A,
+        Matrix<T, General, RowMajor, Allocator>& A_dense);
+    template <class T, class Allocator>
+    void ConvertDenseToArrayRowSparse(
+        Matrix<T, General, RowMajor, Allocator>& A_dense,
+        Matrix<T, General, ArrayRowSparse, Allocator>& A_array);
+
+    template <class T, class Allocator>
+    void ConvertSparsetoDense(Vector<T, VectSparse, Allocator>& V_sparse,
+                              Vector<T, VectFull, Allocator>& V_dense);
+    template <class T, class Allocator>
+    void ConvertDenseToSparse(Vector<T, VectFull, Allocator> V_dense,
+                              Vector<T, VectSparse, Allocator>& V_sparse);
+
+
 } // namespace Verdandi.
 
 

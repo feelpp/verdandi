@@ -22,6 +22,8 @@
 
 #include "blue.hpp"
 #include "cholesky.hpp"
+#include "useful_function.hpp"
+
 #include <cppunit/TestResult.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -29,7 +31,7 @@ using namespace CppUnit;
 
 CPPUNIT_TEST_SUITE_REGISTRATION(BLUETest);
 CPPUNIT_TEST_SUITE_REGISTRATION(CholeskyTest);
-
+CPPUNIT_TEST_SUITE_REGISTRATION(UsefulFunctionTest);
 
 int main()
 {
