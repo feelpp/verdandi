@@ -63,11 +63,20 @@ namespace Verdandi
                       default_value,
                       bool with_default,
                       Seldon::Vector<T, VectFull, Allocator>& value);
+        template<class T, class Prop, class Storage, class Allocator>
+        void SetValue(string name, string constraint,
+                      const Seldon::Matrix<T, Prop, Storage, Allocator>&
+                      default_value,
+                      bool with_default,
+                      Seldon::Matrix<T, Prop, Storage, Allocator>& value);
 
         using ::Ops::Ops::IsParam;
         template<class T, class Allocator>
         bool IsParam(string name,
                      Seldon::Vector<T, VectFull, Allocator>& value);
+        template<class T, class Prop, class Storage, class Allocator>
+        bool IsParam(string name,
+                     Seldon::Matrix<T, Prop, Storage, Allocator>& value);
 
         using ::Ops::Ops::CheckConstraint;
         bool CheckConstraint(string expression);

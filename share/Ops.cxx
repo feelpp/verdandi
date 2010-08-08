@@ -220,7 +220,93 @@ namespace Verdandi
     }
 
 
-    //! Checks whether \a name is a table of 'T'.
+    //! Retrieves a value and checks if it satisfies given constraints.
+    /*! If the entry is not found, the default value is returned (if any).
+
+      If the matrix is given by a Lua array, it is assumed that the Lua array
+      is in row-major order (the rows are stored one after the other), and the
+      number of rows is given by the matrix on entry. If the matrix on entry
+      has no row, it is assumed the matrix to be read has a single row. The
+      matrix is reallocated according to the number of columns found in the
+      Lua array. If the number of elements in the Lua array is not a multiple
+      of the number of rows in the matrix, an exception is raised.
+
+      If the matrix is given in a file, the Lua entry should provide the file
+      name. The file is read with method 'Read' of \a value.
+      \param[in] name name of the entry.
+      \param[in] constraint constraint to be satisfied.
+      \param[in] default_value default value.
+      \param[in] with_default is there a default value? If not, \a
+      default_value is ignored.
+      \param[out] value the value of the entry named \a name.
+      \note The default value may not satisfy the constraint.
+    */
+    template<class T, class Prop, class Storage, class Allocator>
+    void Ops::SetValue(string name, string constraint,
+                       const Seldon::Matrix<T, Prop, Storage, Allocator>&
+                       default_value,
+                       bool with_default,
+                       Seldon::Matrix<T, Prop, Storage, Allocator>& value)
+    {
+        if (!this->Exists(name))
+        {
+            if (with_default)
+                value = default_value;
+            else
+                throw Error("SetValue",
+                            "The " + Entry(name) + " was not found.");
+        }
+        else if (this->Is<string>(name))
+        {
+            string filename;
+            SetValue(name, "", "", false, filename);
+            value.Read(filename);
+            if (constraint.empty())
+                return;
+            for (int i = 0; i < value.GetM(); i++)
+                for (int j = 0; j < value.GetN(); j++)
+                    if (!CheckConstraintOnValue(to_str(value(i, j)),
+                                                constraint))
+                        throw Error("SetValue",
+                                    "The entry "
+                                    + Entry(name + "[" + to_str(i + 1) + ", "
+                                            + to_str(j + 1) + "]")
+                                    + " does not satisfy the constraint:\n"
+                                    + Constraint(constraint));
+        }
+        else
+        {
+
+            std::vector<T> default_data(default_value.GetM()
+                                        * default_value.GetN());
+            int index = 0;
+            for (int i = 0; i < default_value.GetM(); i++)
+                for (int j = 0; j < default_value.GetN(); j++)
+                    default_data[index++] = default_value(i, j);
+
+            std::vector<T> data;
+            SetValue(name, constraint, default_data, with_default, data);
+            if (value.GetM() != 0 && int(data.size()) % value.GetM() != 0)
+                throw Error("SetValue",
+                            "The entry " + Entry(name)
+                            + " contains " + to_str(int(data.size()))
+                            + " elements, which is incompatible with a matrix"
+                            + " containing " + to_str(value.GetM())
+                            + " rows.");
+            if (value.GetM() == 0)
+                value.Reallocate(1, int(data.size()));
+            else
+                value.Reallocate(value.GetM(),
+                                 int(data.size()) / value.GetM());
+            index = 0;
+            for (int i = 0; i < value.GetM(); i++)
+                for (int j = 0; j < value.GetN(); j++)
+                    value(i, j) = data[index++];
+        }
+    }
+
+
+    //! Checks whether \a name is a 'Vector<T>'.
     /*!
       \param[in] name the name of the entry whose type is checked.
       \param[in] value anything: it is used to determine the type.
@@ -231,6 +317,25 @@ namespace Verdandi
     template<class T, class Allocator>
     bool Ops::IsParam(string name,
                       Seldon::Vector<T, VectFull, Allocator>& value)
+    {
+        string str_value;
+        std::vector<T> vect_value;
+        return this->IsParam(name, str_value)
+            || this->IsParam(name, vect_value);
+    }
+
+
+    //! Checks whether \a name is a 'Matrix<T>'.
+    /*!
+      \param[in] name the name of the entry whose type is checked.
+      \param[in] value anything: it is used to determine the type.
+      \return True if the entry is a 'Matrix<T>', false otherwise.
+      \note The prefix is prepended to \a name. If \a name does not exist, an
+      exception is raised.
+    */
+    template<class T, class Prop, class Storage, class Allocator>
+    bool Ops::IsParam(string name,
+                      Seldon::Matrix<T, Prop, Storage, Allocator>& value)
     {
         string str_value;
         std::vector<T> vect_value;
