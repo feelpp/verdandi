@@ -85,7 +85,7 @@ namespace Verdandi
     {
         observation_aggregator_.Initialize(configuration_file);
 
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
 
         MessageHandler::AddRecipient("grid_to_network_observation_manager",
                                      reinterpret_cast<void*>(this),

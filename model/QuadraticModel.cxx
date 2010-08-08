@@ -72,7 +72,7 @@ namespace Verdandi
 
         /*** Configuration ***/
 
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
 
         configuration.SetPrefix("quadratic_model.definition.");
 

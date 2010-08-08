@@ -83,8 +83,6 @@ namespace Verdandi
 #include "seldon/vector/Vector2.hxx"
 #include "seldon/vector/Vector3.hxx"
 
-#include "ops/OpsHeader.hxx"
-
 
 namespace Verdandi
 {
@@ -101,6 +99,7 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
+#include "share/Ops.hxx"
 #include "share/Logger.hxx"
 #include "share/Error.hxx"
 #include "share/UsefulFunction.hxx"

@@ -42,7 +42,7 @@ namespace Verdandi
         model_(configuration_file),
         observation_manager_(model_, configuration_file)
     {
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
 
         /*** Initializations ***/
 

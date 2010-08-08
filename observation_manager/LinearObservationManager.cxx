@@ -86,7 +86,7 @@ namespace Verdandi
     {
         observation_aggregator_.Initialize(configuration_file);
 
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
 
         Nstate_model_ = model.GetNstate();
 

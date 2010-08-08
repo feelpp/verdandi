@@ -329,7 +329,7 @@ namespace Verdandi
         valid_options["file"] = file_;
         valid_options["uppercase"] = uppercase_;
 
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
         configuration.SetPrefix(section_name);
         string tmp;
         configuration.Set("default_options", "", "", tmp);
@@ -374,7 +374,7 @@ namespace Verdandi
     void Logger::InitializeFilename(string configuration_file,
                                     string section_name)
     {
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
         configuration.SetPrefix(section_name);
         configuration.Set("file", "", VERDANDI_LOG_FILENAME, file_name_);
         file_name_ = find_replace(file_name_, "%{D}", GenerateDate());
@@ -397,7 +397,7 @@ namespace Verdandi
     void Logger::InitializeLevel(string configuration_file,
                                  string section_name)
     {
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
         configuration.SetPrefix(section_name);
         int logging_level = default_logging_level;
         configuration.Set("Logging_level", "", logging_level, logging_level_);

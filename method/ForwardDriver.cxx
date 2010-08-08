@@ -40,7 +40,7 @@ namespace Verdandi
     ForwardDriver<ClassModel>::ForwardDriver(string configuration_file):
         model_(configuration_file), iteration_(-1)
     {
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
 
         /*** Initializations ***/
 

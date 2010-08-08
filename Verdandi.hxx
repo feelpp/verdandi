@@ -27,9 +27,7 @@
 #include "seldon/vector/Vector2.cxx"
 #include "seldon/vector/Vector3.cxx"
 
-#include "ops/Ops.hxx"
-
-
+#include "share/Ops.cxx"
 #include "share/Logger.cxx"
 #include "share/Error.cxx"
 #include "share/UsefulFunction.cxx"

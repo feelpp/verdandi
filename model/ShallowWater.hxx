@@ -235,7 +235,7 @@ namespace Verdandi
         // Configuration.
         void
         ReadConfigurationBoundaryCondition(string side,
-                                           Ops::Ops& configuration,
+                                           Ops& configuration,
                                            int& type, T& value,
                                            T& amplitude, T& frequency);
 

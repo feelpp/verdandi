@@ -69,7 +69,7 @@ namespace Verdandi
 
         /*** Configuration ***/
 
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
 
         configuration.SetPrefix("clamped_bar.domain.");
         configuration.Set("bar_length", bar_length_);

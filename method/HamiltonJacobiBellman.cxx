@@ -43,7 +43,7 @@ namespace Verdandi
         observation_manager_(model_, configuration_file),
         time_step_(0)
     {
-        Ops::Ops configuration(configuration_file);
+        Ops configuration(configuration_file);
 
         /*** Initializations ***/
 
