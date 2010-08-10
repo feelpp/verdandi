@@ -76,12 +76,8 @@ namespace Verdandi
 
         configuration.SetPrefix("quadratic_model.definition.");
 
-        vector<string> state_vector;
-        configuration.Set("initial_state", state_vector);
-        Nstate_ = int(state_vector.size());
-        state_.Reallocate(Nstate_);
-        for (int i = 0; i < Nstate_; i++)
-            to_num(state_vector[i], state_(i));
+        configuration.Set("initial_state", state_);
+        Nstate_ = state_.GetLength();
 
         configuration.Set("with_quadratic_term", with_quadratic_term_);
         configuration.Set("with_linear_term", with_linear_term_);
@@ -89,62 +85,55 @@ namespace Verdandi
 
         if (with_quadratic_term_)
         {
-            vector<string> Q_vector;
-            configuration.Set("quadratic_term", Q_vector);
-            if (int(Q_vector.size()) != Nstate_ * Nstate_ * Nstate_)
+            Q_state_.Reallocate(Nstate_);
+            Q_.resize(Nstate_);
+            for (int i = 0; i < Nstate_; i++)
+                Q_[i].Reallocate(Nstate_, Nstate_);
+            configuration.Set("quadratic_term", Q_);
+            if (int(Q_.size()) != Nstate_)
                 throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                          "The initial state has "
                                          + to_str(Nstate_) + " elements, but "
                                          "the entry \"quadratic_term\" has "
-                                         + to_str(int(Q_vector.size()))
-                                         + " elements, instead of "
-                                         + to_str(Nstate_ * Nstate_ * Nstate_)
-                                         + ".");
-            Q_.resize(Nstate_);
+                                         + to_str(int(Q_.size()))
+                                         + " elements.");
             for (int i = 0; i < Nstate_; i++)
-                Q_[i].Reallocate(Nstate_, Nstate_);
-            for (int i = 0; i < Nstate_; i++)
-                for (int j = 0; j < Nstate_; j++)
-                    for (int k = 0; k < Nstate_; k++)
-                        to_num(Q_vector[i * Nstate_ * Nstate_
-                                        + j * Nstate_ + k], Q_[i](j, k));
-
-            Q_state_.Reallocate(Nstate_);
+                if (Q_[i].GetM() != Nstate_ || Q_[i].GetN() != Nstate_)
+                    throw ErrorConfiguration("QuadraticModel::QuadraticModel",
+                                             "The initial state has "
+                                             + to_str(Nstate_) + " elements, "
+                                             "but the matrix " + to_str(i)
+                                             + " of \"quadratic_term\" has "
+                                             + to_str(int(Q_[i].GetM()))
+                                             + " rows and "
+                                             + to_str(int(Q_[i].GetN()))
+                                             + " columns.");
         }
 
         if (with_linear_term_)
         {
-            vector<string> L_vector;
-            configuration.Set("linear_term", L_vector);
-            if (int(L_vector.size()) != Nstate_ * Nstate_)
+            L_.Reallocate(Nstate_, Nstate_);
+            configuration.Set("linear_term", L_);
+            if (L_.GetM() != Nstate_ || L_.GetN() != Nstate_)
                 throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                          "The initial state has "
                                          + to_str(Nstate_) + " elements, but "
-                                         "the entry \"linear_term\" has "
-                                         + to_str(int(L_vector.size()))
-                                         + " elements, instead of "
-                                         + to_str(Nstate_ * Nstate_) + ".");
-            L_.Reallocate(Nstate_, Nstate_);
-            for (int i = 0; i < Nstate_; i++)
-                for (int j = 0; j < Nstate_; j++)
-                    to_num(L_vector[i * Nstate_ + j], L_(i, j));
+                                         "the entry \"linear_term\" is a "
+                                         + to_str(int(L_.GetM())) + " x "
+                                         + to_str(int(L_.GetN()))
+                                         + " matrix.");
         }
 
         if (with_constant_term_)
         {
-            vector<string> b_vector;
-            configuration.Set("constant", b_vector);
-            if (int(b_vector.size()) != Nstate_)
+            configuration.Set("constant", b_);
+            if (b_.GetLength() != Nstate_)
                 throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                          "The initial state has "
                                          + to_str(Nstate_) + " elements, but "
                                          "the entry \"constant\" has "
-                                         + to_str(int(b_vector.size()))
-                                         + " elements, instead of "
-                                         + to_str(Nstate_) + ".");
-            b_.Reallocate(Nstate_);
-            for (int i = 0; i < Nstate_; i++)
-                to_num(b_vector[i], b_(i));
+                                         + to_str(b_.GetLength())
+                                         + " elements.");
         }
 
         configuration.Set("Delta_t", Delta_t_);

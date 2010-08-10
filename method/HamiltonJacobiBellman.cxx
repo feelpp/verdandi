@@ -123,52 +123,41 @@ namespace Verdandi
         if (with_advection_term_)
             configuration.Set("model_time_dependent", model_time_dependent_);
 
-        vector<string> Q_0_vector;
-        configuration.Set("Q_0", Q_0_vector);
-        if (int(Q_0_vector.size()) != Ndimension_ * Ndimension_)
+        Q_0_.Reallocate(Ndimension_, Ndimension_);
+        configuration.Set("Q_0", Q_0_);
+        if (Q_0_.GetM() != Ndimension_ || Q_0_.GetN() != Ndimension_)
             throw ErrorConfiguration("HamiltonJacobiBellman::"
                                      "HamiltonJacobiBellman",
                                      "The entry \"Q_0\" should be "
-                                     "a matrix with "
-                                     + to_str(Ndimension_ * Ndimension_)
-                                     + " elements, but "
-                                     + to_str(Q_0_vector.size()) + " elements"
-                                     " were provided.");
-        Q_0_.Reallocate(Ndimension_, Ndimension_);
-        for (int i = 0; i <  Ndimension_; i++)
-            for (int j = 0; j <  Ndimension_; j++)
-                to_num(Q_0_vector[i * Ndimension_ + j], Q_0_(i, j));
+                                     "a " + to_str(Ndimension_) + " x "
+                                     + to_str(Ndimension_) + " matrix, "
+                                     " but a " + to_str(Q_0_.GetM()) + " x "
+                                     + to_str(Q_0_.GetN())
+                                     + " matrix was provided.");
 
-        vector<string> x_0_vector;
-        configuration.Set("x_0", x_0_vector);
-        if (int(x_0_vector.size()) != Ndimension_)
+        x_0_.Reallocate(Ndimension_);
+        configuration.Set("x_0", x_0_);
+        if (x_0_.GetLength() != Ndimension_)
             throw ErrorConfiguration("HamiltonJacobiBellman::"
                                      "HamiltonJacobiBellman",
                                      "The entry \"x_0\" should contain "
                                      + to_str(Ndimension_) + " elements, but "
-                                     + to_str(x_0_vector.size())
+                                     + to_str(x_0_.GetLength())
                                      + " elements were provided.");
-        x_0_.Reallocate(Ndimension_);
-        for (int i = 0; i < Ndimension_; i++)
-            to_num(x_0_vector[i], x_0_(i));
 
         if (with_quadratic_term_)
         {
-            vector<string> Q_vector;
-            configuration.Set("Q", Q_vector);
-            if (int(Q_vector.size()) != Ndimension_ * Ndimension_)
+            Q_inv_.Reallocate(Ndimension_, Ndimension_);
+            configuration.Set("Q", Q_inv_);
+            if (Q_inv_.GetM() != Ndimension_ || Q_inv_.GetN() != Ndimension_)
                 throw ErrorConfiguration("HamiltonJacobiBellman::"
                                          "HamiltonJacobiBellman",
                                          "The entry \"Q\" should be "
-                                         "a matrix with "
-                                         + to_str(Ndimension_ * Ndimension_)
-                                         + " elements, but "
-                                         + to_str(Q_vector.size())
-                                         + " elements were provided.");
-            Q_inv_.Reallocate(Ndimension_, Ndimension_);
-            for (int i = 0; i <  Ndimension_; i++)
-                for (int j = 0; j <  Ndimension_; j++)
-                    to_num(Q_vector[i * Ndimension_ + j], Q_inv_(i, j));
+                                         "a " + to_str(Ndimension_) + " x "
+                                         + to_str(Ndimension_) + " matrix, "
+                                         " but a " + to_str(Q_inv_.GetM())
+                                         + " x " + to_str(Q_inv_.GetN())
+                                         + " matrix was provided.");
             // Q must be diagonal, and its inverse is therefore trivial to
             // compute.
             for (int i = 0; i <  Ndimension_; i++)
@@ -180,9 +169,18 @@ namespace Verdandi
                                                  "a diagonal matrix. Non-"
                                                  "diagonal matrix is not"
                                                  " supported.");
-                    else if (Q_inv_(i, j) != T(0))
-                        Q_inv_(i, j) = Delta_t_
-                            / (Q_inv_(i, j) * Delta_x_(i) * Delta_x_(i));
+            for (int i = 0; i <  Ndimension_; i++)
+                if (Q_inv_(i, i) <= T(0))
+                    throw ErrorConfiguration("HamiltonJacobiBellman::"
+                                             "HamiltonJacobiBellman",
+                                             "The entry \"Q\" should be "
+                                             "positive definite, but its "
+                                             + to_str(i) + "-th diagonal "
+                                             "element is "
+                                             + to_str(Q_inv_(i, i)) + ".");
+                else
+                    Q_inv_(i, i) = Delta_t_
+                        / (Q_inv_(i, i) * Delta_x_(i) * Delta_x_(i));
         }
         else
         {
@@ -195,21 +193,17 @@ namespace Verdandi
 
         if (with_source_term_)
         {
-            vector<string> R_vector;
-            configuration.Set("R", R_vector);
-            if (int(R_vector.size()) != Ndimension_ * Ndimension_)
+            R_.Reallocate(Ndimension_, Ndimension_);
+            configuration.Set("R", R_);
+            if (R_.GetM() != Ndimension_ || R_.GetN() != Ndimension_)
                 throw ErrorConfiguration("HamiltonJacobiBellman::"
                                          "HamiltonJacobiBellman",
                                          "The entry \"R\" should be "
-                                         "a matrix with "
-                                         + to_str(Ndimension_ * Ndimension_)
-                                         + " elements, but "
-                                         + to_str(R_vector.size())
-                                         + "  elements were provided.");
-            R_.Reallocate(Ndimension_, Ndimension_);
-            for (int i = 0; i <  Ndimension_; i++)
-                for (int j = 0; j <  Ndimension_; j++)
-                    to_num(R_vector[i * Ndimension_ + j], R_(i, j));
+                                         "a " + to_str(Ndimension_) + " x "
+                                         + to_str(Ndimension_) + " matrix, "
+                                         " but a " + to_str(R_.GetM())
+                                         + " x " + to_str(R_.GetN())
+                                         + " matrix was provided.");
         }
 
         /*** Solver ***/
@@ -247,21 +241,17 @@ namespace Verdandi
         {
             configuration.SetPrefix("hjb.lax_friedrichs.");
 
-            string upper_bound_model;
-            configuration.Set("Upper_bound_model", upper_bound_model);
-            vector<string> bound_vector = split(upper_bound_model);
-            if (int(bound_vector.size()) != Ndimension_)
+            configuration.Set("Upper_bound_model", upper_bound_model_);
+            if (upper_bound_model_.GetLength() != Ndimension_)
                 throw ErrorConfiguration("HamiltonJacobiBellman::"
                                          "HamiltonJacobiBellman",
                                          "The entry \"upper_bound_model\" "
                                          "should contain "
                                          + to_str(Ndimension_)
                                          + " elements, but "
-                                         + to_str(bound_vector.size())
+                                         + to_str(upper_bound_model_
+                                                  .GetLength())
                                          + " elements were provided.");
-            upper_bound_model_.Reallocate(Ndimension_);
-            for (int i = 0; i < Ndimension_; i++)
-                to_num(bound_vector[i], upper_bound_model_(i));
         }
 
         /*** Ouput saver ***/
