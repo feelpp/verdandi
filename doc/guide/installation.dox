@@ -52,4 +52,67 @@ $ optimal_interpolation configuration/river.cfg [3]
 
 \section windows Windows
 
+\subsection dependencies Install the dependencies
+<ul> 
+
+<li> <b>SCons</b>: <br>
+First install Python, version 2.6 for example. Install <a href="http://www.scons.org/">SCons</a>. Add the path of the SCons program to the system variable <code>Path</code> (environment variable in your system properties).</li>
+
+
+<li> <b>Download precompiled libraries:</b> <br>
+
+<a href="http://www.fi.muni.cz/~xsvobod2/misc/lapack/">Blas and Lapack</a> (tested with the shared version, statically-linked, release). Rename the libraries in <code>blas.lib</code> and <code>lapack.lib</code>. Add the directories containing the <code>.dll</code> to your <code>PATH</code> environment variable. <br>
+
+<a href="http://www.netlib.org/atlas/archives/windows/">Atlas and Cblas</a> (tested with
+<code>atlas330_WinNT_P4SSE2.zip</code>). Rename the libraries in <code>atlas.lib</code> and <code>cblas.lib</code>. <br>
+
+<a href="http://code.google.com/p/luaforwindows/">Lua</a> (tested with lua 5.1). Rename the libraries in <code>lua.lib</code>. Add the directories containing the <code>.dll</code> to your <code>PATH</code> environment variable.
+</li>
+
+
+<li> <b>Create SuperLU library:</b> <br>
+
+Download <a href="http://crd.lbl.gov/~xiaoye/SuperLU/">SuperLU</a>. <br> 
+
+Within Microsoft Visual Studio, create a new Win32 Console Application. Start with an empty project. Then add to the project all the <code>.c</code> and <code>.h</code> files from <code>SuperLU/SRC</code> directory (Project -> Add existing item). Change the configuration to build a release version (Build -> Configuration Manager -> Configuration -> Release). <br>
+
+Specify the <code>SuperLU/SRC</code> location in <code>Additional Include Directories</code> (Project -> Properties -> Configuration Properties -> C/C++ -> General). Change the property of the project to make the output as Library file <code>.lib</code> (neither <code>.exe</code> nor <code>.dll</code> file) instead of Application(<code>.exe</code>) (Project -> Properties -> Configuration Properties -> General -> Configuration Type). <br>
+
+Compile the project to produce the library file, e.g. <code>superlu.lib</code> (Build -> Build Solution).
+</li>
+
+
+<li> <b>Seldon:</b> <br>
+   Download <a href="http://seldon.sourceforge.net/download.php">Seldon</a>.
+</li>
+
+</ul>
+
+\subsection project Create a Verdandi project
+<ul>
+<li> Download %Verdandi and expand it to the directory of your choice (for example <code>MY_VERDANDI_PATH</code>). </li>
+
+<li> Create a Verdandi project within Microsoft Visual Studio (File -> New -> Project). In Visual C++/General, select Makefile Project. Choose a name and a location for the solution (for example <code>Verdandi_solution</code>). The build command line is <code>scons</code>, the clean command line is <code>scons -c</code> and the rebuild command line is <code>scons -c && scons</code>.</li>
+</ul>
+
+\subsection test Run a test
+<ul>
+
+<li> In the directory containing the project, copy the SConstruct file from <code>verdandi/src/example/clamped-bar</code>. Also copy an example to test, for example <code>forward.cpp</code>, and copy the directory <code>configuration</code>. Edit the <code>SConstruct</code> file. Set <code>verdandi_path</code> to <code>MY_VERDANDI_PATH</code> and add the following lines before the last line:
+
+\precode
+flag_cpp = "/nologo /EHsc /MD"
+linker = "LINK"
+# Put here the list of directories containing the library files to be included.
+include_path = ["Lua_path\include", "SuperLU_path\SRC", "Ops_parent_directory_path", "Seldon_parent_directory_path"]
+# Put here the list of directories containing the library (.lib files).
+library_path = ["Library_folder_1", "Library_folder_2"]
+\endprecode
+</li>
+
+<li> Edit the Project -> Properties. In Configuration Properties -> NMake, set the build command line to <code>scons forward.exe</code> and the rebuild command line to <code>scons -c && scons forward.exe</code>. Set the output to <code>forward.exe</code>. </li>
+
+<li> Compile with Build -> Build solution. The linker may raise errors for unfound libraries. In this case, build once again the solution. Specify <code>configuration\bar-truth.lua</code> in Configuration Properties/Debugging/Command Arguments. Create an empty directory <code>result\bar-truth</code> in the folder containing the <code>SConstruct</code> file you copied above. To run the example, launch Debug -> Start Without Debugging. If you are told that the executable is out of date, check the box so that you will not be asked again and click on <code>No</code> (do not rebuild the project). </li>
+
+</ul>
 */
