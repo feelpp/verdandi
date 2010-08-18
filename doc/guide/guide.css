@@ -14,14 +14,14 @@ h1 {
 h2 {
 	font: normal 1.5em arial;
         font-weight: bold;
-	color: #8b2;
+	color: #9c3;
         padding: 0px;
         margin: 0px 0px 10px 0px;
 }
 h3 {
 	font: normal 1.5em arial;
         font-weight: bold;
-	color: #8b2;
+	color: #580;
         padding: 0px;
         margin: 0px 0px 10px 0px;
 }
@@ -170,7 +170,7 @@ PRE.fragment {
 
 .doxygen h2 a {
         font-weight: bold;
-	color: #8b2;
+	color: #9c3;
 	text-decoration: none;
 }
 
@@ -184,7 +184,7 @@ PRE.fragment {
 
 .doxygen h3 a {
         font-weight: bold;
-	color: #8b2;
+	color: #580;
 }
 
 .doxygen h3 a:hover {
