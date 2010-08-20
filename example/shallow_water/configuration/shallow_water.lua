@@ -8,7 +8,7 @@ shallow_water = {
       -- Time step.
       Delta_t = Delta_t_shallow_water,
       -- Simulation time.
-      final_date = final_time_shallow_water,
+      final_time = final_time_shallow_water,
 
       x_min = 0.,
       y_min = 0.,

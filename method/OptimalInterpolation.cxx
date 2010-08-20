@@ -66,8 +66,8 @@ namespace Verdandi
         // Should iterations be displayed on screen?
         configuration.Set("show_iteration",
                           option_display_["show_iteration"]);
-        // Should current date be displayed on screen?
-        configuration.Set("show_date", option_display_["show_date"]);
+        // Should current time be displayed on screen?
+        configuration.Set("show_time", option_display_["show_time"]);
 
         /*** Assimilation options ***/
 
@@ -152,9 +152,9 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
-        if (option_display_["show_date"])
+        if (option_display_["show_time"])
             cout << "Current step: "
-                 << model_.GetDate() << endl;
+                 << model_.GetTime() << endl;
         model_.InitializeStep();
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
@@ -188,13 +188,13 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
 
-        observation_manager_.SetDate(model_, model_.GetDate());
+        observation_manager_.SetTime(model_, model_.GetTime());
 
         if (observation_manager_.HasObservation())
         {
-            if (option_display_["show_date"])
+            if (option_display_["show_time"])
                 cout << "Performing optimal interpolation at time step ["
-                     << model_.GetDate() << "]..." << endl;
+                     << model_.GetTime() << "]..." << endl;
 
             state_vector state;
             model_.GetState(state);
@@ -208,7 +208,7 @@ namespace Verdandi
 
             model_.SetState(state);
 
-            if (option_display_["show_date"])
+            if (option_display_["show_time"])
                 cout << " done." << endl;
 
             MessageHandler::Send(*this, "model", "analysis");
@@ -427,13 +427,13 @@ namespace Verdandi
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, model_.GetDate(), "state_forecast");
+            output_saver_.Save(state, model_.GetTime(), "state_forecast");
         }
 
         if (message.find("analysis") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, model_.GetDate(), "state_analysis");
+            output_saver_.Save(state, model_.GetTime(), "state_analysis");
         }
 
     }

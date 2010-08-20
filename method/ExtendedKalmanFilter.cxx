@@ -68,8 +68,8 @@ namespace Verdandi
         // Should iterations be displayed on screen?
         configuration.Set("display.show_iteration",
                           option_display_["show_iteration"]);
-        // Should current date be displayed on screen?
-        configuration.Set("display.show_date", option_display_["show_date"]);
+        // Should current time be displayed on screen?
+        configuration.Set("display.show_time", option_display_["show_time"]);
 
         /*** Assimilation options ***/
 
@@ -195,13 +195,13 @@ namespace Verdandi
 
         MessageHandler::Send(*this, "all", "::Analyze begin");
 
-        observation_manager_.SetDate(model_, model_.GetDate());
+        observation_manager_.SetTime(model_, model_.GetTime());
 
         if (observation_manager_.HasObservation())
         {
-            if (option_display_["show_date"])
+            if (option_display_["show_time"])
                 cout << "Performing EKF at time step ["
-                     << model_.GetDate() << "]..." << endl;
+                     << model_.GetTime() << "]..." << endl;
 
             state_vector state;
             model_.GetState(state);
@@ -215,7 +215,7 @@ namespace Verdandi
 
             model_.SetState(state);
 
-            if (option_display_["show_date"])
+            if (option_display_["show_time"])
                 cout << " done." << endl;
 
             MessageHandler::Send(*this, "model", "analysis");
@@ -232,9 +232,9 @@ namespace Verdandi
     void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
     ::PropagateCovarianceMatrix_vector()
     {
-        double saved_date;
+        double saved_time;
         state_vector saved_state;
-        saved_date = model_.GetDate();
+        saved_time = model_.GetTime();
         model_.GetState(saved_state);
 
         // One column of covariance matrix P.
@@ -272,7 +272,7 @@ namespace Verdandi
             SetCol(error_covariance_column, j, background_error_variance_);
         }
 
-        model_.SetDate(saved_date);
+        model_.SetTime(saved_time);
         model_.SetState(saved_state);
     }
 
@@ -378,14 +378,14 @@ namespace Verdandi
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetDate()),
+            output_saver_.Save(state, double(model_.GetTime()),
                                "state_forecast");
         }
 
         if (message.find("analysis") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetDate()),
+            output_saver_.Save(state, double(model_.GetTime()),
                                "state_analysis");
         }
     }

@@ -110,10 +110,10 @@ namespace Verdandi
         configuration.Set("file", observation_file_);
         configuration.Set("Delta_t", "v > 0", Delta_t_);
         configuration.Set("Nskip", "v > 0", Nskip_);
-        configuration.Set("final_date", "", numeric_limits<double>::max(),
-                          final_date_);
+        configuration.Set("final_time", "", numeric_limits<double>::max(),
+                          final_time_);
 
-        date_ = -numeric_limits<double>::max();
+        time_ = -numeric_limits<double>::max();
 
         configuration.Set("error.variance", "v > 0", error_variance_value_);
 
@@ -174,7 +174,7 @@ namespace Verdandi
 
         int expected_file_size;
         expected_file_size = Nbyte_observation_ *
-            int(final_date_ / (Delta_t_ * Nskip_));
+            int(final_time_ / (Delta_t_ * Nskip_));
 
         int file_size;
         ifstream file_stream;
@@ -240,85 +240,85 @@ namespace Verdandi
     }
 
 
-    //! Sets the date of observations to be loaded.
+    //! Sets the time of observations to be loaded.
     /*!
       \param[in] model the model.
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
     template <class Model>
     void GridToNetworkObservationManager<T>
-    ::SetDate(const Model& model, double date)
+    ::SetTime(const Model& model, double time)
     {
-        SetDate(date);
+        SetTime(time);
     }
 
 
-    //! Sets the date of observations to be loaded.
+    //! Sets the time of observations to be loaded.
     /*!
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::SetDate(double date)
+    ::SetTime(double time)
     {
-        if (date_ == date)
+        if (time_ == time)
             return;
 
-        date_ = date;
-        SetAvailableDate(date_, available_date_);
+        time_ = time;
+        SetAvailableTime(time_, available_time_);
         observation_aggregator_.
-            Contribution(date_, available_date_, contribution_);
+            Contribution(time_, available_time_, contribution_);
     }
 
 
-    //! Sets the available observation dates at a given date.
+    //! Sets the available observation times at a given time.
     /*!
-      \param[in] date the given date.
-      \param[out] available_date the available observation dates.
+      \param[in] time the given time.
+      \param[out] available_time the available observation times.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::SetAvailableDate(double date,
-                       GridToNetworkObservationManager<T>::date_vector&
-                       available_date) const
+    ::SetAvailableTime(double time,
+                       GridToNetworkObservationManager<T>::time_vector&
+                       available_time) const
     {
-        double date_inf, date_sup;
+        double time_inf, time_sup;
         int selection_policy;
-        observation_aggregator_.GetContributionInterval(date, date_inf,
-                                                        date_sup,
+        observation_aggregator_.GetContributionInterval(time, time_inf,
+                                                        time_sup,
                                                         selection_policy);
-        SetAvailableDate(date_inf, date_sup, available_date);
+        SetAvailableTime(time_inf, time_sup, available_time);
 
-        Logger::Log<3>(*this, to_str(date) + ", [" + to_str(date_inf) + " " +
-                       to_str(date_sup) + "], {" + to_str(available_date) +
+        Logger::Log<3>(*this, to_str(time) + ", [" + to_str(time_inf) + " " +
+                       to_str(time_sup) + "], {" + to_str(available_time) +
                        "}\n");
     }
 
 
-    //! Sets available observation dates at a given time interval.
+    //! Sets available observation times at a given time interval.
     /*!
-      \param[in] date_inf lower bound of the given time interval.
-      \param[in] date_sup upper bound of the given time interval.
-      \param[out] available_date the available observation dates.
+      \param[in] time_inf lower bound of the given time interval.
+      \param[in] time_sup upper bound of the given time interval.
+      \param[out] available_time the available observation times.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::SetAvailableDate(double date_inf, double date_sup,
-                       GridToNetworkObservationManager<T>::date_vector&
-                       available_date) const
+    ::SetAvailableTime(double time_inf, double time_sup,
+                       GridToNetworkObservationManager<T>::time_vector&
+                       available_time) const
     {
-        available_date.Clear();
+        available_time.Clear();
 
-        date_sup = date_sup < final_date_ ? date_sup : final_date_;
+        time_sup = time_sup < final_time_ ? time_sup : final_time_;
 
         double period = Delta_t_ * Nskip_;
-        double available_date_0 = floor(date_inf / period) * period;
-        if (available_date_0 == date_inf)
-            available_date.PushBack(available_date_0);
-        available_date_0 += period;
-        for (double t = available_date_0; t < date_sup; t += period)
-            available_date.PushBack(t);
+        double available_time_0 = floor(time_inf / period) * period;
+        if (available_time_0 == time_inf)
+            available_time.PushBack(available_time_0);
+        available_time_0 += period;
+        for (double t = available_time_0; t < time_sup; t += period)
+            available_time.PushBack(t);
     }
 
 
@@ -330,46 +330,46 @@ namespace Verdandi
     /*** Gets observations ***/
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at date \a date are loaded and concatenated
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at time \a time are loaded and concatenated
       in a vector.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(double date,
+    ::GetFlattenedObservation(double time,
                               GridToNetworkObservationManager<T>
                               ::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetFlattenedObservation(available_date, observation);
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetFlattenedObservation(available_time, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup]
+    //! Gets observations flattened over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup]
       are loaded and concatenated in a vector.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(double date_inf, double date_sup,
+    ::GetFlattenedObservation(double time_inf, double time_sup,
                               GridToNetworkObservationManager<T>
                               ::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetFlattenedObservation(available_date, observation);
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetFlattenedObservation(available_time, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
+    //! Gets observations flattened over a list of times.
     /*! The observations available are loaded and concatenated in a vector.
       \param[out] observation the observation to be loaded.
     */
@@ -378,27 +378,27 @@ namespace Verdandi
     ::GetFlattenedObservation(
         GridToNetworkObservationManager<T>::observation_vector& observation)
     {
-        GetFlattenedObservation(available_date_, observation);
+        GetFlattenedObservation(available_time_, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and concatenated in a vector.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(const GridToNetworkObservationManager<T>
-                              ::date_vector&
-                              available_date,
+                              ::time_vector&
+                              available_time,
                               GridToNetworkObservationManager<T>
                               ::observation_vector&
                               observation)
     {
         observation_vector2 observation2;
-        GetRawObservation(available_date, observation2);
+        GetRawObservation(available_time, observation2);
         observation2.Flatten(observation);
     }
 
@@ -406,17 +406,17 @@ namespace Verdandi
     /*** Gets observations and associated variables ***/
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at date \a date are loaded and concatenated
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at time \a time are loaded and concatenated
       in a vector.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(double date,
+    ::GetFlattenedObservation(double time,
                               GridToNetworkObservationManager<T>
                               ::variable_vector&
                               observation_variable,
@@ -424,25 +424,25 @@ namespace Verdandi
                               ::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetFlattenedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetFlattenedObservation(available_time, observation_variable,
                                 observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup]
+    //! Gets observations flattened over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup]
       are loaded and concatenated in a vector.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(double date_inf, double date_sup,
+    ::GetFlattenedObservation(double time_inf, double time_sup,
                               GridToNetworkObservationManager<T>
                               ::variable_vector&
                               observation_variable,
@@ -450,14 +450,14 @@ namespace Verdandi
                               ::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetFlattenedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetFlattenedObservation(available_time, observation_variable,
                                 observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
+    //! Gets observations flattened over a list of times.
     /*! The observations available are loaded and concatenated in a vector.
       \param[out] observation_variable variables associated with the
       observations.
@@ -471,15 +471,15 @@ namespace Verdandi
         GridToNetworkObservationManager<T>
         ::observation_vector& observation)
     {
-        GetFlattenedObservation(available_date_, observation_variable,
+        GetFlattenedObservation(available_time_, observation_variable,
                                 observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and concatenated in a vector.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation the observation to be loaded.
@@ -487,8 +487,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(const GridToNetworkObservationManager<T>
-                              ::date_vector&
-                              available_date,
+                              ::time_vector&
+                              available_time,
                               GridToNetworkObservationManager<T>
                               ::variable_vector&
                               observation_variable,
@@ -498,7 +498,7 @@ namespace Verdandi
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
-        GetRawObservation(available_date, observation_variable2,
+        GetRawObservation(available_time, observation_variable2,
                           observation3);
         observation3.Flatten(observation);
         observation_variable2.Flatten(observation_variable);
@@ -508,10 +508,10 @@ namespace Verdandi
     /*** Gets observations, associated variables and associated index ***/
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at date \a date are loaded and concatenated
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at time \a time are loaded and concatenated
       in a vector.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index indexes associated with the observations.
@@ -519,7 +519,7 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(double date,
+    ::GetFlattenedObservation(double time,
                               GridToNetworkObservationManager<T>
                               ::variable_vector&
                               observation_variable,
@@ -530,18 +530,18 @@ namespace Verdandi
                               ::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetFlattenedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetFlattenedObservation(available_time, observation_variable,
                                 observation_index, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup]
+    //! Gets observations flattened over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup]
       are loaded and concatenated in a vector.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index indexes associated with the observations.
@@ -549,7 +549,7 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(double date_inf, double date_sup,
+    ::GetFlattenedObservation(double time_inf, double time_sup,
                               GridToNetworkObservationManager<T>
                               ::variable_vector&
                               observation_variable,
@@ -560,14 +560,14 @@ namespace Verdandi
                               ::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetFlattenedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetFlattenedObservation(available_time, observation_variable,
                                 observation_index, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
+    //! Gets observations flattened over a list of times.
     /*! The observations available are loaded and concatenated in a vector.
       \param[out] observation_variable variables associated with the
       observations.
@@ -584,15 +584,15 @@ namespace Verdandi
         GridToNetworkObservationManager<T>
         ::observation_vector& observation)
     {
-        GetFlattenedObservation(available_date_, observation_variable,
+        GetFlattenedObservation(available_time_, observation_variable,
                                 observation_index, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and concatenated in a vector.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index indexes associated with the observations.
@@ -602,7 +602,7 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(
         const GridToNetworkObservationManager<T>
-        ::date_vector& available_date,
+        ::time_vector& available_time,
         GridToNetworkObservationManager<T>
         ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector& observation_index,
@@ -611,7 +611,7 @@ namespace Verdandi
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
         index_vector3 observation_index3;
-        GetRawObservation(available_date, observation_variable2,
+        GetRawObservation(available_time, observation_variable2,
                           observation_index3, observation3);
         observation3.Flatten(observation);
         observation_variable2.Flatten(observation_variable);
@@ -627,44 +627,44 @@ namespace Verdandi
     /*** Gets observations ***/
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the given date are loaded and
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the given time are loaded and
       aggregated.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        double date,
+        double time,
         GridToNetworkObservationManager<T>::observation_vector& observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetAggregatedObservation(available_date, observation);
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetAggregatedObservation(available_time, observation);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup] are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
       and aggregated.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         GridToNetworkObservationManager<T>::observation_vector& observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetAggregatedObservation(available_date, observation);
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetAggregatedObservation(available_time, observation);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
+    //! Gets observations aggregated over a list of times.
     /*! The observations available are loaded and
       aggregated.
       \param[out] observation the aggregated observations.
@@ -674,36 +674,36 @@ namespace Verdandi
     ::GetAggregatedObservation(
         GridToNetworkObservationManager<T>::observation_vector& observation)
     {
-        GetAggregatedObservation(available_date_, observation);
+        GetAggregatedObservation(available_time_, observation);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and aggregated.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation the aggregated observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
+        const GridToNetworkObservationManager<T>::time_vector& available_time,
         GridToNetworkObservationManager<T>::observation_vector& observation)
     {
         observation_vector2 observation2;
-        GetRawObservation(available_date, observation2);
-        observation_aggregator_.Aggregate(available_date, contribution_,
-                                          observation2, date_, observation);
+        GetRawObservation(available_time, observation2);
+        observation_aggregator_.Aggregate(available_time, contribution_,
+                                          observation2, time_, observation);
     }
 
 
     /*** Gets observations and associated variables ***/
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the given date are loaded and
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the given time are loaded and
       aggregated.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation2 the aggregated observations.
@@ -711,23 +711,23 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        double date,
+        double time,
         GridToNetworkObservationManager<T>
         ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetAggregatedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetAggregatedObservation(available_time, observation_variable,
                                  observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup] are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
       and aggregated.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation2 the aggregated observations.
@@ -735,19 +735,19 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         GridToNetworkObservationManager<T>
         ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetAggregatedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetAggregatedObservation(available_time, observation_variable,
                                  observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
+    //! Gets observations aggregated over a list of times.
     /*! The observations available are loaded and
       aggregated.
       \param[out] observation_variable variables associated with the
@@ -761,15 +761,15 @@ namespace Verdandi
         ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        GetAggregatedObservation(available_date_, observation_variable,
+        GetAggregatedObservation(available_time_, observation_variable,
                                  observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and aggregated.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation2 the aggregated observations.
@@ -777,20 +777,20 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
+        const GridToNetworkObservationManager<T>::time_vector& available_time,
         GridToNetworkObservationManager<T>
         ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
-        GetRawObservation(available_date, observation_variable2,
+        GetRawObservation(available_time, observation_variable2,
                           observation3);
-        observation_aggregator_.Aggregate(available_date,
+        observation_aggregator_.Aggregate(available_time,
                                           contribution_,
                                           observation_variable2,
                                           observation3,
-                                          date_,
+                                          time_,
                                           observation_variable,
                                           observation2);
     }
@@ -799,10 +799,10 @@ namespace Verdandi
     /*** Gets observations, associated variables and associated index ***/
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the given date are loaded and
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the given time are loaded and
       aggregated.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index2 indexes associated with the observations.
@@ -811,24 +811,24 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        double date,
+        double time,
         GridToNetworkObservationManager<T>
         ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector2& observation_index2,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetAggregatedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetAggregatedObservation(available_time, observation_variable,
                                  observation_index2, observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup] are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
       and aggregated.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index2 indexes associated with the observations.
@@ -837,20 +837,20 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         GridToNetworkObservationManager<T>
         ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector2& observation_index2,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetAggregatedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetAggregatedObservation(available_time, observation_variable,
                                  observation_index2, observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
+    //! Gets observations aggregated over a list of times.
     /*! The observations available are loaded and
       aggregated.
       \param[out] observation_variable variables associated with the
@@ -866,15 +866,15 @@ namespace Verdandi
         GridToNetworkObservationManager<T>::index_vector2& observation_index2,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        GetAggregatedObservation(available_date_, observation_variable,
+        GetAggregatedObservation(available_time_, observation_variable,
                                  observation_index2, observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and aggregated.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index2 indexes associated with the observations.
@@ -883,7 +883,7 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetAggregatedObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
+        const GridToNetworkObservationManager<T>::time_vector& available_time,
         GridToNetworkObservationManager<T>
         ::variable_vector& observation_variable,
         GridToNetworkObservationManager<T>::index_vector2& observation_index2,
@@ -892,14 +892,14 @@ namespace Verdandi
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
         index_vector3 observation_index3;
-        GetRawObservation(available_date, observation_variable2,
+        GetRawObservation(available_time, observation_variable2,
                           observation_index3, observation3);
-        observation_aggregator_.Aggregate(available_date,
+        observation_aggregator_.Aggregate(available_time,
                                           contribution_,
                                           observation_variable2,
                                           observation_index3,
                                           observation3,
-                                          date_,
+                                          time_,
                                           observation_variable,
                                           observation_index2,
                                           observation2);
@@ -914,42 +914,42 @@ namespace Verdandi
     /*** Gets observations ***/
 
 
-    //! Gets available observations at a given date.
+    //! Gets available observations at a given time.
     /*!
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        double date,
+        double time,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetRawObservation(available_date, observation2);
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetRawObservation(available_time, observation2);
     }
 
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetRawObservation(available_date, observation2);
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetRawObservation(available_time, observation2);
     }
 
 
-    //! Gets observations at the current date.
+    //! Gets observations at the current time.
     /*!
       \param[out] observation2 the observation to be loaded.
     */
@@ -958,31 +958,31 @@ namespace Verdandi
     ::GetRawObservation(
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        GetRawObservation(available_date_, observation2);
+        GetRawObservation(available_time_, observation2);
     }
 
 
-    //! Gets observations of a list of dates.
+    //! Gets observations of a list of times.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
+        const GridToNetworkObservationManager<T>::time_vector& available_time,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
     {
-        ReadObservation(available_date, observation2);
+        ReadObservation(available_time, observation2);
     }
 
 
     /*** Gets observations and associated variables ***/
 
 
-    //! Gets available observations at a given date.
+    //! Gets available observations at a given time.
     /*!
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observation to be loaded.
@@ -990,22 +990,22 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        double date,
+        double time,
         GridToNetworkObservationManager<T>
         ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetRawObservation(available_date, observation_variable2,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetRawObservation(available_time, observation_variable2,
                           observation3);
     }
 
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observation to be loaded.
@@ -1013,20 +1013,20 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         GridToNetworkObservationManager<T>
         ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetRawObservation(available_date, observation_variable2,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetRawObservation(available_time, observation_variable2,
                           observation3);
     }
 
 
 
-    //! Gets observations at the current date.
+    //! Gets observations at the current time.
     /*!
       \param[out] observation_variable2 variables associated with the
       observations.
@@ -1039,14 +1039,14 @@ namespace Verdandi
         ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
-        GetRawObservation(available_date_, observation_variable2,
+        GetRawObservation(available_time_, observation_variable2,
                           observation3);
     }
 
 
-    //! Gets observations of a list of dates.
+    //! Gets observations of a list of times.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observation to be loaded.
@@ -1055,22 +1055,22 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
         const GridToNetworkObservationManager<T>
-        ::date_vector& available_date,
+        ::time_vector& available_time,
         GridToNetworkObservationManager<T>
         ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
-        ReadObservationVariable(available_date, observation_variable2);
-        ReadObservation(available_date, observation_variable2, observation3);
+        ReadObservationVariable(available_time, observation_variable2);
+        ReadObservation(available_time, observation_variable2, observation3);
     }
 
 
     /*** Gets observations, associated variables and associated index ***/
 
 
-    //! Gets available observations at a given date.
+    //! Gets available observations at a given time.
     /*!
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation_index3 indexes associated with the observations.
@@ -1079,7 +1079,7 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        double date,
+        double time,
         GridToNetworkObservationManager<T>
         ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>
@@ -1087,17 +1087,17 @@ namespace Verdandi
         GridToNetworkObservationManager<T>
         ::observation_vector3& observation3)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetRawObservation(available_date, observation_variable2,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetRawObservation(available_time, observation_variable2,
                           observation_index3, observation3);
     }
 
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation_index3 indexes associated with the observations.
@@ -1106,21 +1106,21 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         GridToNetworkObservationManager<T>
         ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::index_vector3& observation_index3,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetRawObservation(available_date, observation_variable2,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetRawObservation(available_time, observation_variable2,
                           observation_index3, observation3);
     }
 
 
 
-    //! Gets observations at the current date.
+    //! Gets observations at the current time.
     /*!
       \param[out] observation_variable2 variables associated with the
       observations.
@@ -1135,14 +1135,14 @@ namespace Verdandi
         GridToNetworkObservationManager<T>::index_vector3& observation_index3,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
-        GetRawObservation(available_date_, observation_variable2,
+        GetRawObservation(available_time_, observation_variable2,
                           observation_index3, observation3);
     }
 
 
-    //! Gets observations of a list of dates.
+    //! Gets observations of a list of times.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation_index3 indexes associated with the observations.
@@ -1151,15 +1151,15 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetRawObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
+        const GridToNetworkObservationManager<T>::time_vector& available_time,
         GridToNetworkObservationManager<T>
         ::variable_vector2& observation_variable2,
         GridToNetworkObservationManager<T>::index_vector3& observation_index3,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
     {
-        ReadObservationVariable(available_date, observation_variable2);
-        ReadObservation(available_date, observation_variable2, observation3);
-        ReadObservationIndex(available_date, observation_variable2,
+        ReadObservationVariable(available_time, observation_variable2);
+        ReadObservation(available_time, observation_variable2, observation3);
+        ReadObservationIndex(available_time, observation_variable2,
                              observation_index3);
     }
 
@@ -1171,7 +1171,7 @@ namespace Verdandi
 
     //! Builds variables vector associated with given observations.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable2 variables associated with the
       observations.
     */
@@ -1179,21 +1179,21 @@ namespace Verdandi
     void GridToNetworkObservationManager<T>
     ::ReadObservationVariable(
         const GridToNetworkObservationManager<T>
-        ::date_vector& available_date,
+        ::time_vector& available_time,
         GridToNetworkObservationManager<T>
         ::variable_vector2& observation_variable2)
         const
     {
-        int Nt = available_date.GetSize();
+        int Nt = available_time.GetSize();
         observation_variable2.Reallocate(Nt);
         for (int h = 0; h < Nt; h++)
             observation_variable2(h).PushBack(0);
     }
 
 
-    //! Builds observations associated with given dates and variables.
+    //! Builds observations associated with given times and variables.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[in] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observations.
@@ -1201,56 +1201,56 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::ReadObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
+        const GridToNetworkObservationManager<T>::time_vector& available_time,
         const GridToNetworkObservationManager<T>::variable_vector2&
         observation_variable2,
         GridToNetworkObservationManager<T>::observation_vector3& observation3)
         const
     {
         int Nvariable, Nt;
-        Nt = available_date.GetSize();
+        Nt = available_time.GetSize();
         observation3.Reallocate(Nt);
         for (int h = 0; h < Nt; h++)
         {
             Nvariable = observation_variable2(h).GetSize();
             observation3.Reallocate(h, Nvariable);
             for (int v = 0; v < Nvariable; v++)
-                ReadObservation(available_date(h),
+                ReadObservation(available_time(h),
                                 observation_variable2(h, v),
                                 observation3.GetVector(h, v));
         }
     }
 
 
-    //! Builds observations associated with given dates.
+    //! Builds observations associated with given times.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation2 the observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::ReadObservation(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
+        const GridToNetworkObservationManager<T>::time_vector& available_time,
         GridToNetworkObservationManager<T>::observation_vector2& observation2)
         const
     {
-        int Nt = available_date.GetSize();
+        int Nt = available_time.GetSize();
         observation2.Reallocate(Nt);
         for (int h = 0; h < Nt; h++)
-            ReadObservation(available_date(h), 0, observation2(h));
+            ReadObservation(available_time(h), 0, observation2(h));
     }
 
 
-    //! Reads observation from observation file given a date and a variable.
+    //! Reads observation from observation file given a time and a variable.
     /*!
-      \param[in] date the date.
+      \param[in] time the time.
       \param[in] variable the variable.
       \param[out] observation the observations.
     */
     template <class T>
     void GridToNetworkObservationManager<T>
     ::ReadObservation(
-        double date, int variable,
+        double time, int variable,
         GridToNetworkObservationManager<T>::observation_vector& observation)
         const
     {
@@ -1258,7 +1258,7 @@ namespace Verdandi
         Matrix<T> input_data(Nx_model_, Ny_model_);
         int iteration;
 
-        iteration = int(date / (Delta_t_ * Nskip_));
+        iteration = int(time / (Delta_t_ * Nskip_));
 
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
@@ -1285,7 +1285,7 @@ namespace Verdandi
 
     //! Reads observations indexes.
     /*!
-      \param[in] available_date the available date.
+      \param[in] available_time the available time.
       \param[in] observation_variable2 variable associated with the
       observations.
       \param[out] observation_index3 the indexes associated with the
@@ -1294,14 +1294,14 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::ReadObservationIndex(
-        const GridToNetworkObservationManager<T>::date_vector& available_date,
+        const GridToNetworkObservationManager<T>::time_vector& available_time,
         const GridToNetworkObservationManager<T>::variable_vector2&
         observation_variable2,
         GridToNetworkObservationManager<T>::index_vector3& observation_index3)
         const
     {
         int Nvariable, Nt;
-        Nt = available_date.GetSize();
+        Nt = available_time.GetSize();
         observation_index3.Reallocate(Nt);
         for (int h = 0; h < Nt; h++)
         {
@@ -1365,15 +1365,15 @@ namespace Verdandi
     ////////////
 
 
-    //! Indicates if some observations are available at a given date.
+    //! Indicates if some observations are available at a given time.
     /*!
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
-    bool GridToNetworkObservationManager<T>::HasObservation(double date)
+    bool GridToNetworkObservationManager<T>::HasObservation(double time)
     {
-        SetDate(date);
-        return available_date_.GetSize() != 0
+        SetTime(time);
+        return available_time_.GetSize() != 0
             && !is_equal(Norm1(contribution_), 0.);
     }
 
@@ -1382,14 +1382,14 @@ namespace Verdandi
     template <class T>
     bool GridToNetworkObservationManager<T>::HasObservation() const
     {
-        return available_date_.GetSize() != 0
+        return available_time_.GetSize() != 0
             && !is_equal(Norm1(contribution_), 0.);
     }
 
 
     //! Gets Nobservation_ value.
     /*!
-      \return The total number of observation at current date.
+      \return The total number of observation at current time.
     */
     template <class T>
     int GridToNetworkObservationManager<T>::GetNobservation() const

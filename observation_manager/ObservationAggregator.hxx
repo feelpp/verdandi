@@ -40,8 +40,8 @@ namespace Verdandi
 
         /*** Tracks ***/
 
-        //! Vector of dates.
-        Vector2<double> date_;
+        //! Vector of times.
+        Vector2<double> time_;
         //! Index of the active track.
         int active_track_index_;
 
@@ -81,37 +81,37 @@ namespace Verdandi
 
         void Initialize(string configuration_file);
 
-        void GetContributionInterval(double date, double& date_inf,
-                                     double& date_sup, int& selection_policy)
+        void GetContributionInterval(double time, double& time_inf,
+                                     double& time_sup, int& selection_policy)
             const;
 
-        template <class date_vector, class observation_vector2,
+        template <class time_vector, class observation_vector2,
                   class observation_vector>
-        void Aggregate(const date_vector& observation_date,
+        void Aggregate(const time_vector& observation_time,
                        const Vector<double>& contribution,
                        const observation_vector2& observation,
-                       double date,
+                       double time,
                        observation_vector& aggregated_observation);
-        template <class date_vector, class variable_vector2,
+        template <class time_vector, class variable_vector2,
                   class observation_vector3,
                   class variable_vector, class observation_vector2>
-        void Aggregate(const date_vector& observation_date,
+        void Aggregate(const time_vector& observation_time,
                        const Vector<double>& contribution,
                        const variable_vector2& observation_variable,
                        const observation_vector3& observation,
-                       double date,
+                       double time,
                        variable_vector& aggregated_variable,
                        observation_vector2& aggregated_observation);
-        template <class date_vector, class variable_vector2,
+        template <class time_vector, class variable_vector2,
                   class index_vector3, class observation_vector3,
                   class variable_vector, class index_vector2,
                   class observation_vector2>
-        void Aggregate(const date_vector& observation_date,
+        void Aggregate(const time_vector& observation_time,
                        const Vector<double>& contribution,
                        const variable_vector2& observation_variable,
                        const index_vector3& observation_index,
                        const observation_vector3& observation,
-                       double date,
+                       double time,
                        variable_vector& aggregated_variable,
                        index_vector2& aggregated_index,
                        observation_vector2& aggregated_observation);
@@ -120,25 +120,25 @@ namespace Verdandi
 
         int CreateTrack();
         void SetTrack(int track);
-        double LastDate() const;
-        double LastDate(int track) const;
-        void PushDate(double date);
-        void PushDate(double date, int track);
+        double LastTime() const;
+        double LastTime(int track) const;
+        void PushTime(double time);
+        void PushTime(double time, int track);
 
         /*** Contributions management ***/
 
-        template <class date_vector>
-        void Contribution(double date, const date_vector& observation_date,
+        template <class time_vector>
+        void Contribution(double time, const time_vector& observation_time,
                           Vector<double>& contribution);
-        template <class date_vector>
-        void Contribution(double date, const date_vector& observation_date,
+        template <class time_vector>
+        void Contribution(double time, const time_vector& observation_time,
                           Vector<double>& width_left,
                           Vector<double>& width_right,
                           Vector<double>& contribution);
         double Contribution(double delta_t) const;
 
-        template <class date_vector>
-        void GetValueIndex(date_vector& X, double value, int& index_inf,
+        template <class time_vector>
+        void GetValueIndex(time_vector& X, double value, int& index_inf,
                            int& index_sup) const;
     };
 

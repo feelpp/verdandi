@@ -100,29 +100,29 @@ namespace Verdandi
     }
 
 
-    //! Returns the contribution time interval corresponding to a given date.
+    //! Returns the contribution time interval corresponding to a given time.
     /*! This method returns the time interval into which observations have a
-      non-zero contribution at date \a date. An integer is associated to this
+      non-zero contribution at time \a time. An integer is associated to this
       interval to indicate the observation selection policy.
       '0' indicates that all observations available in the given interval
       have to be considered.
       '-1' indicates that all observations available in the interval
-      [\a date_inf ; \a date] have to be considered.
+      [\a time_inf ; \a time] have to be considered.
       '1' indicates that all observations available in the interval
-      [\a date ; \a date_sup] have to be considered.
+      [\a time ; \a time_sup] have to be considered.
       '2' indicates that only the closest left observation of the interval
-      from date and the closest right observation are requested.
+      from time and the closest right observation are requested.
       '3' indicates that all observation in the given interval have to be
       considered, but, one should take into account non constant triangle
       widths.
-      \param[in] date a given date.
-      \param[out] date_inf lower bound of the time interval.
-      \param[out] date_sup upper bound of the time interval.
+      \param[in] time a given time.
+      \param[out] time_inf lower bound of the time interval.
+      \param[out] time_sup upper bound of the time interval.
       \param[out] selection_policy interval selection policy.
     */
     template <class T>
     void ObservationAggregator<T>
-    ::GetContributionInterval(double date, double& date_inf, double& date_sup,
+    ::GetContributionInterval(double time, double& time_inf, double& time_sup,
                               int& selection_policy)
         const
     {
@@ -131,53 +131,53 @@ namespace Verdandi
             selection_policy = 0;
 
             // Always switch off observation.
-            if (discard_observation_ && date_.GetSize() != 0)
+            if (discard_observation_ && time_.GetSize() != 0)
             {
-                int i_date_inf, i_date_sup;
+                int i_time_inf, i_time_sup;
 
-                GetValueIndex(date_(active_track_index_), date, i_date_inf,
-                              i_date_sup);
+                GetValueIndex(time_(active_track_index_), time, i_time_inf,
+                              i_time_sup);
 
-                if (i_date_inf == -1)
+                if (i_time_inf == -1)
                 {
-                    date_inf = date - width_left_;
-                    date_inf = date_inf > 0. ? date_inf : 0.;
+                    time_inf = time - width_left_;
+                    time_inf = time_inf > 0. ? time_inf : 0.;
 
-                    date_sup = date + width_right_ <
-                        date_(active_track_index_)(0)
-                        - width_left_ ? date + width_right_ :
-                        date_(active_track_index_)(0) - width_left_;
+                    time_sup = time + width_right_ <
+                        time_(active_track_index_)(0)
+                        - width_left_ ? time + width_right_ :
+                        time_(active_track_index_)(0) - width_left_;
 
                     return;
                 }
 
-                if (i_date_sup == -1)
+                if (i_time_sup == -1)
                 {
-                    date_inf = date_(active_track_index_)(i_date_inf);
-                    date_inf = date - width_left_ > date_inf + width_right_ ?
-                        date - width_left_ : date_inf + width_right_;
-                    date_inf = date_inf > 0. ? date_inf : 0.;
+                    time_inf = time_(active_track_index_)(i_time_inf);
+                    time_inf = time - width_left_ > time_inf + width_right_ ?
+                        time - width_left_ : time_inf + width_right_;
+                    time_inf = time_inf > 0. ? time_inf : 0.;
 
-                    date_sup = date + width_right_;
+                    time_sup = time + width_right_;
                     return;
                 }
 
-                date_inf = date_(active_track_index_)(i_date_inf);
-                date_inf = date - width_left_ > date_inf + width_right_ ?
-                    date - width_left_ : date_inf + width_right_;
-                date_inf = date_inf > 0. ? date_inf : 0.;
+                time_inf = time_(active_track_index_)(i_time_inf);
+                time_inf = time - width_left_ > time_inf + width_right_ ?
+                    time - width_left_ : time_inf + width_right_;
+                time_inf = time_inf > 0. ? time_inf : 0.;
 
-                date_sup = date_(active_track_index_)(i_date_sup);
-                date_sup = date + width_right_ < date_sup - width_left_ ?
-                    date + width_right_ : date_sup - width_left_;
+                time_sup = time_(active_track_index_)(i_time_sup);
+                time_sup = time + width_right_ < time_sup - width_left_ ?
+                    time + width_right_ : time_sup - width_left_;
 
                 return;
             }
 
-            date_inf = date - width_left_;
-            date_inf = date_inf > 0. ? date_inf : 0.;
+            time_inf = time - width_left_;
+            time_inf = time_inf > 0. ? time_inf : 0.;
 
-            date_sup = date + width_right_;
+            time_sup = time + width_right_;
 
             return;
         }
@@ -188,54 +188,54 @@ namespace Verdandi
             selection_policy = 0;
 
             // Always switch off observation.
-            if (discard_observation_ && date_.GetSize() != 0)
+            if (discard_observation_ && time_.GetSize() != 0)
             {
-                int i_date_inf, i_date_sup;
+                int i_time_inf, i_time_sup;
 
-                GetValueIndex(date_(active_track_index_), date, i_date_inf,
-                              i_date_sup);
+                GetValueIndex(time_(active_track_index_), time, i_time_inf,
+                              i_time_sup);
 
-                if (i_date_inf == -1)
+                if (i_time_inf == -1)
                 {
-                    date_inf = date - width_left_;
-                    date_inf = date_inf > 0. ? date_inf : 0.;
+                    time_inf = time - width_left_;
+                    time_inf = time_inf > 0. ? time_inf : 0.;
 
-                    date_sup = date + width_right_ <
-                        date_(active_track_index_)(0)
-                        - width_left_ ? date + width_right_ :
-                        date_(active_track_index_)(0) - width_left_;
+                    time_sup = time + width_right_ <
+                        time_(active_track_index_)(0)
+                        - width_left_ ? time + width_right_ :
+                        time_(active_track_index_)(0) - width_left_;
 
                     return;
                 }
 
-                if (i_date_sup == -1)
+                if (i_time_sup == -1)
                 {
-                    date_inf = date_(active_track_index_)(i_date_inf);
-                    date_inf = date - width_left_ > date_inf + width_right_ ?
-                        date - width_left_ : date_inf + width_right_;
-                    date_inf = date_inf > 0. ? date_inf : 0.;
+                    time_inf = time_(active_track_index_)(i_time_inf);
+                    time_inf = time - width_left_ > time_inf + width_right_ ?
+                        time - width_left_ : time_inf + width_right_;
+                    time_inf = time_inf > 0. ? time_inf : 0.;
 
-                    date_sup = date + width_right_;
+                    time_sup = time + width_right_;
 
                     return;
                 }
 
-                date_inf = date_(active_track_index_)(i_date_inf);
-                date_inf = date - width_left_ > date_inf + width_right_ ?
-                    date - width_left_ : date_inf + width_right_;
-                date_inf = date_inf > 0. ? date_inf : 0.;
+                time_inf = time_(active_track_index_)(i_time_inf);
+                time_inf = time - width_left_ > time_inf + width_right_ ?
+                    time - width_left_ : time_inf + width_right_;
+                time_inf = time_inf > 0. ? time_inf : 0.;
 
-                date_sup = date_(active_track_index_)(i_date_sup);
-                date_sup = date + width_right_ < date_sup - width_left_ ?
-                    date + width_right_ : date_sup - width_left_;
+                time_sup = time_(active_track_index_)(i_time_sup);
+                time_sup = time + width_right_ < time_sup - width_left_ ?
+                    time + width_right_ : time_sup - width_left_;
 
                 return;
             }
 
-            date_inf = date - width_left_;
-            date_inf = date_inf > 0. ? date_inf : 0.;
+            time_inf = time - width_left_;
+            time_inf = time_inf > 0. ? time_inf : 0.;
 
-            date_sup = date + width_right_;
+            time_sup = time + width_right_;
 
             return;
         }
@@ -245,10 +245,10 @@ namespace Verdandi
         {
             selection_policy = 3;
 
-            date_inf = date - width_left_upper_bound_;
-            date_inf = date_inf > 0. ? date_inf : 0.;
+            time_inf = time - width_left_upper_bound_;
+            time_inf = time_inf > 0. ? time_inf : 0.;
 
-            date_sup = date + width_right_upper_bound_;
+            time_sup = time + width_right_upper_bound_;
 
             return;
         }
@@ -259,85 +259,85 @@ namespace Verdandi
             selection_policy = 2;
 
             // Always switch off observation.
-            if (discard_observation_ && date_.GetSize() != 0)
+            if (discard_observation_ && time_.GetSize() != 0)
             {
-                int i_date_inf, i_date_sup;
+                int i_time_inf, i_time_sup;
 
-                GetValueIndex(date_(active_track_index_), date, i_date_inf,
-                              i_date_sup);
+                GetValueIndex(time_(active_track_index_), time, i_time_inf,
+                              i_time_sup);
 
-                if (i_date_inf == -1)
+                if (i_time_inf == -1)
                 {
-                    date_inf = date - width_left_upper_bound_;
-                    date_inf = date_inf > 0. ? date_inf : 0.;
+                    time_inf = time - width_left_upper_bound_;
+                    time_inf = time_inf > 0. ? time_inf : 0.;
 
-                    date_sup = date + width_right_upper_bound_ <
-                        date_(active_track_index_)(0)
-                        - width_left_upper_bound_ ? date +
+                    time_sup = time + width_right_upper_bound_ <
+                        time_(active_track_index_)(0)
+                        - width_left_upper_bound_ ? time +
                         width_right_upper_bound_ :
-                        date_(active_track_index_)(0) -
+                        time_(active_track_index_)(0) -
                         width_left_upper_bound_;
 
                     return;
                 }
 
-                if (i_date_sup == -1)
+                if (i_time_sup == -1)
                 {
-                    date_inf = date_(active_track_index_)(i_date_inf);
-                    date_inf = date - width_left_upper_bound_ > date_inf +
+                    time_inf = time_(active_track_index_)(i_time_inf);
+                    time_inf = time - width_left_upper_bound_ > time_inf +
                         width_right_upper_bound_ ?
-                        date - width_left_upper_bound_ : date_inf +
+                        time - width_left_upper_bound_ : time_inf +
                         width_right_upper_bound_;
-                    date_inf = date_inf > 0. ? date_inf : 0.;
+                    time_inf = time_inf > 0. ? time_inf : 0.;
 
-                    date_sup = date + width_right_upper_bound_;
+                    time_sup = time + width_right_upper_bound_;
 
                     return;
                 }
 
-                date_inf = date_(active_track_index_)(i_date_inf);
-                date_inf = date - width_left_upper_bound_ > date_inf +
+                time_inf = time_(active_track_index_)(i_time_inf);
+                time_inf = time - width_left_upper_bound_ > time_inf +
                     width_right_upper_bound_ ?
-                    date - width_left_upper_bound_ : date_inf +
+                    time - width_left_upper_bound_ : time_inf +
                     width_right_upper_bound_;
-                date_inf = date_inf > 0. ? date_inf : 0.;
+                time_inf = time_inf > 0. ? time_inf : 0.;
 
-                date_sup = date_(active_track_index_)(i_date_sup);
-                date_sup = date + width_right_upper_bound_ < date_sup -
+                time_sup = time_(active_track_index_)(i_time_sup);
+                time_sup = time + width_right_upper_bound_ < time_sup -
                     width_left_upper_bound_ ?
-                    date + width_right_upper_bound_ : date_sup -
+                    time + width_right_upper_bound_ : time_sup -
                     width_left_upper_bound_;
 
                 return;
             }
 
-            date_inf = date - width_left_upper_bound_;
-            date_inf = date_inf > 0. ? date_inf : 0.;
+            time_inf = time - width_left_upper_bound_;
+            time_inf = time_inf > 0. ? time_inf : 0.;
 
-            date_sup = date + width_right_upper_bound_;
+            time_sup = time + width_right_upper_bound_;
 
             return;
         }
     }
 
 
-    //! Computes an aggregated observation vector over a list of dates.
-    /*! The observations that have a non-zero contribution at date \a date are
+    //! Computes an aggregated observation vector over a list of times.
+    /*! The observations that have a non-zero contribution at time \a time are
       aggregated.
-      \param[in] observation_date the dates of \a observation.
+      \param[in] observation_time the times of \a observation.
       \param[in] contribution the contributions associated with observations.
       \param[in] observation the observations to be aggregated.
-      \param[in] date the date at which the observations should be aggregated.
+      \param[in] time the time at which the observations should be aggregated.
       \param[out] aggregated_observation the aggregated observation vector.
     */
     template <class T>
-    template <class date_vector, class observation_vector2,
+    template <class time_vector, class observation_vector2,
               class observation_vector>
     void ObservationAggregator<T>
-    ::Aggregate(const date_vector& observation_date,
+    ::Aggregate(const time_vector& observation_time,
                 const Vector<double>& contribution,
                 const observation_vector2& observation,
-                double date,
+                double time,
                 observation_vector& aggregated_observation)
     {
 
@@ -348,40 +348,40 @@ namespace Verdandi
         int Nobservation = observation(0).GetSize();
         aggregated_observation.Reallocate(Nobservation);
         aggregated_observation.Fill(T(0.));
-        int Nt = observation_date.GetSize();
+        int Nt = observation_time.GetSize();
         for (int h = 0; h < Nt; h++)
             Add(contribution(h), observation(h), aggregated_observation);
         Mlt(T(1. / sum), aggregated_observation);
 
         if (discard_observation_)
-            PushDate(date);
+            PushTime(time);
     }
 
 
-    //! Computes aggregated observation over a list of dates and observations.
-    /*! The observations that have a non-zero contribution at date \a date are
+    //! Computes aggregated observation over a list of times and observations.
+    /*! The observations that have a non-zero contribution at time \a time are
       aggregated. The variables associated with the new aggregated
       observations vector are stored in \a aggregated_variable.
-      \param[in] observation_date the date of the given observations.
+      \param[in] observation_time the time of the given observations.
       \param[in] contribution the contributions associated with observations.
       \param[in] observation_variable variables associated with the
       observations.
       \param[in] observation the given observation observation.
-      \param[in] date a given date.
+      \param[in] time a given time.
       \param[out] aggregated_variable the variables associated with the
       aggregated observations.
       \param[out] aggregated_observation the aggregated observation.
     */
     template <class T>
-    template <class date_vector, class variable_vector2,
+    template <class time_vector, class variable_vector2,
               class observation_vector3,
               class variable_vector, class observation_vector2>
     void ObservationAggregator<T>
-    ::Aggregate(const date_vector& observation_date,
+    ::Aggregate(const time_vector& observation_time,
                 const Vector<double>& contribution,
                 const variable_vector2& observation_variable,
                 const observation_vector3& observation,
-                double date,
+                double time,
                 variable_vector& aggregated_variable,
                 observation_vector2& aggregated_observation)
     {
@@ -409,7 +409,7 @@ namespace Verdandi
         aggregated_observation.Fill(T(0.));
 
         int Nt, variable_index;
-        Nt = observation_date.GetSize();
+        Nt = observation_time.GetSize();
         for (int h = 0; h < Nt; h++)
             for (int v = 0; v < observation(h).GetSize(); v++)
             {
@@ -430,49 +430,49 @@ namespace Verdandi
         }
 
         if (discard_observation_)
-            PushDate(date);
+            PushTime(time);
     }
 
 
-    //! Computes aggregated observation over a list of dates and observations.
-    /*! The observations that have a non-zero contribution at date \a date are
+    //! Computes aggregated observation over a list of times and observations.
+    /*! The observations that have a non-zero contribution at time \a time are
       aggregated. The variables associated with the new aggregated
       observations vector are stored in \a aggregated_variable. The indexes
       associated with the new aggregated observations vector are stored in
       \a aggregated_index.
-      \param[in] observation_date the date of the given observations.
+      \param[in] observation_time the time of the given observations.
       \param[in] contribution the contributions associated with observations.
       \param[in] observation_variable variables associated with observations.
       \param[in] observation_index corresponding observation locations.
       \param[in] observation the given observation observation.
-      \param[in] date a given date.
+      \param[in] time a given time.
       \param[out] aggregated_variable variables associated with the
       aggregated observations.
       \param[out] aggregated_index the aggregated locations.
       \param[out] aggregated_observation the aggregated observation.
     */
     template <class T>
-    template <class date_vector, class variable_vector2,
+    template <class time_vector, class variable_vector2,
               class index_vector3, class observation_vector3,
               class variable_vector, class index_vector2,
               class observation_vector2>
     void ObservationAggregator<T>
-    ::Aggregate(const date_vector& observation_date,
+    ::Aggregate(const time_vector& observation_time,
                 const Vector<double>& contribution,
                 const variable_vector2& observation_variable,
                 const index_vector3& observation_index,
                 const observation_vector3& observation,
-                double date,
+                double time,
                 variable_vector& aggregated_variable,
                 index_vector2& aggregated_index,
                 observation_vector2& aggregated_observation)
     {
         throw ErrorUndefined("ObservationAggregator::Aggregate"
-                             "(const date_vector& observation_date, "
+                             "(const time_vector& observation_time, "
                              "const variable_vector2& observation_variable, "
                              "const index_vector3& observation_index, "
                              "const observation_vector3& observation, "
-                             "double date, "
+                             "double time, "
                              "variable_vector& aggregated_variable, "
                              "index_vector2& aggregated_index, "
                              "observation_vector2& aggregated_observation)");
@@ -488,8 +488,8 @@ namespace Verdandi
     {
         Vector<double> track;
         track.PushBack(numeric_limits<double>::min());
-        date_.PushBack(track);
-        return date_.GetSize() - 1;
+        time_.PushBack(track);
+        return time_.GetSize() - 1;
     }
 
 
@@ -500,91 +500,91 @@ namespace Verdandi
     template <class T>
     void ObservationAggregator<T>::SetTrack(int track)
     {
-        if (track < 0 || track >= date_.GetSize())
+        if (track < 0 || track >= time_.GetSize())
             throw WrongIndex("ObservationAggregator<T>::SetTrack(int track)",
                              string("The track should be in [0, ") +
-                             to_str(date_.GetSize() - 1) +
+                             to_str(time_.GetSize() - 1) +
                              "], but is equal to " + to_str(track) + ".");
         active_track_index_ = track;
     }
 
 
-    //! Returns the last date of the current track.
+    //! Returns the last time of the current track.
     /*!
-      \return The last date of the current track.
+      \return The last time of the current track.
     */
     template <class T>
-    double ObservationAggregator<T>::LastDate() const
+    double ObservationAggregator<T>::LastTime() const
     {
-        int Ndate = date_.GetSize(active_track_index_);
-        return date_(active_track_index_, Ndate - 1);
+        int Ntime = time_.GetSize(active_track_index_);
+        return time_(active_track_index_, Ntime - 1);
     }
 
 
-    //! Returns the last date of a given track.
+    //! Returns the last time of a given track.
     /*!
       \param[in] track a given track.
-      \return The last date of the given track.
+      \return The last time of the given track.
     */
     template <class T>
-    double ObservationAggregator<T>::LastDate(int track) const
+    double ObservationAggregator<T>::LastTime(int track) const
     {
-        int Ndate = date_.GetSize(track);
-        return date_(track, Ndate - 1);
+        int Ntime = time_.GetSize(track);
+        return time_(track, Ntime - 1);
     }
 
 
-    //! Pushes a date to the current track.
+    //! Pushes a time to the current track.
     /*!
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
-    void ObservationAggregator<T>::PushDate(double date)
+    void ObservationAggregator<T>::PushTime(double time)
     {
-        PushDate(date, active_track_index_);
+        PushTime(time, active_track_index_);
     }
 
 
 
-    //! Pushes a date to a given track.
+    //! Pushes a time to a given track.
     /*!
       \param[in] track index of a given track.
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
-    void ObservationAggregator<T>::PushDate(double date, int track)
+    void ObservationAggregator<T>::PushTime(double time, int track)
     {
-        int Ndate = date_(track).GetSize();
-        date_(track).Resize(Ndate + 1);
-        for (int i = Ndate - 1; i > -1; i--)
+        int Ntime = time_(track).GetSize();
+        time_(track).Resize(Ntime + 1);
+        for (int i = Ntime - 1; i > -1; i--)
         {
-            date_(track)(i + 1) = date_(track)(i);
-            if (date_(track)(i + 1) < date)
+            time_(track)(i + 1) = time_(track)(i);
+            if (time_(track)(i + 1) < time)
             {
-                date_(track)(i + 1) = date;
+                time_(track)(i + 1) = time;
                 return;
             }
         }
 
-        date_(0) = date;
+        time_(0) = time;
     }
 
 
-    //! Computes the contributions of given observations at a given date.
+    //! Computes the contributions of given observations at a given time.
     /*!
-      \param[in] date the given date.
-      \param[in] observation_date the dates associated with the given
+      \param[in] time the given time.
+      \param[in] observation_time the times associated with the given
       observations.
       \param[out] contribution the contributions computed.
     */
     template <class T>
-    template <class date_vector>
+    template <class time_vector>
     void ObservationAggregator<T>
-    ::Contribution(double date, const date_vector& observation_date,
+    ::Contribution(double time, const time_vector& observation_time,
                    Vector<double>& contribution)
     {
-        int Ndate = observation_date.GetSize();
-        contribution.Reallocate(Ndate);
+        int Ntime = observation_time.GetSize();
+        contribution.Reallocate(Ntime);
 
         if (interpolation_type_ == type_step_)
         {
@@ -595,8 +595,8 @@ namespace Verdandi
         if (interpolation_type_ == type_triangle_
             && width_property_ == width_constant_)
         {
-            for (int i = 0; i< Ndate; i++)
-                contribution(i) = Contribution(date - observation_date(i));
+            for (int i = 0; i< Ntime; i++)
+                contribution(i) = Contribution(time - observation_time(i));
             return;
         }
 
@@ -604,59 +604,59 @@ namespace Verdandi
         {
             contribution.Fill(T(0.));
 
-            if (Ndate == 2)
+            if (Ntime == 2)
             {
-                width_left_ = observation_date(1) - observation_date(0);
-                width_right_ = observation_date(1) - observation_date(0);
-                contribution(0) = Contribution(date - observation_date(0));
-                contribution(1) = Contribution(date - observation_date(1));
+                width_left_ = observation_time(1) - observation_time(0);
+                width_right_ = observation_time(1) - observation_time(0);
+                contribution(0) = Contribution(time - observation_time(0));
+                contribution(1) = Contribution(time - observation_time(1));
             }
 
             return;
         }
 
         throw ErrorArgument("ObservationAggregator"
-                            "::Contribution(double date, "
-                            "const date_vector& observation_date,"
+                            "::Contribution(double time, "
+                            "const time_vector& observation_time,"
                             "Vector<double>& contribution) const");
     }
 
 
-    //! Computes the contributions of given observations at a given date.
+    //! Computes the contributions of given observations at a given time.
     /*!
-      \param[in] date the given date.
-      \param[in] observation_date the dates associated with the given
+      \param[in] time the given time.
+      \param[in] observation_time the times associated with the given
       observations.
       \param[in] width_left the non constant triangle width left.
       \param[in] width_right the non constant triangle width right.
       \param[out] contribution the contributions computed.
     */
     template <class T>
-    template <class date_vector>
+    template <class time_vector>
     void ObservationAggregator<T>
-    ::Contribution(double date, const date_vector& observation_date,
+    ::Contribution(double time, const time_vector& observation_time,
                    Vector<double>& width_left, Vector<double>& width_right,
                    Vector<double>& contribution)
     {
-        int Ndate = observation_date.GetSize();
-        contribution.Reallocate(Ndate);
+        int Ntime = observation_time.GetSize();
+        contribution.Reallocate(Ntime);
 
         if (interpolation_type_ == type_triangle_
             && width_property_ == width_per_observation_)
         {
-            for (int i = 0; i< Ndate; i++)
+            for (int i = 0; i< Ntime; i++)
             {
                 width_left_ = width_left(i);
                 width_right_ = width_right(i);
-                contribution(i) = Contribution(date - observation_date(i));
+                contribution(i) = Contribution(time - observation_time(i));
             }
 
             return;
         }
 
         throw ErrorArgument("ObservationAggregator"
-                            "::Contribution(double date, "
-                            "const date_vector& observation_date,"
+                            "::Contribution(double time, "
+                            "const time_vector& observation_time,"
                             "Vector<double>& contribution) const");
     }
 
@@ -685,8 +685,8 @@ namespace Verdandi
       \param[out] index_sup index of the closest value higher than \a value.
     */
     template <class T>
-    template <class date_vector>
-    void ObservationAggregator<T>::GetValueIndex(date_vector& X, double value,
+    template <class time_vector>
+    void ObservationAggregator<T>::GetValueIndex(time_vector& X, double value,
                                                  int& index_inf,
                                                  int& index_sup) const
     {

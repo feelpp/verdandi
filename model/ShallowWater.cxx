@@ -35,7 +35,7 @@ namespace Verdandi
     //! Constructor.
     template <class T>
     ShallowWater<T>::ShallowWater():
-        date_(0.), g_(9.81), urng_(0), current_row_(-1),
+        time_(0.), g_(9.81), urng_(0), current_row_(-1),
         current_column_(-1)
     {
     }
@@ -47,7 +47,7 @@ namespace Verdandi
     */
     template <class T>
     ShallowWater<T>::ShallowWater(string configuration_file):
-        date_(0.), g_(9.81), urng_(0), current_row_(-1),
+        time_(0.), g_(9.81), urng_(0), current_row_(-1),
         current_column_(-1)
     {
         //Initialize(configuration_file);
@@ -92,7 +92,7 @@ namespace Verdandi
         configuration.Set("Ny", Ny_);
 
         configuration.Set("Delta_t", Delta_t_);
-        configuration.Set("final_date", final_date_);
+        configuration.Set("final_time", final_time_);
 
 
         // Departure from the uniform initial condition.
@@ -391,7 +391,7 @@ namespace Verdandi
             abort();
         }
 
-        date_ += Delta_t_;
+        time_ += Delta_t_;
     }
 
 
@@ -402,7 +402,7 @@ namespace Verdandi
     template <class T>
     bool ShallowWater<T>::HasFinished() const
     {
-        return date_ >= final_date_;
+        return time_ >= final_time_;
     }
 
 
@@ -414,7 +414,7 @@ namespace Verdandi
     void ShallowWater<T>::StepBack(const typename ShallowWater<T>
                                    ::state_vector& state)
     {
-        date_ -= Delta_t_;
+        time_ -= Delta_t_;
         SetFullState(state);
     }
 
@@ -425,9 +425,9 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>::Save()
     {
-        output_saver_.Save(u_, date_, "u");
-        output_saver_.Save(v_, date_, "v");
-        output_saver_.Save(h_, date_, "h");
+        output_saver_.Save(u_, time_, "u");
+        output_saver_.Save(v_, time_, "v");
+        output_saver_.Save(h_, time_, "h");
     }
 
 
@@ -436,14 +436,14 @@ namespace Verdandi
     ///////////////////
 
 
-    //! Returns the current date.
+    //! Returns the current time.
     /*!
-      \return The current date.
+      \return The current time.
     */
     template <class T>
-    double ShallowWater<T>::GetDate() const
+    double ShallowWater<T>::GetTime() const
     {
-        return date_;
+        return time_;
     }
 
 

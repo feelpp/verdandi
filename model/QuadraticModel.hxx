@@ -76,11 +76,11 @@ namespace Verdandi
         //! Time step.
         double Delta_t_;
 
-        //! Final date of the simulation.
-        double final_date_;
+        //! Final time of the simulation.
+        double final_time_;
 
-        //! Current date.
-        double date_;
+        //! Current time.
+        double time_;
 
         //! Temporary variable that stores Q times the state vector.
         Vector<T> Q_state_;
@@ -106,8 +106,8 @@ namespace Verdandi
 
         // Access methods.
         T GetDelta_t() const;
-        double GetDate() const;
-        void SetDate(double date);
+        double GetTime() const;
+        void SetTime(double time);
         int GetNstate() const;
         void GetState(state_vector& state) const;
         void SetState(state_vector& state);

@@ -14,7 +14,7 @@ observation = {
    -- Period with which available observations are actually assimilated.
    Nskip = 1,
    -- Duration during which observations are assimilated.
-   final_date = final_time_clamped_bar,
+   final_time = final_time_clamped_bar,
 
    -- In case of triangles widths defined in a file.
    width_file = "configuration/width.bin",

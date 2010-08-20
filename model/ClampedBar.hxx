@@ -86,12 +86,12 @@ namespace Verdandi
 
         //! Time step.
         double Delta_t_;
-        //! Current date.
-        double date_;
+        //! Current time.
+        double time_;
         //! Simulation duration.
-        double final_date_;
-        //! Simulation dates.
-        vector<double> date_vector_;
+        double final_time_;
+        //! Simulation times.
+        vector<double> time_vector_;
 
         //! Mass parameter.
         double mass_density_;
@@ -173,8 +173,8 @@ namespace Verdandi
 
 
         // Access methods.
-        double GetDate() const;
-        void SetDate(double& date);
+        double GetTime() const;
+        void SetTime(double& time);
         int GetNstate() const;
         void GetState(state_vector& state) const;
         void SetState(state_vector& state);

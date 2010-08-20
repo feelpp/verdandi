@@ -97,8 +97,8 @@ namespace Verdandi
 
         //! Number of time steps.
         int Nt_;
-        //! Initial date.
-        T initial_date_;
+        //! Initial time.
+        T initial_time_;
         //! Time step.
         T Delta_t_;
         //! Current iteration.

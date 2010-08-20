@@ -45,15 +45,15 @@ namespace Verdandi
 
         //! Iteration.
         int iteration_;
-        //! Date vector.
-        Vector<double> date_;
+        //! Time vector.
+        Vector<double> time_;
 
         /*** Configuration ***/
 
         //! Should the iterations be displayed?
         bool show_iteration_;
-        //! Should the current date be displayed?
-        bool show_date_;
+        //! Should the current time be displayed?
+        bool show_time_;
 
         /*** Output saver ***/
 

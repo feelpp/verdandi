@@ -54,8 +54,8 @@ namespace Verdandi
         configuration.SetPrefix("forward.");
         // Should the iteration be displayed on screen?
         configuration.Set("display.show_iteration", show_iteration_);
-        // Should the date be displayed on screen?
-        configuration.Set("display.show_date", show_date_);
+        // Should the time be displayed on screen?
+        configuration.Set("display.show_time", show_time_);
 
         /*** Ouput saver ***/
 
@@ -101,11 +101,11 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
-        if (show_date_)
-            Logger::StdOut(*this, "Date: " + to_str(model_.GetDate()));
+        if (show_time_)
+            Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
             Logger::Log<-3>(*this,
-                            "Date: " + to_str(model_.GetDate()));
+                            "Time: " + to_str(model_.GetTime()));
         if (show_iteration_)
             Logger::StdOut(*this, "Initialization");
         else
@@ -136,15 +136,15 @@ namespace Verdandi
     template <class ClassModel>
     void ForwardDriver<ClassModel>::Forward()
     {
-        date_.PushBack(model_.GetDate());
+        time_.PushBack(model_.GetTime());
 
         MessageHandler::Send(*this, "all", "::Forward begin");
 
-        if (show_date_)
-            Logger::StdOut(*this, "Date: " + to_str(model_.GetDate()));
+        if (show_time_)
+            Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
             Logger::Log<-3>(*this,
-                            "Date: " + to_str(model_.GetDate()));
+                            "Time: " + to_str(model_.GetTime()));
         if (show_iteration_)
             Logger::StdOut(*this, "Iteration " + to_str(iteration_) + " -> "
                            + to_str(iteration_ + 1));
@@ -207,7 +207,7 @@ namespace Verdandi
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, model_.GetDate(), "state_forecast");
+            output_saver_.Save(state, model_.GetTime(), "state_forecast");
         }
 
     }

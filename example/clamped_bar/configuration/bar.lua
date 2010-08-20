@@ -47,7 +47,7 @@ optimal_interpolation = {
    display = {
 
       show_iteration = false,
-      show_date = false
+      show_time = false
    },
 
    output_saver = {
@@ -87,7 +87,7 @@ extended_kalman_filter = {
    display = {
 
       show_iteration = false,
-      show_date = true
+      show_time = true
    },
 
    output_saver = {
@@ -116,7 +116,7 @@ forward = {
    display = {
 
       show_iteration = false,
-      show_date = false
+      show_time = false
 
    },
 

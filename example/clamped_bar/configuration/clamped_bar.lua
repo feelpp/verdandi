@@ -8,7 +8,7 @@ clamped_bar = {
       -- Time step.
       Delta_t = Delta_t_clamped_bar,
       -- Simulation time.
-      final_date = final_time_clamped_bar,
+      final_time = final_time_clamped_bar,
 
       bar_length = 1.,
       Nx = 20

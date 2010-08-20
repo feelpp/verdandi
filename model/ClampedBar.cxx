@@ -75,7 +75,7 @@ namespace Verdandi
         configuration.Set("bar_length", bar_length_);
         configuration.Set("Nx", Nx_);
         configuration.Set("Delta_t", Delta_t_);
-        configuration.Set("final_date", final_date_);
+        configuration.Set("final_time", final_time_);
 
         configuration.SetPrefix("clamped_bar.error_statistics.");
         configuration.Set("background_error_variance", "v >= 0",
@@ -109,9 +109,9 @@ namespace Verdandi
         /*** Allocation ***/
 
         Delta_x_ = bar_length_ / Nx_;
-        date_vector_.reserve(floor(final_date_ / Delta_t_));
-        date_vector_ = vector<double>(1, 0.);
-        date_ = 0.;
+        time_vector_.reserve(floor(final_time_ / Delta_t_));
+        time_vector_ = vector<double>(1, 0.);
+        time_ = 0.;
 
         // Skeleton.
         int NvalSkel = 3 * (Nx_- 1) + 4;
@@ -285,8 +285,8 @@ namespace Verdandi
     void ClampedBar<T>::Forward()
     {
         // Update time.
-        date_ += Delta_t_;
-        date_vector_.push_back(date_);
+        time_ += Delta_t_;
+        time_vector_.push_back(time_);
 
         // Right hand side.
         force_.Fill(T(0.));
@@ -331,7 +331,7 @@ namespace Verdandi
     template <class T>
     bool ClampedBar<T>::HasFinished() const
     {
-        return date_ >= final_date_;
+        return time_ >= final_time_;
     }
 
 
@@ -341,8 +341,8 @@ namespace Verdandi
     template <class T>
     void ClampedBar<T>::Save()
     {
-        output_saver_.Save(disp_0_, date_, "disp_0");
-        output_saver_.Save(velo_0_, date_, "velo_0");
+        output_saver_.Save(disp_0_, time_, "disp_0");
+        output_saver_.Save(velo_0_, time_, "velo_0");
     }
 
 
@@ -360,11 +360,11 @@ namespace Verdandi
     template <class T>
     void ClampedBar<T>::ApplyModel(state_vector& x, bool reinitialize_model)
     {
-        double saved_date;
+        double saved_time;
         state_vector saved_state;
         if (reinitialize_model)
         {
-            saved_date = GetDate();
+            saved_time = GetTime();
             GetState(saved_state);
         }
 
@@ -374,7 +374,7 @@ namespace Verdandi
 
         if (reinitialize_model)
         {
-            SetDate(saved_date);
+            SetTime(saved_time);
             SetState(saved_state);
         }
 
@@ -413,25 +413,25 @@ namespace Verdandi
     ////////////////////
 
 
-    //! Returns the current date.
+    //! Returns the current time.
     /*!
-      \return The current date.
+      \return The current time.
     */
     template <class T>
-    double ClampedBar<T>::GetDate() const
+    double ClampedBar<T>::GetTime() const
     {
-        return date_;
+        return time_;
     }
 
 
-    //! Sets the date of the model to a given date.
+    //! Sets the time of the model to a given time.
     /*!
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
-    void ClampedBar<T>::SetDate(double& date)
+    void ClampedBar<T>::SetTime(double& time)
     {
-        date_= date;
+        time_= time;
     }
 
 

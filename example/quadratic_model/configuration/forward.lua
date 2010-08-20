@@ -19,7 +19,7 @@ forward = {
    display = {
 
       show_iteration = false,
-      show_date = true
+      show_time = true
 
    },
 

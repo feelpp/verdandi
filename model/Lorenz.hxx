@@ -71,11 +71,11 @@ namespace Verdandi
         //! Time step.
         double Delta_t_;
 
-        //! Final date of the simulation.
-        double final_date_;
+        //! Final time of the simulation.
+        double final_time_;
 
-        //! Current date.
-        double date_;
+        //! Current time.
+        double time_;
 
         /*** Output saver ***/
 
@@ -101,8 +101,8 @@ namespace Verdandi
         T GetY() const;
         T GetZ() const;
         T GetDelta_t() const;
-        double GetDate() const;
-        void SetDate(double date);
+        double GetTime() const;
+        void SetTime(double time);
         int GetNstate() const;
         void GetState(state_vector& state) const;
         void SetState(state_vector& state);

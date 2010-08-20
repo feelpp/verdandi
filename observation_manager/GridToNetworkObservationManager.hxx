@@ -77,12 +77,12 @@ namespace Verdandi
         //! Type of the index vector 3.
         typedef Vector3<int> index_vector3;
 
-        //! Type of the date vector.
-        typedef Vector<double> date_vector;
-        //! Type of the date vector 2.
-        typedef Vector2<double> date_vector2;
-        //! Type of the date vector 3.
-        typedef Vector3<double> date_vector3;
+        //! Type of the time vector.
+        typedef Vector<double> time_vector;
+        //! Type of the time vector 2.
+        typedef Vector2<double> time_vector2;
+        //! Type of the time vector 3.
+        typedef Vector3<double> time_vector3;
 
     protected:
 
@@ -92,7 +92,7 @@ namespace Verdandi
         string observation_file_;
         //! How are stored the observations.
         string observation_type_;
-        //! Number total of observations at current date.
+        //! Number total of observations at current time.
         int Nobservation_;
         //! Size in byte of an observations vector.
         size_t Nbyte_observation_;
@@ -101,14 +101,14 @@ namespace Verdandi
         //! Period with which available observations are actually loaded.
         int Nskip_;
         //! Duration during which observations are assimilated.
-        double final_date_;
+        double final_time_;
 
-        /*** Observation dates ***/
+        /*** Observation times ***/
 
-        //! Requested date.
-        double date_;
-        //! Available observation date of the time interval.
-        date_vector available_date_;
+        //! Requested time.
+        double time_;
+        //! Available observation time of the time interval.
+        time_vector available_time_;
         //! Contribution associated with available observations.
         Vector<double> contribution_;
         //! Observations aggregator.
@@ -161,11 +161,11 @@ namespace Verdandi
         void SetTrack(int track);
 
         template <class Model>
-        void SetDate(const Model& model, double date);
-        void SetDate(double date);
-        void SetAvailableDate(double date, date_vector& available_date) const;
-        void SetAvailableDate(double date_inf, double date_sup,
-                              date_vector& available_date) const;
+        void SetTime(const Model& model, double time);
+        void SetTime(double time);
+        void SetAvailableTime(double time, time_vector& available_time) const;
+        void SetAvailableTime(double time_inf, double time_sup,
+                              time_vector& available_time) const;
 
 
         ////////////////////////////
@@ -175,42 +175,42 @@ namespace Verdandi
 
         /*** Gets observations ***/
 
-        void GetFlattenedObservation(double date,
+        void GetFlattenedObservation(double time,
                                      observation_vector& observation);
-        void GetFlattenedObservation(double date_inf, double date_sup,
+        void GetFlattenedObservation(double time_inf, double time_sup,
                                      observation_vector& observation);
         void GetFlattenedObservation(observation_vector& observation);
-        void GetFlattenedObservation(const date_vector& available_date,
+        void GetFlattenedObservation(const time_vector& available_time,
                                      observation_vector& observation);
 
         /*** Gets observations and associated variables ***/
 
-        void GetFlattenedObservation(double date,
+        void GetFlattenedObservation(double time,
                                      variable_vector& observation_variable,
                                      observation_vector& observation);
-        void GetFlattenedObservation(double date_inf, double date_sup,
+        void GetFlattenedObservation(double time_inf, double time_sup,
                                      variable_vector& observation_variable,
                                      observation_vector& observation);
         void GetFlattenedObservation(variable_vector& observation_variable,
                                      observation_vector& observation);
-        void GetFlattenedObservation(const date_vector& available_date,
+        void GetFlattenedObservation(const time_vector& available_time,
                                      variable_vector& observation_variable,
                                      observation_vector& observation);
 
         /*** Gets observations, associated variables and associated index ***/
 
-        void GetFlattenedObservation(double date,
+        void GetFlattenedObservation(double time,
                                      variable_vector& observation_variable,
                                      index_vector& observation_index,
                                      observation_vector& observation);
-        void GetFlattenedObservation(double date_inf, double date_sup,
+        void GetFlattenedObservation(double time_inf, double time_sup,
                                      variable_vector& observation_variable,
                                      index_vector& observation_index,
                                      observation_vector& observation);
         void GetFlattenedObservation(variable_vector& observation_variable,
                                      index_vector& observation_index,
                                      observation_vector& observation);
-        void GetFlattenedObservation(const date_vector& available_date,
+        void GetFlattenedObservation(const time_vector& available_time,
                                      variable_vector& observation_variable,
                                      index_vector& observation_index,
                                      observation_vector& observation);
@@ -223,42 +223,42 @@ namespace Verdandi
 
         /*** Gets observations ***/
 
-        void GetAggregatedObservation(double date,
+        void GetAggregatedObservation(double time,
                                       observation_vector& observation);
-        void GetAggregatedObservation(double date_inf, double date_sup,
+        void GetAggregatedObservation(double time_inf, double time_sup,
                                       observation_vector& observation);
         void GetAggregatedObservation(observation_vector& observation);
-        void GetAggregatedObservation(const date_vector& available_date,
+        void GetAggregatedObservation(const time_vector& available_time,
                                       observation_vector& observation);
 
         /*** Gets observations and associated variables ***/
 
-        void GetAggregatedObservation(double date,
+        void GetAggregatedObservation(double time,
                                       variable_vector& observation_variable,
                                       observation_vector2& observation2);
-        void GetAggregatedObservation(double date_inf, double date_sup,
+        void GetAggregatedObservation(double time_inf, double time_sup,
                                       variable_vector& observation_variable,
                                       observation_vector2& observation2);
         void GetAggregatedObservation(variable_vector& observation_variable,
                                       observation_vector2& observation2);
-        void GetAggregatedObservation(const date_vector& available_date,
+        void GetAggregatedObservation(const time_vector& available_time,
                                       variable_vector& observation_variable,
                                       observation_vector2& observation2);
 
         /*** Gets observations, associated variables and associated index ***/
 
-        void GetAggregatedObservation(double date,
+        void GetAggregatedObservation(double time,
                                       variable_vector& observation_variable,
                                       index_vector2& observation_index2,
                                       observation_vector2& observation2);
-        void GetAggregatedObservation(double date_inf, double date_sup,
+        void GetAggregatedObservation(double time_inf, double time_sup,
                                       variable_vector& observation_variable,
                                       index_vector2& observation_index2,
                                       observation_vector2& observation2);
         void GetAggregatedObservation(variable_vector& observation_variable,
                                       index_vector2& observation_index2,
                                       observation_vector2& observation2);
-        void GetAggregatedObservation(const date_vector& available_date,
+        void GetAggregatedObservation(const time_vector& available_time,
                                       variable_vector& observation_variable,
                                       index_vector2& observation_index2,
                                       observation_vector2& observation2);
@@ -271,42 +271,42 @@ namespace Verdandi
 
         /*** Gets observations ***/
 
-        void GetRawObservation(double date,
+        void GetRawObservation(double time,
                                observation_vector2& observation2);
-        void GetRawObservation(double date_inf, double date_sup,
+        void GetRawObservation(double time_inf, double time_sup,
                                observation_vector2& observation2);
         void GetRawObservation(observation_vector2& observation2);
-        void GetRawObservation(const date_vector& available_date,
+        void GetRawObservation(const time_vector& available_time,
                                observation_vector2& observation2);
 
         /*** Gets observations and associated variables ***/
 
-        void GetRawObservation(double date,
+        void GetRawObservation(double time,
                                variable_vector2& observation_variable2,
                                observation_vector3& observation3);
-        void GetRawObservation(double date_inf, double date_sup,
+        void GetRawObservation(double time_inf, double time_sup,
                                variable_vector2& observation_variable2,
                                observation_vector3& observation3);
         void GetRawObservation(variable_vector2& observation_variable2,
                                observation_vector3& observation3);
-        void GetRawObservation(const date_vector& available_date,
+        void GetRawObservation(const time_vector& available_time,
                                variable_vector2& observation_variable2,
                                observation_vector3& observation3);
 
         /*** Gets observations, associated variables and associated index ***/
 
-        void GetRawObservation(double date,
+        void GetRawObservation(double time,
                                variable_vector2& observation_variable2,
                                index_vector3& observation_index3,
                                observation_vector3& observation3);
-        void GetRawObservation(double date_inf, double date_sup,
+        void GetRawObservation(double time_inf, double time_sup,
                                variable_vector2& observation_variable2,
                                index_vector3& observation_index3,
                                observation_vector3& observation3);
         void GetRawObservation(variable_vector2& observation_variable2,
                                index_vector3& observation_index3,
                                observation_vector3& observation3);
-        void GetRawObservation(const date_vector& available_date,
+        void GetRawObservation(const time_vector& available_time,
                                variable_vector2& observation_variable2,
                                index_vector3& observation_index3,
                                observation_vector3& observation3);
@@ -317,17 +317,17 @@ namespace Verdandi
         ///////////////////////////////
 
 
-        void ReadObservationVariable(const date_vector& available_date,
+        void ReadObservationVariable(const time_vector& available_time,
                                      variable_vector2& observation_variable2)
             const;
-        void ReadObservation(const date_vector& available_date,
+        void ReadObservation(const time_vector& available_time,
                              const variable_vector2& observation_variable2,
                              observation_vector3& observation3) const;
-        void ReadObservation(const date_vector& available_date,
+        void ReadObservation(const time_vector& available_time,
                              observation_vector2& observation2) const;
-        void ReadObservation(double date, int variable,
+        void ReadObservation(double time, int variable,
                              observation_vector& observation) const;
-        void ReadObservationIndex(const date_vector& available_date, const
+        void ReadObservationIndex(const time_vector& available_time, const
                                   variable_vector2& observation_variable2,
                                   index_vector3& observation_index3) const;
 
@@ -356,7 +356,7 @@ namespace Verdandi
 
 
         bool HasObservation() const;
-        bool HasObservation(double date);
+        bool HasObservation(double time);
         int GetNobservation() const;
         bool IsOperatorSparse() const;
         bool IsErrorSparse() const;

@@ -98,10 +98,10 @@ namespace Verdandi
 
         //! Time step.
         double Delta_t_;
-        //! Current date.
-        double date_;
+        //! Current time.
+        double time_;
         //! Simulation duration.
-        double final_date_;
+        double final_time_;
 
         //! Gravitational acceleration.
         const double g_;
@@ -206,7 +206,7 @@ namespace Verdandi
         void Save();
 
         // Access methods.
-        double GetDate() const;
+        double GetTime() const;
         int GetNx() const;
         int GetNy() const;
         int GetNz() const;

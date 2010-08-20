@@ -14,7 +14,7 @@ observation = {
    -- Period with which available observations are actually assimilated.
    Nskip = 1,
    -- Duration during which observations are assimilated.
-   final_date = final_time_shallow_water,
+   final_time = final_time_shallow_water,
 
    aggregator = {
 

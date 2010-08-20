@@ -67,8 +67,8 @@ namespace Verdandi
         // Should iterations be displayed on screen?
         configuration.Set("show_iteration",
                           option_display_["show_iteration"]);
-        // Should current date be displayed on screen?
-        configuration.Set("show_date", option_display_["show_date"]);
+        // Should current time be displayed on screen?
+        configuration.Set("show_time", option_display_["show_time"]);
 
         /*** Domain definition ***/
 
@@ -108,7 +108,7 @@ namespace Verdandi
                                      " the HJB solver (" + to_str(Ndimension_)
                                      + ").");
 
-        configuration.Set("initial_date", initial_date_);
+        configuration.Set("initial_time", initial_time_);
         configuration.Set("Delta_t", Delta_t_);
         configuration.Set("Nt", Nt_);
 
@@ -300,11 +300,11 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
-        if (option_display_["show_date"])
-            Logger::StdOut(*this, "Date: "
+        if (option_display_["show_time"])
+            Logger::StdOut(*this, "Time: "
                            + to_str(T(time_step_) * Delta_t_));
         else
-            Logger::Log<-3>(*this, "Date: "
+            Logger::Log<-3>(*this, "Time: "
                             + to_str(T(time_step_) * Delta_t_));
         if (option_display_["show_iteration"])
             Logger::StdOut(*this, "Iteration " + to_str(time_step_) + " -> "
@@ -342,17 +342,17 @@ namespace Verdandi
         if (with_advection_term_ && !model_time_dependent_)
         {
             courant_number_ = 0.;
-            double date, time_step;
+            double time, time_step;
             for (int i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
 
-                model_.SetDate(initial_date_);
+                model_.SetTime(initial_time_);
                 model_.SetState(x);
                 model_.Forward();
                 model_.GetState(Mx);
-                date = model_.GetDate();
-                time_step = date - initial_date_;
+                time = model_.GetTime();
+                time_step = time - initial_time_;
 
                 Add(-1., x, Mx);
                 for (int d = 0; d < Ndimension_; d++)
@@ -401,11 +401,11 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
-        if (option_display_["show_date"])
-            Logger::StdOut(*this, "Date: "
+        if (option_display_["show_time"])
+            Logger::StdOut(*this, "Time: "
                            + to_str(T(time_step_) * Delta_t_));
         else
-            Logger::Log<-3>(*this, "Date: "
+            Logger::Log<-3>(*this, "Time: "
                             + to_str(T(time_step_) * Delta_t_));
         if (option_display_["show_iteration"])
             Logger::StdOut(*this, "Iteration " + to_str(time_step_) + " -> "
@@ -438,11 +438,11 @@ namespace Verdandi
 
         /*** Source term (norm of the innovation) ***/
 
-        double date = initial_date_ + T(time_step_) * Delta_t_;
+        double time = initial_time_ + T(time_step_) * Delta_t_;
         if (with_source_term_)
         {
-            model_.SetDate(date);
-            observation_manager_.SetDate(model_, date);
+            model_.SetTime(time);
+            observation_manager_.SetTime(model_, time);
         }
         if (with_source_term_ && observation_manager_.HasObservation())
         {
@@ -511,9 +511,9 @@ namespace Verdandi
             time_length_upper_bound(d) = Delta_t_ / Delta_x_(d)
                 * upper_bound_model_(d);
 
-        // Model dates.
-        double initial_date = initial_date_ + T(time_step_) * Delta_t_;
-        double date, time_step;
+        // Model times.
+        double initial_time = initial_time_ + T(time_step_) * Delta_t_;
+        double time, time_step;
 
         T time_delta = 0.;
         while (time_delta != Delta_t_)
@@ -525,12 +525,12 @@ namespace Verdandi
                 {
                     get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
 
-                    model_.SetDate(initial_date);
+                    model_.SetTime(initial_time);
                     model_.SetState(x);
                     model_.Forward();
                     model_.GetState(Mx);
-                    date = model_.GetDate();
-                    time_step = date - initial_date;
+                    time = model_.GetTime();
+                    time_step = time - initial_time;
 
                     Add(-1., x, Mx);
                     for (int d = 0; d < Ndimension_; d++)
@@ -662,9 +662,9 @@ namespace Verdandi
 
         /*** Advection term ***/
 
-        // Model dates.
-        double initial_date = initial_date_ + T(time_step_) * Delta_t_;
-        double date, time_step;
+        // Model times.
+        double initial_time = initial_time_ + T(time_step_) * Delta_t_;
+        double time, time_step;
 
         if (model_time_dependent_)
         {
@@ -673,12 +673,12 @@ namespace Verdandi
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
 
-                model_.SetDate(initial_date);
+                model_.SetTime(initial_time);
                 model_.SetState(x);
                 model_.Forward();
                 model_.GetState(Mx);
-                date = model_.GetDate();
-                time_step = date - initial_date;
+                time = model_.GetTime();
+                time_step = time - initial_time;
 
                 Add(-1., x, Mx);
                 for (int d = 0; d < Ndimension_; d++)
@@ -784,9 +784,9 @@ namespace Verdandi
 
         /*** Advection term ***/
 
-        // Model dates.
-        double initial_date = initial_date_ + T(time_step_) * Delta_t_;
-        double date, time_step;
+        // Model times.
+        double initial_time = initial_time_ + T(time_step_) * Delta_t_;
+        double time, time_step;
 
         T time_delta = 0.;
         if (with_advection_term_ && model_time_dependent_)
@@ -796,12 +796,12 @@ namespace Verdandi
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
 
-                model_.SetDate(initial_date);
+                model_.SetTime(initial_time);
                 model_.SetState(x);
                 model_.Forward();
                 model_.GetState(Mx);
-                date = model_.GetDate();
-                time_step = date - initial_date;
+                time = model_.GetTime();
+                time_step = time - initial_time;
 
                 Add(-1., x, Mx);
                 for (int d = 0; d < Ndimension_; d++)

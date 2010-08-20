@@ -22,8 +22,8 @@ lorenz = {
    time = {
 
       Delta_t = .001,
-      initial_date = 0.,
-      final_date = 100.
+      initial_time = 0.,
+      final_time = 100.
 
    },
 

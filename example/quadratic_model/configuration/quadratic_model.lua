@@ -22,8 +22,8 @@ quadratic_model = {
                   0.},
 
       Delta_t = .0015,
-      initial_date = 0.,
-      final_date = 2.5
+      initial_time = 0.,
+      final_time = 2.5
 
    },
 

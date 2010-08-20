@@ -95,8 +95,8 @@ namespace Verdandi
         configuration.Set("type", "", "state", observation_type_);
         configuration.Set("Delta_t", "v > 0", Delta_t_);
         configuration.Set("Nskip", "v > 0", Nskip_);
-        configuration.Set("final_date", "", numeric_limits<double>::max(),
-                          final_date_);
+        configuration.Set("final_time", "", numeric_limits<double>::max(),
+                          final_time_);
 
         configuration.Set("width_file", "", "", width_file_);
         configuration.Set("error.variance", "v > 0", error_variance_value_);
@@ -108,7 +108,7 @@ namespace Verdandi
                           operator_diagonal_value_);
         configuration.Set("operator.file", operator_file_);
 
-        date_ = numeric_limits<double>::min();
+        time_ = numeric_limits<double>::min();
 
         /*** Building the matrices ***/
 
@@ -165,7 +165,7 @@ namespace Verdandi
 
         int expected_file_size;
         expected_file_size = Nbyte_observation_ *
-            int(final_date_ / (Delta_t_ * Nskip_));
+            int(final_time_ / (Delta_t_ * Nskip_));
 
         int file_size;
         ifstream file_stream;
@@ -222,89 +222,89 @@ namespace Verdandi
     }
 
 
-    //! Sets the date of observations to be loaded.
+    //! Sets the time of observations to be loaded.
     /*!
       \param[in] model the model.
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
     template <class Model>
     void LinearObservationManager<T>
-    ::SetDate(const Model& model, double date)
+    ::SetTime(const Model& model, double time)
     {
-        SetDate(date);
+        SetTime(time);
     }
 
 
-    //! Sets the date of observations to be loaded.
+    //! Sets the time of observations to be loaded.
     /*!
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::SetDate(double date)
+    ::SetTime(double time)
     {
-        if (date_ == date)
+        if (time_ == time)
             return;
 
-        date_ = date;
-        SetAvailableDate(date_, available_date_);
+        time_ = time;
+        SetAvailableTime(time_, available_time_);
     }
 
 
-    //! Sets the available observation dates at a given date.
+    //! Sets the available observation times at a given time.
     /*!
-      \param[in] date the given date.
-      \param[out] available_date the available observation dates.
+      \param[in] time the given time.
+      \param[out] available_time the available observation times.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::SetAvailableDate(double date, LinearObservationManager<T>::date_vector&
-                       available_date)
+    ::SetAvailableTime(double time, LinearObservationManager<T>::time_vector&
+                       available_time)
     {
-        double date_inf, date_sup;
+        double time_inf, time_sup;
         int selection_policy;
-        observation_aggregator_.GetContributionInterval(date, date_inf,
-                                                        date_sup,
+        observation_aggregator_.GetContributionInterval(time, time_inf,
+                                                        time_sup,
                                                         selection_policy);
-        SetAvailableDate(date, date_inf, date_sup, selection_policy,
-                         available_date);
+        SetAvailableTime(time, time_inf, time_sup, selection_policy,
+                         available_time);
 
-        Logger::Log<3>(*this, to_str(date) + ", [" + to_str(date_inf) + " " +
-                       to_str(date_sup) + "], {" + to_str(available_date) +
+        Logger::Log<3>(*this, to_str(time) + ", [" + to_str(time_inf) + " " +
+                       to_str(time_sup) + "], {" + to_str(available_time) +
                        "}\n");
     }
 
 
-    //! Sets available observation dates at a given time interval.
+    //! Sets available observation times at a given time interval.
     /*!
-      \param[in] date_inf lower bound of the given time interval.
-      \param[in] date_sup upper bound of the given time interval.
+      \param[in] time_inf lower bound of the given time interval.
+      \param[in] time_sup upper bound of the given time interval.
       \param[in] selection_policy interval selection policy.
-      \param[out] available_date the available observation dates.
+      \param[out] available_time the available observation times.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::SetAvailableDate(double date, double date_inf, double date_sup,
+    ::SetAvailableTime(double time, double time_inf, double time_sup,
                        int selection_policy,
-                       LinearObservationManager<T>::date_vector&
-                       available_date)
+                       LinearObservationManager<T>::time_vector&
+                       available_time)
     {
-        available_date.Clear();
-        date_sup = date_sup < final_date_ ? date_sup : final_date_;
+        available_time.Clear();
+        time_sup = time_sup < final_time_ ? time_sup : final_time_;
 
         double period = Delta_t_ * Nskip_;
 
         // All observations available in the given interval are considered.
         if (selection_policy == 0)
         {
-            double available_date_0 = floor(date_inf / period) * period;
-            if (available_date_0 == date_inf)
-                available_date.PushBack(available_date_0);
-            available_date_0 += period;
-            for (double t = available_date_0; t < date_sup; t += period)
-                available_date.PushBack(t);
-            observation_aggregator_.Contribution(date_, available_date_,
+            double available_time_0 = floor(time_inf / period) * period;
+            if (available_time_0 == time_inf)
+                available_time.PushBack(available_time_0);
+            available_time_0 += period;
+            for (double t = available_time_0; t < time_sup; t += period)
+                available_time.PushBack(t);
+            observation_aggregator_.Contribution(time_, available_time_,
                                                  contribution_);
             return;
         }
@@ -313,13 +313,13 @@ namespace Verdandi
         // are requested.
         if (selection_policy == 2)
         {
-            double t1 = floor(date / period) * period;
+            double t1 = floor(time / period) * period;
             double t2 = t1 + period;
-            if (t1 > date_inf)
-                available_date.PushBack(t1);
-            if (t2 < date_sup)
-                available_date.PushBack(t2);
-            observation_aggregator_.Contribution(date_, available_date_,
+            if (t1 > time_inf)
+                available_time.PushBack(t1);
+            if (t2 < time_sup)
+                available_time.PushBack(t2);
+            observation_aggregator_.Contribution(time_, available_time_,
                                                  contribution_);
             return;
         }
@@ -329,68 +329,68 @@ namespace Verdandi
         // observations.
         if (selection_policy == 3)
         {
-            double available_date_0, available_date_1;
+            double available_time_0, available_time_1;
             int Nobservation;
 
             Vector<double> width_left, width_right, available_width_left,
                 available_width_right;
-            ReadObservationTriangleWidth(date_inf, date_sup, width_left,
+            ReadObservationTriangleWidth(time_inf, time_sup, width_left,
                                          width_right);
 
-            available_date_0 = floor(date_inf / period) * period;
-            if (!is_equal(available_date_0, date_inf))
-                available_date_0 += period;
+            available_time_0 = floor(time_inf / period) * period;
+            if (!is_equal(available_time_0, time_inf))
+                available_time_0 += period;
 
-            available_date_1 = floor(date_sup / period) * period;
-            if (is_equal(available_date_1, date_sup))
-                available_date_1 -= period;
+            available_time_1 = floor(time_sup / period) * period;
+            if (is_equal(available_time_1, time_sup))
+                available_time_1 -= period;
 
-            Nobservation = floor((available_date_1 - available_date_0)
+            Nobservation = floor((available_time_1 - available_time_0)
                                  / period) + 1;
 
-            double t = available_date_0;
+            double t = available_time_0;
             for (int i = 0; i < Nobservation; i++, t += period)
             {
-                if (t < date)
+                if (t < time)
                 {
-                    if (t + width_right(i) > date)
+                    if (t + width_right(i) > time)
                     {
-                        available_date.PushBack(t);
+                        available_time.PushBack(t);
                         available_width_left.PushBack(width_left(i));
                         available_width_right.PushBack(width_right(i));
                     }
                 }
-                else if (t > date)
+                else if (t > time)
                 {
-                    if (t - width_left(i) < date)
+                    if (t - width_left(i) < time)
                     {
-                        available_date.PushBack(t);
+                        available_time.PushBack(t);
                         available_width_left.PushBack(width_left(i));
                         available_width_right.PushBack(width_right(i));
                     }
                 }
                 else
                 {
-                    available_date.PushBack(t);
+                    available_time.PushBack(t);
                     available_width_left.PushBack(width_left(i));
                     available_width_right.PushBack(width_right(i));
                 }
 
             }
             observation_aggregator_.
-                Contribution(date_, available_date_,
+                Contribution(time_, available_time_,
                              available_width_left, available_width_right,
                              contribution_);
             return;
         }
 
         throw ErrorArgument("void LinearObservationManager<T>"
-                            "::SetAvailableDate(double date,"
-                            " double date_inf, double date_sup,"
+                            "::SetAvailableTime(double time,"
+                            " double time_inf, double time_sup,"
                             " int selection_policy,"
                             "LinearObservationManager<T>"
-                            "::date_vector&"
-                            "available_date) const");
+                            "::time_vector&"
+                            "available_time) const");
     }
 
 
@@ -402,44 +402,44 @@ namespace Verdandi
     /*** Gets observations ***/
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at date \a date are loaded and concatenated
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at time \a time are loaded and concatenated
       in a vector.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(double date,
+    ::GetFlattenedObservation(double time,
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetFlattenedObservation(available_date, observation);
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetFlattenedObservation(available_time, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup]
+    //! Gets observations flattened over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup]
       are loaded and concatenated in a vector.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(double date_inf, double date_sup,
+    ::GetFlattenedObservation(double time_inf, double time_sup,
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetFlattenedObservation(available_date, observation);
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetFlattenedObservation(available_time, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
+    //! Gets observations flattened over a list of times.
     /*! The observations available are loaded and concatenated in a vector.
       \param[out] observation the observation to be loaded.
     */
@@ -448,25 +448,25 @@ namespace Verdandi
     ::GetFlattenedObservation(
         LinearObservationManager<T>::observation_vector& observation)
     {
-        GetFlattenedObservation(available_date_, observation);
+        GetFlattenedObservation(available_time_, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and concatenated in a vector.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation the observation to be loaded.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(const LinearObservationManager<T>::date_vector&
-                              available_date,
+    ::GetFlattenedObservation(const LinearObservationManager<T>::time_vector&
+                              available_time,
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
         observation_vector2 observation2;
-        GetRawObservation(available_date, observation2);
+        GetRawObservation(available_time, observation2);
         observation2.Flatten(observation);
     }
 
@@ -474,54 +474,54 @@ namespace Verdandi
     /*** Gets observations and associated variables ***/
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at date \a date are loaded and concatenated
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at time \a time are loaded and concatenated
       in a vector.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(double date,
+    ::GetFlattenedObservation(double time,
                               LinearObservationManager<T>::variable_vector&
                               observation_variable,
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetFlattenedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetFlattenedObservation(available_time, observation_variable,
                                 observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup]
+    //! Gets observations flattened over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup]
       are loaded and concatenated in a vector.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(double date_inf, double date_sup,
+    ::GetFlattenedObservation(double time_inf, double time_sup,
                               LinearObservationManager<T>::variable_vector&
                               observation_variable,
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetFlattenedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetFlattenedObservation(available_time, observation_variable,
                                 observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
+    //! Gets observations flattened over a list of times.
     /*! The observations available are loaded and concatenated in a vector.
       \param[out] observation_variable variables associated with the
       observations.
@@ -533,23 +533,23 @@ namespace Verdandi
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::observation_vector& observation)
     {
-        GetFlattenedObservation(available_date_, observation_variable,
+        GetFlattenedObservation(available_time_, observation_variable,
                                 observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and concatenated in a vector.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation the observation to be loaded.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(const LinearObservationManager<T>::date_vector&
-                              available_date,
+    ::GetFlattenedObservation(const LinearObservationManager<T>::time_vector&
+                              available_time,
                               LinearObservationManager<T>::variable_vector&
                               observation_variable,
                               LinearObservationManager<T>::observation_vector&
@@ -557,7 +557,7 @@ namespace Verdandi
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
-        GetRawObservation(available_date, observation_variable2,
+        GetRawObservation(available_time, observation_variable2,
                           observation3);
         observation3.Flatten(observation);
         observation_variable2.Flatten(observation_variable);
@@ -567,10 +567,10 @@ namespace Verdandi
     /*** Gets observations, associated variables and associated index ***/
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at date \a date are loaded and concatenated
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at time \a time are loaded and concatenated
       in a vector.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index indexes associated with the observations.
@@ -578,7 +578,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(double date,
+    ::GetFlattenedObservation(double time,
                               LinearObservationManager<T>::variable_vector&
                               observation_variable,
                               LinearObservationManager<T>::index_vector&
@@ -586,18 +586,18 @@ namespace Verdandi
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetFlattenedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetFlattenedObservation(available_time, observation_variable,
                                 observation_index, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup]
+    //! Gets observations flattened over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup]
       are loaded and concatenated in a vector.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index indexes associated with the observations.
@@ -605,7 +605,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(double date_inf, double date_sup,
+    ::GetFlattenedObservation(double time_inf, double time_sup,
                               LinearObservationManager<T>::variable_vector&
                               observation_variable,
                               LinearObservationManager<T>::index_vector&
@@ -613,14 +613,14 @@ namespace Verdandi
                               LinearObservationManager<T>::observation_vector&
                               observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetFlattenedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetFlattenedObservation(available_time, observation_variable,
                                 observation_index, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
+    //! Gets observations flattened over a list of times.
     /*! The observations available are loaded and concatenated in a vector.
       \param[out] observation_variable variables associated with the
       observations.
@@ -634,15 +634,15 @@ namespace Verdandi
         LinearObservationManager<T>::index_vector& observation_index,
         LinearObservationManager<T>::observation_vector& observation)
     {
-        GetFlattenedObservation(available_date_, observation_variable,
+        GetFlattenedObservation(available_time_, observation_variable,
                                 observation_index, observation);
     }
 
 
-    //! Gets observations flattened over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations flattened over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and concatenated in a vector.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index indexes associated with the observations.
@@ -651,7 +651,7 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetFlattenedObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::index_vector& observation_index,
         LinearObservationManager<T>::observation_vector& observation)
@@ -659,7 +659,7 @@ namespace Verdandi
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
         index_vector3 observation_index3;
-        GetRawObservation(available_date, observation_variable2,
+        GetRawObservation(available_time, observation_variable2,
                           observation_index3, observation3);
         observation3.Flatten(observation);
         observation_variable2.Flatten(observation_variable);
@@ -675,44 +675,44 @@ namespace Verdandi
     /*** Gets observations ***/
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the given date are loaded and
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the given time are loaded and
       aggregated.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation the aggregated observations.
     */
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        double date,
+        double time,
         LinearObservationManager<T>::observation_vector& observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetAggregatedObservation(available_date, observation);
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetAggregatedObservation(available_time, observation);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup] are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
       and aggregated.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation the aggregated observations.
     */
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         LinearObservationManager<T>::observation_vector& observation)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetAggregatedObservation(available_date, observation);
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetAggregatedObservation(available_time, observation);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
+    //! Gets observations aggregated over a list of times.
     /*! The observations available are loaded and
       aggregated.
       \param[out] observation the aggregated observations.
@@ -722,36 +722,36 @@ namespace Verdandi
     ::GetAggregatedObservation(
         LinearObservationManager<T>::observation_vector& observation)
     {
-        GetAggregatedObservation(available_date_, observation);
+        GetAggregatedObservation(available_time_, observation);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and aggregated.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation the aggregated observations.
     */
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::observation_vector& observation)
     {
         observation_vector2 observation2;
-        GetRawObservation(available_date, observation2);
-        observation_aggregator_.Aggregate(available_date, contribution_,
-                                          observation2, date_, observation);
+        GetRawObservation(available_time, observation2);
+        observation_aggregator_.Aggregate(available_time, contribution_,
+                                          observation2, time_, observation);
     }
 
 
     /*** Gets observations and associated variables ***/
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the given date are loaded and
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the given time are loaded and
       aggregated.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation2 the aggregated observations.
@@ -759,22 +759,22 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        double date,
+        double time,
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetAggregatedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetAggregatedObservation(available_time, observation_variable,
                                  observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup] are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
       and aggregated.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation2 the aggregated observations.
@@ -782,18 +782,18 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetAggregatedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetAggregatedObservation(available_time, observation_variable,
                                  observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
+    //! Gets observations aggregated over a list of times.
     /*! The observations available are loaded and
       aggregated.
       \param[out] observation_variable variables associated with the
@@ -806,15 +806,15 @@ namespace Verdandi
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        GetAggregatedObservation(available_date_, observation_variable,
+        GetAggregatedObservation(available_time_, observation_variable,
                                  observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and aggregated.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation2 the aggregated observations.
@@ -822,19 +822,19 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
-        GetRawObservation(available_date, observation_variable2,
+        GetRawObservation(available_time, observation_variable2,
                           observation3);
-        observation_aggregator_.Aggregate(available_date,
+        observation_aggregator_.Aggregate(available_time,
                                           contribution_,
                                           observation_variable2,
                                           observation3,
-                                          date_,
+                                          time_,
                                           observation_variable,
                                           observation2);
     }
@@ -843,10 +843,10 @@ namespace Verdandi
     /*** Gets observations, associated variables and associated index ***/
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the given date are loaded and
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the given time are loaded and
       aggregated.
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index2 indexes associated with the observations.
@@ -855,23 +855,23 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        double date,
+        double time,
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::index_vector2& observation_index2,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetAggregatedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetAggregatedObservation(available_time, observation_variable,
                                  observation_index2, observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations in the interval [\a date_inf, \a date_sup] are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
       and aggregated.
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index2 indexes associated with the observations.
@@ -880,19 +880,19 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::index_vector2& observation_index2,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetAggregatedObservation(available_date, observation_variable,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetAggregatedObservation(available_time, observation_variable,
                                  observation_index2, observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
+    //! Gets observations aggregated over a list of times.
     /*! The observations available are loaded and
       aggregated.
       \param[out] observation_variable variables associated with the
@@ -907,15 +907,15 @@ namespace Verdandi
         LinearObservationManager<T>::index_vector2& observation_index2,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        GetAggregatedObservation(available_date_, observation_variable,
+        GetAggregatedObservation(available_time_, observation_variable,
                                  observation_index2, observation2);
     }
 
 
-    //! Gets observations aggregated over a list of dates.
-    /*! The observations available at the dates \a available_date are loaded
+    //! Gets observations aggregated over a list of times.
+    /*! The observations available at the times \a available_time are loaded
       and aggregated.
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index2 indexes associated with the observations.
@@ -924,7 +924,7 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::variable_vector& observation_variable,
         LinearObservationManager<T>::index_vector2& observation_index2,
         LinearObservationManager<T>::observation_vector2& observation2)
@@ -932,14 +932,14 @@ namespace Verdandi
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
         index_vector3 observation_index3;
-        GetRawObservation(available_date, observation_variable2,
+        GetRawObservation(available_time, observation_variable2,
                           observation_index3, observation3);
-        observation_aggregator_.Aggregate(available_date,
+        observation_aggregator_.Aggregate(available_time,
                                           contribution_,
                                           observation_variable2,
                                           observation_index3,
                                           observation3,
-                                          date_,
+                                          time_,
                                           observation_variable,
                                           observation_index2,
                                           observation2);
@@ -954,42 +954,42 @@ namespace Verdandi
     /*** Gets observations ***/
 
 
-    //! Gets available observations at a given date.
+    //! Gets available observations at a given time.
     /*!
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        double date,
+        double time,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetRawObservation(available_date, observation2);
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetRawObservation(available_time, observation2);
     }
 
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetRawObservation(available_date, observation2);
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetRawObservation(available_time, observation2);
     }
 
 
-    //! Gets observations at the current date.
+    //! Gets observations at the current time.
     /*!
       \param[out] observation2 the observation to be loaded.
     */
@@ -998,31 +998,31 @@ namespace Verdandi
     ::GetRawObservation(
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        GetRawObservation(available_date_, observation2);
+        GetRawObservation(available_time_, observation2);
     }
 
 
-    //! Gets observations of a list of dates.
+    //! Gets observations of a list of times.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation2 the observation to be loaded.
     */
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::observation_vector2& observation2)
     {
-        ReadObservation(available_date, observation2);
+        ReadObservation(available_time, observation2);
     }
 
 
     /*** Gets observations and associated variables ***/
 
 
-    //! Gets available observations at a given date.
+    //! Gets available observations at a given time.
     /*!
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observation to be loaded.
@@ -1030,21 +1030,21 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        double date,
+        double time,
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetRawObservation(available_date, observation_variable2,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetRawObservation(available_time, observation_variable2,
                           observation3);
     }
 
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observation to be loaded.
@@ -1052,19 +1052,19 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetRawObservation(available_date, observation_variable2,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetRawObservation(available_time, observation_variable2,
                           observation3);
     }
 
 
 
-    //! Gets observations at the current date.
+    //! Gets observations at the current time.
     /*!
       \param[out] observation_variable2 variables associated with the
       observations.
@@ -1076,14 +1076,14 @@ namespace Verdandi
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        GetRawObservation(available_date_, observation_variable2,
+        GetRawObservation(available_time_, observation_variable2,
                           observation3);
     }
 
 
-    //! Gets observations of a list of dates.
+    //! Gets observations of a list of times.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observation to be loaded.
@@ -1091,21 +1091,21 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        ReadObservationVariable(available_date, observation_variable2);
-        ReadObservation(available_date, observation_variable2, observation3);
+        ReadObservationVariable(available_time, observation_variable2);
+        ReadObservation(available_time, observation_variable2, observation3);
     }
 
 
     /*** Gets observations, associated variables and associated index ***/
 
 
-    //! Gets available observations at a given date.
+    //! Gets available observations at a given time.
     /*!
-      \param[in] date the given date.
+      \param[in] time the given time.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation_index3 indexes associated with the observations.
@@ -1114,22 +1114,22 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        double date,
+        double time,
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::index_vector3& observation_index3,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector available_date;
-        SetAvailableDate(date, available_date);
-        GetRawObservation(available_date, observation_variable2,
+        time_vector available_time;
+        SetAvailableTime(time, available_time);
+        GetRawObservation(available_time, observation_variable2,
                           observation_index3, observation3);
     }
 
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] date_inf lower_bound of the given interval.
-      \param[in] date_sup upper_bound of the given interval.
+      \param[in] time_inf lower_bound of the given interval.
+      \param[in] time_sup upper_bound of the given interval.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation_index3 indexes associated with the observations.
@@ -1138,20 +1138,20 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        double date_inf, double date_sup,
+        double time_inf, double time_sup,
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::index_vector3& observation_index3,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        date_vector available_date;
-        SetAvailableDate(date_inf, date_sup, available_date);
-        GetRawObservation(available_date, observation_variable2,
+        time_vector available_time;
+        SetAvailableTime(time_inf, time_sup, available_time);
+        GetRawObservation(available_time, observation_variable2,
                           observation_index3, observation3);
     }
 
 
 
-    //! Gets observations at the current date.
+    //! Gets observations at the current time.
     /*!
       \param[out] observation_variable2 variables associated with the
       observations.
@@ -1165,14 +1165,14 @@ namespace Verdandi
         LinearObservationManager<T>::index_vector3& observation_index3,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        GetRawObservation(available_date_, observation_variable2,
+        GetRawObservation(available_time_, observation_variable2,
                           observation_index3, observation3);
     }
 
 
-    //! Gets observations of a list of dates.
+    //! Gets observations of a list of times.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation_index3 indexes associated with the observations.
@@ -1181,14 +1181,14 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::variable_vector2& observation_variable2,
         LinearObservationManager<T>::index_vector3& observation_index3,
         LinearObservationManager<T>::observation_vector3& observation3)
     {
-        ReadObservationVariable(available_date, observation_variable2);
-        ReadObservation(available_date, observation_variable2, observation3);
-        ReadObservationIndex(available_date, observation_variable2,
+        ReadObservationVariable(available_time, observation_variable2);
+        ReadObservation(available_time, observation_variable2, observation3);
+        ReadObservationIndex(available_time, observation_variable2,
                              observation_index3);
     }
 
@@ -1200,27 +1200,27 @@ namespace Verdandi
 
     //! Builds variables vector associated with given observations.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation_variable2 variables associated with the
       observations.
     */
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservationVariable(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::variable_vector2& observation_variable2)
         const
     {
-        int Nt = available_date.GetSize();
+        int Nt = available_time.GetSize();
         observation_variable2.Reallocate(Nt);
         for (int h = 0; h < Nt; h++)
             observation_variable2(h).PushBack(0);
     }
 
 
-    //! Builds observations associated with given dates and variables.
+    //! Builds observations associated with given times and variables.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[in] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observations.
@@ -1228,7 +1228,7 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         const LinearObservationManager<T>::variable_vector2&
         observation_variable2,
         LinearObservationManager<T>::observation_vector3& observation3) const
@@ -1245,7 +1245,7 @@ namespace Verdandi
 #endif
 
         int Nvariable, Nt;
-        Nt = available_date.GetSize();
+        Nt = available_time.GetSize();
         observation3.Reallocate(Nt);
         for (int h = 0; h < Nt; h++)
         {
@@ -1253,7 +1253,7 @@ namespace Verdandi
             observation3.Reallocate(h, Nvariable);
             for (int v = 0; v < Nvariable; v++)
                 ReadObservation(file_stream,
-                                available_date(h),
+                                available_time(h),
                                 observation_variable2(h, v),
                                 observation3.GetVector(h, v));
         }
@@ -1262,15 +1262,15 @@ namespace Verdandi
     }
 
 
-    //! Builds observations associated with given dates.
+    //! Builds observations associated with given times.
     /*!
-      \param[in] available_date the given observation date vector.
+      \param[in] available_time the given observation time vector.
       \param[out] observation2 the observations.
     */
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservation(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         LinearObservationManager<T>::observation_vector2& observation2) const
     {
         ifstream file_stream;
@@ -1284,26 +1284,26 @@ namespace Verdandi
                           + observation_file_ + "\".");
 #endif
 
-        int Nt = available_date.GetSize();
+        int Nt = available_time.GetSize();
         observation2.Reallocate(Nt);
         for (int h = 0; h < Nt; h++)
-            ReadObservation(file_stream, available_date(h), 0,
+            ReadObservation(file_stream, available_time(h), 0,
                             observation2(h));
 
         file_stream.close();
     }
 
 
-    //! Reads observation from observation file given a date and a variable.
+    //! Reads observation from observation file given a time and a variable.
     /*!
       \param[in] file_stream the observation file stream.
-      \param[in] date the date.
+      \param[in] time the time.
       \param[in] variable the variable.
       \param[out] observation the observations.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::ReadObservation(ifstream& file_stream, double date, int variable,
+    ::ReadObservation(ifstream& file_stream, double time, int variable,
                       LinearObservationManager<T>::observation_vector&
                       observation) const
     {
@@ -1311,7 +1311,7 @@ namespace Verdandi
         observation_vector input_data;
 
         streampos position;
-        position =  (floor(date / (Delta_t_ * Nskip_) + 0.5) + variable)
+        position =  (floor(time / (Delta_t_ * Nskip_) + 0.5) + variable)
             * Nbyte_observation_;
         file_stream.seekg(position);
         input_data.Read(file_stream);
@@ -1323,7 +1323,7 @@ namespace Verdandi
 
     //! Reads observations indexes.
     /*!
-      \param[in] available_date the available date.
+      \param[in] available_time the available time.
       \param[in] observation_variable2 variable associated with the
       observations.
       \param[out] observation_index3 the indexes associated with the
@@ -1332,13 +1332,13 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservationIndex(
-        const LinearObservationManager<T>::date_vector& available_date,
+        const LinearObservationManager<T>::time_vector& available_time,
         const LinearObservationManager<T>::variable_vector2&
         observation_variable2,
         LinearObservationManager<T>::index_vector3& observation_index3) const
     {
         int Nvariable, Nt;
-        Nt = available_date.GetSize();
+        Nt = available_time.GetSize();
         observation_index3.Reallocate(Nt);
         for (int h = 0; h < Nt; h++)
         {
@@ -1355,18 +1355,18 @@ namespace Verdandi
 
     //! Reads triangle width associated with observations of a given interval.
     /*!
-      \param[in] date_inf lower bound of a given interval.
-      \param[in] date_sup upper bound of a given interval.
+      \param[in] time_inf lower bound of a given interval.
+      \param[in] time_sup upper bound of a given interval.
       \param[out] width_left left widths associated with observations.
       \param[out] width_right right widths associated with observations.
     */
     template <class T>
     void LinearObservationManager<T>
-    ::ReadObservationTriangleWidth(double date_inf, double date_sup,
+    ::ReadObservationTriangleWidth(double time_inf, double time_sup,
                                    Vector<double>& width_left,
                                    Vector<double>& width_right) const
     {
-        double period, available_date_0, available_date_1;
+        double period, available_time_0, available_time_1;
         int Nwidth, Nbyte_width;
         Vector<double> input_data;
 
@@ -1382,19 +1382,19 @@ namespace Verdandi
                           + width_file_ + "\".");
 #endif
         period = Delta_t_ * Nskip_;
-        available_date_0 = floor(date_inf / period) * period;
-        if (!is_equal(available_date_0, date_inf))
-            available_date_0 += period;
-        available_date_1 = floor(date_sup / period) * period;
-        if (is_equal(available_date_1, date_sup))
-            available_date_1 -= period;
+        available_time_0 = floor(time_inf / period) * period;
+        if (!is_equal(available_time_0, time_inf))
+            available_time_0 += period;
+        available_time_1 = floor(time_sup / period) * period;
+        if (is_equal(available_time_1, time_sup))
+            available_time_1 -= period;
 
-        Nwidth = floor((available_date_1 - available_date_0) / period) + 1;
+        Nwidth = floor((available_time_1 - available_time_0) / period) + 1;
         Nbyte_width = 2 * sizeof(double) + sizeof(int);
         width_left.Reallocate(Nwidth);
         width_right.Reallocate(Nwidth);
 
-        position = floor(available_date_0 / Delta_t_) * Nbyte_width;
+        position = floor(available_time_0 / Delta_t_) * Nbyte_width;
         for (int i = 0; i < Nwidth; i++, position += Nskip_ * Nbyte_width)
         {
             file_stream.seekg(position);
@@ -1457,15 +1457,15 @@ namespace Verdandi
     ////////////
 
 
-    //! Indicates if some observations are available at a given date.
+    //! Indicates if some observations are available at a given time.
     /*!
-      \param[in] date a given date.
+      \param[in] time a given time.
     */
     template <class T>
-    bool LinearObservationManager<T>::HasObservation(double date)
+    bool LinearObservationManager<T>::HasObservation(double time)
     {
-        SetDate(date);
-        return available_date_.GetSize() != 0
+        SetTime(time);
+        return available_time_.GetSize() != 0
             && !is_equal(Norm1(contribution_), 0.);
     }
 
@@ -1474,14 +1474,14 @@ namespace Verdandi
     template <class T>
     bool LinearObservationManager<T>::HasObservation() const
     {
-        return available_date_.GetSize() != 0
+        return available_time_.GetSize() != 0
             && !is_equal(Norm1(contribution_), 0.);
     }
 
 
     //! Gets Nobservation_ value.
     /*!
-      \return The total number of observation at current date.
+      \return The total number of observation at current time.
     */
     template <class T>
     int LinearObservationManager<T>::GetNobservation() const

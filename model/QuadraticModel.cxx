@@ -34,7 +34,7 @@ namespace Verdandi
 
     //! Constructor.
     template <class T>
-    QuadraticModel<T>::QuadraticModel(): Delta_t_(1.), date_(0.)
+    QuadraticModel<T>::QuadraticModel(): Delta_t_(1.), time_(0.)
     {
     }
 
@@ -137,8 +137,8 @@ namespace Verdandi
         }
 
         configuration.Set("Delta_t", Delta_t_);
-        configuration.Set("initial_date", date_);
-        configuration.Set("final_date", final_date_);
+        configuration.Set("initial_time", time_);
+        configuration.Set("final_time", final_time_);
 
         /*** Output saver ***/
 
@@ -191,7 +191,7 @@ namespace Verdandi
         if (with_constant_term_)
             Add(Delta_t_, b_, state_);
 
-        date_ += Delta_t_;
+        time_ += Delta_t_;
     }
 
 
@@ -202,7 +202,7 @@ namespace Verdandi
     template <class T>
     bool QuadraticModel<T>::HasFinished() const
     {
-        return date_ >= final_date_;
+        return time_ >= final_time_;
     }
 
 
@@ -212,7 +212,7 @@ namespace Verdandi
     template <class T>
     void QuadraticModel<T>::Save()
     {
-        output_saver_.Save(state_, date_, "state");
+        output_saver_.Save(state_, time_, "state");
     }
 
 
@@ -232,25 +232,25 @@ namespace Verdandi
     }
 
 
-    //! Returns the current date.
+    //! Returns the current time.
     /*!
-      \return The current date.
+      \return The current time.
     */
     template <class T>
-    double QuadraticModel<T>::GetDate() const
+    double QuadraticModel<T>::GetTime() const
     {
-        return date_;
+        return time_;
     }
 
 
-    //! Sets the current date.
+    //! Sets the current time.
     /*!
-      \param[in] date the current date.
+      \param[in] time the current time.
     */
     template <class T>
-    void QuadraticModel<T>::SetDate(double date)
+    void QuadraticModel<T>::SetTime(double time)
     {
-        date_ = date;
+        time_ = time;
     }
 
 

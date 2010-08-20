@@ -34,7 +34,7 @@ namespace Verdandi
 
     //! Constructor.
     template <class T>
-    Lorenz<T>::Lorenz(): X_(0), Y_(0), Z_(0), Delta_t_(1), date_(0)
+    Lorenz<T>::Lorenz(): X_(0), Y_(0), Z_(0), Delta_t_(1), time_(0)
     {
     }
 
@@ -89,8 +89,8 @@ namespace Verdandi
         configuration.SetPrefix("lorenz.time.");
 
         configuration.Set("Delta_t", Delta_t_);
-        configuration.Set("initial_date", date_);
-        configuration.Set("final_date", final_date_);
+        configuration.Set("initial_time", time_);
+        configuration.Set("final_time", final_time_);
 
         /*** Output saver ***/
 
@@ -124,7 +124,7 @@ namespace Verdandi
         Y_ += Delta_t_ * (X_tmp_ * (Ra_ - Z_) - Y_);
         Z_ += Delta_t_ * (X_tmp_ * Y_tmp_ - b_ * Z_);
 
-        date_ += Delta_t_;
+        time_ += Delta_t_;
     }
 
 
@@ -135,7 +135,7 @@ namespace Verdandi
     template <class T>
     bool Lorenz<T>::HasFinished() const
     {
-        return date_ >= final_date_;
+        return time_ >= final_time_;
     }
 
 
@@ -145,9 +145,9 @@ namespace Verdandi
     template <class T>
     void Lorenz<T>::Save()
     {
-        output_saver_.Save(X_, date_, "X");
-        output_saver_.Save(Y_, date_, "Y");
-        output_saver_.Save(Z_, date_, "Z");
+        output_saver_.Save(X_, time_, "X");
+        output_saver_.Save(Y_, time_, "Y");
+        output_saver_.Save(Z_, time_, "Z");
     }
 
 
@@ -200,25 +200,25 @@ namespace Verdandi
     }
 
 
-    //! Returns the current date.
+    //! Returns the current time.
     /*!
-      \return The current date.
+      \return The current time.
     */
     template <class T>
-    double Lorenz<T>::GetDate() const
+    double Lorenz<T>::GetTime() const
     {
-        return date_;
+        return time_;
     }
 
 
-    //! Sets the current date.
+    //! Sets the current time.
     /*!
-      \param[in] date the current date.
+      \param[in] time the current time.
     */
     template <class T>
-    void Lorenz<T>::SetDate(double date)
+    void Lorenz<T>::SetTime(double time)
     {
-        date_ = date;
+        time_ = time;
     }
 
 
