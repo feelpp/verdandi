@@ -49,12 +49,12 @@ namespace Verdandi
     {
 
     public:
-#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+#ifdef VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
         //! Type of the tangent linear operator.
-        typedef Matrix<T, General, RowSparse> tangent_operator_matrix;
+        typedef Matrix<T, General, RowSparse> tangent_linear_operator;
 #else
         //! Type of the tangent linear operator.
-        typedef Matrix<T> tangent_operator_matrix;
+        typedef Matrix<T> tangent_linear_operator;
 #endif
 
 #ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
@@ -65,8 +65,10 @@ namespace Verdandi
         typedef Matrix<T> error_variance;
 #endif
         //! Type of a row of the tangent linear operator.
-        typedef Vector<T> tangent_operator_row;
+        typedef Vector<T> tangent_linear_operator_row;
 
+        //! Type of the observation vector.
+        typedef Vector<T> observation;
         //! Type of the observation vector.
         typedef Vector<T> observation_vector;
         //! Type of the observation vector 2.
@@ -129,7 +131,7 @@ namespace Verdandi
         /*** Observation operator ***/
 
         //! Tangent operator matrix (H).
-        tangent_operator_matrix tangent_operator_matrix_;
+        tangent_linear_operator tangent_operator_matrix_;
         //! How is defined the observation operator?
         string operator_definition_;
         //! In case of a diagonal operator.
@@ -348,7 +350,7 @@ namespace Verdandi
         /////////////////
 
 
-        void GetObservation(observation_vector& observation);
+        void GetObservation(observation& observation);
 
 
         ////////////////
@@ -356,9 +358,8 @@ namespace Verdandi
         ////////////////
 
 
-        template <class state_vector>
-        void GetInnovation(const state_vector& state,
-                           observation_vector& innovation);
+        template <class state>
+        void GetInnovation(const state& x, observation& innovation);
 
 
         ////////////
@@ -379,26 +380,23 @@ namespace Verdandi
         ///////////////
 
 
-        template <class state_vector>
-        void ApplyOperator(const state_vector& x, observation_vector& y)
-            const;
+        template <class state>
+        void ApplyOperator(const state& x, observation& y) const;
 
-        template <class state_vector>
-        void ApplyTangentOperator(const state_vector& x,
-                                  observation_vector& y) const;
-        T GetTangentOperator(int i, int j) const;
-        void GetTangentOperatorRow(int row, tangent_operator_row&
-                                   tangent_operator_row) const;
-        const tangent_operator_matrix& GetTangentOperatorMatrix() const;
-        template <class state_vector>
-        void ApplyAdjointOperator(const state_vector& x,
-                                  observation_vector& y) const;
+        template <class state>
+        void ApplyTangentLinearOperator(const state& x, observation& y) const;
+        T GetTangentLinearOperator(int i, int j) const;
+        void GetTangentLinearOperatorRow(int row, tangent_linear_operator_row&
+                                         tangent_operator_row) const;
+        const tangent_linear_operator& GetTangentLinearOperator() const;
+        template <class state>
+        void ApplyAdjointOperator(const state& x, observation& y) const;
 
         bool HasBLUECorrection() const;
         void GetBLUECorrection(Vector<T>& BLUE_correction) const;
 
-        T GetObservationErrorCovariance(int i, int j) const;
-        const error_variance& GetObservationErrorVariance() const;
+        T GetErrorVariance(int i, int j) const;
+        const error_variance& GetErrorVariance() const;
 
         string GetName() const;
         void Message(string message);

@@ -238,7 +238,7 @@ namespace Verdandi
       \param[out] state the controlled state vector.
     */
     template <class T>
-    void Lorenz<T>::GetState(typename Lorenz<T>::state_vector& state) const
+    void Lorenz<T>::GetState(typename Lorenz<T>::state& state) const
     {
         state.Reallocate(3);
         state(0) = X_;
@@ -252,7 +252,7 @@ namespace Verdandi
       \param[in] state the new controlled state vector.
     */
     template <class T>
-    void Lorenz<T>::SetState(typename Lorenz<T>::state_vector& state)
+    void Lorenz<T>::SetState(typename Lorenz<T>::state& state)
     {
         X_ = state(0);
         Y_ = state(1);
@@ -265,7 +265,7 @@ namespace Verdandi
       \param[out] state the full state vector.
     */
     template <class T>
-    void Lorenz<T>::GetFullState(typename Lorenz<T>::state_vector& state)
+    void Lorenz<T>::GetFullState(typename Lorenz<T>::state& state)
         const
     {
         GetState(state);
@@ -278,7 +278,7 @@ namespace Verdandi
     */
     template <class T>
     void Lorenz<T>
-    ::SetFullState(const typename Lorenz<T>::state_vector& state)
+    ::SetFullState(const typename Lorenz<T>::state& state)
     {
         SetState(state);
     }
@@ -291,10 +291,10 @@ namespace Verdandi
     */
     template <class T>
     void Lorenz<T>
-    ::GetBackgroundErrorCovarianceRow(int row, error_covariance_row&
-                                      error_covariance_row)
+    ::GetStateErrorVarianceRow(int row, state_error_variance_row&
+                               state_error_covariance_row)
     {
-        throw ErrorUndefined("Lorenz::GetBackgroundErrorCovarianceRow");
+        throw ErrorUndefined("Lorenz::GetStateErrorVarianceRow");
     }
 
 
@@ -304,10 +304,10 @@ namespace Verdandi
       \return The matrix of the background error covariance.
     */
     template <class T>
-    const typename Lorenz<T>::background_error_variance& Lorenz<T>
-    ::GetBackgroundErrorVarianceMatrix() const
+    const typename Lorenz<T>::state_error_variance& Lorenz<T>
+    ::GetStateErrorVariance() const
     {
-        throw ErrorUndefined("Lorenz::GetBackgroundErrorVarianceMatrix");
+        throw ErrorUndefined("Lorenz::GetStateErrorVariance");
     }
 
 

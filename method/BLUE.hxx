@@ -25,27 +25,27 @@ namespace Verdandi
 
 
     template <class StateErrorVariance, class ObservationOperator,
-              class ObservationVector, class ObservationErrorVariance,
-              class StateVector>
+              class Observation, class ObservationErrorVariance,
+              class State>
     void ComputeBLUE_matrix(StateErrorVariance& B,
                             const ObservationOperator& H,
-                            const ObservationVector& y,
+                            const Observation& y,
                             const ObservationErrorVariance& R,
-                            StateVector& x,
+                            State& x,
                             bool is_y_innovation = false,
                             bool compute_variance = false);
 
 
     template <class StateErrorVariance,
-              class ObservationOperator, class CrossedMatrix,
-              class ObservationVector, class ObservationErrorVariance,
-              class StateVector>
+              class ObservationOperator, class MatrixStateObservation,
+              class Observation, class ObservationErrorVariance,
+              class State>
     void ComputeBLUE_matrix(StateErrorVariance& B,
                             const ObservationOperator& H,
-                            const CrossedMatrix& cm,
-                            const ObservationVector& y,
+                            const MatrixStateObservation& cm,
+                            const Observation& y,
                             const ObservationErrorVariance& R,
-                            StateVector& x,
+                            State& x,
                             bool is_y_innovation = false,
                             bool compute_variance = false);
 

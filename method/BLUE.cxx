@@ -44,13 +44,13 @@ namespace Verdandi
       has to be updated.
     */
     template <class StateErrorVariance, class ObservationOperator,
-              class ObservationVector, class ObservationErrorVariance,
-              class StateVector>
+              class Observation, class ObservationErrorVariance,
+              class State>
     void ComputeBLUE_matrix(StateErrorVariance& B,
                             const ObservationOperator& H,
-                            const ObservationVector& y,
+                            const Observation& y,
                             const ObservationErrorVariance& R,
-                            StateVector& x,
+                            State& x,
                             bool is_y_innovation,
                             bool compute_variance)
     {
@@ -80,25 +80,25 @@ namespace Verdandi
       has to be updated.
     */
     template <class StateErrorVariance,
-              class ObservationOperator, class CrossedMatrix,
-              class ObservationVector, class ObservationErrorVariance,
-              class StateVector>
+              class ObservationOperator, class MatrixStateObservation,
+              class Observation, class ObservationErrorVariance,
+              class State>
     void ComputeBLUE_matrix(StateErrorVariance& B,
                             const ObservationOperator& H,
-                            const CrossedMatrix& cm,
-                            const ObservationVector& y,
+                            const MatrixStateObservation& cm,
+                            const Observation& y,
                             const ObservationErrorVariance& R,
-                            StateVector& x,
+                            State& x,
                             bool is_y_innovation,
                             bool compute_variance)
     {
-        typedef typename StateVector::value_type T;
+        typedef typename State::value_type T;
 
         int Ny = y.GetLength();
         int Nx = x.GetLength();
 
         // Temporary matrices.
-        CrossedMatrix working_matrix_xy(Nx, Ny);
+        MatrixStateObservation working_matrix_xy(Nx, Ny);
 
         ObservationErrorVariance working_matrix_yy(Ny, Ny);
 
@@ -113,7 +113,7 @@ namespace Verdandi
         Add(T(1), R, working_matrix_yy);
 
         // Innovation.
-        ObservationVector innovation;
+        Observation innovation;
         if (is_y_innovation)
             innovation.SetData(y);
         else
@@ -132,7 +132,7 @@ namespace Verdandi
         else
         {
             // Kalman Gain.
-            CrossedMatrix K(Nx, Ny);
+            MatrixStateObservation K(Nx, Ny);
             K.Fill(T(0));
 
             GetInverse(working_matrix_yy);

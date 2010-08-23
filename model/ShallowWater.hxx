@@ -51,13 +51,13 @@ namespace Verdandi
         //! Const reference to the numerical type.
         typedef const T& const_reference;
         //! Type of the background error covariance matrix.
-        typedef Matrix<T, General, RowSparse> background_error_variance;
+        typedef Matrix<T, General, RowSparse> state_error_variance;
         //! Type of a row of the background error variance.
-        typedef Vector<T> error_covariance_row;
+        typedef Vector<T> state_error_variance_row;
         //! Type of the model state vector.
-        typedef Vector<T> state_vector;
+        typedef Vector<T> state;
         //! Type of the model/observation crossed matrix.
-        typedef Matrix<T, General, RowSparse> crossed_matrix;
+        typedef Matrix<T, General, RowSparse> matrix_state_observation;
 
     protected:
 
@@ -163,9 +163,9 @@ namespace Verdandi
         //! Balgovind scale for background covariance.
         double Balgovind_scale_background_;
         //! Background error variance.
-        double background_error_variance_value_;
+        double state_error_variance_value_;
         //! Background error covariance matrix (B).
-        background_error_variance background_error_variance_;
+        state_error_variance state_error_variance_;
 
         //! Balgovind scale for model covariance.
         double Balgovind_scale_model_;
@@ -177,7 +177,7 @@ namespace Verdandi
         //! Number of the column of Q currently stored.
         int current_column_;
         //! Value of the row of B currently stored.
-        error_covariance_row error_covariance_row_;
+        state_error_variance_row state_error_variance_row_;
 
         /*** Experiment settings ***/
 
@@ -202,7 +202,7 @@ namespace Verdandi
         // Processing.
         void Forward();
         bool HasFinished() const;
-        void StepBack(const state_vector& state);
+        void StepBack(const state& state);
         void Save();
 
         // Access methods.
@@ -215,15 +215,13 @@ namespace Verdandi
         int GetDeltaX() const;
         int GetDeltaY() const;
         int GetNstate() const;
-        void GetState(state_vector& state) const;
-        void SetState(state_vector& state);
-        void GetFullState(state_vector& state) const;
-        void SetFullState(const state_vector& state);
-        void GetBackgroundErrorCovarianceRow(int row,
-                                             error_covariance_row&
-                                             error_covariance_row);
-        const background_error_variance&
-        GetBackgroundErrorVarianceMatrix() const;
+        void GetState(state& state) const;
+        void SetState(state& state);
+        void GetFullState(state& state) const;
+        void SetFullState(const state& state);
+        void GetStateErrorVarianceRow(int row, state_error_variance_row&
+                                      state_error_variance_row);
+        const state_error_variance& GetStateErrorVariance() const;
         bool IsErrorSparse() const;
 
         const ShallowWater<T>& GetModel() const;

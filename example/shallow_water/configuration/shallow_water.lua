@@ -51,9 +51,9 @@ shallow_water = {
    error_statistics = {
 
       -- Diagonal value of "B".
-      background_error_variance = 100.,
+      state_error_variance = 100.,
       -- Decorrelation length in Balgovind formula.
-      background_error_scale = 1.,
+      state_error_scale = 1.,
 
       -- Not used in our case.
       model_error_variance = 1.,

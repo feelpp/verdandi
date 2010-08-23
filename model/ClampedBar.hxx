@@ -53,25 +53,25 @@ namespace Verdandi
         typedef const T& const_reference;
 #ifdef VERDANDI_SPARSE
         //! Type of the background error covariance matrix.
-        typedef Matrix<T, General, RowSparse> background_error_variance;
+        typedef Matrix<T, General, RowSparse> state_error_variance;
         //! Type of a row of the background error variance.
-        typedef Vector<T, VectSparse> error_covariance_row;
+        typedef Vector<T, VectSparse> state_error_variance_row;
         //! Type of the model/observation crossed matrix.
-        typedef Matrix<T, General, RowSparse> crossed_matrix;
+        typedef Matrix<T, General, RowSparse> matrix_state_observation;
         //! Type of the tangent linear operator.
-        typedef Matrix<T, General, RowSparse> tangent_operator_matrix;
+        typedef Matrix<T, General, RowSparse> tangent_linear_operator;
 #else
         //! Type of the background error covariance matrix.
-        typedef Matrix<T> background_error_variance;
+        typedef Matrix<T> state_error_variance;
         //! Type of a row of the background error variance.
-        typedef Vector<T> error_covariance_row;
+        typedef Vector<T> state_error_variance_row;
         //! Type of the model/observation crossed matrix.
-        typedef Matrix<T> crossed_matrix;
+        typedef Matrix<T> matrix_state_observation;
         //! Type of the tangent linear operator.
-        typedef Matrix<T> tangent_operator_matrix;
+        typedef Matrix<T> tangent_linear_operator;
 #endif
         //! Type of the model state vector.
-        typedef Vector<T> state_vector;
+        typedef Vector<T> state;
 
 
     protected:
@@ -134,17 +134,17 @@ namespace Verdandi
         //! Balgovind scale for background covariance.
         double Balgovind_scale_background_;
         //! Background error variance.
-        double background_error_variance_value_;
+        double state_error_variance_value_;
 
         //! Background error covariance matrix (B).
-        background_error_variance background_error_variance_;
+        state_error_variance state_error_variance_;
 
         //! Number of the row of B currently stored.
         int current_row_;
         //! Number of the column of Q currently stored.
         int current_column_;
         //! Value of the row of B currently stored.
-        error_covariance_row error_covariance_row_;
+        state_error_variance_row state_error_variance_row_;
 
         /*** Output saver ***/
 
@@ -166,28 +166,25 @@ namespace Verdandi
         void Save();
 
         // Operators.
-        void ApplyModel(state_vector& x, bool reinitialize_model = false);
-        void ApplyTangentLinearModel(state_vector& x,
-                                     bool reinitialize_model = false);
-        void GetTangentLinearModel(tangent_operator_matrix&) const;
+        void ApplyOperator(state& x, bool reinitialize_model = false);
+        void ApplyTangentLinearOperator(state& x,
+                                        bool reinitialize_model = false);
+        void GetTangentLinearOperator(tangent_linear_operator&) const;
 
 
         // Access methods.
         double GetTime() const;
         void SetTime(double& time);
         int GetNstate() const;
-        void GetState(state_vector& state) const;
-        void SetState(state_vector& state);
-        void GetFullState(state_vector& state) const;
-        void SetFullState(const state_vector& state);
+        void GetState(state& state) const;
+        void SetState(state& state);
+        void GetFullState(state& state) const;
+        void SetFullState(const state& state);
 
-        void GetBackgroundErrorCovarianceRow(int row,
-                                             error_covariance_row&
-                                             error_covariance_row);
-        background_error_variance&
-        GetBackgroundErrorVarianceMatrix();
-        const background_error_variance&
-        GetBackgroundErrorVarianceMatrix() const;
+        void GetStateErrorVarianceRow(int row, state_error_variance_row&
+                                      state_error_variance_row);
+        state_error_variance& GetStateErrorVariance();
+        const state_error_variance& GetStateErrorVariance() const;
         bool IsErrorSparse() const;
 
         string GetName() const;

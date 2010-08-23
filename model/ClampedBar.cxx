@@ -78,21 +78,21 @@ namespace Verdandi
         configuration.Set("final_time", final_time_);
 
         configuration.SetPrefix("clamped_bar.error_statistics.");
-        configuration.Set("background_error_variance", "v >= 0",
-                          background_error_variance_value_);
-        configuration.Set("background_error_scale", "v > 0",
+        configuration.Set("state_error_variance", "v >= 0",
+                          state_error_variance_value_);
+        configuration.Set("state_error_scale", "v > 0",
                           Balgovind_scale_background_);
 
         Ndof_ = Nx_ + 1;
 
-#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+#ifdef VERDANDI_STATE_ERROR_SPARSE
         build_diagonal_sparse_matrix(GetNstate(),
-                                     background_error_variance_value_,
-                                     background_error_variance_);
+                                     state_error_variance_value_,
+                                     state_error_variance_);
 #else
-        background_error_variance_.Reallocate(GetNstate(), GetNstate());
-        background_error_variance_.SetIdentity();
-        Mlt(T(background_error_variance_value_), background_error_variance_);
+        state_error_variance_.Reallocate(GetNstate(), GetNstate());
+        state_error_variance_.SetIdentity();
+        Mlt(T(state_error_variance_value_), state_error_variance_);
 #endif
 
         configuration.SetPrefix("clamped_bar.physics.");
@@ -358,10 +358,10 @@ namespace Verdandi
       be reinitialized after the forward call.
     */
     template <class T>
-    void ClampedBar<T>::ApplyModel(state_vector& x, bool reinitialize_model)
+    void ClampedBar<T>::ApplyOperator(state& x, bool reinitialize_model)
     {
         double saved_time;
-        state_vector saved_state;
+        state saved_state;
         if (reinitialize_model)
         {
             saved_time = GetTime();
@@ -388,10 +388,10 @@ namespace Verdandi
       be reinitialized after the forward call.
     */
     template <class T>
-    void ClampedBar<T>::ApplyTangentLinearModel(state_vector& x,
-                                                bool reinitialize_model)
+    void ClampedBar<T>::ApplyTangentLinearOperator(state& x,
+                                                   bool reinitialize_model)
     {
-        ApplyModel(x, reinitialize_model);
+        ApplyOperator(x, reinitialize_model);
     }
 
 
@@ -401,10 +401,10 @@ namespace Verdandi
     */
     template <class T>
     void ClampedBar<T>
-    ::GetTangentLinearModel(tangent_operator_matrix& A) const
+    ::GetTangentLinearOperator(tangent_linear_operator& A) const
     {
-        throw ErrorUndefined("ClampedBar::GetTangentLinearModel"
-                             "(tangent_operator_matrix& A) const");
+        throw ErrorUndefined("ClampedBar::GetTangentLinearOperator"
+                             "(tangent_linear_operator& A) const");
     }
 
 
@@ -451,7 +451,7 @@ namespace Verdandi
       \param[out] state the reduced state vector.
     */
     template <class T>
-    void ClampedBar<T>::GetState(state_vector& state) const
+    void ClampedBar<T>::GetState(state& state) const
     {
         int position = 0;
         state.Reallocate(2 * Ndof_);
@@ -468,7 +468,7 @@ namespace Verdandi
       \param[in] state the reduced state vector.
     */
     template <class T>
-    void ClampedBar<T>::SetState(state_vector& state)
+    void ClampedBar<T>::SetState(state& state)
     {
         int position = 0;
         for (int i = 0; i < Ndof_; i++)
@@ -483,7 +483,7 @@ namespace Verdandi
       \param[out] state the full state vector.
     */
     template <class T>
-    void ClampedBar<T>::GetFullState(state_vector& state) const
+    void ClampedBar<T>::GetFullState(state& state) const
     {
         throw ErrorUndefined("ClampedBar"
                              "::GetFullState()");
@@ -495,7 +495,7 @@ namespace Verdandi
       \param[in] state the full state vector.
     */
     template <class T>
-    void ClampedBar<T>::SetFullState(const state_vector& state)
+    void ClampedBar<T>::SetFullState(const state& state)
     {
         throw ErrorUndefined("ClampedBar"
                              "::SetFullState()");
@@ -509,29 +509,29 @@ namespace Verdandi
     */
     template <class T>
     void ClampedBar<T>
-    ::GetBackgroundErrorCovarianceRow(int row, error_covariance_row&
-                                      error_covariance_row)
+    ::GetStateErrorVarianceRow(int row, state_error_variance_row&
+                               state_error_variance_row)
     {
-#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+#ifdef VERDANDI_STATE_ERROR_SPARSE
         {
-            error_covariance_row.Reallocate(GetNstate());
-            error_covariance_row.Zero();
-            error_covariance_row(row) = background_error_variance_value_;
+            state_error_variance_row.Reallocate(GetNstate());
+            state_error_variance_row.Zero();
+            state_error_variance_row(row) = state_error_variance_value_;
         }
 # else
         {
-#ifdef VERDANDI_BACKGROUND_ERROR_DENSE
+#ifdef VERDANDI_STATE_ERROR_DENSE
             {
-                error_covariance_row.Reallocate(GetNstate());
-                error_covariance_row.Zero();
-                error_covariance_row(row)
-                    = background_error_variance_value_;
+                state_error_variance_row.Reallocate(GetNstate());
+                state_error_variance_row.Zero();
+                state_error_variance_row(row)
+                    = state_error_variance_value_;
             }
 #else
             {
                 // The row has already been computed.
                 if (row == current_row_)
-                    error_covariance_row = error_covariance_row_;
+                    state_error_variance_row = state_error_variance_row_;
                 else
                 {
                     int i;
@@ -550,11 +550,11 @@ namespace Verdandi
                         distance_x = Delta_x_ * T(i - i_row);
                         distance = sqrt(distance_x * distance_x)
                             / Balgovind_scale_background_;
-                        error_covariance_row_(position++)
-                            = background_error_variance_value_
+                        state_error_variance_row_(position++)
+                            = state_error_variance_value_
                             * (1. + distance) * exp(-distance);
                     }
-                    error_covariance_row = error_covariance_row_;
+                    state_error_variance_row = state_error_variance_row_;
                 }
             }
 #endif
@@ -569,10 +569,10 @@ namespace Verdandi
       \return The matrix of the background error covariance.
     */
     template <class T>
-    typename ClampedBar<T>::background_error_variance& ClampedBar<T>
-    ::GetBackgroundErrorVarianceMatrix()
+    typename ClampedBar<T>::state_error_variance& ClampedBar<T>
+    ::GetStateErrorVariance()
     {
-        return background_error_variance_;
+        return state_error_variance_;
     }
 
 
@@ -582,10 +582,10 @@ namespace Verdandi
       \return The matrix of the background error covariance.
     */
     template <class T>
-    const typename ClampedBar<T>::background_error_variance& ClampedBar<T>
-    ::GetBackgroundErrorVarianceMatrix() const
+    const typename ClampedBar<T>::state_error_variance& ClampedBar<T>
+    ::GetStateErrorVariance() const
     {
-        return background_error_variance_;
+        return state_error_variance_;
     }
 
 
@@ -596,7 +596,7 @@ namespace Verdandi
     template <class T>
     bool ClampedBar<T>::IsErrorSparse() const
     {
-#ifdef VERDANDI_BACKGROUND_ERROR_SPARSE
+#ifdef VERDANDI_STATE_ERROR_SPARSE
         return true;
 #else
         return false;

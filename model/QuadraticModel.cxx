@@ -271,7 +271,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::GetState(typename QuadraticModel<T>::state_vector& state) const
+    ::GetState(typename QuadraticModel<T>::state& state) const
     {
         state = state_;
     }
@@ -283,7 +283,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::SetState(typename QuadraticModel<T>::state_vector& state)
+    ::SetState(typename QuadraticModel<T>::state& state)
     {
         state_ = state;
     }
@@ -295,7 +295,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::GetFullState(typename QuadraticModel<T>::state_vector& state) const
+    ::GetFullState(typename QuadraticModel<T>::state& state) const
     {
         GetState(state);
     }
@@ -307,7 +307,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::SetFullState(const typename QuadraticModel<T>::state_vector& state)
+    ::SetFullState(const typename QuadraticModel<T>::state& state)
     {
         SetState(state);
     }

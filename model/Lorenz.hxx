@@ -42,10 +42,10 @@ namespace Verdandi
         typedef const T* const_pointer;
         typedef T& reference;
         typedef const T& const_reference;
-        typedef Matrix<T> background_error_variance;
-        typedef Vector<T> error_covariance_row;
-        typedef Vector<T> state_vector;
-        typedef Matrix<T> crossed_matrix;
+        typedef Matrix<T> state_error_variance;
+        typedef Vector<T> state_error_variance_row;
+        typedef Vector<T> state;
+        typedef Matrix<T> matrix_state_observation;
 
     protected:
 
@@ -104,15 +104,13 @@ namespace Verdandi
         double GetTime() const;
         void SetTime(double time);
         int GetNstate() const;
-        void GetState(state_vector& state) const;
-        void SetState(state_vector& state);
-        void GetFullState(state_vector& state) const;
-        void SetFullState(const state_vector& state);
-        void GetBackgroundErrorCovarianceRow(int row,
-                                             error_covariance_row&
-                                             error_covariance_row);
-        const background_error_variance&
-        GetBackgroundErrorVarianceMatrix() const;
+        void GetState(state& state) const;
+        void SetState(state& state);
+        void GetFullState(state& state) const;
+        void SetFullState(const state& state);
+        void GetStateErrorVarianceRow(int row, state_error_variance_row&
+                                      error_covariance_row);
+        const state_error_variance& GetStateErrorVariance() const;
         bool IsErrorSparse() const;
 
         string GetName() const;

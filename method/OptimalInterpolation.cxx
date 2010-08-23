@@ -196,11 +196,11 @@ namespace Verdandi
                 cout << "Performing optimal interpolation at time step ["
                      << model_.GetTime() << "]..." << endl;
 
-            state_vector state;
+            model_state state;
             model_.GetState(state);
             Nstate_ = model_.GetNstate();
 
-            observation_vector innovation;
+            observation innovation;
             observation_manager_.GetInnovation(state, innovation);
             Nobservation_ = innovation.GetSize();
 
@@ -228,7 +228,7 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE(const observation_vector& innovation, state_vector& state)
+    ::ComputeBLUE(const observation& innovation, model_state& state)
     {
         if (blue_computation_ == "vector")
             ComputeBLUE_vector(innovation, state);
@@ -244,8 +244,8 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE_vector(const observation_vector& innovation,
-                         state_vector& state)
+    ::ComputeBLUE_vector(const observation& innovation,
+                         model_state& state)
     {
 #ifdef VERDANDI_DENSE
         Nobservation_ = observation_manager_.GetNobservation();
@@ -253,10 +253,10 @@ namespace Verdandi
         int r, c;
 
         // One row of background matrix B.
-        background_error_covariance_vector error_covariance_row(Nstate_);
+        model_state_error_variance_row error_covariance_row(Nstate_);
 
         // One row of tangent operator matrix.
-        tangent_operator_vector tangent_operator_row(Nstate_);
+        observation_tangent_linear_operator_row tangent_operator_row(Nstate_);
 
         // Temporary matrix and vector.
         // 'HBHR_inv' will eventually contain the matrix (HBH' + R)^(-1).
@@ -269,19 +269,19 @@ namespace Verdandi
         T H_entry;
         for (int j = 0; j < Nstate_; j++)
         {
-            model_.GetBackgroundErrorCovarianceRow(j, error_covariance_row);
+            model_.GetStateErrorVarianceRow(j, error_covariance_row);
             // Computes the j-th row of BH'.
             for (r = 0; r < Nobservation_; r++)
             {
                 observation_manager_
-                    .GetTangentOperatorRow(r, tangent_operator_row);
+                    .GetTangentLinearOperatorRow(r, tangent_operator_row);
                 row(r) = DotProd(error_covariance_row, tangent_operator_row);
             }
 
             // Keeps on building HBH'.
             for (r = 0; r < Nobservation_; r++)
             {
-                H_entry = observation_manager_.GetTangentOperator(r, j);
+                H_entry = observation_manager_.GetTangentLinearOperator(r, j);
                 for (c = 0; c < Nobservation_; c++)
                     HBHR_inv(r, c) += H_entry * row(c);
             }
@@ -290,8 +290,7 @@ namespace Verdandi
         // Computes (HBH' + R).
         for (r = 0; r < Nobservation_; r++)
             for (c = 0; c < Nobservation_; c++)
-                HBHR_inv(r, c) += observation_manager_
-                    .GetObservationErrorCovariance(r, c);
+                HBHR_inv(r, c) += observation_manager_.GetErrorVariance(r, c);
 
         // Computes (HBH' + R)^{-1}.
         GetInverse(HBHR_inv);
@@ -306,11 +305,11 @@ namespace Verdandi
         for (r = 0; r < Nstate_; r++)
         {
             // Computes the r-th row of BH'.
-            model_.GetBackgroundErrorCovarianceRow(r, error_covariance_row);
+            model_.GetStateErrorVarianceRow(r, error_covariance_row);
             for (c = 0; c < Nobservation_; c++)
             {
                 observation_manager_
-                    .GetTangentOperatorRow(c, tangent_operator_row);
+                    .GetTangentLinearOperatorRow(c, tangent_operator_row);
                 BHt_row(c) = DotProd(error_covariance_row,
                                      tangent_operator_row);
             }
@@ -333,30 +332,29 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE_matrix(const observation_vector& innovation,
-                         state_vector& state)
+    ::ComputeBLUE_matrix(const observation& innovation,
+                         model_state& state)
     {
 #ifdef VERDANDI_SPARSE
         Nobservation_ = observation_manager_.GetNobservation();
 
         // Temporary matrix and vector.
-        crossed_matrix working_matrix_so(Nstate_, Nobservation_);
-        tangent_operator_matrix working_matrix_oo(Nobservation_,
-                                                  Nobservation_);
+        matrix_state_observation working_matrix_so(Nstate_, Nobservation_);
+        observation_tangent_linear_operator working_matrix_oo(Nobservation_,
+                                                              Nobservation_);
         // Computes BH'.
         MltAdd(T(1), SeldonNoTrans,
-               model_.GetBackgroundErrorVarianceMatrix(), SeldonTrans,
-               observation_manager_.GetTangentOperatorMatrix(), T(0),
+               model_.GetStateErrorVariance(), SeldonTrans,
+               observation_manager_.GetTangentLinearOperator(), T(0),
                working_matrix_so);
 
         // Computes HBH'.
-        Mlt(observation_manager_.GetTangentOperatorMatrix(),
+        Mlt(observation_manager_.GetTangentLinearOperator(),
             working_matrix_so, working_matrix_oo);
 
         // Computes (HBH' + R).
         Add(T(1),
-            observation_manager_.GetObservationErrorVariance(),
-            working_matrix_oo);
+            observation_manager_.GetErrorVariance(), working_matrix_oo);
 
         // Computes x = (HBH' + R)^{-1} * innovation by solving the linear
         // system (HBH' + R) * x = innovation.
@@ -368,7 +366,7 @@ namespace Verdandi
         MatrixMumps<T> matrix_super_lu;
 #endif
         GetLU(working_matrix_oo, matrix_super_lu);
-        observation_vector working_vector(Nobservation_);
+        observation working_vector(Nobservation_);
         working_vector = innovation;
         SolveLU(matrix_super_lu, working_vector);
         MltAdd(T(1.), working_matrix_so, working_vector, T(1.), state);
@@ -423,7 +421,7 @@ namespace Verdandi
     void OptimalInterpolation<T, ClassModel, ClassObservationManager>
     ::Message(string message)
     {
-        state_vector state;
+        model_state state;
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);

@@ -36,7 +36,7 @@ namespace Verdandi
 
     public:
         //! Type of the model state vector.
-        typedef typename ClassModel::state_vector state_vector;
+        typedef typename ClassModel::state model_state;
 
     protected:
 

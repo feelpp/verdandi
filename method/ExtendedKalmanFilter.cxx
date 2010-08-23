@@ -138,8 +138,7 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
-        background_error_variance_.
-            Copy(model_.GetBackgroundErrorVarianceMatrix());
+        state_error_variance_.Copy(model_.GetStateErrorVariance());
 
         /*** Assimilation ***/
 
@@ -203,11 +202,11 @@ namespace Verdandi
                 cout << "Performing EKF at time step ["
                      << model_.GetTime() << "]..." << endl;
 
-            state_vector state;
+            model_state state;
             model_.GetState(state);
             Nstate_ = model_.GetNstate();
 
-            observation_vector innovation;
+            observation innovation;
             observation_manager_.GetInnovation(state, innovation);
             Nobservation_ = innovation.GetSize();
 
@@ -233,43 +232,42 @@ namespace Verdandi
     ::PropagateCovarianceMatrix_vector()
     {
         double saved_time;
-        state_vector saved_state;
+        model_state saved_state;
         saved_time = model_.GetTime();
         model_.GetState(saved_state);
 
         // One column of covariance matrix P.
-        background_error_covariance_vector error_covariance_column(Nstate_);
+        model_state_error_variance_row error_covariance_column(Nstate_);
 
         for (int j = 0; j < Nstate_; j++)
         {
-            GetCol(background_error_variance_, j,
+            GetCol(state_error_variance_, j,
                    error_covariance_column);
 #ifdef VERDANDI_DENSE
-            model_.ApplyTangentLinearModel(error_covariance_column);
+            model_.ApplyTangentLinearOperator(error_covariance_column);
 #else
-            state_vector working_vector(Nstate_);
+            model_state working_vector(Nstate_);
             ConvertSparseToDense(error_covariance_column, working_vector);
-            model_.ApplyTangentLinearModel(working_vector);
+            model_.ApplyTangentLinearOperator(working_vector);
             ConvertDenseToSparse(working_vector, error_covariance_column);
 #endif
-            SetCol(error_covariance_column, j, background_error_variance_);
+            SetCol(error_covariance_column, j, state_error_variance_);
         }
 
-        Transpose(background_error_variance_);
+        Transpose(state_error_variance_);
 
         for (int j = 0; j < Nstate_; j++)
         {
-            GetCol(background_error_variance_, j,
-                   error_covariance_column);
+            GetCol(state_error_variance_, j, error_covariance_column);
 #ifdef VERDANDI_DENSE
-            model_.ApplyTangentLinearModel(error_covariance_column);
+            model_.ApplyTangentLinearOperator(error_covariance_column);
 #else
-            state_vector working_vector(Nstate_);
+            model_state working_vector(Nstate_);
             ConvertSparseToDense(error_covariance_column, working_vector);
-            model_.ApplyTangentLinearModel(working_vector);
+            model_.ApplyTangentLinearOperator(working_vector);
             ConvertDenseToSparse(working_vector, error_covariance_column);
 #endif
-            SetCol(error_covariance_column, j, background_error_variance_);
+            SetCol(error_covariance_column, j, state_error_variance_);
         }
 
         model_.SetTime(saved_time);
@@ -282,15 +280,13 @@ namespace Verdandi
     void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
     ::PropagateCovarianceMatrix_matrix()
     {
-        tangent_operator_matrix A;
-        model_.GetTangentLinearModel(A);
+        model_tangent_linear_operator A;
+        model_.GetTangentLinearOperator(A);
 
-        MltAdd(T(1.), A, background_error_variance_,
-               T(0.), background_error_variance_);
+        MltAdd(T(1.), A, state_error_variance_, T(0.), state_error_variance_);
 
-        MltAdd(T(1.), SeldonNoTrans,
-               background_error_variance_, SeldonTrans, A, T(0.),
-               background_error_variance_);
+        MltAdd(T(1.), SeldonNoTrans, state_error_variance_,
+               SeldonTrans, A, T(0.), state_error_variance_);
     }
 
 
@@ -301,18 +297,17 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class ClassObservationManager>
     void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::ComputeBLUE(const observation_vector& innovation, state_vector& state)
+    ::ComputeBLUE(const observation& innovation, model_state& state)
     {
         if (blue_computation_ == "vector")
             throw ErrorUndefined("ExtendedKalmanFilter"
                                  "::ComputeBLUE()");
         else
-            ComputeBLUE_matrix(background_error_variance_,
+            ComputeBLUE_matrix(state_error_variance_,
                                observation_manager_.
-                               GetTangentOperatorMatrix(),
+                               GetTangentLinearOperator(),
                                innovation,
-                               observation_manager_.
-                               GetObservationErrorVariance(),
+                               observation_manager_.GetErrorVariance(),
                                state, true, true);
     }
 
@@ -374,7 +369,7 @@ namespace Verdandi
     void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
     ::Message(string message)
     {
-        state_vector state;
+        model_state state;
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);

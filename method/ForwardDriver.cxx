@@ -203,7 +203,7 @@ namespace Verdandi
     template <class ClassModel>
     void  ForwardDriver<ClassModel>::Message(string message)
     {
-        state_vector state;
+        model_state state;
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);

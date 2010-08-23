@@ -116,7 +116,7 @@ namespace Verdandi
         if (operator_definition_ == "diagonal")
         {
             Nobservation_ = Nstate_model_;
-#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+#ifdef VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
             build_diagonal_sparse_matrix(Nstate_model_,
                                          operator_diagonal_value_,
                                          tangent_operator_matrix_);
@@ -128,7 +128,7 @@ namespace Verdandi
         }
         else if (operator_definition_ == "file")
         {
-#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+#ifdef VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
             throw ErrorUndefined("LinearObservationManager::Initialize()",
                                  "File definition of sparse tangent operator "
                                  "matrix is not yet supported.");
@@ -1419,8 +1419,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetObservation(
-        LinearObservationManager<T>::observation_vector& observation)
+    ::GetObservation(LinearObservationManager<T>::observation& observation)
     {
         GetAggregatedObservation(observation);
     }
@@ -1437,16 +1436,15 @@ namespace Verdandi
       \param[out] innovation innovation vector.
     */
     template <class T>
-    template <class state_vector>
+    template <class state>
     void LinearObservationManager<T>
-    ::GetInnovation(
-        const state_vector& state,
-        LinearObservationManager<T>::observation_vector& innovation)
+    ::GetInnovation(const state& x,
+                    LinearObservationManager<T>::observation& innovation)
     {
         innovation.Reallocate(Nobservation_);
-        observation_vector observation;
+        observation observation;
         GetObservation(observation);
-        ApplyOperator(state, innovation);
+        ApplyOperator(x, innovation);
         Mlt(T(-1), innovation);
         Add(T(1), observation, innovation);
     }
@@ -1500,7 +1498,7 @@ namespace Verdandi
     template <class T>
     bool LinearObservationManager<T>::IsOperatorSparse() const
     {
-#ifdef VERDANDI_TANGENT_OPERATOR_SPARSE
+#ifdef VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
         return true;
 #else
         return false;
@@ -1552,10 +1550,10 @@ namespace Verdandi
       \param[out] y the value of the operator at \a x.
     */
     template <class T>
-    template <class state_vector>
+    template <class state>
     void LinearObservationManager<T>
-    ::ApplyOperator(const state_vector& x,
-                    LinearObservationManager<T>::observation_vector& y) const
+    ::ApplyOperator(const state& x,
+                    LinearObservationManager<T>::observation& y) const
     {
         if (x.GetSize() == 0)
             return;
@@ -1578,10 +1576,10 @@ namespace Verdandi
       \param[out] y the value of the tangent linear operator at \a x.
     */
     template <class T>
-    template <class state_vector>
+    template <class state>
     void LinearObservationManager<T>
-    ::ApplyTangentOperator(const state_vector& x,
-                           LinearObservationManager<T>::observation_vector& y)
+    ::ApplyTangentLinearOperator(const state& x,
+                                 LinearObservationManager<T>::observation& y)
         const
     {
         ApplyOperator(x, y);
@@ -1596,7 +1594,7 @@ namespace Verdandi
     */
     template <class T>
     T LinearObservationManager<T>
-    ::GetTangentOperator(int i, int j) const
+    ::GetTangentLinearOperator(int i, int j) const
     {
         if (operator_definition_ == "diagonal")
         {
@@ -1620,8 +1618,10 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetTangentOperatorRow(int row, typename LinearObservationManager<T>
-                            ::tangent_operator_row& tangent_operator_row)
+    ::GetTangentLinearOperatorRow(int row,
+                                  typename LinearObservationManager<T>
+                                  ::tangent_linear_operator_row&
+                                  tangent_operator_row)
         const
     {
         if (operator_definition_ == "diagonal")
@@ -1654,8 +1654,8 @@ namespace Verdandi
     */
     template <class T>
     const typename LinearObservationManager<T>
-    ::tangent_operator_matrix& LinearObservationManager<T>
-    ::GetTangentOperatorMatrix() const
+    ::tangent_linear_operator& LinearObservationManager<T>
+    ::GetTangentLinearOperator() const
     {
         return tangent_operator_matrix_;
     }
@@ -1667,12 +1667,10 @@ namespace Verdandi
       \param[out] y the value of the operator at \a x.
     */
     template <class T>
-    template <class state_vector>
+    template <class state>
     void LinearObservationManager<T>
-    ::ApplyAdjointOperator(
-        const state_vector& x,
-        LinearObservationManager<T>::observation_vector& y)
-        const
+    ::ApplyAdjointOperator(const state& x,
+                           LinearObservationManager<T>::observation& y) const
     {
         if (operator_definition_ == "diagonal")
         {
@@ -1719,8 +1717,7 @@ namespace Verdandi
       \return The element (\a i, \a j) of the observation error covariance.
     */
     template <class T>
-    T LinearObservationManager<T>
-    ::GetObservationErrorCovariance(int i, int j) const
+    T LinearObservationManager<T>::GetErrorVariance(int i, int j) const
     {
         if (i == j)
             return error_variance_value_;
@@ -1735,8 +1732,7 @@ namespace Verdandi
     */
     template <class T>
     const typename LinearObservationManager<T>
-    ::error_variance& LinearObservationManager<T>
-    ::GetObservationErrorVariance() const
+    ::error_variance& LinearObservationManager<T>::GetErrorVariance() const
     {
         return error_variance_;
     }

@@ -1328,7 +1328,7 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetObservation(
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+        GridToNetworkObservationManager<T>::observation& observation)
     {
         GetAggregatedObservation(observation);
     }
@@ -1345,16 +1345,16 @@ namespace Verdandi
       \param[out] innovation innovation vector.
     */
     template <class T>
-    template <class state_vector>
+    template <class state>
     void GridToNetworkObservationManager<T>
     ::GetInnovation(
-        const state_vector& state,
-        GridToNetworkObservationManager<T>::observation_vector& innovation)
+        const state& x,
+        GridToNetworkObservationManager<T>::observation& innovation)
     {
         innovation.Reallocate(Nobservation_);
-        observation_vector observation;
+        observation observation;
         GetObservation(observation);
-        ApplyOperator(state, innovation);
+        ApplyOperator(x, innovation);
         Mlt(T(-1), innovation);
         Add(T(1), observation, innovation);
     }
@@ -1461,9 +1461,9 @@ namespace Verdandi
       needed.
     */
     template <class T>
-    template <class state_vector>
+    template <class state>
     void GridToNetworkObservationManager<T>
-    ::ApplyOperator(const state_vector& x, observation_vector& y) const
+    ::ApplyOperator(const state& x, observation& y) const
     {
         y.Reallocate(active_interpolation_index_.GetM());
         y.Zero();
@@ -1486,9 +1486,9 @@ namespace Verdandi
       resized if needed.
     */
     template <class T>
-    template <class state_vector>
+    template <class state>
     void GridToNetworkObservationManager<T>
-    ::ApplyTangentOperator(const state_vector& x, observation_vector& y) const
+    ::ApplyTangentLinearOperator(const state& x, observation& y) const
     {
         ApplyOperator(x, y);
     }
@@ -1502,7 +1502,7 @@ namespace Verdandi
     */
     template <class T>
     T GridToNetworkObservationManager<T>
-    ::GetTangentOperator(int i, int j) const
+    ::GetTangentLinearOperator(int i, int j) const
     {
         if (j == active_interpolation_index_(i, 0))
             return active_interpolation_weight_(i, 0);
@@ -1525,12 +1525,14 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetTangentOperatorRow(int row, GridToNetworkObservationManager<T>
-                            ::tangent_operator_row& tangent_operator_row)
+    ::GetTangentLinearOperatorRow(int row,
+                                  GridToNetworkObservationManager<T>
+                                  ::tangent_linear_operator_row&
+                                  tangent_operator_row)
         const
     {
         for (int i = 0; i < tangent_operator_row.GetLength(); i++)
-            tangent_operator_row(i) = GetTangentOperator(row, i);
+            tangent_operator_row(i) = GetTangentLinearOperator(row, i);
     }
 
 
@@ -1540,12 +1542,12 @@ namespace Verdandi
     */
     template <class T>
     const typename
-    GridToNetworkObservationManager<T>::tangent_operator_matrix&
+    GridToNetworkObservationManager<T>::tangent_linear_operator&
     GridToNetworkObservationManager<T>
-    ::GetTangentOperatorMatrix() const
+    ::GetTangentLinearOperator() const
     {
         throw ErrorUndefined(
-            "GridToNetworkObservationManager::GetTangentOperatorMatrix()");
+            "GridToNetworkObservationManager::GetTangentLinearOperator()");
     }
 
 
@@ -1556,9 +1558,9 @@ namespace Verdandi
       needed.
     */
     template <class T>
-    template <class state_vector>
+    template <class state>
     void GridToNetworkObservationManager<T>
-    ::ApplyAdjointOperator(const state_vector& x, observation_vector& y) const
+    ::ApplyAdjointOperator(const state& x, observation& y) const
     {
         y.Reallocate(Nx_model_ * Ny_model_);
         y.Zero();
@@ -1609,7 +1611,7 @@ namespace Verdandi
     */
     template <class T>
     T GridToNetworkObservationManager<T>
-    ::GetObservationErrorCovariance(int i, int j) const
+    ::GetErrorVariance(int i, int j) const
     {
         if (i == j)
             return error_variance_value_;
@@ -1626,7 +1628,7 @@ namespace Verdandi
     const typename
     GridToNetworkObservationManager<T>::error_variance&
     GridToNetworkObservationManager<T>
-    ::GetObservationErrorVariance() const
+    ::GetErrorVariance() const
     {
         throw ErrorUndefined(
             string("GridToNetworkObservationManager")

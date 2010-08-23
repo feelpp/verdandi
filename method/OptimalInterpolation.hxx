@@ -36,21 +36,22 @@ namespace Verdandi
 
     public:
         //! Type of a row of the background error variance.
-        typedef typename ClassModel::error_covariance_row
-        background_error_covariance_vector;
+        typedef typename ClassModel::state_error_variance_row
+        model_state_error_variance_row;
         //! Type of the model state vector.
-        typedef typename ClassModel::state_vector state_vector;
+        typedef typename ClassModel::state model_state;
         //! Type of the model/observation crossed matrix.
-        typedef typename ClassModel::crossed_matrix crossed_matrix;
+        typedef typename ClassModel::matrix_state_observation
+        matrix_state_observation;
         //! Type of the tangent linear observation operator.
         typedef typename ClassObservationManager
-        ::tangent_operator_matrix tangent_operator_matrix;
+        ::tangent_linear_operator observation_tangent_linear_operator;
         //! Type of a row of the tangent linear observation operator.
-        typedef typename ClassObservationManager::tangent_operator_row
-        tangent_operator_vector;
+        typedef typename ClassObservationManager::tangent_linear_operator_row
+        observation_tangent_linear_operator_row;
         //! Type of the observation vector.
-        typedef typename ClassObservationManager::observation_vector
-        observation_vector;
+        typedef typename ClassObservationManager::observation
+        observation;
 
     protected:
 
@@ -100,12 +101,11 @@ namespace Verdandi
 
         void Analyze();
 
-        void ComputeBLUE(const observation_vector& innovation,
-                         state_vector& state);
-        void ComputeBLUE_vector(const observation_vector& innovation,
-                                state_vector& state);
-        void ComputeBLUE_matrix(const observation_vector& innovation,
-                                state_vector& state);
+        void ComputeBLUE(const observation& innovation, model_state& state);
+        void ComputeBLUE_vector(const observation& innovation,
+                                model_state& state);
+        void ComputeBLUE_matrix(const observation& innovation,
+                                model_state& state);
 
         bool HasFinished() const;
 

@@ -35,7 +35,7 @@ namespace Verdandi
     {
 
     public:
-        typedef typename ClassModel::state_vector state_vector;
+        typedef typename ClassModel::state model_state;
 
     protected:
 
