@@ -38,8 +38,26 @@ else
 <ul>
 <li class="jelly"> <b>USER'S GUIDE</b> </li>
 <li class="jelly"> <?php HL($file, "index", "Introduction");?>  </li>
-<li class="jelly"> <?php HL($file, "installation", "Installation");?> </li>
-<li class="jelly"> <?php HL($file, "overview", "Overview");?> </li>
+
+<li class="jelly"> <?php HL($file, "getting_started", "Getting Started");?>
+
+<?php if (basename($_SERVER['REQUEST_URI'], ".php") == "getting_started"
+or basename($_SERVER['REQUEST_URI'], ".php") == "installation"
+or basename($_SERVER['REQUEST_URI'], ".php") == "notation"
+or basename($_SERVER['REQUEST_URI'], ".php") == "overview")
+{
+  echo '<ul class="navsubul"> <li class="jelly">';
+  HL($file, "installation", "Installation");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "notation", "Notation");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "overview", "Overview");
+  echo '</li> </ul>';
+} ?>
+
+</li>
 
 <li class="jelly"> <?php HL($file, "assimilation_methods", "Assimilation Methods");?>
 
@@ -63,6 +81,22 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "linear_observation_manager")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "linear_observation_manager", "Linear Observation Manager");
+  echo '</li> </ul>';
+} ?>
+
+</li>
+
+<li class="jelly"> <?php HL($file, "plugging_in_verdandi", "Plugging in Verdandi");?>
+
+<?php if (basename($_SERVER['REQUEST_URI'], ".php") == "plugging_in_verdandi"
+or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_model"
+or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_observation")
+{
+  echo '<ul class="navsubul"> <li class="jelly">';
+  HL($file, "plugging_model", "Model");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "plugging_observation", "Observations");
   echo '</li> </ul>';
 } ?>
 
