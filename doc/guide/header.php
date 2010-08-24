@@ -12,14 +12,18 @@
 <link rel="stylesheet" type="text/css" href="<?php echo $root?>/content.css">
 <link rel="stylesheet" href="tabs.css" type="text/css">
 <link rel="stylesheet" href="guide.css" type="text/css">
-<script type="text/javascript" src="prettify.js"></script>
+<?php if (file_exists($root.'/prettify.js'))
+  echo '<script type="text/javascript" src="'.$root.'/prettify.js"></script>';
+else if (file_exists('prettify.js'))
+  echo '<script type="text/javascript" src="prettify.js"></script>'; ?>
 </head>
 
 <body onload="prettyPrint()">
 
 <div class="page">
 
-<?php #include $root.'/header.php';?>
+<?php if (file_exists($root.'/header.php'))
+      include $root.'/header.php'; ?>
 
 <div class="doc">
 
