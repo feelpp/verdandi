@@ -351,47 +351,54 @@ namespace Verdandi
     ///////////////
 
 
-    //! Applies the model to a given vector.
-    /*! The current state of the model is modified.
-      \param[in] x a vector.
-      \param[in] reinitialize_model boolean to indicate if the model has to
-      be reinitialized after the forward call.
+    //! Applies the model to a given state vector.
+    /*!
+      \param[in,out] x on entry, the state vector to which the model is
+      applied; on exit, the state vector after the model is applied.
+      \param[in] forward Boolean to indicate if the model has to go on to the
+      next step.
+      \param[in] preserve_state Boolean to indicate if the model state has to
+      be preserved.
     */
     template <class T>
-    void ClampedBar<T>::ApplyOperator(state& x, bool reinitialize_model)
+    void ClampedBar<T>::ApplyOperator(state& x, bool forward,
+                                      bool preserve_state)
     {
-        double saved_time;
+        double saved_time = 0;
         state saved_state;
-        if (reinitialize_model)
-        {
+        if (!forward)
             saved_time = GetTime();
+
+        if (preserve_state)
             GetState(saved_state);
-        }
 
         SetState(x);
         Forward();
         GetState(x);
 
-        if (reinitialize_model)
-        {
+        if (!forward)
             SetTime(saved_time);
-            SetState(saved_state);
-        }
 
+        if (preserve_state)
+            SetState(saved_state);
     }
 
 
     //! Applies the tangent linear model to a given vector.
-    /*! The current state of the model is modified.
-      \param[in] x a vector.
-      \param[in] reinitialize_model boolean to indicate if the model has to
-      be reinitialized after the forward call.
+    /*!
+      \param[in,out] x on entry, a vector to which the tangent linear model
+      should be applied; on exit, the result.
+      \param[in] forward Boolean to indicate if the model has to go on to the
+      next step.
+      \param[in] preserve_state Boolean to indicate if the model state has to
+      be preserved.
     */
     template <class T>
     void ClampedBar<T>::ApplyTangentLinearOperator(state& x,
-                                                   bool reinitialize_model)
+                                                   bool forward,
+                                                   bool preserve_state)
     {
-        ApplyOperator(x, reinitialize_model);
+        ApplyOperator(x, forward, preserve_state);
     }
 
 

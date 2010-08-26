@@ -166,11 +166,12 @@ namespace Verdandi
         void Save();
 
         // Operators.
-        void ApplyOperator(state& x, bool reinitialize_model = false);
+        void ApplyOperator(state& x, bool forward = false,
+                           bool preserve_state = true);
         void ApplyTangentLinearOperator(state& x,
-                                        bool reinitialize_model = false);
+                                        bool forward = false,
+                                        bool preserve_state = true);
         void GetTangentLinearOperator(tangent_linear_operator&) const;
-
 
         // Access methods.
         double GetTime() const;
