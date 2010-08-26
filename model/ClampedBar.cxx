@@ -442,7 +442,7 @@ namespace Verdandi
     template <class T>
     int ClampedBar<T>::GetNstate() const
     {
-        return 2 * Ndof_;
+        return 2 * Ndof_ - 2;
     }
 
 
@@ -454,10 +454,10 @@ namespace Verdandi
     void ClampedBar<T>::GetState(state& state) const
     {
         int position = 0;
-        state.Reallocate(2 * Ndof_);
-        for (int i = 0; i < Ndof_; i++)
+        state.Reallocate(2 * Ndof_ - 2);
+        for (int i = 1; i < Ndof_; i++)
             state(position++) = disp_0_(i);
-        for (int i = 0; i < Ndof_; i++)
+        for (int i = 1; i < Ndof_; i++)
             state(position++) = velo_0_(i);
     }
 
@@ -471,9 +471,11 @@ namespace Verdandi
     void ClampedBar<T>::SetState(state& state)
     {
         int position = 0;
-        for (int i = 0; i < Ndof_; i++)
+        disp_0_(0) = T(0.);
+        for (int i = 1; i < Ndof_; i++)
             disp_0_(i) = state(position++);
-        for (int i = 0; i < Ndof_; i++)
+        velo_0_(0) = T(0.);
+        for (int i = 1; i < Ndof_; i++)
             velo_0_(i) = state(position++);
     }
 
