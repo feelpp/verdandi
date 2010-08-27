@@ -96,6 +96,9 @@ namespace Verdandi
     void ConvertDenseToSparse(Vector<T, VectFull, Allocator> V_dense,
                               Vector<T, VectSparse, Allocator>& V_sparse);
 
+    template <class T>
+    void Fill(T value, Matrix<T, Symmetric, RowSymSparse>& M);
+
 
 } // namespace Verdandi.
 

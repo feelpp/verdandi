@@ -251,6 +251,22 @@ namespace Verdandi
     }
 
 
+    /*! Returns a decomposition of the state error covariance matrix (\f$B\f$)
+      as a product \f$LUL^T\f$.
+    */
+    /*!
+      \param[out] L the matrix \f$L\f$.
+      \param[out] U the matrix \f$U\f$.
+    */
+    void ModelTemplate::GetStateErrorVarianceSqrt(state_error_variance& L,
+                                                  state_error_variance& U)
+    {
+        throw ErrorUndefined("ModelTemplate::GetStateErrorVarianceSqrt("
+                             "state_error_variance& L, "
+                             "state_error_variance& U)");
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.

@@ -604,6 +604,22 @@ namespace Verdandi
     }
 
 
+    //! Fills a given matrix with a given a value.
+    /*!
+      \param[in] value the value to fill the matrix with.
+      \param[out] M the matrix to be filled.
+    */
+    template <class T>
+    void Fill(T value, Matrix<T, Symmetric, RowSymSparse>& M)
+    {
+        Vector<T> working_vector;
+        working_vector.SetData(M.GetDataSize(), M.GetData());
+        working_vector.Fill(T(value));
+        working_vector.Nullify();
+    }
+
+
+
 } // namespace Verdandi.
 
 

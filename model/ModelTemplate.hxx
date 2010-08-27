@@ -93,6 +93,8 @@ namespace Verdandi
         void GetStateErrorVarianceRow(int row,
                                       state_error_variance_row& P_row);
         state_error_variance& GetStateErrorVariance();
+        void GetStateErrorVarianceSqrt(state_error_variance& L,
+                                       state_error_variance& U);
 
         string GetName() const;
         void Message(string message);
