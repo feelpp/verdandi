@@ -99,23 +99,21 @@ namespace Verdandi
         configuration.Set("final_time", "", numeric_limits<double>::max(),
                           final_time_);
 
+        time_ = numeric_limits<double>::min();
+
         configuration.Set("width_file", "", "", width_file_);
         configuration.Set("error.variance", "v > 0", error_variance_value_);
 
-        configuration.Set("operator.definition",
-                          "ops_in(v, {'diagonal', 'file'})",
-                          operator_definition_);
-        configuration.Set("operator.diagonal_value",
-                          operator_diagonal_value_);
-        configuration.Set("operator.file", operator_file_);
-
-        time_ = numeric_limits<double>::min();
-
         /*** Building the matrices ***/
 
+        configuration.Set("operator.scaled_identity",
+                          operator_scaled_identity_);
 
-        if (operator_definition_ == "diagonal")
+        if (operator_scaled_identity_)
         {
+            configuration.Set("operator.diagonal_value",
+                              operator_diagonal_value_);
+
             Nobservation_ = Nstate_model_;
 #ifdef VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
             build_diagonal_sparse_matrix(Nstate_model_,
@@ -127,23 +125,42 @@ namespace Verdandi
             Mlt(operator_diagonal_value_, tangent_operator_matrix_);
 #endif
         }
-        else if (operator_definition_ == "file")
+        else // Operator given in a Lua table or in a file.
         {
 #ifdef VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
             throw ErrorUndefined("LinearObservationManager::Initialize()",
-                                 "File definition of sparse tangent operator "
-                                 "matrix is not yet supported.");
+                                 "For a sparse operator, only scaled "
+                                 "identity matrices are supported.");
 #else
-            tangent_operator_matrix_.Read(operator_file_);
+            if (configuration.Is<string>("operator.value"))
+                tangent_operator_matrix_
+                    .Read(configuration.Get<string>("operator.file"));
+            else
+            {
+                tangent_operator_matrix_.Clear();
+                configuration.Set("operator.value", tangent_operator_matrix_);
+                if (tangent_operator_matrix_.GetN() % model.GetNstate() != 0)
+                    throw ErrorArgument("LinearObservationManager"
+                                        "::Initialize()",
+                                        "The total number of elements in the "
+                                        "tangent operator matrix ("
+                                        + to_str(tangent_operator_matrix_
+                                                 .GetN())
+                                        + ") is not a multiple of the"
+                                        " dimension of the model state ("
+                                        + to_str(model.GetNstate())  + ").");
+                tangent_operator_matrix_
+                    .Resize(tangent_operator_matrix_.GetN()
+                            / model.GetNstate(),
+                            model.GetNstate());
+            }
             if (tangent_operator_matrix_.GetN() != model.GetNstate())
                 throw ErrorArgument("LinearObservationManager::Initialize()",
                                     "The number of columns of the tangent "
                                     "operator matrix ("
                                     + to_str(tangent_operator_matrix_.GetN())
-                                    + ") defined in the file \"" +
-                                    operator_file_
-                                    + "\" is inconsistent with the"
-                                    " dimension of the model state("
+                                    + ") is inconsistent with the"
+                                    " dimension of the model state ("
                                     + to_str(model.GetNstate())  + ").");
             Nobservation_ = tangent_operator_matrix_.GetM();
 #endif
@@ -1568,7 +1585,7 @@ namespace Verdandi
         if (x.GetSize() == 0)
             return;
 
-        if (operator_definition_ == "diagonal")
+        if (operator_scaled_identity_)
         {
             Copy(x, y);
             Mlt(operator_diagonal_value_, y);
@@ -1606,15 +1623,11 @@ namespace Verdandi
     T LinearObservationManager<T>
     ::GetTangentLinearOperator(int i, int j) const
     {
-        if (operator_definition_ == "diagonal")
-        {
+        if (operator_scaled_identity_)
             if (i == j)
                 return operator_diagonal_value_;
             else
                 return T(0);
-        }
-
-        // Operator defined in a file.
         else
             return tangent_operator_matrix_(i, j);
     }
@@ -1634,7 +1647,7 @@ namespace Verdandi
                                   tangent_operator_row)
         const
     {
-        if (operator_definition_ == "diagonal")
+        if (operator_scaled_identity_)
         {
             // if (operator_sparse_)
             // {
@@ -1651,8 +1664,6 @@ namespace Verdandi
                 tangent_operator_row(row) = operator_diagonal_value_;
             }
         }
-
-        // Operator defined in a file.
         else
             GetRow(tangent_operator_matrix_, row, tangent_operator_row);
     }
@@ -1682,13 +1693,11 @@ namespace Verdandi
     ::ApplyAdjointOperator(const state& x,
                            LinearObservationManager<T>::observation& y) const
     {
-        if (operator_definition_ == "diagonal")
+        if (operator_scaled_identity_)
         {
             y = x;
             Mlt(operator_diagonal_value_, y);
         }
-
-        // Operator defined in a file.
         else
             Mlt(1., SeldonTrans, tangent_operator_matrix_, x, 0., y);
     }

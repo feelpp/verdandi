@@ -134,12 +134,10 @@ namespace Verdandi
 
         //! Tangent operator matrix (H).
         tangent_linear_operator tangent_operator_matrix_;
-        //! How is defined the observation operator?
-        string operator_definition_;
-        //! In case of a diagonal operator.
+        //! Is the operator a scaled identity matrix?
+        bool operator_scaled_identity_;
+        //! In case of a scaled identity operator.
         T operator_diagonal_value_;
-        //! In case of an operator defined in a file.
-        string operator_file_;
 
         //! Observation error variance.
         T error_variance_value_;

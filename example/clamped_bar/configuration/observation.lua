@@ -51,13 +51,13 @@ observation = {
 
    operator = {
 
-      -- How is defined the observation operator? If the operator is not
-      -- "diagonal", values are read from a file (see entry "File" below).
-      definition = "diagonal",
-      -- In case of a diagonal operator.
+
+      -- Is the operator a scaled identity matrix?
+      scaled_identity = true,
+      -- If so, put the diagonal value:
       diagonal_value = 1.,
-      -- In case of an operator defined in a file.
-      file = "configuration/matrix.bin"
+      -- Otherwise, the operator value (file name or table):
+      value = {}
 
    },
 
