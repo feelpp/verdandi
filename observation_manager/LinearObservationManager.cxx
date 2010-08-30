@@ -95,6 +95,7 @@ namespace Verdandi
         configuration.Set("type", "", "state", observation_type_);
         configuration.Set("Delta_t", "v > 0", Delta_t_);
         configuration.Set("Nskip", "v > 0", Nskip_);
+        configuration.Set("initial_time", "", 0., initial_time_);
         configuration.Set("final_time", "", numeric_limits<double>::max(),
                           final_time_);
 
@@ -165,7 +166,7 @@ namespace Verdandi
 
         int expected_file_size;
         expected_file_size = Nbyte_observation_ *
-            int(final_time_ / (Delta_t_ * Nskip_));
+            int((final_time_ - initial_time_) / (Delta_t_ * Nskip_));
 
         int file_size;
         ifstream file_stream;
@@ -291,6 +292,7 @@ namespace Verdandi
                        available_time)
     {
         available_time.Clear();
+        time_inf = time_inf > initial_time_ ? time_inf : initial_time_;
         time_sup = time_sup < final_time_ ? time_sup : final_time_;
 
         double period = Delta_t_ * Nskip_;
@@ -298,7 +300,9 @@ namespace Verdandi
         // All observations available in the given interval are considered.
         if (selection_policy == 0)
         {
-            double available_time_0 = floor(time_inf / period) * period;
+            double available_time_0
+                = initial_time_
+                + floor((time_inf - initial_time_) / period) * period;
             if (available_time_0 == time_inf)
                 available_time.PushBack(available_time_0);
             available_time_0 += period;
@@ -313,7 +317,8 @@ namespace Verdandi
         // are requested.
         if (selection_policy == 2)
         {
-            double t1 = floor(time / period) * period;
+            double t1 = initial_time_
+                + floor((time - initial_time_) / period) * period;
             double t2 = t1 + period;
             if (t1 > time_inf)
                 available_time.PushBack(t1);
@@ -337,11 +342,13 @@ namespace Verdandi
             ReadObservationTriangleWidth(time_inf, time_sup, width_left,
                                          width_right);
 
-            available_time_0 = floor(time_inf / period) * period;
+            available_time_0 = initial_time_
+                + floor((time_inf - initial_time_) / period) * period;
             if (!is_equal(available_time_0, time_inf))
                 available_time_0 += period;
 
-            available_time_1 = floor(time_sup / period) * period;
+            available_time_1 = initial_time_
+                + floor((time_sup - initial_time_) / period) * period;
             if (is_equal(available_time_1, time_sup))
                 available_time_1 -= period;
 
@@ -1311,8 +1318,8 @@ namespace Verdandi
         observation_vector input_data;
 
         streampos position;
-        position =  (floor(time / (Delta_t_ * Nskip_) + 0.5) + variable)
-            * Nbyte_observation_;
+        position = (floor((time - initial_time_) / (Delta_t_ * Nskip_) + 0.5)
+                    + variable) * Nbyte_observation_;
         file_stream.seekg(position);
         input_data.Read(file_stream);
 
@@ -1382,10 +1389,12 @@ namespace Verdandi
                           + width_file_ + "\".");
 #endif
         period = Delta_t_ * Nskip_;
-        available_time_0 = floor(time_inf / period) * period;
+        available_time_0 = initial_time_
+            + floor((time_inf - initial_time_) / period) * period;
         if (!is_equal(available_time_0, time_inf))
             available_time_0 += period;
-        available_time_1 = floor(time_sup / period) * period;
+        available_time_1 = initial_time_
+            + floor((time_sup - initial_time_) / period) * period;
         if (is_equal(available_time_1, time_sup))
             available_time_1 -= period;
 
@@ -1394,7 +1403,8 @@ namespace Verdandi
         width_left.Reallocate(Nwidth);
         width_right.Reallocate(Nwidth);
 
-        position = floor(available_time_0 / Delta_t_) * Nbyte_width;
+        position = floor((available_time_0 - initial_time_) / Delta_t_)
+            * Nbyte_width;
         for (int i = 0; i < Nwidth; i++, position += Nskip_ * Nbyte_width)
         {
             file_stream.seekg(position);

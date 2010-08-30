@@ -113,7 +113,9 @@ namespace Verdandi
         double Delta_t_;
         //! Period with which available observations are actually loaded.
         int Nskip_;
-        //! Duration during which observations are assimilated.
+        //! First time at which observations are available.
+        double initial_time_;
+        //! Final time at which observations are available.
         double final_time_;
 
         /*** Observation times ***/
