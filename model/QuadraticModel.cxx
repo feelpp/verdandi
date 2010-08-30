@@ -85,28 +85,28 @@ namespace Verdandi
 
         if (with_quadratic_term_)
         {
-            Q_state_.Reallocate(Nstate_);
-            Q_.resize(Nstate_);
+            S_state_.Reallocate(Nstate_);
+            S_.resize(Nstate_);
             for (int i = 0; i < Nstate_; i++)
-                Q_[i].Reallocate(Nstate_, Nstate_);
-            configuration.Set("quadratic_term", Q_);
-            if (int(Q_.size()) != Nstate_)
+                S_[i].Reallocate(Nstate_, Nstate_);
+            configuration.Set("quadratic_term", S_);
+            if (int(S_.size()) != Nstate_)
                 throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                          "The initial state has "
                                          + to_str(Nstate_) + " elements, but "
                                          "the entry \"quadratic_term\" has "
-                                         + to_str(int(Q_.size()))
+                                         + to_str(int(S_.size()))
                                          + " elements.");
             for (int i = 0; i < Nstate_; i++)
-                if (Q_[i].GetM() != Nstate_ || Q_[i].GetN() != Nstate_)
+                if (S_[i].GetM() != Nstate_ || S_[i].GetN() != Nstate_)
                     throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                              "The initial state has "
                                              + to_str(Nstate_) + " elements, "
                                              "but the matrix " + to_str(i)
                                              + " of \"quadratic_term\" has "
-                                             + to_str(int(Q_[i].GetM()))
+                                             + to_str(int(S_[i].GetM()))
                                              + " rows and "
-                                             + to_str(int(Q_[i].GetN()))
+                                             + to_str(int(S_[i].GetN()))
                                              + " columns.");
         }
 
@@ -140,15 +140,58 @@ namespace Verdandi
         configuration.Set("initial_time", time_);
         configuration.Set("final_time", final_time_);
 
+        /*** Errors ***/
+
+        configuration.SetPrefix("quadratic_model.");
+
+        if (configuration.Exists("error"))
+        {
+            Q_.Reallocate(Nstate_, Nstate_);
+            if (configuration.Get<bool>("error.scaled_identity"))
+            {
+                Q_.SetIdentity();
+                Mlt(configuration.Get<T>("error.diagonal_value", "v >= 0"),
+                    Q_);
+            }
+            else
+                configuration.Set("error.value", Q_);
+        }
+
+        if (configuration.Exists("error_sqrt"))
+        {
+            Q_sqrt_.Reallocate(Nstate_, 0);
+            configuration.Set("error_sqrt.value", Q_sqrt_);
+        }
+
+        if (configuration.Exists("state_error"))
+        {
+            P_.Reallocate(Nstate_, Nstate_);
+            if (configuration.Get<bool>("state_error.scaled_identity"))
+            {
+                P_.SetIdentity();
+                Mlt(configuration.Get<T>("state_error.diagonal_value",
+                                         "v >= 0"),
+                    P_);
+            }
+            else
+                configuration.Set("state_error.value", P_);
+        }
+
+        if (configuration.Exists("state_error_sqrt"))
+        {
+            P_sqrt_.Reallocate(Nstate_, 0);
+            configuration.Set("state_error_sqrt.value", P_sqrt_);
+        }
+
         /*** Output saver ***/
 
         output_saver_.Initialize(configuration_file,
                                  "quadratic_model.output_saver.");
         if (with_quadratic_term_)
         {
-            output_saver_.Empty("Q");
+            output_saver_.Empty("S");
             for (int i = 0; i < Nstate_; i++)
-                output_saver_.Save(Q_[i], "Q");
+                output_saver_.Save(S_[i], "S");
         }
         if (with_linear_term_)
         {
@@ -183,8 +226,8 @@ namespace Verdandi
         if (with_quadratic_term_)
             for (int i = 0; i < Nstate_; i++)
             {
-                MltAdd(Delta_t_, Q_[i], state_, T(0), Q_state_);
-                state_(i) += DotProd(Q_state_, state_);
+                MltAdd(Delta_t_, S_[i], state_, T(0), S_state_);
+                state_(i) += DotProd(S_state_, state_);
             }
         if (with_linear_term_)
             MltAdd(Delta_t_, L_, state_, T(1), state_);
@@ -236,9 +279,9 @@ namespace Verdandi
         {
             for (int i = 0; i < Nstate_; i++)
             {
-                MltAdd(Delta_t_, Q_[i], state_, T(0), Q_state_);
-                MltAdd(Delta_t_, SeldonTrans, Q_[i], state_, T(1), Q_state_);
-                x(i) += DotProd(Q_state_, input);
+                MltAdd(Delta_t_, S_[i], state_, T(0), S_state_);
+                MltAdd(Delta_t_, SeldonTrans, S_[i], state_, T(1), S_state_);
+                x(i) += DotProd(S_state_, input);
             }
             if (with_linear_term_)
                 MltAdd(Delta_t_, L_, input, T(1), x);
@@ -365,6 +408,107 @@ namespace Verdandi
     ::SetFullState(const typename QuadraticModel<T>::state& state)
     {
         SetState(state);
+    }
+
+
+    ////////////
+    // ERRORS //
+    ////////////
+
+
+    //! Returns the model error variance.
+    /*!
+      \return The model error variance.
+    */
+    template <class T>
+    typename QuadraticModel<T>::error_variance&
+    QuadraticModel<T>::GetErrorVariance()
+    {
+        return Q_;
+    }
+
+
+    //! Returns the model error variance.
+    /*!
+      \return The model error variance.
+    */
+    template <class T>
+    const typename QuadraticModel<T>::error_variance&
+    QuadraticModel<T>::GetErrorVariance() const
+    {
+        return Q_;
+    }
+
+
+    //! Returns the square root of the model error variance.
+    /*!
+      \return The square root of the model error variance.
+    */
+    template <class T>
+    typename QuadraticModel<T>::error_variance&
+    QuadraticModel<T>::GetErrorVarianceSqrt()
+    {
+        return Q_sqrt_;
+    }
+
+
+    //! Returns the square root of the model error variance.
+    /*!
+      \return The square root of the model error variance.
+    */
+    template <class T>
+    const typename QuadraticModel<T>::error_variance&
+    QuadraticModel<T>::GetErrorVarianceSqrt() const
+    {
+        return Q_sqrt_;
+    }
+
+
+    //! Returns the state error variance.
+    /*!
+      \return The state error variance.
+    */
+    template <class T>
+    typename QuadraticModel<T>::state_error_variance&
+    QuadraticModel<T>::GetStateErrorVariance()
+    {
+        return P_;
+    }
+
+
+    //! Returns the state error variance.
+    /*!
+      \return The state error variance.
+    */
+    template <class T>
+    const typename QuadraticModel<T>::state_error_variance&
+    QuadraticModel<T>::GetStateErrorVariance() const
+    {
+        return P_;
+    }
+
+
+    //! Returns the square root of the state error variance.
+    /*!
+      \return The square root of the state error variance.
+    */
+    template <class T>
+    typename QuadraticModel<T>::state_error_variance&
+    QuadraticModel<T>::GetStateErrorVarianceSqrt()
+    {
+        return P_sqrt_;
+    }
+
+
+    //! Returns the square root of the state error variance.
+    /*!
+      \return The square root of the state error variance.
+    */
+    template <class T>
+    const typename QuadraticModel<T>::state_error_variance&
+    QuadraticModel<T>::GetStateErrorVarianceSqrt() const
+    {
+        return P_sqrt_;
     }
 
 

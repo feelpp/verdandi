@@ -48,6 +48,7 @@ namespace Verdandi
         typedef Vector<T> state_error_variance_row;
         typedef Vector<T> state;
         typedef Matrix<T> matrix_state_observation;
+        typedef Matrix<T> error_variance;
 
     protected:
 
@@ -65,7 +66,7 @@ namespace Verdandi
         bool with_constant_term_;
 
         //! Quadratic terms.
-        vector<Matrix<T> > Q_;
+        vector<Matrix<T> > S_;
 
         //! Matrix that defines the linear part of the model.
         Matrix<T> L_;
@@ -83,7 +84,21 @@ namespace Verdandi
         double time_;
 
         //! Temporary variable that stores Q times the state vector.
-        Vector<T> Q_state_;
+        Vector<T> S_state_;
+
+        /*** Errors ***/
+
+        //! Variance of the model error.
+        error_variance Q_;
+
+        //! Variance of the model error in square root form.
+        error_variance Q_sqrt_;
+
+        //! Variance of the state error.
+        error_variance P_;
+
+        //! Variance of the state error in square root form.
+        error_variance P_sqrt_;
 
         /*** Output saver ***/
 
@@ -116,6 +131,16 @@ namespace Verdandi
         void SetState(state& state);
         void GetFullState(state& state) const;
         void SetFullState(const state& state);
+
+        // Errors.
+        error_variance& GetErrorVariance();
+        const error_variance& GetErrorVariance() const;
+        error_variance& GetErrorVarianceSqrt();
+        const error_variance& GetErrorVarianceSqrt() const;
+        state_error_variance& GetStateErrorVariance();
+        const state_error_variance& GetStateErrorVariance() const;
+        state_error_variance& GetStateErrorVarianceSqrt();
+        const state_error_variance& GetStateErrorVarianceSqrt() const;
 
         string GetName() const;
         void Message(string message);

@@ -27,6 +27,42 @@ quadratic_model = {
 
    },
 
+   error = {
+
+      -- Is the model error variance a scaled identity matrix?
+      scaled_identity = true,
+      -- If so, put the diagonal value:
+      diagonal_value = 1.,
+      -- Otherwise, the operator value (file name or table):
+      value = {}
+
+   },
+
+   error_sqrt = {
+
+      -- Columns of the square root of the model error variance.
+      value = {}
+
+   },
+
+   state_error = {
+
+      -- Is the state error variance a scaled identity matrix?
+      scaled_identity = true,
+      -- If so, put the diagonal value:
+      diagonal_value = 1.,
+      -- Otherwise, the operator value (file name or table):
+      value = {}
+
+   },
+
+   state_error_sqrt = {
+
+      -- Columns of the square root of the state error variance.
+      value = {}
+
+   },
+
    output_saver = {
 
       variable_list = {"state", "Q", "L", "b"},
