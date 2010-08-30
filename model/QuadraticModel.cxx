@@ -195,6 +195,61 @@ namespace Verdandi
     }
 
 
+    //! Applies the model to a given state vector.
+    /*!
+      \param[in,out] c on entry, the state vector to which the model is
+      applied; on exit, the state vector after the model is applied.
+      \param[in] forward Boolean to indicate if the model has to go on to the
+      next step.
+      \param[in] preserve_state Boolean to indicate if the model state has to
+      be preserved.
+    */
+    template <class T>
+    void QuadraticModel<T>
+    ::ApplyOperator(typename QuadraticModel<T>::state& x,
+                    bool forward, bool preserve_state)
+    {
+        state current_state;
+        if (preserve_state)
+            GetState(current_state);
+        SetState(x);
+        Forward();
+        if (!forward)
+            time_ -= Delta_t_;
+        GetState(x);
+        if (preserve_state)
+            SetState(current_state);
+    }
+
+
+    //! Applies the tangent linear model to a given vector.
+    /*!
+      \param[in,out] x on entry, a vector to which the tangent linear model
+      should be applied; on exit, the result.
+    */
+    template <class T>
+    void QuadraticModel<T>
+    ::ApplyTangentLinearOperator(typename QuadraticModel<T>::state& x)
+    {
+        state input = x;
+        if (with_quadratic_term_)
+        {
+            for (int i = 0; i < Nstate_; i++)
+            {
+                MltAdd(Delta_t_, Q_[i], state_, T(0), Q_state_);
+                MltAdd(Delta_t_, SeldonTrans, Q_[i], state_, T(1), Q_state_);
+                x(i) += DotProd(Q_state_, input);
+            }
+            if (with_linear_term_)
+                MltAdd(Delta_t_, L_, input, T(1), x);
+        }
+        else if (with_linear_term_)
+            MltAdd(Delta_t_, L_, input, T(1), x);
+        else
+            x.Zero();
+    }
+
+
     //! Checks whether the model has finished.
     /*!
       \return True if no more data assimilation is required, false otherwise.
