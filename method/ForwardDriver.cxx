@@ -185,6 +185,17 @@ namespace Verdandi
     }
 
 
+    //! Returns the model.
+    /*!
+      \return The model.
+    */
+    template <class ClassModel>
+    ClassModel& ForwardDriver<ClassModel>::GetModel()
+    {
+        return model_;
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.

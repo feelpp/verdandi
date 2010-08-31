@@ -77,6 +77,7 @@ namespace Verdandi
 
         // Access methods.
         const ClassModel& GetModel() const;
+        ClassModel& GetModel();
         string GetName() const;
         void Message(string message);
     };
