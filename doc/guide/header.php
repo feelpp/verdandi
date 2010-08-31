@@ -63,13 +63,17 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "overview")
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "assimilation_methods"
 or basename($_SERVER['REQUEST_URI'], ".php") == "optimal_interpolation"
-or basename($_SERVER['REQUEST_URI'], ".php") == "extended_kalman_filter")
+or basename($_SERVER['REQUEST_URI'], ".php") == "extended_kalman_filter"
+or basename($_SERVER['REQUEST_URI'], ".php") == "unscented_kalman_filter")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "optimal_interpolation", "Optimal Interpolation");
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "extended_kalman_filter", "Extended Kalman Filter");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "unscented_kalman_filter", "Unscented Kalman Filter");
   echo '</li> </ul>';
 } ?>
 
