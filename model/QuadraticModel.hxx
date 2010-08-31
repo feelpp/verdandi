@@ -44,6 +44,7 @@ namespace Verdandi
         typedef const T* const_pointer;
         typedef T& reference;
         typedef const T& const_reference;
+        typedef Matrix<T> tangent_linear_operator;
         typedef Matrix<T> state_error_variance;
         typedef Vector<T> state_error_variance_row;
         typedef Vector<T> state;
@@ -119,6 +120,7 @@ namespace Verdandi
         void ApplyOperator(state& x,
                            bool forward = false, bool preserve_state = true);
         void ApplyTangentLinearOperator(state& x);
+        void GetTangentLinearOperator(tangent_linear_operator&) const;
         bool HasFinished() const;
         void Save();
 

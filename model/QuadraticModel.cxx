@@ -293,6 +293,42 @@ namespace Verdandi
     }
 
 
+    //! Returns the tangent linear model.
+    /*!
+      \param[out] M the matrix of the tangent linear model.
+    */
+    template <class T>
+    void QuadraticModel<T>
+    ::GetTangentLinearOperator
+    (typename QuadraticModel<T>::tangent_linear_operator& M) const
+    {
+        M.Reallocate(Nstate_, Nstate_);
+        if (with_quadratic_term_)
+        {
+            Vector<T> M_row(Nstate_);
+            for (int i = 0; i < Nstate_; i++)
+            {
+                MltAdd(T(1), S_[i], state_, T(0), M_row);
+                MltAdd(T(Delta_t_), SeldonTrans, S_[i], state_,
+                       T(Delta_t_), M_row);
+                SetRow(M_row, i, M);
+                M(i, i) += T(1);
+            }
+            if (with_linear_term_)
+                Add(T(Delta_t_), L_, M);
+        }
+        else if (with_linear_term_)
+        {
+            M.Copy(L_);
+            Mlt(Delta_t_, M);
+            for (int i = 0; i < Nstate_; i++)
+                M(i, i) += T(1);
+        }
+        else
+            M.SetIdentity();
+    }
+
+
     //! Checks whether the model has finished.
     /*!
       \return True if no more data assimilation is required, false otherwise.
