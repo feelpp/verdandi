@@ -139,10 +139,6 @@ namespace Verdandi
         //! Background error covariance matrix (B).
         state_error_variance state_error_variance_;
 
-        //! Number of the row of B currently stored.
-        int current_row_;
-        //! Number of the column of Q currently stored.
-        int current_column_;
         //! Value of the row of B currently stored.
         state_error_variance_row state_error_variance_row_;
 

@@ -521,54 +521,7 @@ namespace Verdandi
     ::GetStateErrorVarianceRow(int row, state_error_variance_row&
                                state_error_variance_row)
     {
-#ifdef VERDANDI_STATE_ERROR_SPARSE
-        {
-            state_error_variance_row.Reallocate(GetNstate());
-            state_error_variance_row.Zero();
-            state_error_variance_row(row) = state_error_variance_value_;
-        }
-# else
-        {
-#ifdef VERDANDI_STATE_ERROR_DENSE
-            {
-                state_error_variance_row.Reallocate(GetNstate());
-                state_error_variance_row.Zero();
-                state_error_variance_row(row)
-                    = state_error_variance_value_;
-            }
-#else
-            {
-                // The row has already been computed.
-                if (row == current_row_)
-                    state_error_variance_row = state_error_variance_row_;
-                else
-                {
-                    int i;
-                    current_row_ = row;
-                    current_column_ = -1;
-
-                    // Positions related to 'row'.
-                    int i_row = row;
-                    int j_row = row - i_row;
-
-                    T distance_x;
-                    T distance;
-                    int position = 0;
-                    for (i = 0; i < Nx_; i++)
-                    {
-                        distance_x = Delta_x_ * T(i - i_row);
-                        distance = sqrt(distance_x * distance_x)
-                            / Balgovind_scale_background_;
-                        state_error_variance_row_(position++)
-                            = state_error_variance_value_
-                            * (1. + distance) * exp(-distance);
-                    }
-                    state_error_variance_row = state_error_variance_row_;
-                }
-            }
-#endif
-        }
-#endif
+        GetRow(state_error_variance_, row, state_error_variance_row);
     }
 
 
