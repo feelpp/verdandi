@@ -524,6 +524,22 @@ namespace Verdandi
     }
 
 
+    //! Returns a row of the state error variance.
+    /*!
+      \param[in] row row index.
+      \param[out] P_row the row with index \a row in the state error variance.
+    */
+    template <class T>
+    void
+    QuadraticModel<T>
+    ::GetStateErrorVarianceRow
+    (int row,
+     typename QuadraticModel<T>::state_error_variance_row& P_row)
+    {
+        GetRow(P_, row, P_row);
+    }
+
+
     //! Returns the square root of the state error variance.
     /*!
       \return The square root of the state error variance.

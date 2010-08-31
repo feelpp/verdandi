@@ -141,6 +141,8 @@ namespace Verdandi
         const error_variance& GetErrorVarianceSqrt() const;
         state_error_variance& GetStateErrorVariance();
         const state_error_variance& GetStateErrorVariance() const;
+        void GetStateErrorVarianceRow(int row, state_error_variance_row&
+                                      state_error_variance_row);
         state_error_variance& GetStateErrorVarianceSqrt();
         const state_error_variance& GetStateErrorVarianceSqrt() const;
 
