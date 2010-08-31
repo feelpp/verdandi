@@ -36,16 +36,15 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class ClassModel>
-    ForwardDriver<ClassModel>::ForwardDriver(string configuration_file):
+    template <class Model>
+    ForwardDriver<Model>::ForwardDriver(string configuration_file):
         model_(configuration_file), iteration_(-1)
     {
         Ops configuration(configuration_file);
 
         /*** Initializations ***/
 
-        MessageHandler::AddRecipient("model", model_,
-                                     ClassModel::StaticMessage);
+        MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      ForwardDriver::StaticMessage);
 
@@ -80,8 +79,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class ClassModel>
-    ForwardDriver<ClassModel>::~ForwardDriver()
+    template <class Model>
+    ForwardDriver<Model>::~ForwardDriver()
     {
     }
 
@@ -96,8 +95,8 @@ namespace Verdandi
       \param[in] configuration_file configuration file to be given to the
       model initialization method.
     */
-    template <class ClassModel>
-    void ForwardDriver<ClassModel>::Initialize(string configuration_file)
+    template <class Model>
+    void ForwardDriver<Model>::Initialize(string configuration_file)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
@@ -121,8 +120,8 @@ namespace Verdandi
 
 
     //! Initializes the model before a time step.
-    template <class ClassModel>
-    void ForwardDriver<ClassModel>::InitializeStep()
+    template <class Model>
+    void ForwardDriver<Model>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
@@ -133,8 +132,8 @@ namespace Verdandi
 
 
     //! Performs a step forward without optimal interpolation.
-    template <class ClassModel>
-    void ForwardDriver<ClassModel>::Forward()
+    template <class Model>
+    void ForwardDriver<Model>::Forward()
     {
         time_.PushBack(model_.GetTime());
 
@@ -166,8 +165,8 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class ClassModel>
-    bool ForwardDriver<ClassModel>::HasFinished() const
+    template <class Model>
+    bool ForwardDriver<Model>::HasFinished() const
     {
         return model_.HasFinished();
     }
@@ -177,9 +176,8 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class ClassModel>
-    const ClassModel&
-    ForwardDriver<ClassModel>::GetModel() const
+    template <class Model>
+    const Model& ForwardDriver<Model>::GetModel() const
     {
         return model_;
     }
@@ -189,8 +187,8 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class ClassModel>
-    ClassModel& ForwardDriver<ClassModel>::GetModel()
+    template <class Model>
+    Model& ForwardDriver<Model>::GetModel()
     {
         return model_;
     }
@@ -200,8 +198,8 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class ClassModel>
-    string ForwardDriver<ClassModel>::GetName() const
+    template <class Model>
+    string ForwardDriver<Model>::GetName() const
     {
         return "ForwardDriver";
     }
@@ -211,8 +209,8 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class ClassModel>
-    void  ForwardDriver<ClassModel>::Message(string message)
+    template <class Model>
+    void  ForwardDriver<Model>::Message(string message)
     {
         model_state state;
         if (message.find("forecast") != string::npos)

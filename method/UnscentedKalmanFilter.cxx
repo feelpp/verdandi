@@ -40,8 +40,8 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    UnscentedKalmanFilter<T, Model, ObservationManager>
     ::UnscentedKalmanFilter(string configuration_file):
         model_(configuration_file),
         observation_manager_(model_, configuration_file)
@@ -50,11 +50,10 @@ namespace Verdandi
 
         /*** Initializations ***/
 
-        MessageHandler::AddRecipient("model", model_,
-                                     ClassModel::StaticMessage);
+        MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
         MessageHandler::AddRecipient("observation_manager",
                                      observation_manager_,
-                                     ClassObservationManager::StaticMessage);
+                                     ObservationManager::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      UnscentedKalmanFilter::StaticMessage);
 
@@ -109,8 +108,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class ClassModel, class ClassObservationManager>
-    UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    UnscentedKalmanFilter<T, Model, ObservationManager>
     ::~UnscentedKalmanFilter()
     {
         sigma_point_collection_.Deallocate();
@@ -127,8 +126,8 @@ namespace Verdandi
       the analysis of the first step.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void UnscentedKalmanFilter<T, Model, ObservationManager>
     ::Initialize(string configuration_file)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
@@ -174,9 +173,8 @@ namespace Verdandi
     //! Initializes a step for the unscented Kalman filter.
     /*! Initializes a step for the model.
      */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::InitializeStep()
+    template <class T, class Model, class ObservationManager>
+    void UnscentedKalmanFilter<T, Model, ObservationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
@@ -187,9 +185,8 @@ namespace Verdandi
 
 
     //! Performs a step forward, with optimal interpolation at the end.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::Forward()
+    template <class T, class Model, class ObservationManager>
+    void UnscentedKalmanFilter<T, Model, ObservationManager>::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
@@ -313,9 +310,8 @@ namespace Verdandi
 
     //! Computes an analysis.
     /*! Whenever observations are available, it computes BLUE. */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::Analyze()
+    template <class T, class Model, class ObservationManager>
+    void UnscentedKalmanFilter<T, Model, ObservationManager>::Analyze()
     {
 
         MessageHandler::Send(*this, "all", "::Analyze begin");
@@ -578,9 +574,9 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    bool UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::HasFinished() const
+    template <class T, class Model, class ObservationManager>
+    bool UnscentedKalmanFilter<T, Model, ObservationManager>::HasFinished()
+        const
     {
         return model_.HasFinished();
     }
@@ -590,10 +586,9 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    const ClassModel&
-    UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::GetModel() const
+    template <class T, class Model, class ObservationManager>
+    const Model&
+    UnscentedKalmanFilter<T, Model, ObservationManager>::GetModel() const
     {
         return model_;
     }
@@ -603,9 +598,9 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    string UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::GetName() const
+    template <class T, class Model, class ObservationManager>
+    string
+    UnscentedKalmanFilter<T, Model, ObservationManager>::GetName() const
     {
         return "UnscentedKalmanFilter";
     }
@@ -615,8 +610,8 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void UnscentedKalmanFilter<T, Model, ObservationManager>
     ::Message(string message)
     {
         model_state state;

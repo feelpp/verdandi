@@ -30,18 +30,18 @@ namespace Verdandi
 
 
     //! This class simply performs a forward simulation.
-    template <class ClassModel>
+    template <class Model>
     class ForwardDriver: public VerdandiBase
     {
 
     public:
         //! Type of the model state vector.
-        typedef typename ClassModel::state model_state;
+        typedef typename Model::state model_state;
 
     protected:
 
         //! Underlying model.
-        ClassModel model_;
+        Model model_;
 
         //! Iteration.
         int iteration_;
@@ -76,8 +76,8 @@ namespace Verdandi
         bool HasFinished() const;
 
         // Access methods.
-        const ClassModel& GetModel() const;
-        ClassModel& GetModel();
+        const Model& GetModel() const;
+        Model& GetModel();
         string GetName() const;
         void Message(string message);
     };

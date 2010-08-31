@@ -30,22 +30,22 @@ namespace Verdandi
 
 
     //! This class is a solver for Hamilton-Jacobi-Bellman equation.
-    template <class T, class ClassModel, class ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
     class HamiltonJacobiBellman: public VerdandiBase
     {
 
     public:
-        typedef typename ClassModel::state model_state;
+        typedef typename Model::state model_state;
 
     protected:
 
         /*** Main components ***/
 
         //! Underlying model.
-        ClassModel model_;
+        Model model_;
 
         //! Observation manager.
-        ClassObservationManager observation_manager_;
+        ObservationManager observation_manager_;
 
         /*** Configuration ***/
 
@@ -161,7 +161,7 @@ namespace Verdandi
         bool HasFinished() const;
 
         // Access methods.
-        const ClassModel& GetModel() const;
+        const Model& GetModel() const;
 
         string GetName() const;
         void Message(string message);

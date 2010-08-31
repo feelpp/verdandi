@@ -36,8 +36,8 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    HamiltonJacobiBellman<T, Model, ObservationManager>
     ::HamiltonJacobiBellman(string configuration_file):
         model_(configuration_file),
         observation_manager_(model_, configuration_file),
@@ -47,11 +47,10 @@ namespace Verdandi
 
         /*** Initializations ***/
 
-        MessageHandler::AddRecipient("model", model_,
-                                     ClassModel::StaticMessage);
+        MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
         MessageHandler::AddRecipient("observation_manager",
                                      observation_manager_,
-                                     ClassObservationManager::StaticMessage);
+                                     ObservationManager::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      HamiltonJacobiBellman::StaticMessage);
 
@@ -277,8 +276,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class ClassModel, class ClassObservationManager>
-    HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    HamiltonJacobiBellman<T, Model, ObservationManager>
     ::~HamiltonJacobiBellman()
     {
     }
@@ -294,8 +293,8 @@ namespace Verdandi
       the analysis of the first step.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>
     ::Initialize(string configuration_file)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
@@ -395,9 +394,8 @@ namespace Verdandi
     //! Initializes a step for the time integration of HJB equation.
     /*! Initializes a step for the model.
      */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
-    ::InitializeStep()
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
@@ -422,9 +420,8 @@ namespace Verdandi
 
 
     //! Performs a step forward.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
-    ::Forward()
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
@@ -486,8 +483,8 @@ namespace Verdandi
 
 
     //! Performs a step forward, using a first-order Lax-Friedrichs scheme.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>
     ::AdvectionLxFForward()
     {
         MessageHandler::Send(*this, "all", "::AdvectionLxFForward begin");
@@ -641,8 +638,8 @@ namespace Verdandi
     /*! \brief Performs a step forward, using a first-order central scheme
       introduced in Bryson and Levy (SIAM J. Sci. Comput., 2003).
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>
     ::AdvectionBrysonLevyForward()
     {
         MessageHandler::Send(*this, "all",
@@ -763,8 +760,8 @@ namespace Verdandi
 
 
     //! Performs a step forward, using a first-order Godunov scheme.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>
     ::AdvectionGodunov()
     {
         MessageHandler::Send(*this, "all", "::AdvectionGodunov begin");
@@ -889,8 +886,8 @@ namespace Verdandi
       \param[in] v_r value in the right cell.
       \return The Godunov flux.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    inline T HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    inline T HamiltonJacobiBellman<T, Model, ObservationManager>
     ::GodunovFlux(T q, T M, T v_l, T v, T v_r) const
     {
         if (q == T(0))
@@ -920,9 +917,9 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    bool HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
-    ::HasFinished() const
+    template <class T, class Model, class ObservationManager>
+    bool HamiltonJacobiBellman<T, Model, ObservationManager>::HasFinished()
+        const
     {
         return time_step_ == Nt_;
     }
@@ -932,10 +929,9 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    const ClassModel&
-    HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
-    ::GetModel() const
+    template <class T, class Model, class ObservationManager>
+    const Model&
+    HamiltonJacobiBellman<T, Model, ObservationManager>::GetModel() const
     {
         return model_;
     }
@@ -945,9 +941,9 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    string HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
-    ::GetName() const
+    template <class T, class Model, class ObservationManager>
+    string HamiltonJacobiBellman<T, Model, ObservationManager>::GetName()
+        const
     {
         return "HamiltonJacobiBellman";
     }
@@ -957,8 +953,8 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void HamiltonJacobiBellman<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>
     ::Message(string message)
     {
         if (message.find("initial value") != string::npos

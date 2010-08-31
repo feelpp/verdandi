@@ -37,8 +37,8 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    ExtendedKalmanFilter<T, Model, ObservationManager>
     ::ExtendedKalmanFilter(string configuration_file):
         model_(configuration_file),
         observation_manager_(model_, configuration_file)
@@ -47,11 +47,10 @@ namespace Verdandi
 
         /*** Initializations ***/
 
-        MessageHandler::AddRecipient("model", model_,
-                                     ClassModel::StaticMessage);
+        MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
         MessageHandler::AddRecipient("observation_manager",
                                      observation_manager_,
-                                     ClassObservationManager::StaticMessage);
+                                     ObservationManager::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      ExtendedKalmanFilter::StaticMessage);
 
@@ -107,8 +106,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class ClassModel, class ClassObservationManager>
-    ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    ExtendedKalmanFilter<T, Model, ObservationManager>
     ::~ExtendedKalmanFilter()
     {
     }
@@ -124,8 +123,8 @@ namespace Verdandi
       the analysis of the first step.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::Initialize(string configuration_file)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
@@ -153,9 +152,8 @@ namespace Verdandi
     //! Initializes a step for the optimal interpolation.
     /*! Initializes a step for the model.
      */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::InitializeStep()
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
@@ -166,9 +164,8 @@ namespace Verdandi
 
 
     //! Performs a step forward, with optimal interpolation at the end.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::Forward()
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
@@ -187,9 +184,8 @@ namespace Verdandi
     //! Computes an analysis.
     /*! Whenever observations are available, it computes BLUE.
      */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::Analyze()
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>::Analyze()
     {
 
         MessageHandler::Send(*this, "all", "::Analyze begin");
@@ -227,8 +223,8 @@ namespace Verdandi
 
 
     //! Computes covariance.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::PropagateCovarianceMatrix_vector()
     {
         double saved_time;
@@ -276,8 +272,8 @@ namespace Verdandi
 
 
     //! Computes covariance.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::PropagateCovarianceMatrix_matrix()
     {
         model_tangent_linear_operator A;
@@ -295,8 +291,8 @@ namespace Verdandi
       innovation. It computes the BLUE (best linear unbiased estimator).
       \param[in] state_vector the state vector to analyze.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::ComputeBLUE(const observation& innovation, model_state& state)
     {
         if (blue_computation_ == "vector")
@@ -316,17 +312,17 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    bool ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::HasFinished() const
+    template <class T, class Model, class ObservationManager>
+    bool ExtendedKalmanFilter<T, Model, ObservationManager>::HasFinished()
+        const
     {
         return model_.HasFinished();
     }
 
 
     //! Computes Covariance.
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::PropagateCovarianceMatrix()
     {
         if (covariance_computation_ == "vector")
@@ -340,10 +336,9 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    const ClassModel&
-    ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::GetModel() const
+    template <class T, class Model, class ObservationManager>
+    const Model&
+    ExtendedKalmanFilter<T, Model, ObservationManager>::GetModel() const
     {
         return model_;
     }
@@ -353,9 +348,8 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    string ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
-    ::GetName() const
+    template <class T, class Model, class ObservationManager>
+    string ExtendedKalmanFilter<T, Model, ObservationManager>::GetName() const
     {
         return "ExtendedKalmanFilter";
     }
@@ -365,8 +359,8 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class ClassModel, class ClassObservationManager>
-    void ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::Message(string message)
     {
         model_state state;

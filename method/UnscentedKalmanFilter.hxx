@@ -30,33 +30,33 @@ namespace Verdandi
 
 
     //! This class implements the unscented Kalman filter.
-    template <class T, class ClassModel, class ClassObservationManager>
+    template <class T, class Model, class ObservationManager>
     class UnscentedKalmanFilter: public VerdandiBase
     {
 
     public:
         //! Type of a row of the background error variance.
-        typedef typename ClassModel::state_error_variance_row
+        typedef typename Model::state_error_variance_row
         model_state_error_variance_row;
         //! Type of the model state vector.
-        typedef typename ClassModel::state model_state;
+        typedef typename Model::state model_state;
         //! Type of the model/observation crossed matrix.
-        typedef typename ClassModel::matrix_state_observation
+        typedef typename Model::matrix_state_observation
         matrix_state_observation;
         //! Type of the background error variance.
-        typedef typename ClassModel::state_error_variance
+        typedef typename Model::state_error_variance
         model_state_error_variance;
         //! Type of the tangent linear model.
-        typedef typename ClassModel::tangent_linear_operator
+        typedef typename Model::tangent_linear_operator
         model_tangent_linear_operator;
         //! Type of the tangent linear observation operator.
-        typedef typename ClassObservationManager
+        typedef typename ObservationManager
         ::tangent_linear_operator observation_tangent_linear_operator;
         //! Type of a row of the tangent linear observation operator.
-        typedef typename ClassObservationManager::tangent_linear_operator_row
+        typedef typename ObservationManager::tangent_linear_operator_row
         observation_tangent_linear_operator_row;
         //! Type of the observation vector.
-        typedef typename ClassObservationManager::observation
+        typedef typename ObservationManager::observation
         observation;
         //! Type of the sigma point vector.
         typedef Vector<T, VectFull, NewAlloc<T> > sigma_point;
@@ -71,9 +71,9 @@ namespace Verdandi
         /*** Main components ***/
 
         //! Underlying model.
-        ClassModel model_;
+        Model model_;
         //! Observation manager.
-        ClassObservationManager observation_manager_;
+        ObservationManager observation_manager_;
         //! Background error covariance matrix (B).
         model_state_error_variance background_error_variance_;
 
@@ -133,7 +133,7 @@ namespace Verdandi
         bool HasFinished() const;
 
         // Access methods.
-        const ClassModel& GetModel() const;
+        const Model& GetModel() const;
 
         string GetName() const;
         void Message(string message);
