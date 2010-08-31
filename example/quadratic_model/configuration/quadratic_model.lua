@@ -21,7 +21,7 @@ quadratic_model = {
       constant = {0.,
                   0.},
 
-      Delta_t = .0015,
+      Delta_t = Delta_t_model,
       initial_time = 0.,
       final_time = 2.5
 
@@ -65,9 +65,9 @@ quadratic_model = {
 
    output_saver = {
 
-      variable_list = {"state", "Q", "L", "b"},
+      variable_list = {"state", "S", "L", "b"},
       file = output_directory .. "%{name}.bin",
-      time = "step 0.015 1.e-6"
+      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
 
    }
 

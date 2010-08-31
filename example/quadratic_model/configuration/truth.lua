@@ -1,6 +1,9 @@
 ----------------------------------- GLOBAL -----------------------------------
 
 
+Delta_t_model = 0.0015
+Nskip_save = 100
+
 output_directory = "result/"
 
 
@@ -26,17 +29,15 @@ forward = {
    output_saver = {
 
       variable_list = {"state_forecast"},
-      file = output_directory .. "forward-%{name}.%{extension}",
-      time = "step 100000",
-      mode = "binary",
-      mode_scalar = "text"
+      file = output_directory .. "truth-%{name}.%{extension}",
+      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
 
    },
 
    output = {
 
-      configuration = output_directory .. "forward.lua",
-      log = output_directory .. "forward.log"
+      configuration = output_directory .. "truth.lua",
+      log = output_directory .. "truth.log"
 
    }
 
