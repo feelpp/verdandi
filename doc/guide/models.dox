@@ -9,9 +9,9 @@
 The shallow-water equations (also called Saint Venant equations) are a set of hyperbolic partial differential equations that describe the flow below a pressure surface in a fluid. It is suitable for flows with a free surface and small depth. For instance, these equations can be applied to model the behavior of a lake or a river. The model describes the evolution of the water height \f$h(x,y)\f$ and the horizontal velocity \f$(u(x,y),v(x,y))\f$. A simplified expression of the model is: <br>
 
 <center>
-\f$\partial_th + \partial_x(hu) + \partial_y(hv) = 0\f$;  <br>
-\f$\partial_t(hu) + \partial_x(huu) + \partial_y(huv) +\frac{1}2g\partial_xh^2 = 0\f$;  <br>
-\f$\partial_t(hv) + \partial_x(huv) + \partial_y(hvv) +\frac{1}2g\partial_yh^2 = 0\f$.  <br>
+\f$\partial_th + \partial_x(hu) + \partial_y(hv) = 0\f$  <br>
+\f$\partial_t(hu) + \partial_x(huu) + \partial_y(huv) +\frac{1}2g\partial_xh^2 = 0\f$ <br>
+\f$\partial_t(hv) + \partial_x(huv) + \partial_y(hvv) +\frac{1}2g\partial_yh^2 = 0\f$  <br>
 </center>
 
 One can define several boundary conditions:
@@ -32,5 +32,45 @@ The state contains:
 </ul>
 
 \section clamped_bar Clamped Bar
+
+The clamped bar model describes the vibration of a still bar clamped at one end. The bar is discretized with <code>Nx</code> finite elements of the same length. With the hypothesis of "small displacements", it follows the set of linear equations:
+
+<center>
+\f$ M \ddot Y + K Y = F\f$  <br/>
+</center>
+
+where \f$M\f$ is the mass matrix, \f$K\f$ is the stiffness matrix and \f$F\f$ is the effort matrix.
+
+The clamped bar model is solved numerically using a Newmark scheme (middle point) for integration in time:
+<center>
+\f$ \ddot Y_{n + \frac{1}2} = \frac{\ddot Y_{n+1} + \ddot Y_{n} }2 =  \frac{\dot Y_{n+1} - \dot Y_{n} } {\Delta t} \f$  <br/>
+\f$ \dot Y_{n + \frac{1}2} = \frac{\dot Y_{n+1} + \dot Y_{n} }2 =  \frac{Y_{n+1} - Y_{n} } {\Delta t} \f$  <br/>
+</center>
+
+Algorithmically, it follows:
+<center>
+\f$ \dot Y_{n + 1} = \frac{2}{\Delta t} (Y_{n+1} - Y_{n}) - \dot Y_{n} \f$  <br/>
+\f$ (\frac{1}2 K +  \frac{2}{\Delta t} M) Y_{n+1} = (-\frac{1}2 K +  \frac{2}{\Delta t^2} M) Y_{n} + F_{n + \frac{1}2} \f$  <br/>
+</center>
+
+One can define several parameters:
+<ol>
+        <li> <code>bar_length</code>: the length of the bar; </li>
+        <li><code>Nx</code>: the number of elements; </li>
+        <li><code>Delta_t</code>: the time step; </li>
+        <li> <code>final_time</code>: the duration of the simulation; </li>
+        <li><code>Young_modulus</code>: the Young's modulus; </li>
+        <li><code>mass_density</code>: the mass density. </li>
+</ol>
+
+The clamped-bar model is implemented in <code>ClampedBar.hxx</code> and <code>ClampedBar.cxx</code>. The class \link Verdandi::ClampedBar ClampedBar\endlink is a template class: <code>ClampedBar<T></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>).
+
+The state contains:
+<ul>
+<li> the vertical displacement along y; </li>
+<li> the vertical velocity along y. </li>
+</ul>
+
+<br> The displacement and the velocity at the first point are equal to zero since the bar is clamped. These zeroes are removed from the state. The size of the state is therefore  <code> 2 (Nx - 1)</code>.
 
 */
