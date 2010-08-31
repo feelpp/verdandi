@@ -148,14 +148,14 @@ namespace Verdandi
     public:
         // Constructors and destructor.
         GridToNetworkObservationManager();
-        template <class ClassModel>
-        GridToNetworkObservationManager(const ClassModel& model,
+        template <class Model>
+        GridToNetworkObservationManager(const Model& model,
                                         string configuration_file);
         ~GridToNetworkObservationManager();
 
         // Initialization.
-        template <class ClassModel>
-        void Initialize(const ClassModel& model, string configuration_file);
+        template <class Model>
+        void Initialize(const Model& model, string configuration_file);
 
         void SetAllActive();
 

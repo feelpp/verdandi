@@ -48,12 +48,12 @@ namespace Verdandi
     /*! It defines the operator for a 2D regular grid.
       \param[in] model model.
       \param[in] configuration_file configuration_file.
-      \tparam ClassModel the model type; e.g. ShallowWater<double>
+      \tparam Model the model type; e.g. ShallowWater<double>
     */
     template <class T>
-    template <class ClassModel>
+    template <class Model>
     GridToNetworkObservationManager<T>
-    ::GridToNetworkObservationManager(const ClassModel& model,
+    ::GridToNetworkObservationManager(const Model& model,
                                       string configuration_file)
     {
     }
@@ -76,12 +76,12 @@ namespace Verdandi
     /*!
       \param[in] model model.
       \param[in] configuration_file configuration file.
-      \tparam ClassModel the model type; e.g. ShallowWater<double>
+      \tparam Model the model type; e.g. ShallowWater<double>
     */
     template <class T>
-    template <class ClassModel>
+    template <class Model>
     void GridToNetworkObservationManager<T>
-    ::Initialize(const ClassModel& model, string configuration_file)
+    ::Initialize(const Model& model, string configuration_file)
     {
         observation_aggregator_.Initialize(configuration_file);
 
