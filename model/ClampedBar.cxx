@@ -514,7 +514,7 @@ namespace Verdandi
     //! Computes a row of the background error covariance matrix B.
     /*!
       \param[in] row row index.
-      \param[out] error_covariance_row the value of row number \a row.
+      \param[out] state_error_covariance_row the value of row number \a row.
     */
     template <class T>
     void ClampedBar<T>
