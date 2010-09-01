@@ -74,6 +74,13 @@ namespace Verdandi
 
         /*** Configuration ***/
 
+        //! Path to the configuration file.
+        string configuration_file_;
+        //! Path to the model configuration file.
+        string model_configuration_file_;
+        //! Path to the configuration file for the observation manager.
+        string observation_configuration_file_;
+
         //! Display options.
         map<string, bool> option_display_;
 
@@ -103,7 +110,7 @@ namespace Verdandi
 
         /*** Methods ***/
 
-        void Initialize(string configuration_file);
+        void Initialize();
 
         void InitializeStep();
 

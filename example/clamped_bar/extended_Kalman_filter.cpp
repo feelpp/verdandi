@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     ExtendedKalmanFilter<real, ClampedBar<real>,
         LinearObservationManager<real> > driver(argv[1]);
 
-    driver.Initialize(argv[1]);
+    driver.Initialize();
 
     while (!driver.HasFinished())
     {

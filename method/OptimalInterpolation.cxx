@@ -39,10 +39,8 @@ namespace Verdandi
     template <class T, class Model, class ObservationManager>
     OptimalInterpolation<T, Model, ObservationManager>
     ::OptimalInterpolation(string configuration_file):
-        model_(configuration_file),
-        observation_manager_(model_, configuration_file)
+        configuration_file_(configuration_file)
     {
-        Ops configuration(configuration_file);
 
         /*** Initializations ***/
 
@@ -58,6 +56,19 @@ namespace Verdandi
          * Reads the configuration *
          ***************************/
 
+        Ops configuration(configuration_file);
+        configuration.SetPrefix("optimal_interpolation.");
+
+        /*** Model ***/
+
+        configuration.Set("model.configuration_file", "", configuration_file,
+                          model_configuration_file_);
+
+        /*** Observation manager ***/
+
+        configuration.Set("observation_manager.configuration_file", "",
+                          configuration_file,
+                          observation_configuration_file_);
 
         /*** Display options ***/
 
@@ -117,19 +128,17 @@ namespace Verdandi
 
     //! Initializes the optimal interpolation driver.
     /*! Initializes the model and the observation manager. Optionally computes
-      the analysis of the first step.
-      \param[in] configuration_file configuration file.
-    */
+      the analysis of the first step. */
     template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>
-    ::Initialize(string configuration_file)
+    void OptimalInterpolation<T, Model, ObservationManager>::Initialize()
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
         /*** Initializations ***/
 
-        model_.Initialize(configuration_file);
-        observation_manager_.Initialize(model_, configuration_file);
+        model_.Initialize(model_configuration_file_);
+        observation_manager_.Initialize(model_,
+                                        observation_configuration_file_);
 
         /*** Assimilation ***/
 

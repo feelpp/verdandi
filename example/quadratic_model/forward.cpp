@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 
     ForwardDriver<QuadraticModel<double> > driver(argv[1]);
 
-    driver.Initialize(argv[1]);
+    driver.Initialize();
 
     while (!driver.HasFinished())
     {

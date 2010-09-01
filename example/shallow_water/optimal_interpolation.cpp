@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     OptimalInterpolation<real, ShallowWater<real>,
         OBSERVATION_OPERATOR<real> > driver(argv[1]);
 
-    driver.Initialize(argv[1]);
+    driver.Initialize();
 
     while (!driver.HasFinished())
     {

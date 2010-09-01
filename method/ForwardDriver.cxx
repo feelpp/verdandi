@@ -38,9 +38,10 @@ namespace Verdandi
     */
     template <class Model>
     ForwardDriver<Model>::ForwardDriver(string configuration_file):
-        model_(configuration_file), iteration_(-1)
+        iteration_(-1), configuration_file_(configuration_file)
     {
-        Ops configuration(configuration_file);
+        Ops configuration(configuration_file_);
+        configuration.SetPrefix("forward.");
 
         /*** Initializations ***/
 
@@ -48,9 +49,13 @@ namespace Verdandi
         MessageHandler::AddRecipient("driver", *this,
                                      ForwardDriver::StaticMessage);
 
+        /*** Model ***/
+
+        configuration.Set("model.configuration_file", "", configuration_file,
+                          model_configuration_file_);
+
         /*** Display options ***/
 
-        configuration.SetPrefix("forward.");
         // Should the iteration be displayed on screen?
         configuration.Set("display.show_iteration", show_iteration_);
         // Should the time be displayed on screen?
@@ -96,21 +101,16 @@ namespace Verdandi
       model initialization method.
     */
     template <class Model>
-    void ForwardDriver<Model>::Initialize(string configuration_file)
+    void ForwardDriver<Model>::Initialize()
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
-        if (show_time_)
-            Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
-        else
-            Logger::Log<-3>(*this,
-                            "Time: " + to_str(model_.GetTime()));
         if (show_iteration_)
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
 
-        model_.Initialize(configuration_file);
+        model_.Initialize(model_configuration_file_);
         iteration_ = 0;
 
         MessageHandler::Send(*this, "model", "initial condition");
