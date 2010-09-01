@@ -303,6 +303,33 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
+    ::SetAvailableTime(double time_inf, double time_sup,
+                       LinearObservationManager<T>::time_vector&
+                       available_time)
+    {
+        available_time.Clear();
+        double period = Delta_t_ * Nskip_;
+        double available_time_0
+                = initial_time_
+                + floor((time_inf - initial_time_) / period) * period;
+        if (available_time_0 == time_inf)
+            available_time.PushBack(available_time_0);
+        available_time_0 += period;
+        for (double t = available_time_0; t < time_sup; t += period)
+            available_time.PushBack(t);
+        return;
+    }
+
+
+    //! Sets available observation times at a given time interval.
+    /*!
+      \param[in] time_inf lower bound of the given time interval.
+      \param[in] time_sup upper bound of the given time interval.
+      \param[in] selection_policy interval selection policy.
+      \param[out] available_time the available observation times.
+    */
+    template <class T>
+    void LinearObservationManager<T>
     ::SetAvailableTime(double time, double time_inf, double time_sup,
                        int selection_policy,
                        LinearObservationManager<T>::time_vector&
