@@ -268,7 +268,7 @@ if ARGUMENTS["line"] == "no":
 if os.name == "posix":
     env_lua.Append(CFLAGS = "-DLUA_USE_POSIX")
 # For Lua 5.1.4.
-if env['PLATFORM'] != 'win32':
+if env_lua['PLATFORM'] != 'win32':
     dependency_list = ["lapi", "lcode", "ldebug", "ldo", "ldump", "lfunc",
                        "lgc", "llex", "lmem", "lobject", "lopcodes",
                        "lparser", "lstate", "lstring", "ltable", "ltm",
@@ -278,10 +278,10 @@ if env['PLATFORM'] != 'win32':
     dependency_list_c = [os.path.join(verdandi_path, "include/lua/src/"
                                       + t + ".c")
                          for t in dependency_list]
-# Makes sure that the library is compiled only if not already
-# available. Indeed, if the library was compiled using the Lua makefile or if
-# another version of Lua is used, it should not be combined by SCons. In
-# addition, "scons -c" should not remove the library.
+    # Makes sure that the library is compiled only if not already
+    # available. Indeed, if the library was compiled using the Lua makefile or
+    # if another version of Lua is used, it should not be combined by
+    # SCons. In addition, "scons -c" should not remove the library.
     lua_library = os.path.join(verdandi_path, "include/lua/src/liblua.a")
     if not os.path.isfile(lua_library):
         env_lua.StaticLibrary(lua_library, dependency_list_c)
