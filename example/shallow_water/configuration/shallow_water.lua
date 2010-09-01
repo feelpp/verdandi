@@ -32,7 +32,7 @@ shallow_water = {
 
    },
 
-   model_error = {
+   error = {
 
       -- Standard deviation of the white Gaussian noise on *boundary*
       -- conditions.
@@ -48,17 +48,12 @@ shallow_water = {
 
    },
 
-   error_statistics = {
+   state_error = {
 
       -- Diagonal value of "B".
-      state_error_variance = 100.,
+      variance = 100.,
       -- Decorrelation length in Balgovind formula.
-      state_error_scale = 1.,
-
-      -- Not used in our case.
-      model_error_variance = 1.,
-      -- Not used in our case.
-      model_error_scale = 1.
+      scale = 1.
 
    },
 

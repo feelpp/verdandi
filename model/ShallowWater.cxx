@@ -100,7 +100,7 @@ namespace Verdandi
         configuration.Set("value", value_);
 
         // Perturbations.
-        configuration.SetPrefix("shallow_water.model_error.");
+        configuration.SetPrefix("shallow_water.error.");
         configuration.Set("standard_deviation_bc", "v >= 0",
                           model_error_std_bc_);
         configuration.Set("standard_deviation_ic", "v >= 0",
@@ -140,22 +140,15 @@ namespace Verdandi
         }
 
         // Error statistics.
-        configuration.SetPrefix("shallow_water.error_statistics.");
+        configuration.SetPrefix("shallow_water.state_error.");
 
-        configuration.Set("state_error_variance", "v >= 0",
-                          state_error_variance_value_);
-        configuration.Set("state_error_scale", "v > 0",
-                          Balgovind_scale_background_);
+        configuration.Set("variance", "v >= 0", state_error_variance_value_);
+        configuration.Set("scale", "v > 0", Balgovind_scale_background_);
 #ifdef VERDANDI_STATE_ERROR_SPARSE
         build_diagonal_sparse_matrix(Nx_ * Ny_,
                                      state_error_variance_value_,
                                      state_error_variance_);
 #endif
-
-        configuration.Set("model_error_variance", "v >= 0",
-                          model_error_variance_);
-        configuration.Set("model_error_scale", "v > 0",
-                          Balgovind_scale_model_);
 
         // Description of boundary conditions.
         ReadConfigurationBoundaryCondition("left", configuration,

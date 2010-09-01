@@ -20,7 +20,7 @@ dofile("configuration/shallow_water.lua")
 
 -- The configuration of the model is modified.
 shallow_water.initial_condition.value = 1.
-shallow_water.model_error.standard_deviation_bc = 0.1
+shallow_water.error.standard_deviation_bc = 0.1
 
 
 -------------------------------- OBSERVATION ---------------------------------
