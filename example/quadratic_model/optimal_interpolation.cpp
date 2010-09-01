@@ -1,8 +1,10 @@
-#define SELDON_DEBUG_LEVEL_2
+#define SELDON_DEBUG_LEVEL_4
 #define SELDON_WITH_BLAS
 #define SELDON_WITH_LAPACK
+
 #define VERDANDI_DENSE
 #define VERDANDI_WITH_ABORT
+
 #include "Verdandi.hxx"
 using namespace Verdandi;
 

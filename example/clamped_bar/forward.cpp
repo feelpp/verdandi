@@ -12,9 +12,9 @@
 using namespace Verdandi;
 #include "seldon/SeldonSolver.hxx"
 
+#include "model/ClampedBar.cxx"
+#include "method/ForwardDriver.cxx"
 
-#include "ForwardDriver.cxx"
-#include "ClampedBar.cxx"
 
 int main(int argc, char** argv)
 {

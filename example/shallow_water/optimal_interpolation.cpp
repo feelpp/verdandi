@@ -5,18 +5,18 @@
 #endif
 
 
-#define SELDON_WITH_CBLAS
+#define SELDON_WITH_BLAS
 #define SELDON_WITH_LAPACK
 #define SELDON_WITH_SUPERLU
+
 #define VERDANDI_SPARSE
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
-
 #include "seldon/SeldonSolver.hxx"
 
-#include "OptimalInterpolation.cxx"
-#include "ShallowWater.cxx"
+#include "model/ShallowWater.cxx"
+#include "method/OptimalInterpolation.cxx"
 
 #define _QUOTE(x) #x
 #define QUOTE(x) _QUOTE(x)

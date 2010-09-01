@@ -1,11 +1,13 @@
 #define SELDON_DEBUG_LEVEL_4
+
 #define VERDANDI_DENSE
 #define VERDANDI_WITH_ABORT
+
 #include "Verdandi.hxx"
 using namespace Verdandi;
 
-#include "method/ForwardDriver.cxx"
 #include "model/ModelTemplate.cxx"
+#include "method/ForwardDriver.cxx"
 
 
 int main(int argc, char** argv)

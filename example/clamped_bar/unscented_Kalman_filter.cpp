@@ -12,9 +12,9 @@
 using namespace Verdandi;
 #include "seldon/SeldonSolver.hxx"
 
-#include "UnscentedKalmanFilter.cxx"
-#include "LinearObservationManager.cxx"
-#include "ClampedBar.cxx"
+#include "model/ClampedBar.cxx"
+#include "observation_manager/LinearObservationManager.cxx"
+#include "method/UnscentedKalmanFilter.cxx"
 
 
 int main(int argc, char** argv)

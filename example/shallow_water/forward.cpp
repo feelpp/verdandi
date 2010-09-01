@@ -1,14 +1,13 @@
-// Generates the truth observations by applying the model from truth initial
-// conditions (river-truth.cfg).
 #define SELDON_DEBUG_LEVEL_4
+
 #define VERDANDI_WITH_ABORT
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
 
-#include "ForwardDriver.cxx"
+#include "model/ShallowWater.cxx"
+#include "method/ForwardDriver.cxx"
 
-#include "ShallowWater.cxx"
 
 int main(int argc, char** argv)
 {

@@ -12,9 +12,9 @@
 using namespace Verdandi;
 #include "seldon/SeldonSolver.hxx"
 
-#include "OptimalInterpolation.cxx"
-#include "LinearObservationManager.cxx"
-#include "ClampedBar.cxx"
+#include "model/ClampedBar.cxx"
+#include "observation_manager/LinearObservationManager.cxx"
+#include "method/OptimalInterpolation.cxx"
 
 
 int main(int argc, char** argv)
