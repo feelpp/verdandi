@@ -114,6 +114,7 @@ namespace Verdandi
         iteration_ = 0;
 
         MessageHandler::Send(*this, "model", "initial condition");
+        MessageHandler::Send(*this, "driver", "initial condition");
 
         MessageHandler::Send(*this, "all", "::Initialize end");
     }
@@ -213,6 +214,13 @@ namespace Verdandi
     void  ForwardDriver<Model>::Message(string message)
     {
         model_state state;
+        if (message.find("initial condition") != string::npos)
+        {
+            model_.GetState(state);
+            output_saver_.Save(state, double(model_.GetTime()),
+                               "state_forecast");
+        }
+
         if (message.find("forecast") != string::npos)
         {
             model_.GetState(state);
