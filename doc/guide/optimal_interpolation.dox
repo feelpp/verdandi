@@ -61,6 +61,7 @@ With: <br>
 \f$x_h^a\f$ analysis state vector; <br>
 \f$y_h\f$ observation vector; <br>
 \f$H_h\f$ linear observation operator that maps the state space to the observation space; <br>
+\f$H_h\f$ observation operator linearized at \f$x^f_h\f$; <br>
 \f$B_h\f$ background error covariance matrix (error variance of \f$x_h^f\f$); <br>
 \f$R_h\f$ observational error covariance matrix; <br>
 \f$K_h\f$ analysis gain matrix; <br>
