@@ -132,7 +132,7 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_observation")
 </li>
 <!-- <li class="jelly"> <?php HL($file, "faq", "F.A.Q.");?> </li>-->
 <li class="jelly"> <a
-href="mailto:seldon-help@lists.sourceforge.net"
+href="mailto:verdandi-help@lists.gforge.inria.fr"
 style="color:black">Support</a></li>
 </ul>
 
