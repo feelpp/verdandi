@@ -36,7 +36,7 @@ dofile("configuration/observation.lua")
 optimal_interpolation = {
 
    -- Computation mode for BLUE: "vector" or "matrix".
-   BLUE_computation = "vector",
+   BLUE_computation = "matrix",
 
    data_assimilation = {
 
