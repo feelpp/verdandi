@@ -1,7 +1,6 @@
-/* body { */
-/* 	font:80%/1.7 Verdana, Geneva, Arial, Helvetica, sans-serif; */
-/* 	margin:4em 0 0 0; */
-/* } */
+body {
+	font:normal 17px Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
 
 /* title styles */
 h1 {
@@ -14,14 +13,14 @@ h1 {
 h2 {
 	font: normal 1.5em arial;
         font-weight: bold;
-	color: #9c3;
+	color: #580;
         padding: 0px;
         margin: 0px 0px 10px 0px;
 }
 h3 {
 	font: normal 1.5em arial;
         font-weight: bold;
-	color: #580;
+	color: #9c3;
         padding: 0px;
         margin: 0px 0px 10px 0px;
 }
@@ -170,7 +169,7 @@ PRE.fragment {
 
 .doxygen h2 a {
         font-weight: bold;
-	color: #9c3;
+	color: #580;
 	text-decoration: none;
 }
 
@@ -184,7 +183,7 @@ PRE.fragment {
 
 .doxygen h3 a {
         font-weight: bold;
-	color: #580;
+	color: #9c3;
 }
 
 .doxygen h3 a:hover {
@@ -192,8 +191,7 @@ PRE.fragment {
 }
 
 .contents code {
-	font-family: "Courier New";
-	font-size: 108%;
+	font-family: monospace;
 	font-weight: bold;
 }
 
