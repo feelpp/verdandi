@@ -6,9 +6,9 @@ final_time_shallow_water = 1500 * Delta_t_shallow_water
 -- Saving period.
 Nskip_save = 10
 
-observation_file = "result/river-truth/forward-state_forecast.bin"
+observation_file = "result/truth-state_forecast.bin"
 
-output_directory = "result/river/"
+output_directory = "result/"
 output_mode = "binary"
 output_mode_scalar = "text"
 

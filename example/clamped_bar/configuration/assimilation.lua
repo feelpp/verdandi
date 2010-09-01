@@ -6,9 +6,9 @@ final_time_clamped_bar = 10.0
 -- Saving period.
 Nskip_save = 10
 
-observation_file = "result/bar-truth/forward-state_forecast.bin"
+observation_file = "result/truth-state_forecast.bin"
 
-output_directory = "result/bar/"
+output_directory = "result/"
 output_mode = "binary"
 output_mode_scalar = "text"
 

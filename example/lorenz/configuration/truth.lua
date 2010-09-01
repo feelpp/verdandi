@@ -26,7 +26,7 @@ forward = {
    output_saver = {
 
       variable_list = {"state_forecast"},
-      file = output_directory .. "forward-%{name}.%{extension}",
+      file = output_directory .. "truth-%{name}.%{extension}",
       mode = "binary",
       mode_scalar = "text"
 
@@ -34,8 +34,8 @@ forward = {
 
    output = {
 
-      configuration = output_directory .. "forward.lua",
-      log = output_directory .. "forward.log"
+      configuration = output_directory .. "truth.lua",
+      log = output_directory .. "truth.log"
 
    }
 

@@ -1,5 +1,3 @@
-// Generates the truth observations by applying the model from truth initial
-// conditions (river-truth.cfg).
 #define SELDON_DEBUG_LEVEL_4
 #define SELDON_WITH_CBLAS
 #define SELDON_WITH_LAPACK
