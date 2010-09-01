@@ -7,11 +7,11 @@
 <?php $root='..';?>
 
 <head>
-<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
 <title>Verdandi user's guide</title>
-<link rel="stylesheet" type="text/css" href="<?php echo $root?>/content.css">
-<link rel="stylesheet" href="tabs.css" type="text/css">
-<link rel="stylesheet" href="guide.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="<?php echo $root?>/content.css"/>
+<link rel="stylesheet" href="tabs.css" type="text/css"/>
+<link rel="stylesheet" href="guide.css" type="text/css"/>
 <?php if (file_exists($root.'/prettify.js'))
   echo '<script type="text/javascript" src="'.$root.'/prettify.js"></script>';
 else if (file_exists('prettify.js'))
@@ -127,7 +127,7 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_observation")
 </li> </ul> </li>
 <li class="jelly"> <?php HL($file, "namespacemembers", "Functions");?> </li>
 <li class="jelly"> Search for <form action="search.php" method="get">
-    <input class="search" type="text" name="query" value="" size="20" accesskey="s">
+    <input class="search" type="text" name="query" value="" size="20" accesskey="s"/>
   </form>
 </li>
 <!-- <li class="jelly"> <?php HL($file, "faq", "F.A.Q.");?> </li>-->
