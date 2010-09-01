@@ -417,7 +417,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::SetState(typename QuadraticModel<T>::state& state)
+    ::SetState(const typename QuadraticModel<T>::state& state)
     {
         state_ = state;
     }
