@@ -48,4 +48,7 @@ with \f$\bar e^o_h = \mathrm{E}(e^o_h)\f$ in a stochastic framework.
 The observational error covariance matrix is
 \f[R_h = \mathrm{E}\left(\tilde e^o_h (\tilde e^o_h)^T\right)\,.\f]
 
+The innovation, defined as the discrepancy between the observations and the corresponding model forecast, is denoted
+\f[d_h = y_h - \mathcal{H}_h(x^f_h)\,.\f]
+
 */
