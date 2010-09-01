@@ -95,8 +95,8 @@ namespace Verdandi
 
     //! Empty accessor.
     /*! Sets the value of the boolean empty.
-      \param[in] has_to_empty_file Boolean that indicates if the file has to be
-      emptied.
+      \param[in] has_to_empty_file Boolean that indicates if the file has to
+      be emptied.
     */
     void Variable::HasToEmptyFile(bool has_to_empty_file)
     {

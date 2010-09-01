@@ -120,7 +120,8 @@ namespace Verdandi
         configuration.SetPrefix("observation.location.");
 
         vector<string> observation_location_vector;
-        configuration.Set("observation_location", observation_location_vector);
+        configuration.Set("observation_location",
+                          observation_location_vector);
         int value;
         for (int i = 0; i < int(observation_location_vector.size() - 1);
              i += 2)
