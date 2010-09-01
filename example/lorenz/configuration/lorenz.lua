@@ -23,7 +23,7 @@ lorenz = {
 
       Delta_t = .001,
       initial_time = 0.,
-      final_time = 100.
+      final_time = 10.
 
    },
 
