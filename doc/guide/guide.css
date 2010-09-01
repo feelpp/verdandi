@@ -492,20 +492,12 @@ table.memname td.memname {vertical-align: top;}
 	padding: 0;
 	background-color: #d5e1e8;
 	font-weight: bold;
-	-webkit-border-top-left-radius: 8px;
-	-webkit-border-top-right-radius: 8px;
-	-moz-border-radius-topleft: 8px;
-	-moz-border-radius-topright: 8px;
 }
 
 .memdoc {
 	padding: 2px 5px;
 	background-color: #eef3f5;
 	border-top-width: 0;
-	-webkit-border-bottom-left-radius: 8px;
-	-webkit-border-bottom-right-radius: 8px;
-	-moz-border-radius-bottomleft: 8px;
-	-moz-border-radius-bottomright: 8px;
 }
 
 .paramkey {
