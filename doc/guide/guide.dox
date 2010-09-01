@@ -38,11 +38,9 @@ Who can be a %Verdandi user?
 </ul>
 The users provide the numerical model and the observations with the appropriate interface (see the pages \ref models and \ref observations).
 
-
-<div style="text-align: right;"> %Verdandi homepage: <a href="http://verdandi.gforge.inria.fr/">http://verdandi.gforge.inria.fr/</a>. </div>
-
 \section Acknowledgment
 
 The development of Verdandi is financially supported by the European research initiative <a href="http://www.euheart.eu/">euHeart</a> which aims at developing, sharing and integrating patient-specific multi-physics and multi-level models of the heart and great vessels in normal and pathological conditions to address  clinical challenges. In this project data assimilation is thus intended to allow the personalization of the biophysical models considered in order to perform genuinely patient-specific simulations.
 
+<div style="text-align: right;"> %Verdandi homepage: <a href="http://verdandi.gforge.inria.fr/">http://verdandi.gforge.inria.fr/</a>. </div>
 */
