@@ -45,6 +45,7 @@ namespace Verdandi
     template <class T>
     ClampedBar<T>::ClampedBar(string configuration_file)
     {
+        Initialize(configuration_file);
     }
 
 

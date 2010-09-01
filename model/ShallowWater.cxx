@@ -50,7 +50,7 @@ namespace Verdandi
         time_(0.), g_(9.81), urng_(0), current_row_(-1),
         current_column_(-1)
     {
-        //Initialize(configuration_file);
+        Initialize(configuration_file);
     }
 
 
