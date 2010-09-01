@@ -118,8 +118,6 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_observation")
 
 <li class="jelly"> <?php HL($file, "debugging", "Debugging");?>  </li>
 
-<li class="jelly"> <?php HL($file, "tutorial", "Tutorial");?>  </li>
-
 <li class="jelly"> <?php HL($file, "python", "Python");?> </li>
 <li class="jelly"> <b>API REFERENCE</b> </li>
 <li class="jelly"> <?php HL($file, "annotated", "Classes");?>
