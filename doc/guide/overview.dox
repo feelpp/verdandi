@@ -9,72 +9,93 @@ Below is a summary of %Verdandi contents.
 
 \section methods Methods
 
-One basic <b>data assimilation method</b> in the directory <code>method/</code>: the optimal interpolation.
+In the directory <code>method/</code>, several <b>data assimilation methods</b>:
+
+<ul>
+<li> optimal interpolation (BLUE); </li>
+<li> extended Kalman filter (EKF); </li>
+<li> unscented Kalman filter (UKF); </li>
+<li> base perturbation manager. </li>
+</ul>
 
 <h3>Source code</h3>
-class OptimalInterpolation<T, ClassModel, ClassObservationManager> <br>
+class \link Verdandi::OptimalInterpolation OptimalInterpolation<T, ClassModel, ClassObservationManager> \endlink <br>
 OptimalInterpolation.hxx <br>
-OptimalInterpolation.cxx
-
+OptimalInterpolation.cxx <br>
+class \link Verdandi::ExtendedKalmanFilter ExtendedKalmanFilter<T, ClassModel, ClassObservationManager>\endlink <br>
+ExtendedKalmanFilter.hxx <br>
+ExtendedKalmanFilter.cxx <br>
+class \link Verdandi::UnscentedKalmanFilter UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>\endlink <br>
+UnscentedKalmanFilter.hxx <br>
+UnscentedKalmanFilter.cxx <br>
+class \link Verdandi::BasePerturbationManager BasePerturbationManager\endlink <br>
+BasePerturbationManager.hxx <br>
+BasePerturbationManager.cxx
 
 \section overview_models Models
 
-Two sample <b>models</b> in the directory <code>model/</code>: clamped bar (mechanics), shallow water (oceanography).
+In the directory <code>model/</code>, several sample <b>models</b>:
+
+<ul>
+<li> clamped bar (mechanics); </li>
+<li> Lorenz; </li>
+<li> quadratic model; </li>
+<li> shallow water (oceanography). </li>
+</ul>
 
 <h3>Source code</h3> 
-class ClampedBar<T> <br>
+class \link Verdandi::ClampedBar ClampedBar<T>\endlink <br>
 ClampedBar.hxx <br>
 ClampedBar.cxx <br>
-class ShallowWater<T> <br>
+class \link Verdandi::ShallowWater ShallowWater<T>\endlink <br>
 ShallowWater.hxx <br>
-ShallowWater.cxx
+ShallowWater.cxx <br>
+class \link Verdandi::Lorenz Lorenz<T>\endlink <br>
+Lorenz.hxx <br>
+Lorenz.cxx <br>
+class \link Verdandi::QuadraticModel QuadraticModel<T>\endlink <br>
+QuadraticModel.hxx <br>
+QuadraticModel.cxx
 
 \section overview_observations Observation managers
 
-Two (linear) <b>observation managers</b> in the directory <code>observation_manager/</code>: an observation manager whose observation operator is simply defined with a matrix, and an observation manager with an observation operator that maps from a model grid to an observation network.
+In the directory <code>observation_manager/</code>, two (linear) <b>observation managers</b>: 
+
+<ul>
+<li> a linear observation manager whose observation operator is simply defined with a matrix; </li>
+<li> a grid to network observation manager with an observation operator that maps from a model grid to an observation network; </li>
+<li> an observation aggregator. </li>
+</ul>
 
 <h3>Source code</h3> 
-class LinearObservationManager<T> <br>
+class \link Verdandi::LinearObservationManager LinearObservationManager<T>\endlink <br>
 LinearObservationManager.hxx <br>
 LinearObservationManager.cxx <br>
-class GridToNetworkObservationManager<T> <br>
+class \link Verdandi::GridToNetworkObservationManager GridToNetworkObservationManager<T>\endlink <br>
 GridToNetworkObservationManager.hxx <br>
-GridToNetworkObservationManager.cxx
+GridToNetworkObservationManager.cxx <br>
+class \link Verdandi::ObservationAggregator ObservationAggregator<T>\endlink <br>
+ObservationAggregator.hxx <br>
+ObservationAggregator.cxx
 
-\section error Error statistics
-
-<b>Error statistics</b> in the directory <code>error/</code>: classical error covariance matrices in diagonal form and in Balgovind form (isotropic or not).
-
-<h3>Source code</h3>
-class BalgovindMatrix<T> <br>
-BalgovindMatrix.hxx <br>
-BalgovindMatrix.cxx <br>
-class DiagonalMatrix<T> <br>
-DiagonalMatrix.hxx <br>
-DiagonalMatrix.cxx <br>
-class IsotropicBalgovindMatrix<T> <br>
-IsotropicBalgovindMatrix.hxx <br>
-IsotropicBalgovindMatrix.cxx
 
 \section miscellaneous Miscellaneous
 
-In the directory <code>output_saver/</code>, one may find a class to save several kinds of output.
+In the directory <code>output_saver/</code>, one may find a class to save several kinds of output results.
 
 <h3>Source code</h3>
-class OutputSaver <br>
+class \link Verdandi::OutputSaver OutputSaver \endlink <br>
 OutputSaver.hxx <br>
 OutputSaver.cxx
 
 In the directory <code>share/</code>, one may find a class for objects to communicate.
 
 <h3>Source code</h3>
-class MessageHandler <br>
+class \link Verdandi::MessageHandler MessageHandler \endlink <br>
 MessageHandler.hxx <br>
 MessageHandler.cxx
 
-<b>Twin experiments</b> can be carried out.
-
-<b>Sparse matrices</b> (for error variances and linear observation operators) are managed.
+Sparse matrices (for error variances and linear observation operators) are managed.
 
 \section scripts Scripts
 
