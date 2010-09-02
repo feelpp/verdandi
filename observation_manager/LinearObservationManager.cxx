@@ -183,7 +183,7 @@ namespace Verdandi
 
         int expected_file_size;
         expected_file_size = Nbyte_observation_ *
-            int((final_time_ - initial_time_) / (Delta_t_ * Nskip_));
+            (int((final_time_ - initial_time_) / (Delta_t_ * Nskip_)) + 1);
 
         int file_size;
         ifstream file_stream;
