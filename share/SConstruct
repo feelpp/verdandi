@@ -285,6 +285,8 @@ if env_lua['PLATFORM'] != 'win32':
     lua_library = os.path.join(verdandi_path, "include/lua/src/liblua.a")
     if not os.path.isfile(lua_library):
         env_lua.StaticLibrary(lua_library, dependency_list_c)
+    if "g++" in env["CXX"]:
+        env_lua.Append(CFLAGS = "-fPIC") # for SWIG.
 
 target_list = glob.glob("*.cpp")
 for filename in target_list:
