@@ -288,7 +288,12 @@ if env_lua['PLATFORM'] != 'win32':
     if "g++" in env["CXX"]:
         env_lua.Append(CFLAGS = "-fPIC") # for SWIG.
 
+# The default targets are all ".cpp" files, but targets can be excluded.
 target_list = glob.glob("*.cpp")
+exclude_target = to_string_list("exclude_target")
+for filename in target_list[:]:
+    if filename in exclude_target or filename[:-4] in exclude_target:
+        target_list.remove(filename)
 for filename in target_list:
     if env['PLATFORM'] == 'win32':
         env.Program(filename[:-4], [filename])
