@@ -209,10 +209,10 @@ namespace Verdandi
         GetCholesky(background_error_variance_sqrt);
 #else
         Matrix<T> tmp_sqrt;
-        convert_RowSparse_to_Dense(background_error_variance_, tmp_sqrt);
+        ConvertRowSparseToDense(background_error_variance_, tmp_sqrt);
         GetCholesky(tmp_sqrt);
         Matrix<T, General, ArrayRowSparse> tmp_sqrt_array;
-        convert_Dense_to_ArrayRowSparse(tmp_sqrt, tmp_sqrt_array);
+        ConvertDenseToArrayRowSparse(tmp_sqrt, tmp_sqrt_array);
         Copy(tmp_sqrt_array, background_error_variance_sqrt);
 #endif
 
@@ -261,8 +261,8 @@ namespace Verdandi
 #else
                 model_state_error_variance_row
                     error_covariance_column(Nstate_);
-                convert_Dense_to_Sparse(x_i.GetVector(i),
-                                        error_covariance_column);
+                ConvertDenseToSparse(x_i.GetVector(i),
+                                     error_covariance_column);
                 SetCol(error_covariance_column, 0, working_matrix);
 #endif
                 MltAdd(T(1), SeldonNoTrans, working_matrix, SeldonTrans,
@@ -300,8 +300,8 @@ namespace Verdandi
 #else
                 model_state_error_variance_row
                     error_covariance_column(Nstate_);
-                convert_Dense_to_Sparse(x_i.GetVector(i),
-                                        error_covariance_column);
+                ConvertDenseToSparse(x_i.GetVector(i),
+                                     error_covariance_column);
                 SetCol(error_covariance_column, 0, working_matrix);
 #endif
                 MltAdd(alpha_i_(i), SeldonNoTrans, working_matrix,
@@ -347,10 +347,10 @@ namespace Verdandi
         GetCholesky(background_error_variance_sqrt);
 #else
         Matrix<T> tmp_sqrt;
-        convert_RowSparse_to_Dense(background_error_variance_, tmp_sqrt);
+        ConvertRowSparseToDense(background_error_variance_, tmp_sqrt);
         GetCholesky(tmp_sqrt);
         Matrix<T, General, ArrayRowSparse> tmp_sqrt_array;
-        convert_Dense_to_ArrayRowSparse(tmp_sqrt, tmp_sqrt_array);
+        ConvertDenseToArrayRowSparse(tmp_sqrt, tmp_sqrt_array);
         Copy(tmp_sqrt_array, background_error_variance_sqrt);
 #endif
 
@@ -415,8 +415,8 @@ namespace Verdandi
 #else
                 model_state_error_variance_row
                     error_covariance_column(Nstate_);
-                convert_Dense_to_Sparse(x_i.GetVector(i),
-                                        error_covariance_column);
+                ConvertDenseToSparse(x_i.GetVector(i),
+                                     error_covariance_column);
                 SetCol(error_covariance_column, 0, working_matrix_state);
 #endif
                 Add(T(-1), z, z_i.GetVector(i));
@@ -425,8 +425,8 @@ namespace Verdandi
 #else
                 model_state_error_variance_row
                     error_covariance_column2(Nstate_);
-                convert_Dense_to_Sparse(z_i.GetVector(i),
-                                        error_covariance_column2);
+                ConvertDenseToSparse(z_i.GetVector(i),
+                                     error_covariance_column2);
                 SetCol(error_covariance_column2, 0,
                        working_matrix_observation);
 #endif
@@ -446,8 +446,8 @@ namespace Verdandi
 #else
                 model_state_error_variance_row
                     error_covariance_column(Nstate_);
-                convert_Dense_to_Sparse(z_i.GetVector(i),
-                                        error_covariance_column);
+                ConvertDenseToSparse(z_i.GetVector(i),
+                                     error_covariance_column);
                 SetCol(error_covariance_column, 0,
                        working_matrix_observation);
 #endif
@@ -509,8 +509,8 @@ namespace Verdandi
 #else
                 model_state_error_variance_row
                     error_covariance_column(Nstate_);
-                convert_Dense_to_Sparse(x_i.GetVector(i),
-                                        error_covariance_column);
+                ConvertDenseToSparse(x_i.GetVector(i),
+                                     error_covariance_column);
                 SetCol(error_covariance_column, 0, working_matrix_state);
 #endif
                 Add(T(-1), z, z_i.GetVector(i));
@@ -519,8 +519,8 @@ namespace Verdandi
 #else
                 model_state_error_variance_row
                     error_covariance_column2(Nstate_);
-                convert_Dense_to_Sparse(z_i.GetVector(i),
-                                        error_covariance_column2);
+                ConvertDenseToSparse(z_i.GetVector(i),
+                                     error_covariance_column2);
                 SetCol(error_covariance_column2, 0,
                        working_matrix_observation);
 #endif
@@ -538,8 +538,8 @@ namespace Verdandi
 #else
                 model_state_error_variance_row
                     error_covariance_column(Nstate_);
-                convert_Dense_to_Sparse(z_i.GetVector(i),
-                                        error_covariance_column);
+                ConvertDenseToSparse(z_i.GetVector(i),
+                                     error_covariance_column);
                 SetCol(error_covariance_column, 0,
                        working_matrix_observation);
 #endif
