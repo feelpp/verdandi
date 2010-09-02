@@ -78,23 +78,50 @@ namespace Verdandi
         configuration.Set("Delta_t", Delta_t_);
         configuration.Set("final_time", final_time_);
 
-        configuration.SetPrefix("clamped_bar.error_statistics.");
-        configuration.Set("state_error_variance", "v >= 0",
-                          state_error_variance_value_);
-        configuration.Set("state_error_scale", "v > 0",
-                          Balgovind_scale_background_);
-
         Ndof_ = Nx_ + 1;
 
+        /*** Errors ***/
+
+        configuration.SetPrefix("clamped_bar.");
+
+        if (configuration.Exists("state_error"))
+        {
+            if (configuration.Get<bool>("state_error.scaled_identity"))
+            {
+                T diagonal_value;
+                configuration.Set("state_error.diagonal_value", "v >= 0",
+                                  diagonal_value);
 #ifdef VERDANDI_STATE_ERROR_SPARSE
-        build_diagonal_sparse_matrix(GetNstate(),
-                                     state_error_variance_value_,
-                                     state_error_variance_);
+                build_diagonal_sparse_matrix(GetNstate(), diagonal_value,
+                                             state_error_variance_);
 #else
-        state_error_variance_.Reallocate(GetNstate(), GetNstate());
-        state_error_variance_.SetIdentity();
-        Mlt(T(state_error_variance_value_), state_error_variance_);
+                state_error_variance_.Reallocate(GetNstate(), GetNstate());
+                state_error_variance_.SetIdentity();
+                Mlt(diagonal_value, state_error_variance_);
 #endif
+            }
+            else
+#ifdef VERDANDI_STATE_ERROR_SPARSE
+                throw ErrorConfiguration("ClampedBar::Initialize(string)",
+                                         "A state error variance in sparse "
+                                         "form cannot be provided with \""
+                                         "clamped_bar.state_error.value\".");
+#else
+                configuration.Set("state_error.value", state_error_variance_);
+                if (state_error_variance_.GetM() != GetNstate()
+                    || state_error_variance_.GetN() != GetNstate())
+                    throw ErrorConfiguration("ClampedBar::Initialize(string)",
+                                             "The size of the state error "
+                                             "variance ("
+                                             + to_str(state_error_variance_
+                                                      .GetM()) + " x "
+                                             + to_str(state_error_variance_
+                                                      .GetN())
+                                             + " matrix) is not compatible "
+                                             "with the size of state ("
+                                             + to_str(GetNstate()) + ").");
+#endif
+        }
 
         configuration.SetPrefix("clamped_bar.physics.");
         configuration.Set("Young_modulus", Young_modulus_);

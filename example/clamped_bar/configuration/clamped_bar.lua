@@ -22,12 +22,14 @@ clamped_bar = {
 
    },
 
-   error_statistics = {
+   state_error = {
 
-      -- Diagonal value of "B".
-      state_error_variance = 100.,
-      -- Decorrelation length in Balgovind formula.
-      state_error_scale = 1.,
+      -- Is the state error variance a scaled identity matrix?
+      scaled_identity = true,
+      -- If so, put the diagonal value:
+      diagonal_value = 100.,
+      -- Otherwise, the operator value (file name or table):
+      value = {}
 
    },
 
