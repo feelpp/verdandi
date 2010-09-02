@@ -252,7 +252,7 @@ namespace Verdandi
       \param[in] state the new controlled state vector.
     */
     template <class T>
-    void Lorenz<T>::SetState(typename Lorenz<T>::state& state)
+    void Lorenz<T>::SetState(const typename Lorenz<T>::state& state)
     {
         X_ = state(0);
         Y_ = state(1);

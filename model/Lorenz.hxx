@@ -105,7 +105,7 @@ namespace Verdandi
         void SetTime(double time);
         int GetNstate() const;
         void GetState(state& state) const;
-        void SetState(state& state);
+        void SetState(const state& state);
         void GetFullState(state& state) const;
         void SetFullState(const state& state);
         void GetStateErrorVarianceRow(int row, state_error_variance_row&
