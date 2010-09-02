@@ -338,6 +338,7 @@ namespace Verdandi
         Preconditioner_Base precond;
         // No preconditioning.
         iter.SetRestart(5);
+        iter.HideMessages();
         Gmres(Newmark_matrix_1_, disp_1_, force_, precond, iter);
 #endif
 
