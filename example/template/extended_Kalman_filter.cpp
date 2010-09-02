@@ -9,7 +9,7 @@
 using namespace Verdandi;
 
 #include "model/ModelTemplate.cxx"
-#include "observation_manager/LinearObservationManager.cxx"
+#include "observation_manager/ObservationManagerTemplate.cxx"
 #include "method/ExtendedKalmanFilter.cxx"
 
 
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     typedef double real;
 
     ExtendedKalmanFilter<double, ModelTemplate,
-        LinearObservationManager<double> > driver(argv[1]);
+        ObservationManagerTemplate> driver(argv[1]);
 
     driver.Initialize();
 

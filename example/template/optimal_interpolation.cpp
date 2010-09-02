@@ -9,7 +9,7 @@
 using namespace Verdandi;
 
 #include "model/ModelTemplate.cxx"
-#include "observation_manager/LinearObservationManager.cxx"
+#include "observation_manager/ObservationManagerTemplate.cxx"
 #include "method/OptimalInterpolation.cxx"
 
 
@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     }
 
     OptimalInterpolation<double, ModelTemplate,
-        LinearObservationManager<double> > driver(argv[1]);
+        ObservationManagerTemplate> driver(argv[1]);
 
     driver.Initialize();
 
