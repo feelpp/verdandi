@@ -181,7 +181,9 @@ namespace Verdandi
         void GetStateErrorVarianceRow(int row, state_error_variance_row&
                                       state_error_variance_row);
         state_error_variance& GetStateErrorVariance();
+#ifndef SWIG
         const state_error_variance& GetStateErrorVariance() const;
+#endif
         bool IsErrorSparse() const;
 
         string GetName() const;
