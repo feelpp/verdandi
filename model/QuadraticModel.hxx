@@ -136,15 +136,23 @@ namespace Verdandi
 
         // Errors.
         error_variance& GetErrorVariance();
+#ifndef SWIG
         const error_variance& GetErrorVariance() const;
+#endif
         error_variance& GetErrorVarianceSqrt();
+#ifndef SWIG
         const error_variance& GetErrorVarianceSqrt() const;
+#endif
         state_error_variance& GetStateErrorVariance();
+#ifndef SWIG
         const state_error_variance& GetStateErrorVariance() const;
+#endif
         void GetStateErrorVarianceRow(int row, state_error_variance_row&
                                       state_error_variance_row);
         state_error_variance& GetStateErrorVarianceSqrt();
+#ifndef SWIG
         const state_error_variance& GetStateErrorVarianceSqrt() const;
+#endif
 
         string GetName() const;
         void Message(string message);

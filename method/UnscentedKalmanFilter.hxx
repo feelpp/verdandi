@@ -20,6 +20,9 @@
 #ifndef VERDANDI_FILE_METHOD_UNSCENTEDKALMANFILTER_HXX
 
 
+#include "seldon/vector/VectorCollection.hxx"
+
+
 namespace Verdandi
 {
 

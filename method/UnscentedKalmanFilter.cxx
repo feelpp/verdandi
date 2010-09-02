@@ -21,6 +21,8 @@
 
 #include "UnscentedKalmanFilter.hxx"
 
+#include "seldon/vector/VectorCollection.cxx"
+
 #include "BLUE.cxx"
 
 #include "SigmaPoint.cxx"
