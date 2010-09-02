@@ -19,8 +19,8 @@ observation = {
    aggregator = {
 
       type = "step",
-      width_left = 1.e-5,
-      width_right = 1.e-5,
+      width_left = Delta_t_model * Nskip_save / 2.,
+      width_right = Delta_t_model * Nskip_save / 2.,
 
       -- If the type is "triangle", the triangles widths may be the same for
       -- all observations ("constant") or not ("per-observation").
@@ -41,7 +41,7 @@ observation = {
    error = {
 
       -- Variance of observational errors.
-      variance = .1
+      variance = 10.
 
    },
 
