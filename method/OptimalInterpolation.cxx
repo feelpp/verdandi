@@ -339,7 +339,7 @@ namespace Verdandi
     void OptimalInterpolation<T, Model, ObservationManager>
     ::ComputeBLUE_matrix(const observation& innovation, model_state& state)
     {
-#ifdef VERDANDI_SPARSE
+#if defined(VERDANDI_SPARSE) && defined(VERDANDI_WITH_DIRECT_SOLVER)
         Nobservation_ = observation_manager_.GetNobservation();
 
         // Temporary matrix and vector.
