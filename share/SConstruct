@@ -231,7 +231,7 @@ env.Replace(LINK = linker)
 # Checks for the libraries, and sets the link flags.
 library_list = to_string_list("library_list")
 for library in ["blas", "atlas", "cblas", "lapack", "g2c", "gslcblas",
-                "gfortran", "newran", "superlu", "cppunit"]:
+                "gfortran", "newran", "superlu", "cppunit", "python"]:
     if library not in library_list:
         library_list += [library]
 if env['PLATFORM'] == 'win32' and library not in library_list:
