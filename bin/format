@@ -141,7 +141,7 @@ def check_lines_lengths(filename, limit_length = 78):
             lines.append(count)
         count += 1
     return lines
-    
+
 ### Printing facility.
 
 class PrintInPlace:

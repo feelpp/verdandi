@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_METHOD_LOCKFILE_CXX
+#ifndef VERDANDI_FILE_SHARE_LOCKFILE_CXX
 
 
 #include "LockFile.hxx"
@@ -74,5 +74,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_METHOD_LOCKFILE_CXX
+#define VERDANDI_FILE_SHARE_LOCKFILE_CXX
 #endif
