@@ -37,13 +37,11 @@ $ scons
 
 Then to run the examples, execute the following commands:
 \precode
-$ write_matrix [1]
-$ forward configuration/river-truth.cfg [2]
-$ optimal_interpolation configuration/river.cfg [3]
+$ forward configuration/river-truth.cfg [1]
+$ optimal_interpolation configuration/river.cfg [2]
 \endprecode
 
 \comment
-        <li>This program writes a matrix in the file <code>configuration/matrix.dat</code>. This matrix is used to define the observation operator. In this example, it is the identity. </li>
         <li>This program generates the true observations by running the model with the true initial conditions described in <code>river-truth.cfg</code>, without any error. It performs steps forward with the shallow-water model without data assimilation.</li>
         <li>This program applies the optimal interpolation, starting from erroneous initial conditions described in <code>river.cfg</code>. The observations are those generated above by <code>forward</code>.</li>
 \endcomment
