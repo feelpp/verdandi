@@ -310,8 +310,8 @@ namespace Verdandi
         available_time.Clear();
         double period = Delta_t_ * Nskip_;
         double available_time_0
-                = initial_time_
-                + floor((time_inf - initial_time_) / period) * period;
+            = initial_time_
+            + floor((time_inf - initial_time_) / period) * period;
         if (available_time_0 == time_inf)
             available_time.PushBack(available_time_0);
         available_time_0 += period;

@@ -174,7 +174,7 @@ namespace Verdandi
         void SetTime(double time);
         void SetAvailableTime(double time, time_vector& available_time);
         void SetAvailableTime(double time_inf, double time_sup, time_vector&
-                       available_time);
+                              available_time);
         void SetAvailableTime(double time, double time_inf, double time_sup,
                               int selection_policy,
                               time_vector& available_time);

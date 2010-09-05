@@ -107,19 +107,19 @@ namespace Verdandi
                                          "form cannot be provided with \""
                                          "clamped_bar.state_error.value\".");
 #else
-                configuration.Set("state_error.value", state_error_variance_);
-                if (state_error_variance_.GetM() != GetNstate()
-                    || state_error_variance_.GetN() != GetNstate())
-                    throw ErrorConfiguration("ClampedBar::Initialize(string)",
-                                             "The size of the state error "
-                                             "variance ("
-                                             + to_str(state_error_variance_
-                                                      .GetM()) + " x "
-                                             + to_str(state_error_variance_
-                                                      .GetN())
-                                             + " matrix) is not compatible "
-                                             "with the size of state ("
-                                             + to_str(GetNstate()) + ").");
+            configuration.Set("state_error.value", state_error_variance_);
+            if (state_error_variance_.GetM() != GetNstate()
+                || state_error_variance_.GetN() != GetNstate())
+                throw ErrorConfiguration("ClampedBar::Initialize(string)",
+                                         "The size of the state error "
+                                         "variance ("
+                                         + to_str(state_error_variance_
+                                                  .GetM()) + " x "
+                                         + to_str(state_error_variance_
+                                                  .GetN())
+                                         + " matrix) is not compatible "
+                                         "with the size of state ("
+                                         + to_str(GetNstate()) + ").");
 #endif
         }
 
