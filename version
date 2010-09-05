@@ -1,6 +1,13 @@
-0.0+
+Verdandi 0.7
 
-Depends on:
+Required dependencies:
+    - Seldon 5.1-rc1
+    - Ops 1.0
+    - Lua 5.1
+
+Recommended dependencies:
+    - SCons 1.0 or higher
+
+Optional dependencies:
+    - Python 2.5 or higher
     - Newran03 beta
-    - Seldon 5.0+
-    - GetPot
