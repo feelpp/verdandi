@@ -15,6 +15,9 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
+//
+// For more information, visit the Verdandi web site:
+//      http://verdandi.gforge.inria.fr/
 
 
 #ifndef VERDANDI_FILE_HAMILTONJACOBIBELLMAN_HXX
