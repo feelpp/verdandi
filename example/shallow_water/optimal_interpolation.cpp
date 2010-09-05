@@ -9,7 +9,7 @@
 #define SELDON_WITH_LAPACK
 #define SELDON_WITH_SUPERLU
 
-#define VERDANDI_SPARSE
+#define VERDANDI_DENSE
 
 #include "Verdandi.hxx"
 using namespace Verdandi;
