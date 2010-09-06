@@ -1,5 +1,5 @@
 body {
-	font:normal 17px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font:normal 15px Verdana, Geneva, Arial, Helvetica, sans-serif;
 }
 
 /* title styles */
@@ -135,7 +135,7 @@ PRE.fragment {
 /* For Doxygen (API) */
 .doxygen {
     overflow: hidden;
-    font-size: 90%;
+    font-size: 100%;
     background-color: white;
     margin: 0px 10px 0px 0px;
     padding: 0px 0px 0px 0px;
@@ -230,7 +230,7 @@ div.navtab {
 
 .doxygen a {
 	color: #153788;
-	font-weight: normal;
+	font-weight: bold;
 	text-decoration: none;
 }
 
