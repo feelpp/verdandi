@@ -39,6 +39,7 @@ namespace Verdandi
     //! Destructor.
     VerdandiBase::~VerdandiBase()
     {
+        MessageHandler::RemoveRecipient(*this);
     }
 
 

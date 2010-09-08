@@ -54,6 +54,8 @@ namespace Verdandi
                          string message);
 
         static string GetName();
+        template <class R>
+        static void RemoveRecipient(R& object);
 
     private:
         static void SendToList(recipient_list& my_list, string message);

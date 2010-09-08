@@ -131,6 +131,36 @@ namespace Verdandi
     }
 
 
+    //! Removes an object from the static recipient map.
+    /*!
+      \tparam R type of the recipient object.
+      \param[in] object the object to remove from the list.
+    */
+    template <class R>
+    void MessageHandler::RemoveRecipient(R& object)
+    {
+        recipient_map::iterator my_map_iterator;
+        for (my_map_iterator = recipient_map_.begin();
+             my_map_iterator != recipient_map_.end(); ++my_map_iterator)
+        {
+            recipient_list::iterator my_list_iterator;
+            recipient_list my_list = my_map_iterator->second;
+            for (my_list_iterator = my_list.begin();
+                 my_list_iterator != my_list.end(); ++my_list_iterator)
+                if (my_list_iterator->first
+                    == reinterpret_cast<void*>(&object))
+                {
+                    my_list.erase(my_list_iterator);
+                    my_map_iterator->second = my_list;
+                    if (my_list.empty())
+                        recipient_map_.erase(my_map_iterator);
+                    // The object cannot be twice in the same list.
+                    break;
+                }
+        }
+    }
+
+
     //! Sends a message to a list of recipients.
     /*!
       \param[in] my_list the list of recipients.
