@@ -81,6 +81,9 @@ namespace Verdandi
 #define SELDON_WITH_ABORT
 #endif
 
+#ifndef VERDANDI_WITH_ABORT
+#define OPS_WITH_EXCEPTION
+#endif
 
 #include "seldon/SeldonHeader.hxx"
 #include "seldon/vector/Vector2.hxx"
