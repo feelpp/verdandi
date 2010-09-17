@@ -1371,7 +1371,38 @@ namespace Verdandi
         input_data.Read(file_stream);
 
         if (observation_type_ == "state")
+        {
+            if (input_data.GetSize() != Nstate_model_)
+                throw ErrorIO("LinearObservationManager::ReadObservation"
+                              "(ifstream& file_stream, double time, "
+                              "int variable, LinearObservationManager"
+                              "::observation_vector& observation) const",
+                              "The observation type is 'state', so the whole"
+                              " model state is supposed to be stored, but "
+                              "the size of the observation read at time "
+                              + to_str(time_) + " (Nread = "
+                              + to_str(input_data.GetSize()) +
+                              ") mismatches with the expected size (Nstate = "
+                              + to_str(Nstate_model_) + ").");
             ApplyOperator(input_data, observation);
+        }
+        else
+        {
+            if (input_data.GetSize() != Nobservation_)
+                throw ErrorIO("LinearObservationManager::ReadObservation"
+                              "(ifstream& file_stream, double time, "
+                              "int variable, LinearObservationManager"
+                              "::observation_vector& observation) const",
+                              "The observation type is 'observation', so "
+                              "only observations are stored in the file, but"
+                              " the size of the observation read at time "
+                              + to_str(time_) + " (Nread = "
+                              + to_str(input_data.GetSize())
+                              + ") mismatches with the "
+                              "expected size (Nobservation = "
+                              + to_str(Nobservation_ ) + ").");
+            Copy(input_data, observation);
+        }
     }
 
 
