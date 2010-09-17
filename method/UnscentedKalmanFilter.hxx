@@ -70,6 +70,8 @@ namespace Verdandi
         typedef Vector<sigma_point, Collection> sigma_point_collection;
         //! Type of the state vector collection.
         typedef Vector<model_state, Collection> state_collection;
+        //! Type of the observation vector collection.
+        typedef Vector<observation, Collection> observation_collection;
 
 
     protected:

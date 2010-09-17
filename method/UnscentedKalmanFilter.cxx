@@ -236,7 +236,7 @@ namespace Verdandi
         if (alpha_constant_)
         {
             // Computes X_{n + 1}^-.
-            x.Reallocate(Nstate_);
+            model_.GetState(x);
             x.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
@@ -276,7 +276,7 @@ namespace Verdandi
         else
         {
             // Computes X_{n + 1}^-.
-            x.Reallocate(Nstate_);
+            model_.GetState(x);
             x.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
@@ -372,8 +372,8 @@ namespace Verdandi
 
         // Computes Z_{n + 1}^(i).
         Nobservation_ = observation_manager_.GetNobservation();
-        model_state working_vector;
-        state_collection z_i;
+        observation working_vector;
+        observation_collection z_i;
         for (int i = 0; i < Nsigma_point_; i++)
         {
             working_vector.Reallocate(Nobservation_);
@@ -386,7 +386,7 @@ namespace Verdandi
         if (alpha_constant_)
         {
             // Computes the predicted measurement Z_{n + 1}.
-            model_state z;
+            observation z;
             z.Reallocate(Nobservation_);
             z.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
@@ -394,7 +394,7 @@ namespace Verdandi
             Mlt(alpha_, z);
 
             // Computes X_{n+1}-.
-            x.Reallocate(Nstate_);
+            model_.GetState(x);
             x.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
                 Add(T(1), x_i.GetVector(i), x);
@@ -482,14 +482,14 @@ namespace Verdandi
         else
         {
             // Computes the predicted measurement Z_{n + 1}.
-            model_state z;
+            observation z;
             z.Reallocate(Nobservation_);
             z.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
                 Add(alpha_i_(i), z_i.GetVector(i), z);
 
             // Computes X_{n+1}-.
-            x.Reallocate(Nstate_);
+            model_.GetState(x);
             x.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
                 Add(alpha_i_(i), x_i.GetVector(i), x);
