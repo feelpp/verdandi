@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2010 INRIA
-// Author(s): Marc Fragu
+// Author(s): Marc Fragu, Vivien Mallet, Philippe Moireau
 //
 // This file is part of the data assimilation library Verdandi.
 //

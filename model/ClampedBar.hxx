@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2009 INRIA
-// Author(s): Dominique Chapelle, Philippe Moireau
+// Author(s): Dominique Chapelle, Philippe Moireau, Marc Fragu
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -24,7 +24,7 @@
 
 #include "seldon/SeldonSolver.hxx"
 
-#include "OutputSaver.cxx"
+#include "OutputSaver.hxx"
 
 
 namespace Verdandi
