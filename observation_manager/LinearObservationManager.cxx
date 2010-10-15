@@ -137,7 +137,7 @@ namespace Verdandi
 #else
             if (configuration.Is<string>("operator.value"))
                 tangent_operator_matrix_
-                    .Read(configuration.Get<string>("operator.file"));
+                    .Read(configuration.Get<string>("operator.value"));
             else
             {
                 tangent_operator_matrix_.Clear();
