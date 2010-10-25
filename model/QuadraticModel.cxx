@@ -291,8 +291,6 @@ namespace Verdandi
         }
         else if (with_linear_term_)
             MltAdd(Delta_t_, L_, input, T(1), x);
-        else
-            x.Zero();
     }
 
 
