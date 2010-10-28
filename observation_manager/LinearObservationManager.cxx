@@ -131,9 +131,26 @@ namespace Verdandi
         else // Operator given in a Lua table or in a file.
         {
 #ifdef VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
-            throw ErrorUndefined("LinearObservationManager::Initialize()",
-                                 "For a sparse operator, only scaled "
-                                 "identity matrices are supported.");
+            if (configuration.Is<string>("operator.value"))
+            {
+                Matrix<T, General, ArrayRowSparse> tmp;
+                tmp.Read(configuration.Get<string>("operator.value"));
+                Copy(tmp, tangent_operator_matrix_);
+            }
+            else
+                throw ErrorUndefined("LinearObservationManager::Initialize()",
+                                     "For a sparse operator, only scaled "
+                                     "identity matrices and file definitions "
+                                     "are supported.");
+            if (tangent_operator_matrix_.GetN() != model.GetNstate())
+                throw ErrorArgument("LinearObservationManager::Initialize()",
+                                    "The number of columns of the tangent "
+                                    "operator matrix ("
+                                    + to_str(tangent_operator_matrix_.GetN())
+                                    + ") is inconsistent with the"
+                                    " dimension of the model state ("
+                                    + to_str(model.GetNstate()) + ").");
+            Nobservation_ = tangent_operator_matrix_.GetM();
 #else
             if (configuration.Is<string>("operator.value"))
                 tangent_operator_matrix_
@@ -151,7 +168,7 @@ namespace Verdandi
                                                  .GetN())
                                         + ") is not a multiple of the"
                                         " dimension of the model state ("
-                                        + to_str(model.GetNstate())  + ").");
+                                        + to_str(model.GetNstate()) + ").");
                 tangent_operator_matrix_
                     .Resize(tangent_operator_matrix_.GetN()
                             / model.GetNstate(),
@@ -164,7 +181,7 @@ namespace Verdandi
                                     + to_str(tangent_operator_matrix_.GetN())
                                     + ") is inconsistent with the"
                                     " dimension of the model state ("
-                                    + to_str(model.GetNstate())  + ").");
+                                    + to_str(model.GetNstate()) + ").");
             Nobservation_ = tangent_operator_matrix_.GetM();
 #endif
         }
