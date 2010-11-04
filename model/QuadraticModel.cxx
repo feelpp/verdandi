@@ -227,12 +227,17 @@ namespace Verdandi
     void QuadraticModel<T>::Forward()
     {
         if (with_quadratic_term_)
+        {
+            state current_state = state_;
             for (int i = 0; i < Nstate_; i++)
             {
-                MltAdd(Delta_t_, S_[i], state_, T(0), S_state_);
-                state_(i) += DotProd(S_state_, state_);
+                MltAdd(Delta_t_, S_[i], current_state, T(0), S_state_);
+                state_(i) += DotProd(S_state_, current_state);
             }
-        if (with_linear_term_)
+            if (with_linear_term_)
+                MltAdd(Delta_t_, L_, current_state, T(1), state_);
+        }
+        else if (with_linear_term_)
             MltAdd(Delta_t_, L_, state_, T(1), state_);
         if (with_constant_term_)
             Add(Delta_t_, b_, state_);
