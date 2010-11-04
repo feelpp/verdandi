@@ -43,7 +43,7 @@ namespace Verdandi
     {
 
     public:
-        typedef typename ClassModel::state_vector state_vector;
+        typedef typename ClassModel::state model_state;
         typedef typename ClassModel::uncertain_variable uncertain_variable;
 
     protected:
@@ -63,6 +63,11 @@ namespace Verdandi
         Vector<double> date_;
 
         /*** Configuration ***/
+
+        //! Path to the configuration file.
+        string configuration_file_;
+        //! Path to the model configuration file.
+        string model_configuration_file_;
 
         //! Should the iterations be displayed?
         bool show_iteration_;
@@ -98,7 +103,7 @@ namespace Verdandi
         template <class T0, class Allocator0>
         void Fill(Vector<T0, Collection, Allocator0>& in, string pdf);
 
-        void Initialize(string configuration_file);
+        void Initialize();
         void InitializeStep();
         void Forward();
 

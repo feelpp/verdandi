@@ -37,7 +37,7 @@ namespace Verdandi
     */
     template <class T, class ClassModel>
     MonteCarlo<T, ClassModel>::MonteCarlo(string configuration_file):
-        iteration_(-1)
+        iteration_(-1), configuration_file_(configuration_file)
     {
 
         /*** Initializations ***/
@@ -47,9 +47,17 @@ namespace Verdandi
         MessageHandler::AddRecipient("driver", *this,
                                      MonteCarlo::StaticMessage);
 
-        /*** Reads the configuration file section Monte Carlo ***/
+        /***************************
+         * Reads the configuration *
+         ***************************/
 
         Ops configuration(configuration_file);
+        configuration.SetPrefix("monte_carlo.");
+
+        /*** Model ***/
+
+        configuration.Set("model.configuration_file", "", configuration_file,
+                          model_configuration_file_);
 
         /*** Display options ***/
 
@@ -182,12 +190,9 @@ namespace Verdandi
 
 
     //! Initializes the simulation.
-    /*! Initializes the model.
-      \param[in] configuration_file configuration file to be given to the
-      model initialization method.
-    */
+    /*! Initializes the model and the perturbation manager. */
     template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::Initialize(string configuration_file)
+    void MonteCarlo<T, ClassModel>::Initialize()
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
@@ -200,11 +205,6 @@ namespace Verdandi
         else
             Logger::Log<-3>(*this, "Initialization");
 
-        Ops configuration(configuration_file);
-
-        string model_configuration_file_;
-        configuration.Set("model_configuration_file",
-                          model_configuration_file_);
         model_.Initialize(model_configuration_file_);
 
         perturbation_manager_.Initialize(configuration_file);
@@ -386,7 +386,7 @@ namespace Verdandi
     {
         if (message.find("forecast") != string::npos)
         {
-            state_vector state;
+            model_state state;
             model_.GetState(state);
             output_saver_.Save(state, model_.GetDate(), "state_forecast");
         }
