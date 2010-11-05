@@ -144,6 +144,8 @@ if flag_cpp != "":
 fortran_compilation_option = debug_flag("debug_fortran")
 
 add_argument("line", ["no", "yes"])
+add_argument("mumps", ["no", "yes"])
+add_argument("umfpack", ["no", "yes"])
 
 # Path to Verdandi.
 try:
@@ -190,6 +192,16 @@ for path in ["container", "error", "method", "model", "observation_manager",
              "output_saver", "share", "include", "include/lua/src"]:
     env.Append(CPPPATH = [os.path.join(verdandi_path, path)])
 
+if ARGUMENTS["mumps"] == "yes":
+    for path in ["include/Mumps/libseq/", "include/Metis/",
+                 "include/Mumps/include/"]:
+        env.Append(CPPPATH = [os.path.join(verdandi_path, path)])
+
+if ARGUMENTS["umfpack"] == "yes":
+    for path in ["include/AMD/Include", "include/UMFPACK/Include",
+                 "include/UFconfig/"]:
+        env.Append(CPPPATH = [os.path.join(verdandi_path, path)])
+
 # Libraries.
 library_path = to_string_list("library_path")
 for path in library_path:
@@ -201,6 +213,15 @@ for path in library_path:
         raise Exception, "Unable to find the library directory \"" \
               + path + "\" (even in Verdandi directory, \"" \
               + verdandi_path + "\")."
+
+if ARGUMENTS["mumps"] == "yes":
+    env.Append(LIBPATH = ["../../include/Mumps/libseq/"])
+    env.Append(LIBPATH = ["../../include/Mumps/lib/"])
+    env.Append(LIBPATH = ["../../include/Metis/Lib/"])
+
+if ARGUMENTS["umfpack"] == "yes":
+    env.Append(LIBPATH = ["../../include/UMFPACK/Lib/"])
+    env.Append(LIBPATH = ["../../include/AMD/Lib/"])
 
 # User shell configuration.
 if os.environ.has_key("LD_LIBRARY_PATH"):
@@ -253,8 +274,10 @@ env.Replace(LINK = linker)
 
 # Checks for the libraries, and sets the link flags.
 library_list = to_string_list("library_list")
-for library in ["blas", "atlas", "cblas", "lapack", "g2c", "gslcblas",
-                "gfortran", "newran", "superlu", "cppunit", "python"]:
+for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
+                "newran", "superlu_3.1", "cblas", "pthread", "mpiseq",
+                "dmumps", "zmumps", "mumps_common", "pord", "metis", "m",
+                "umfpack", "amd", "cppunit"]:
     if library not in library_list:
         library_list += [library]
 if env['PLATFORM'] == 'win32' and library not in library_list:
