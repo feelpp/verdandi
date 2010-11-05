@@ -103,6 +103,12 @@ namespace Verdandi
     void Logger::SetFileName(string file_name)
     {
         file_name_ = file_name;
+#if defined(VERDANDI_WITH_MPI)
+        file_name_ = find_replace(file_name_, "%{rank}",
+                                  to_str(MPI::COMM_WORLD.Get_rank()));
+#else
+        file_name_ = find_replace(file_name_, "%{rank}", "");
+#endif
     }
 
 
@@ -363,8 +369,16 @@ namespace Verdandi
         // If the file name is not empty, it has already been set using
         // 'SetFileName' and it should not be overwritten.
         if (file_name_.empty())
+        {
             file_name_ = find_replace(VERDANDI_LOG_FILENAME, "%{D}",
                                       GenerateDate());
+#if defined(VERDANDI_WITH_MPI)
+            file_name_ = find_replace(file_name_, "%{rank}",
+                                      to_str(MPI::COMM_WORLD.Get_rank()));
+#else
+            file_name_ = find_replace(file_name_, "%{rank}", "");
+#endif
+        }
     }
 
 
@@ -381,6 +395,12 @@ namespace Verdandi
         configuration.SetPrefix(section_name);
         configuration.Set("file", "", VERDANDI_LOG_FILENAME, file_name_);
         file_name_ = find_replace(file_name_, "%{D}", GenerateDate());
+#if defined(VERDANDI_WITH_MPI)
+        file_name_ = find_replace(file_name_, "%{rank}",
+                                  to_str(MPI::COMM_WORLD.Get_rank()));
+#else
+        file_name_ = find_replace(file_name_, "%{rank}", "");
+#endif
     }
 
 

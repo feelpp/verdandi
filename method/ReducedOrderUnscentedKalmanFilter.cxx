@@ -146,9 +146,6 @@ namespace Verdandi
 
             configuration.SetPrefix("reduced_order_unscented_kalman_filter.");
 
-            if (configuration.Exists("output.log"))
-                Logger::SetFileName(configuration.Get<string>("output.log"));
-
             if (configuration.Exists("output.configuration"))
             {
                 string output_configuration;
@@ -158,8 +155,11 @@ namespace Verdandi
             }
 #if defined(VERDANDI_WITH_MPI)
         }
-        Logger::SetFileName("Verdandi_Proc" + to_str(rank_));
 #endif
+        configuration.SetPrefix("reduced_order_unscented_kalman_filter.");
+
+        if (configuration.Exists("output.log"))
+            Logger::SetFileName(configuration.Get<string>("output.log"));
 
     }
 
