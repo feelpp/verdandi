@@ -66,8 +66,11 @@ namespace Verdandi
 
     /*** Linear algebra ***/
 
-    template <class T>
-    void GetCholesky(Matrix<T, General, RowMajor>& A);
+    template <class T, class Allocator>
+    void GetCholesky(Matrix<T, General, RowMajor, Allocator>& A);
+
+    template <class T, class Allocator>
+    void GetCholesky(Matrix<T, General, RowSparse, Allocator>& A);
 
     template <class T, class Allocator>
     void GetInverse(Matrix<T, General, RowSparse, Allocator>& A);
@@ -82,22 +85,36 @@ namespace Verdandi
 
     template <class T, class Allocator>
     void ConvertRowSparseToDense(
-        Matrix<T, General, RowSparse, Allocator>& A,
+        const Matrix<T, General, RowSparse, Allocator>& A,
         Matrix<T, General, RowMajor, Allocator>& A_dense);
     template <class T, class Allocator>
     void ConvertDenseToArrayRowSparse(
-        Matrix<T, General, RowMajor, Allocator>& A_dense,
+        const Matrix<T, General, RowMajor, Allocator>& A_dense,
         Matrix<T, General, ArrayRowSparse, Allocator>& A_array);
+    template <class T, class Allocator>
+    void ConvertArrayRowSparseToDense(
+        const Matrix<T, General, ArrayRowSparse, Allocator>& A_array,
+        Matrix<T, General, RowMajor, Allocator>& A_dense);
+    template <class T, class Allocator>
+    void ConvertRowSparseToArrayRowSparse(
+        const Matrix<T, General, RowSparse, Allocator>& A,
+        Matrix<T, General, ArrayRowSparse, Allocator>& A_dense);
 
     template <class T, class Allocator>
-    void ConvertSparsetoDense(Vector<T, VectSparse, Allocator>& V_sparse,
-                              Vector<T, VectFull, Allocator>& V_dense);
+    void ConvertSparsetoDense(
+        const Vector<T, VectSparse, Allocator>& V_sparse,
+        Vector<T, VectFull, Allocator>& V_dense);
     template <class T, class Allocator>
-    void ConvertDenseToSparse(Vector<T, VectFull, Allocator> V_dense,
-                              Vector<T, VectSparse, Allocator>& V_sparse);
+    void ConvertDenseToSparse(
+        const Vector<T, VectFull, Allocator> V_dense,
+        Vector<T, VectSparse, Allocator>& V_sparse);
 
     template <class T>
     void Fill(T value, Matrix<T, Symmetric, RowSymSparse>& M);
+
+    template <class T, template <class U> class Allocator>
+    void GetRowPointer(const Matrix<T, General, RowMajor, Allocator<T> >& M,
+                       int i, Vector<T, VectFull, Allocator<T> >& V);
 
 
 } // namespace Verdandi.

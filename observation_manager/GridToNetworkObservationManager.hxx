@@ -390,6 +390,7 @@ namespace Verdandi
 
         T GetErrorVariance(int i, int j) const;
         const error_variance& GetErrorVariance() const;
+        const error_variance& GetErrorVarianceInverse() const;
 
         string GetName() const;
         void Message(string message);

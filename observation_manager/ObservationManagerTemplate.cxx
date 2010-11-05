@@ -293,8 +293,22 @@ namespace Verdandi
     {
         throw ErrorUndefined(
             "const typename"
-            "ObservationManagerTemplate::error_variance&"
+            "ObservationManagerTemplate::error_variance& "
             "ObservationManagerTemplate::GetErrorVariance() const");
+    }
+
+
+    //! Returns the inverse of the observation error covariance matrix.
+    /*!
+      \return The inverse of the matrix of the observation error covariance.
+    */
+    const ObservationManagerTemplate::error_variance&
+    ObservationManagerTemplate::GetErrorVariance() const
+    {
+        throw ErrorUndefined(
+            "const typename"
+            "ObservationManagerTemplate::error_variance& "
+            "ObservationManagerTemplate::GetErrorVarianceInverse() const");
     }
 
 

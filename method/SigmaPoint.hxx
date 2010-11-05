@@ -33,15 +33,51 @@ namespace Verdandi
                                     Vector<SigmaPoint, Collection>&
                                     sigma_point, SigmaPoint& alpha,
                                     bool& alpha_constant);
+    template <class T,  template <class U> class Allocator>
+    void ComputeCanonicalSigmaPoint(int p,
+                                    Matrix<T, General, RowMajor,
+                                    Allocator<T> >& sigma_point,
+                                    Vector<T, VectFull, Allocator<T> >&
+                                    alpha, bool& alpha_constant);
+    template <class T,  template <class U> class Allocator>
+    void ComputeCanonicalSigmaPoint(int p,
+                                    Matrix<T, General, RowSparse,
+                                    Allocator<T> >& sigma_point,
+                                    Vector<T, VectFull, Allocator<T> >&
+                                    alpha, bool& alpha_constant);
+
     template <class SigmaPoint>
     void ComputeStarSigmaPoint(int p,
                                Vector<SigmaPoint, Collection>& sigma_point,
                                SigmaPoint& alpha, bool& alpha_constant);
+    template <class T,  template <class U> class Allocator>
+    void ComputeStarSigmaPoint(int p,
+                               Matrix<T, General, RowMajor, Allocator<T> >&
+                               sigma_point,
+                               Vector<T, VectFull, Allocator<T> >& alpha,
+                               bool& alpha_constant);
+    template <class T,  template <class U> class Allocator>
+    void ComputeStarSigmaPoint(int p,
+                               Matrix<T, General, RowSparse, Allocator<T> >&
+                               sigma_point,
+                               Vector<T, VectFull, Allocator<T> >& alpha,
+                               bool& alpha_constant);
     template <class SigmaPoint>
     void ComputeSimplexSigmaPoint(int p,
                                   Vector<SigmaPoint, Collection>& sigma_point,
                                   SigmaPoint& alpha, bool& alpha_constant);
-
+    template <class T,  template <class U> class Allocator>
+    void ComputeSimplexSigmaPoint(int p,
+                                  Matrix<T, General, RowMajor, Allocator<T> >&
+                                  sigma_point,
+                                  Vector<T, VectFull, Allocator<T> >& alpha,
+                                  bool& alpha_constant);
+    template <class T,  template <class U> class Allocator>
+    void ComputeSimplexSigmaPoint(int p,
+                                  Matrix<T, General, RowSparse, Allocator<T> >
+                                  & sigma_point,
+                                  Vector<T, VectFull, Allocator<T> >& alpha,
+                                  bool& alpha_constant);
 
 } // namespace Verdandi.
 

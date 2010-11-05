@@ -1,5 +1,5 @@
 // Copyright (C) 2008, INRIA
-// Author(s): Vivien Mallet, Anne Tilloy
+// Author(s): Vivien Mallet, Anne Tilloy, Marc Fragu
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -453,8 +453,8 @@ namespace Verdandi
       the square root \f$ S \f$ of A as given by the Cholesky decomposition:
       \f$ A = S S^T \f$, with \a S is a lower triangular matrix.
     */
-    template <class T>
-    void GetCholesky(Matrix<T, General, RowMajor>& A)
+    template <class T, class Allocator>
+    void GetCholesky(Matrix<T, General, RowMajor, Allocator>& A)
     {
         Matrix<T, General, RowSymPacked> A_sympacked(A.GetM(), A.GetN());
         for (int i = 0; i < A.GetM(); i++)
@@ -468,6 +468,34 @@ namespace Verdandi
             for (int j = 0; j <= i; j++)
                 A(i, j) = A_sympacked(i, j);
     }
+
+
+    //! Computes the Cholesky decomposition.
+    /*!
+      \param[in] A on entry, a symmetric definite positive matrix. On exit,
+      the square root \f$ S \f$ of A as given by the Cholesky decomposition:
+      \f$ A = S S^T \f$, with \a S is a lower triangular matrix.
+    */
+    template <class T, class Allocator>
+    void GetCholesky(Matrix<T, General, RowSparse, Allocator>& A)
+    {
+        Matrix<T, General, RowSymPacked, Allocator>
+            A_sympacked(A.GetM(), A.GetN());
+        for (int i = 0; i < A.GetM(); i++)
+            for (int j = i; j < A.GetN(); j++)
+                A_sympacked(i, j) = A(i, j);
+
+        GetCholesky(A_sympacked);
+
+        A.Clear();
+        Matrix<T, General, ArrayRowSparse> A_array(A.GetM(), A.GetN());
+        for (int i = 0; i < A.GetM(); i++)
+            for (int j = 0; j <= i; j++)
+                A_array(i, j) = A_sympacked(i, j);
+
+        Copy(A_array, A);
+    }
+
 
 
     //! Solves a sparse linear system using LU factorization.
@@ -528,7 +556,7 @@ namespace Verdandi
     */
     template <class T, class Allocator>
     void ConvertRowSparseToDense(
-        Matrix<T, General, RowSparse, Allocator>& A,
+        const Matrix<T, General, RowSparse, Allocator>& A,
         Matrix<T, General, RowMajor, Allocator>& A_dense)
     {
         int m = A.GetM();
@@ -550,7 +578,7 @@ namespace Verdandi
     */
     template <class T, class Allocator>
     void ConvertDenseToArrayRowSparse(
-        Matrix<T, General, RowMajor, Allocator>& A_dense,
+        const Matrix<T, General, RowMajor, Allocator>& A_dense,
         Matrix<T, General, ArrayRowSparse, Allocator>& A_array)
     {
         int m = A_dense.GetM();
@@ -568,6 +596,54 @@ namespace Verdandi
     }
 
 
+    //! Conversion from 'ArrayRowSparse' to 'RowMajor' format.
+    /*!
+      \param[in] A_array the matrix to be converted.
+      \param[out] A_dense the matrix \a A_array stored in the
+      'RowMajor' format.
+    */
+    template <class T, class Allocator>
+    void ConvertArrayRowSparseToDense(
+        const Matrix<T, General, ArrayRowSparse, Allocator>& A_array,
+        Matrix<T, General, RowMajor, Allocator>& A_dense)
+    {
+        int m = A_array.GetM();
+        int n = A_array.GetN();
+
+        A_dense.Reallocate(m, n);
+
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                A_dense(i, j) = A_array(i, j);
+    }
+
+
+    //! Conversion from 'RowSparse' to 'ArrayRowSparse' format.
+    /*!
+      \param[in] A the 'RowSparse' matrix to be converted.
+      \param[out] A_array the matrix \a A stored in the
+      'ArrayRowSparse' format.
+    */
+    template <class T, class Allocator>
+    void ConvertRowSparseToArrayRowSparse(
+        const Matrix<T, General, RowSparse, Allocator>& A,
+        Matrix<T, General, ArrayRowSparse, Allocator>& A_array)
+    {
+        int m = A.GetM();
+        int n = A.GetN();
+
+        A_array.Reallocate(m, n);
+
+        T* data = A.GetData();
+        int* ptr = A.GetPtr();
+        int* column = A.GetInd();
+
+        for (int i = 0; i < m; i++)
+            for (int j = ptr[i]; j < ptr[i + 1]; j++)
+                A_array.AddInteraction(i, column[j], data[j]);
+    }
+
+
     //! Conversion from 'VectSparse' to 'VectFull' format.
     /*!
       \param[in] V_sparse the 'VectSparse' vector to be converted.
@@ -575,8 +651,9 @@ namespace Verdandi
       format.
     */
     template <class T, class Allocator>
-    void ConvertSparseToDense(Vector<T, VectSparse, Allocator>& V_sparse,
-                              Vector<T, VectFull, Allocator>& V_dense)
+    void ConvertSparseToDense(const Vector<T, VectSparse, Allocator>&
+                              V_sparse, Vector<T, VectFull, Allocator>&
+                              V_dense)
     {
         V_dense.Fill(T(0.));
         for (int k = 0; k < V_sparse.GetM(); k++)
@@ -591,7 +668,7 @@ namespace Verdandi
       format.
     */
     template <class T, class Allocator>
-    void ConvertDenseToSparse(Vector<T, VectFull, Allocator> V_dense,
+    void ConvertDenseToSparse(const Vector<T, VectFull, Allocator> V_dense,
                               Vector<T, VectSparse, Allocator>& V_sparse)
     {
         V_sparse.Clear();
@@ -617,6 +694,28 @@ namespace Verdandi
         working_vector.Fill(T(value));
         working_vector.Nullify();
     }
+
+
+    //! Gets a vector referencing a line of a given matrix.
+    /*!
+      \param[in] M a given matrix.
+      \param[in] i a given line index.
+      \return a vector pointing on the line \a i of \a M.
+    */
+    template <class T, template <class U> class Allocator>
+    void GetRowPointer(const Matrix<T, General, RowMajor, Allocator<T> >& M,
+                       int i, Vector<T, VectFull, Allocator<T> >& V)
+    {
+        if (i < 0 || i >= M.GetM())
+            throw ErrorArgument("void GetLineVector(Matrix<T, General, "
+                                "RowMajor, Allocator<T> >& M, int i, "
+                                "Vector<T, VectFull, Allocator<T> >& V)",
+                                string("Index should be in [0, ")
+                                + to_str(M.GetM() - 1)
+                                + "], but is equal to " + to_str(i) + ".");
+        V.SetData(M.GetN(), &M.GetData()[i * M.GetN()]);
+    }
+
 
 
 

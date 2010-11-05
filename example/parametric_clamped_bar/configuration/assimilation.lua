@@ -153,6 +153,59 @@ unscented_kalman_filter = {
 }
 
 
+-- Simulation with assimilation using UKF.
+reduced_order_unscented_kalman_filter = {
+
+   data_assimilation = {
+
+      analyze_first_step = false,
+      with_resampling = false,
+      -- Indicates how R is stored: "matrix", "matrix_inverse", "vector",
+      -- "vector_inverse".
+      observation_error_variance = "matrix_inverse"
+
+   },
+
+   sigma_point = {
+
+      -- Choice of sigma-points: "canonical", "star" or "simplex".
+      type = "simplex"
+
+   },
+
+   display = {
+
+      show_iteration = false,
+      show_time = true
+
+   },
+
+   output_saver = {
+
+      variable_list = {"state_forecast", "state_analysis"},
+      file = output_directory .. "roukf-%{name}.%{extension}",
+      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      mode = output_mode,
+      mode_scalar = output_mode_scalar
+
+   },
+
+   output = {
+
+     configuration = output_directory .. "roukf.lua",
+     log = output_directory .. "roukf.log"
+
+   },
+
+   mpi = {
+
+        algorithm = 0,
+        master_process_contribution = 1.0
+    }
+
+}
+
+
 -- Forward simulation.
 forward = {
 

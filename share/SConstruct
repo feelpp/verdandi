@@ -108,10 +108,22 @@ linker = create_variable("linker", "$CXX")
 #############
 
 
+# Parallelism.
+add_argument("mpi", ["no", "yes"])
+add_argument("omp", ["no", "yes"])
+
 # The compilers and the linker may be changed with command line options.
 cpp_compiler = ARGUMENTS.get("cpp", cpp_compiler)
 fortran_compiler = ARGUMENTS.get("fortran", fortran_compiler)
 linker = ARGUMENTS.get("link", linker)
+
+if ARGUMENTS["mpi"] == "yes":
+    # search for known good MPI C++ compilers
+    option_list = ['mpicxx','mpiCC','mpic++']
+    for o in option_list:
+        if WhereIs(o) != None:
+            mpi_cxx_compiler = WhereIs(o)
+            break
 
 # Compilation options.
 add_argument("debug", ["0", "-1", "1", "2"])
@@ -201,8 +213,13 @@ if os.environ.has_key("CPLUS_INCLUDE_PATH"):
     env.Append(CPPPATH = os.environ["CPLUS_INCLUDE_PATH"].split(":"))
 
 # Compiler.
-if cpp_compiler is not None:
-    env.Replace(CXX = cpp_compiler)
+if ARGUMENTS["mpi"] == "no":
+   if cpp_compiler is not None:
+        env.Replace(CXX = cpp_compiler)
+if ARGUMENTS["mpi"] == "yes":
+   if mpi_cxx_compiler is not None:
+        env.Replace(CXX = mpi_cxx_compiler)
+
 if fortran_compiler is not None:
     env.Replace(F77 = fortran_compiler)
     env.Replace(F90 = fortran_compiler)
@@ -264,6 +281,10 @@ if ARGUMENTS["line"] == "no":
     env_lua.Replace(ARCOMSTR = "[Archiving] $TARGET")
     env_lua.Replace(RANLIBCOMSTR = "[Indexing] $TARGET")
 
+
+if ARGUMENTS["omp"] == "yes":
+    env.Append(CXXFLAGS = ["-fopenmp"])
+    env.Append(LINKFLAGS = ["-fopenmp"])
 
 ################
 # THE PROGRAMS #

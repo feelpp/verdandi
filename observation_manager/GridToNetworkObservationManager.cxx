@@ -1640,6 +1640,21 @@ namespace Verdandi
     }
 
 
+    //! Returns the inverse of the observation error covariance matrix.
+    /*!
+      \return The inverse of the matrix of the observation error covariance.
+    */
+    const typename GridToNetworkObservationManager<T>::error_variance&
+    GridToNetworkObservationManager<T>::GetErrorVariance() const
+    {
+        throw ErrorUndefined(
+            "const typename"
+            "GridToNetworkObservationManager::error_variance& "
+            "GridToNetworkObservationManager::GetErrorVarianceInverse()"
+            " const");
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.

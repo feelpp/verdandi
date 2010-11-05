@@ -189,10 +189,16 @@ namespace Verdandi
 #ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
         build_diagonal_sparse_matrix(Nobservation_, error_variance_value_,
                                      error_variance_);
+        build_diagonal_sparse_matrix(Nobservation_,
+                                     T(T(1) / error_variance_value_),
+                                     error_variance_inverse_);
 #else
         error_variance_.Reallocate(Nobservation_, Nobservation_);
         error_variance_.SetIdentity();
         Mlt(error_variance_value_, error_variance_);
+        error_variance_inverse_.Reallocate(Nobservation_, Nobservation_);
+        error_variance_inverse_.SetIdentity();
+        Mlt(T(T(1)/ error_variance_value_), error_variance_inverse_);
 #endif
 
         if (observation_type_ == "state")
@@ -1833,6 +1839,20 @@ namespace Verdandi
     {
         return error_variance_;
     }
+
+
+    //! Inverse of the observation error covariance matrix.
+    /*!
+      \return Inverse of the matrix of the observation error covariance.
+    */
+    template <class T>
+    const typename LinearObservationManager<T>
+    ::error_variance& LinearObservationManager<T>::GetErrorVarianceInverse()
+        const
+    {
+        return error_variance_inverse_;
+    }
+
 
 
     //! Returns the name of the class.

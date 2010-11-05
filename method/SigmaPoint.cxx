@@ -78,6 +78,62 @@ namespace Verdandi
     }
 
 
+    //! Computes 'canonical' sigma-points.
+    /*!
+      \param[in] p dimension of the model state.
+      \param[out] sigma_point 'canonical' sigma-points.
+      \param[out] alpha coefficient vector associated with sigma-points.
+      \param[out] alpha_constant boolean to indicate if the coefficients alpha
+      are constants.
+    */
+    template <class T,  template <class U> class Allocator>
+    void ComputeCanonicalSigmaPoint(int p,
+                                    Matrix<T, General, RowMajor,
+                                    Allocator<T> >& sigma_point,
+                                    Vector<T, VectFull, Allocator<T> >&
+                                    alpha, bool& alpha_constant)
+    {
+        typedef Vector<T, VectFull, Allocator<T> > SigmaPoint;
+        Vector<SigmaPoint, Collection> sigma_point_collection;
+        int r;
+
+        ComputeCanonicalSigmaPoint(p, sigma_point_collection,
+                                   alpha, alpha_constant);
+
+        r = sigma_point_collection.GetNvector();
+
+        sigma_point.Reallocate(r, p);
+        for (int i = 0; i < r; i++)
+            SetRow(sigma_point_collection.GetVector(i), i, sigma_point);
+
+        sigma_point_collection.Deallocate();
+    }
+
+
+    //! Computes 'canonical' sigma-points.
+    /*!
+      \param[in] p dimension of the model state.
+      \param[out] sigma_point 'canonical' sigma-points.
+      \param[out] alpha coefficient vector associated with sigma-points.
+      \param[out] alpha_constant boolean to indicate if the coefficients alpha
+      are constants.
+    */
+    template <class T,  template <class U> class Allocator>
+    void ComputeCanonicalSigmaPoint(int p,
+                                    Matrix<T, General, RowSparse,
+                                    Allocator<T> >& sigma_point,
+                                    Vector<T, VectFull, Allocator<T> >&
+                                    alpha, bool& alpha_constant)
+    {
+        Matrix<T, General, RowMajor, Allocator<T> > sigma_point_dense;
+        ComputeCanonicalSigmaPoint(p, sigma_point_dense, alpha,
+                                   alpha_constant);
+        Matrix<T, General, ArrayRowSparse, Allocator<T> > sigma_point_array;
+        ConvertDenseToArrayRowSparse(sigma_point_dense, sigma_point_array);
+        Copy(sigma_point_array, sigma_point);
+    }
+
+
     //! Computes 'star' sigma-points.
     /*!
       \param[in] p dimension of the model state.
@@ -109,6 +165,62 @@ namespace Verdandi
         alpha.Fill(value_type(1) / value_type(2 * p + 1));
 
         alpha_constant = true;
+    }
+
+
+    //! Computes 'star' sigma-points.
+    /*!
+      \param[in] p dimension of the model state.
+      \param[out] sigma_point 'star' sigma-points.
+      \param[out] alpha coefficient vector associated with sigma-points.
+      \param[out] alpha_constant boolean to indicate if the coefficients alpha
+      are constants.
+    */
+    template <class T,  template <class U> class Allocator>
+    void ComputeStarSigmaPoint(int p,
+                               Matrix<T, General, RowMajor, Allocator<T> >&
+                               sigma_point,
+                               Vector<T, VectFull, Allocator<T> >&
+                               alpha, bool& alpha_constant)
+    {
+        typedef Vector<T, VectFull, Allocator<T> > SigmaPoint;
+        Vector<SigmaPoint, Collection> sigma_point_collection;
+        int r;
+
+        ComputeStarSigmaPoint(p, sigma_point_collection,
+                              alpha, alpha_constant);
+
+        r = sigma_point_collection.GetNvector();
+
+        sigma_point.Reallocate(r, p);
+        for (int i = 0; i < r; i++)
+            SetRow(sigma_point_collection.GetVector(i), i, sigma_point);
+
+        sigma_point_collection.Deallocate();
+    }
+
+
+    //! Computes 'star' sigma-points.
+    /*!
+      \param[in] p dimension of the model state.
+      \param[out] sigma_point 'star' sigma-points.
+      \param[out] alpha coefficient vector associated with sigma-points.
+      \param[out] alpha_constant boolean to indicate if the coefficients alpha
+      are constants.
+    */
+    template <class T,  template <class U> class Allocator>
+    void ComputeStarSigmaPoint(int p,
+                               Matrix<T, General, RowSparse, Allocator<T> >&
+                               sigma_point,
+                               Vector<T, VectFull, Allocator<T> >&
+                               alpha, bool& alpha_constant)
+    {
+        Matrix<T, General, RowMajor, Allocator<T> > sigma_point_dense;
+        ComputeStarSigmaPoint(p, sigma_point_dense, alpha,
+                              alpha_constant);
+        Matrix<T, General, ArrayRowSparse, Allocator<T> > sigma_point_array;
+        ConvertDenseToArrayRowSparse(sigma_point_dense, sigma_point_array);
+        Copy(sigma_point_array, sigma_point);
     }
 
 
@@ -159,6 +271,58 @@ namespace Verdandi
         alpha.Fill(value_type(1) / value_type(r));
 
         alpha_constant = true;
+    }
+
+
+    //! Computes 'simplex' sigma-points.
+    /*!
+      \param[in] p dimension of the model state.
+      \param[out] sigma_point 'simplex' sigma-points.
+      \param[out] alpha coefficient vector associated with sigma-points.
+    */
+    template <class T,  template <class U> class Allocator>
+    void ComputeSimplexSigmaPoint(int p,
+                                  Matrix<T, General, RowMajor, Allocator<T> >&
+                                  sigma_point,
+                                  Vector<T, VectFull, Allocator<T> >&
+                                  alpha, bool& alpha_constant)
+    {
+        typedef Vector<T, VectFull, Allocator<T> > SigmaPoint;
+        Vector<SigmaPoint, Collection> sigma_point_collection;
+        int r;
+
+        ComputeSimplexSigmaPoint(p, sigma_point_collection,
+                                 alpha, alpha_constant);
+
+        r = sigma_point_collection.GetNvector();
+
+        sigma_point.Reallocate(r, p);
+        for (int i = 0; i < r; i++)
+            SetRow(sigma_point_collection.GetVector(i), i, sigma_point);
+
+        sigma_point_collection.Deallocate();
+    }
+
+
+    //! Computes 'simplex' sigma-points.
+    /*!
+      \param[in] p dimension of the model state.
+      \param[out] sigma_point 'simplex' sigma-points.
+      \param[out] alpha coefficient vector associated with sigma-points.
+    */
+    template <class T,  template <class U> class Allocator>
+    void ComputeSimplexSigmaPoint(int p,
+                                  Matrix<T, General, RowSparse, Allocator<T> >
+                                  &sigma_point,
+                                  Vector<T, VectFull, Allocator<T> >&
+                                  alpha, bool& alpha_constant)
+    {
+        Matrix<T, General, RowMajor, Allocator<T> > sigma_point_dense;
+        ComputeSimplexSigmaPoint(p, sigma_point_dense, alpha,
+                                 alpha_constant);
+        Matrix<T, General, ArrayRowSparse, Allocator<T> > sigma_point_array;
+        ConvertDenseToArrayRowSparse(sigma_point_dense, sigma_point_array);
+        Copy(sigma_point_array, sigma_point);
     }
 
 

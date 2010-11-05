@@ -146,6 +146,8 @@ namespace Verdandi
         T error_variance_value_;
         //! Observation error covariance matrix (R).
         error_variance error_variance_;
+        //! Inverse of the observation error covariance matrix (R).
+        error_variance error_variance_inverse_;
 
         /*** Triangle interpolation ***/
 
@@ -402,6 +404,7 @@ namespace Verdandi
 
         T GetErrorVariance(int i, int j) const;
         const error_variance& GetErrorVariance() const;
+        const error_variance& GetErrorVarianceInverse() const;
 
         string GetName() const;
         void Message(string message);
