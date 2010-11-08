@@ -50,7 +50,7 @@ The clamped bar model is solved numerically using a Newmark scheme (middle point
 Algorithmically, it follows:
 <center>
 \f$ \dot Y_{n + 1} = \frac{2}{\Delta t} (Y_{n+1} - Y_{n}) - \dot Y_{n} \f$  <br/>
-\f$ (\frac{1}2 K +  \frac{2}{\Delta t} M) Y_{n+1} = (-\frac{1}2 K +  \frac{2}{\Delta t^2} M) Y_{n} + F_{n + \frac{1}2} \f$  <br/>
+\f$ (\frac{1}2 K +  \frac{2}{\Delta t^2} M) Y_{n+1} = (-\frac{1}2 K +  \frac{2}{\Delta t^2} M) Y_{n} + \frac{2}{\Delta t} M \dot Y_{n} + F_{n + \frac{1}2} \f$  <br/>
 </center>
 
 One can define several parameters:
