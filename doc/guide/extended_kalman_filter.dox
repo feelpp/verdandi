@@ -43,13 +43,13 @@ while (!driver.HasFinished()) [6]
 \section algorithm2 Extended Kalman filter algorithm
 
 <ol>
-        <li>Predict: 
-            - \f$x_h^f = \mathcal{M}_{h-1}(x_{h-1}^a)\f$,<br>
-            - \f$P_h^f = M_{h-1} P_{h-1}^a M_{h-1}^T \f$,</li>
-        <li>Update: 
-            - \f$K_h = P_h^fH_h^{T}(H_hP_h^fH_h^{T} + R_h)^{-1}\f$, <br>
-            - \f$x_h^a = x_h^f + K_h(y_h - \mathcal{H}_h(x_h^f))\f$,<br>
-            - \f$P_h^a = (I - K_hH_h)P_h^f\f$.</li>
+        <li>Prediction:
+            - \f$x_h^f = \mathcal{M}_{h-1}(x_{h-1}^a)\f$<br>
+            - \f$P_h^f = M_{h-1} P_{h-1}^a M_{h-1}^T \f$</li>
+        <li>Update:
+            - \f$K_h = P_h^fH_h^{T}(H_hP_h^fH_h^{T} + R_h)^{-1}\f$<br>
+            - \f$x_h^a = x_h^f + K_h(y_h - \mathcal{H}_h(x_h^f))\f$<br>
+            - \f$P_h^a = (I - K_hH_h)P_h^f\f$</li>
 </ol>
 With: <br>
 \f$x_h^f\f$ forecast state vector; <br>

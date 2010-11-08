@@ -49,23 +49,23 @@ Different choices of sigma-points are implemented in %Verdandi:
             - \f$I^{(i)} = \sqrt n e_i \f$, for \f$1 \le i \le n\f$ <br>
             - \f$I^{(i)} = - \sqrt n e_i \f$, for \f$n + 1 \le i \le 2n \f$ ;</li>
             <li>star sigma-points: the origin is added to the previous canonical points;</li>
-            <li>simplex sigma-points: this represents the smallest number of necessary sigma-points (n + 1), which are located on a regular polyhedron of radius \f$ \sqrt n \f$.</li>
+            <li>simplex sigma-points: this represents the smallest number of necessary sigma-points \f$ r = n + 1 \f$, which are located on a regular polyhedron of radius \f$ \sqrt n \f$.</li>
 </ol>
 
 The principle of the UKF filter is to replace the means and covariances of the Kalman filter by the empirical means and covariances propagated by the dynamical operator \f$\mathcal{M}\f$ during the prediction, and by the observation operator \f$\mathcal{H}\f$ during the correction. This lead the following algorithm:
 <ol>
-            <li>Predict: 
-            - \f$x_{h}^{(i)a} = x_h^a + \sqrt{P_h^a} I^{(i)} \f$,<br>
-            - \f$x_{h+1}^f = E_{\alpha}(\mathcal{M}_{h+1}(x_h^{(*)a}))\f$,<br>
-            - \f$P_{h+1}^f = Cov_{\alpha}(\mathcal{M}_{h+1}(x_h^{(*)a}))\f$;</li>
-           <li>Update: 
-            - \f$x_{h+1}^{(i)f} = x_{h+1}^f + \sqrt{P_{h+1}^f} I^{(i)} \f$,<br>
-            - \f$y_{h+1}^{(i)} = \mathcal{H}_{h+1}(x_{h+1}^{(i)f})\f$,<br>
-            - \f$P_{\alpha}^{xy} = Cov_{\alpha}(x_{h+1}^{(*)f}, y_{h+1}^{(*)})\f$,<br>
-            - \f$P_{\alpha}^{y} = R_h + Cov_{\alpha}(y_{h+1}^{(*)}, y_{h+1}^{(*)})\f$,<br>
-            - \f$K_{h+1} = P_{\alpha}^{xy}(P_{\alpha}^{y})^{-1}\f$, <br>
-            - \f$x_{h+1}^a = x_{h+1}^f + K_{h+1}(y_{h+1} - E_{\alpha}(y_{h+1}^{(*)}))\f$,<br>
-            - \f$P_{h+1}^a = P_{h+1}^f - P_{\alpha}^{xy}(P_{\alpha}^{y})^{-1}(P_{\alpha}^{xy})^T\f$.</li>
+            <li>Prediction:
+            - \f$x_{h}^{(i)a} = x_h^a + \sqrt{P_h^a} I^{(i)} \f$<br>
+            - \f$x_{h+1}^f = E_{\alpha}(\mathcal{M}_{h+1}(x_h^{(*)a}))\f$<br>
+            - \f$P_{h+1}^f = Cov_{\alpha}(\mathcal{M}_{h+1}(x_h^{(*)a}))\f$</li>
+           <li>Update:
+            - \f$x_{h+1}^{(i)f} = x_{h+1}^f + \sqrt{P_{h+1}^f} I^{(i)} \f$<br>
+            - \f$y_{h+1}^{(i)} = \mathcal{H}_{h+1}(x_{h+1}^{(i)f})\f$<br>
+            - \f$P_{\alpha}^{xy} = Cov_{\alpha}(x_{h+1}^{(*)f}, y_{h+1}^{(*)})\f$<br>
+            - \f$P_{\alpha}^{y} = R_h + Cov_{\alpha}(y_{h+1}^{(*)}, y_{h+1}^{(*)})\f$<br>
+            - \f$K_{h+1} = P_{\alpha}^{xy}(P_{\alpha}^{y})^{-1}\f$ <br>
+            - \f$x_{h+1}^a = x_{h+1}^f + K_{h+1}(y_{h+1} - E_{\alpha}(y_{h+1}^{(*)}))\f$<br>
+            - \f$P_{h+1}^a = P_{h+1}^f - P_{\alpha}^{xy}(P_{\alpha}^{y})^{-1}(P_{\alpha}^{xy})^T\f$</li>
 
 </ol>
 With: <br>
