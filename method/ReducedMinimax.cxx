@@ -512,6 +512,21 @@ namespace Verdandi
                     * D_tilde_inv_(i);
         Q_sqrt.Clear();
 
+        // Computes $\widecheck F_{t+1}$.
+	Matrix<T, General, RowMajor> F_check(Nstate_, Nprojection_);
+        vtmp.Reallocate(Nprojection_);
+        for (int i = 0; i < Nstate_; i++)
+        {
+            GetCol(projection_, i, vtmp);
+            Mlt(D_tilde_inv_(i), vtmp);
+            SetRow(vtmp, i, F_check);
+        }
+
+        // Computes $\widecheck F_{t+1}^T \widecheck Q_t^{\frac 12}$.
+	Matrix<T, General, RowMajor> FtQ(Nprojection_, Nmode_Q_);
+        MltAdd(T(1), SeldonTrans, F_check,
+               SeldonNoTrans, Q_sqrt_check, T(0), FtQ);
+
         // Computes $G_t + \widecheck M_t^T \widecheck M_t$.
 	Matrix<T, General, RowMajor> G_MtM(Nprevious_projection_,
                                            Nprevious_projection_);
@@ -556,15 +571,6 @@ namespace Verdandi
         MltAdd(T(-1), SeldonNoTrans, mtmp_1, SeldonTrans, mtmp, T(1), B_);
         GetInverse(B_);
 
-        // Calls the model to compute $\mathcal{\widetilde M}_t(F_{t+1} B_t
-        // z_t)$.
-        vtmp.Reallocate(Nprevious_projection_);
-        Mlt(B_, z_, vtmp);
-        Vector<T> MFBz(Nstate_);
-        MltAdd(T(1), SeldonTrans, previous_projection_, vtmp, T(0), MFBz);
-        model_.ApplyOperator(MFBz, true, true);
-        // Note that the model is now one time step further.
-
         /*** Observation-related variables ***/
 
         // Observation operator and data.
@@ -572,7 +578,7 @@ namespace Verdandi
 	observation_tangent_linear_operator H;
 	Vector<T> y;
 
-        observation_manager_.SetTime(model_, model_.GetTime());
+        observation_manager_.SetTime(model_, time);
 
         if (observation_manager_.HasObservation())
         {
@@ -602,45 +608,19 @@ namespace Verdandi
             R_inv_(0, 0) = T(1);
         }
 
-        /*** Computes the minimax gain $G_t$ ***/
-
-        // Computes $\widecheck F_{t+1}$.
-	Matrix<T, General, RowMajor> F_check(Nstate_, Nprojection_);
-        vtmp.Reallocate(Nprojection_);
-        for (int i = 0; i < Nstate_; i++)
-        {
-            GetCol(projection_, i, vtmp);
-            Mlt(D_tilde_inv_(i), vtmp);
-            SetRow(vtmp, i, F_check);
-        }
-
-        // Computes $G_t$.
-        G_.Reallocate(Nprojection_, Nprojection_);
-        MltAdd(T(1), SeldonTrans, F_check, SeldonNoTrans, F_check, T(0), G_);
-
-	Matrix<T, General, RowMajor> FtU(Nprojection_, Nprevious_projection_);
-        MltAdd(T(1), SeldonTrans, F_check, SeldonNoTrans, U_check, T(0), FtU);
-        MltAdd(T(-1), SeldonNoTrans, FtU, SeldonTrans, FtU, T(1), G_);
-
-	Matrix<T, General, RowMajor> FtQ(Nprojection_, Nmode_Q_);
-        MltAdd(T(1), SeldonTrans, F_check,
-               SeldonNoTrans, Q_sqrt_check, T(0), FtQ);
-
-        mtmp.Reallocate(Nprevious_projection_, Nmode_Q_);
-        MltAdd(T(1), SeldonTrans, U_check,
-               SeldonNoTrans, Q_sqrt_check, T(0), mtmp);
-        mtmp_1 = FtQ;
-        MltAdd(T(-1), FtU, mtmp, T(1), mtmp_1);
-        mtmp.Reallocate(Nprojection_, Nmode_Q_);
-        MltAdd(T(1), mtmp_1, Vinv, T(0), mtmp);
-        MltAdd(T(-1), SeldonNoTrans, mtmp, SeldonTrans, mtmp_1, T(1), G_);
-
-        // Adds $H_{t+1}^T R_{t+1}^{-1} H_{t+1}$ to 'G_'.
+        // Computes $H_{t+1}^T R_{t+1}^{-1} H_{t+1}$.
         Matrix<T, General, RowMajor> Ht_Rinv(Nprojection_, Nobservation_);
         MltAdd(T(1), SeldonTrans, H, SeldonNoTrans, R_inv_, T(0), Ht_Rinv);
-        MltAdd(T(1), Ht_Rinv, H, T(1), G_);
 
-        /*** Computes minimax state estimation ***/
+        /*** Computes $z_t$ ***/
+
+        // Calls the model to compute $\mathcal{\widetilde M}_t(F_{t+1} B_t
+        // z_t)$.
+        vtmp.Reallocate(Nprevious_projection_);
+        Mlt(B_, z_, vtmp);
+        Vector<T> MFBz(Nstate_);
+        MltAdd(T(1), SeldonTrans, previous_projection_, vtmp, T(0), MFBz);
+        model_.ApplyOperator(MFBz, true, true);
 
         // Computes $z_t$.
         Add(T(1), e_, MFBz);
@@ -660,13 +640,39 @@ namespace Verdandi
         // Adds $H^T_{t+1} R_{t+1}^{-1} (y_{t+1} - \eta_{t+1})$.
         MltAdd(T(1), Ht_Rinv, y, T(1), z_);
 
-        // Finally computes the minimax state, with $G_{t+1}^{-1} z_{t+1}$.
+        /*** Computes the minimax gain $G_t$ ***/
+
+        // Computes $G_t$.
+        G_.Reallocate(Nprojection_, Nprojection_);
+        MltAdd(T(1), SeldonTrans, F_check, SeldonNoTrans, F_check, T(0), G_);
+
+	Matrix<T, General, RowMajor> FtU(Nprojection_, Nprevious_projection_);
+        MltAdd(T(1), SeldonTrans, F_check, SeldonNoTrans, U_check, T(0), FtU);
+        MltAdd(T(-1), SeldonNoTrans, FtU, SeldonTrans, FtU, T(1), G_);
+
+        mtmp.Reallocate(Nprevious_projection_, Nmode_Q_);
+        MltAdd(T(1), SeldonTrans, U_check,
+               SeldonNoTrans, Q_sqrt_check, T(0), mtmp);
+        mtmp_1 = FtQ;
+        MltAdd(T(-1), FtU, mtmp, T(1), mtmp_1);
+        mtmp.Reallocate(Nprojection_, Nmode_Q_);
+        MltAdd(T(1), mtmp_1, Vinv, T(0), mtmp);
+        MltAdd(T(-1), SeldonNoTrans, mtmp, SeldonTrans, mtmp_1, T(1), G_);
+
+        MltAdd(T(1), Ht_Rinv, H, T(1), G_);
+
+        /*** Computes minimax state estimation ***/
+
+        // Computes the minimax state, with $G_{t+1}^{-1} z_{t+1}$.
         state_ = z_;
         mtmp = G_;
         GetAndSolveLU(mtmp, state_);
 
         vtmp.Reallocate(Nstate_);
         MltAdd(T(1), SeldonTrans, projection_, state_, T(0), vtmp);
+        model_.SetTime(time);
+        model_.InitializeStep();
+        model_.Forward();
         model_.SetState(vtmp);
 
         if (inner_iteration_ == 0)
@@ -737,8 +743,23 @@ namespace Verdandi
         {
             output_saver_.Save(snapshot_, "snapshot");
 
-            GetSVD(snapshot_, singular_value_,
-                   left_singular_vector_, right_singular_vector_);
+            // SVD decomposition.
+            int m = snapshot_.GetM();
+            int n = snapshot_.GetN();
+            char jobl('N'), jobr('S');
+            int lwork = max(3 * min(m, n) + max(m, n), 5 * min(m, n));
+            Vector<double> work(lwork);
+            singular_value_.Reallocate(min(m, n));
+            singular_value_.Zero();
+            left_singular_vector_.Reallocate(m, n);
+            left_singular_vector_.Zero();
+            right_singular_vector_.Reallocate(0, 0);
+            int one = 1;
+            dgesvd_(&jobl, &jobr, &n, &m, snapshot_.GetData(),
+                    &n, singular_value_.GetData(),
+                    right_singular_vector_.GetData(), &one,
+                    left_singular_vector_.GetData(), &n, work.GetData(),
+                    &lwork, &lapack_info.GetInfoRef());
 
             output_saver_.Save(singular_value_, "singular_value");
             output_saver_.Save(left_singular_vector_, "left_singular_vector");
