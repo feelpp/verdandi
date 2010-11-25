@@ -158,9 +158,6 @@ namespace Verdandi
         //! Systematic error.
 	Vector<T> e_;
 
-        //! Intermediate variable to compute the state estimate.
-	Vector<T> z_;
-
         //! Observation error.
         Matrix<T, General, RowMajor> R_inv_;
         //! Systematic error in the observations.

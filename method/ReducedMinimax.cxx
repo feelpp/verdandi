@@ -443,21 +443,20 @@ namespace Verdandi
             e0(j) *= D_tilde_inv_(j);
 
         // Computes $F_0^T \widetilde D^{-\frac 12}\overline e$.
-        z_.Reallocate(Nprojection_);
-        MltAdd(T(1), SeldonTrans, F_check, e0, T(0), z_);
+        state_.Reallocate(Nprojection_);
+        MltAdd(T(1), SeldonTrans, F_check, e0, T(0), state_);
 
         // Computes $F_0^T \widecheck Q^{\frac 12} (I_{q \times q} +
         // \widecheck Q^{\frac T2} \widecheck Q^{\frac 12})^{-1} \widecheck
         // Q^{\frac T2} \widetilde D^{-\frac 12 } \overline e$.
         vtmp.Reallocate(Nmode_Q_);
         MltAdd(T(1), SeldonTrans, Q_sqrt_check, e0, T(0), vtmp);
-        MltAdd(T(-1), FtQ_IQtQinv, vtmp, T(1), z_);
+        MltAdd(T(-1), FtQ_IQtQinv, vtmp, T(1), state_);
 
         // Adds $H^T_0 R_0^{-1} (y_0 - \eta_0)$.
-        MltAdd(T(1), Ht_Rinv, y, T(1), z_);
+        MltAdd(T(1), Ht_Rinv, y, T(1), state_);
 
         // Finally computes the minimax state, with $G_0^{-1} z_0$.
-        state_ = z_;
         mtmp = G_;
         GetAndSolveLU(mtmp, state_);
 
@@ -504,6 +503,11 @@ namespace Verdandi
         Q_sqrt = model_.GetErrorVarianceSqrt();
         Nmode_Q_= Q_sqrt.GetN();
 
+        // Forecast step.
+        model_state forecast_state;
+        model_.GetState(forecast_state);
+        model_.ApplyOperator(forecast_state, true, false);
+
         // Computes $\widecheck Q_t^{\frac 12}$.
 	Matrix<T, General, RowMajor> Q_sqrt_check = Q_sqrt;
         for (int i = 0; i < Nstate_; i++)
@@ -540,6 +544,11 @@ namespace Verdandi
         GetInverse(mtmp);
         GetCholesky(mtmp);
         MltAdd(T(1), M_check, mtmp, T(0), U_check);
+
+        // Computes $\widecheck U_t^T \widecheck Q_t^{\frac 12}$.
+        Matrix<T, General, RowMajor> UtQ(Nprevious_projection_, Nmode_Q_);
+        MltAdd(T(1), SeldonTrans, U_check,
+               SeldonNoTrans, Q_sqrt_check, T(0), UtQ);
 
         // Computes $V_t$.
 	Matrix<T, General, RowMajor> IQtQinv;
@@ -612,34 +621,6 @@ namespace Verdandi
         Matrix<T, General, RowMajor> Ht_Rinv(Nprojection_, Nobservation_);
         MltAdd(T(1), SeldonTrans, H, SeldonNoTrans, R_inv_, T(0), Ht_Rinv);
 
-        /*** Computes $z_t$ ***/
-
-        // Calls the model to compute $\mathcal{\widetilde M}_t(F_{t+1} B_t
-        // z_t)$.
-        vtmp.Reallocate(Nprevious_projection_);
-        Mlt(B_, z_, vtmp);
-        Vector<T> MFBz(Nstate_);
-        MltAdd(T(1), SeldonTrans, previous_projection_, vtmp, T(0), MFBz);
-        model_.ApplyOperator(MFBz, true, true);
-
-        // Computes $z_t$.
-        Add(T(1), e_, MFBz);
-        for (int j = 0; j < Nstate_; j++)
-            MFBz(j) *= D_tilde_inv_(j);
-
-        z_.Reallocate(Nprojection_);
-        MltAdd(T(1), SeldonTrans, F_check, MFBz, T(0), z_);
-
-        vtmp.Reallocate(Nmode_Q_);
-        MltAdd(T(1), SeldonTrans, Q_sqrt_check, MFBz, T(0), vtmp);
-        MFBz.Clear();
-        vtmp_1.Reallocate(Nmode_Q_);
-        Mlt(IQtQinv, vtmp, vtmp_1);
-        MltAdd(T(-1), SeldonNoTrans, FtQ, vtmp_1, T(1), z_);
-
-        // Adds $H^T_{t+1} R_{t+1}^{-1} (y_{t+1} - \eta_{t+1})$.
-        MltAdd(T(1), Ht_Rinv, y, T(1), z_);
-
         /*** Computes the minimax gain $G_t$ ***/
 
         // Computes $G_t$.
@@ -650,29 +631,48 @@ namespace Verdandi
         MltAdd(T(1), SeldonTrans, F_check, SeldonNoTrans, U_check, T(0), FtU);
         MltAdd(T(-1), SeldonNoTrans, FtU, SeldonTrans, FtU, T(1), G_);
 
-        mtmp.Reallocate(Nprevious_projection_, Nmode_Q_);
-        MltAdd(T(1), SeldonTrans, U_check,
-               SeldonNoTrans, Q_sqrt_check, T(0), mtmp);
         mtmp_1 = FtQ;
-        MltAdd(T(-1), FtU, mtmp, T(1), mtmp_1);
-        mtmp.Reallocate(Nprojection_, Nmode_Q_);
-        MltAdd(T(1), mtmp_1, Vinv, T(0), mtmp);
-        MltAdd(T(-1), SeldonNoTrans, mtmp, SeldonTrans, mtmp_1, T(1), G_);
+        MltAdd(T(-1), FtU, UtQ, T(1), mtmp_1);
+        Matrix<T, General, RowMajor> FtQ_FtUUtQ_Vinv(Nprojection_, Nmode_Q_);
+        MltAdd(T(1), mtmp_1, Vinv, T(0), FtQ_FtUUtQ_Vinv);
+        MltAdd(T(-1), SeldonNoTrans, FtQ_FtUUtQ_Vinv, SeldonTrans, mtmp_1,
+               T(1), G_);
 
         MltAdd(T(1), Ht_Rinv, H, T(1), G_);
 
         /*** Computes minimax state estimation ***/
 
-        // Computes the minimax state, with $G_{t+1}^{-1} z_{t+1}$.
-        state_ = z_;
+        // Computes $\widecheck M_t \widehat x_t$.
+        for (int i = 0; i < Nstate_; i++)
+            forecast_state(i) *= D_tilde_inv_(i);
+
+        // $\widecheck F_{t+1}^T (\widecheck M_t \widehat x_t)$.
+        Mlt(SeldonTrans, F_check, forecast_state, state_);
+
+        // $(\widecheck F_{t+1}^T \widecheck U_t) \widecheck U_t^T
+        //  (\widecheck M_t \widehat x_t)$.
+        vtmp.Reallocate(Nprevious_projection_);
+        MltAdd(T(1), SeldonTrans, U_check, forecast_state, T(0), vtmp);
+        MltAdd(T(-1), FtU, vtmp, T(1), state_);
+
+        // $\left[ \widecheck Q_t^{\frac T2} - (\widecheck Q_t^{\frac T2}
+        //  \widecheck U_t) \widecheck U_t^T \right]
+        //  (\widecheck M_t \widehat x_t)$.
+        Matrix<T, General, RowMajor> Q_UUtQ = Q_sqrt_check;
+        MltAdd(T(-1), U_check, UtQ, T(1), Q_UUtQ);
+        vtmp.Reallocate(Nmode_Q_);
+        Mlt(SeldonTrans, Q_UUtQ, forecast_state, vtmp);
+        MltAdd(T(-1), FtQ_FtUUtQ_Vinv, vtmp, T(1), state_);
+
+        // Adds $H^T_{t+1} R_{t+1}^{-1} (y_{t+1} - \eta_{t+1})$.
+        MltAdd(T(1), Ht_Rinv, y, T(1), state_);
+
+        // Now multiplies everything by $G_{t+1}^{-1}$.
         mtmp = G_;
         GetAndSolveLU(mtmp, state_);
 
         vtmp.Reallocate(Nstate_);
         MltAdd(T(1), SeldonTrans, projection_, state_, T(0), vtmp);
-        model_.SetTime(time);
-        model_.InitializeStep();
-        model_.Forward();
         model_.SetState(vtmp);
 
         if (inner_iteration_ == 0)
