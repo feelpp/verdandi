@@ -206,6 +206,42 @@ reduced_order_unscented_kalman_filter = {
 }
 
 
+-- Simulation with assimilation using UKF.
+reduced_order_extended_kalman_filter = {
+
+   data_assimilation = {
+
+      analyze_first_step = false,
+
+   },
+
+   display = {
+
+      show_iteration = false,
+      show_time = true
+
+   },
+
+   output_saver = {
+
+      variable_list = {"state_forecast", "state_analysis"},
+      file = output_directory .. "roekf-%{name}.%{extension}",
+      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      mode = output_mode,
+      mode_scalar = output_mode_scalar
+
+   },
+
+   output = {
+
+     configuration = output_directory .. "roekf.lua",
+     log = output_directory .. "roekf_%{rank}.log"
+
+   },
+
+}
+
+
 -- Forward simulation.
 forward = {
 
