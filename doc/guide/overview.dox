@@ -15,6 +15,8 @@ In the directory <code>method/</code>, several <b>data assimilation methods</b>:
 <li> optimal interpolation (BLUE); </li>
 <li> extended Kalman filter (EKF); </li>
 <li> unscented Kalman filter (UKF); </li>
+<li> reduced order extended Kalman filter (ROEKF); </li>
+<li> reduced order unscented Kalman filter (ROUKF); </li>
 <li> base perturbation manager. </li>
 </ul>
 
@@ -28,6 +30,12 @@ ExtendedKalmanFilter.cxx <br>
 class \link Verdandi::UnscentedKalmanFilter UnscentedKalmanFilter<T, ClassModel, ClassObservationManager>\endlink <br>
 UnscentedKalmanFilter.hxx <br>
 UnscentedKalmanFilter.cxx <br>
+class \link Verdandi::ReducedOrderExtendedKalmanFilter ReducedOrderExtendedKalmanFilter<T, ClassModel, ClassObservationManager>\endlink <br>
+ReducedOrderExtendedKalmanFilter.hxx <br>
+ReducedOrderExtendedKalmanFilter.cxx <br>
+class \link Verdandi::ReducedOrderUnscentedKalmanFilter ReducedOrderUnscentedKalmanFilter<T, ClassModel, ClassObservationManager>\endlink <br>
+ReducedOrderUnscentedKalmanFilter.hxx <br>
+ReducedOrderUnscentedKalmanFilter.cxx <br>
 class \link Verdandi::BasePerturbationManager BasePerturbationManager\endlink <br>
 BasePerturbationManager.hxx <br>
 BasePerturbationManager.cxx
