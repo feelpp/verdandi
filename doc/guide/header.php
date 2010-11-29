@@ -69,7 +69,8 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "overview")
 or basename($_SERVER['REQUEST_URI'], ".php") == "optimal_interpolation"
 or basename($_SERVER['REQUEST_URI'], ".php") == "extended_kalman_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "unscented_kalman_filter"
-or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_unscented_kalman_filter")
+or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_unscented_kalman_filter"
+or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_extended_kalman_filter")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "optimal_interpolation", "Optimal Interpolation");
@@ -79,6 +80,9 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_unscented_kalman_
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "unscented_kalman_filter", "Unscented Kalman Filter");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "reduced_order_extended_kalman_filter", "Reduced Order Extended Kalman Filter");
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "reduced_order_unscented_kalman_filter", "Reduced Order Unscented Kalman Filter");
