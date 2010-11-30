@@ -97,10 +97,18 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_extended_kalman_f
 <li class="jelly"> <?php HL($file, "observations", "Observations");?>
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "observations"
-or basename($_SERVER['REQUEST_URI'], ".php") == "linear_observation_manager")
+or basename($_SERVER['REQUEST_URI'], ".php") == "linear_observation_manager"
+or basename($_SERVER['REQUEST_URI'], ".php") == "grid_to_network_observation_manager"
+or basename($_SERVER['REQUEST_URI'], ".php") == "observation_aggregator")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "linear_observation_manager", "Linear Observation Manager");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "grid_to_network_observation_manager", "Grid To Network Observation Manager");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "observation_aggregator", "Observation Aggregator");
   echo '</li> </ul>';
 } ?>
 
