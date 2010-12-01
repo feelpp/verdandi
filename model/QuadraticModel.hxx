@@ -87,7 +87,7 @@ namespace Verdandi
         //! Current time.
         double time_;
 
-        //! Temporary variable that stores Q times the state vector.
+        //! Temporary variable that stores S times the state vector.
         Vector<T> S_state_;
 
         /*** Errors ***/
