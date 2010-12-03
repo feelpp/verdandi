@@ -27,6 +27,9 @@ parametric_clamped_bar = {
         theta_force = {1., 2., 2., 4.},
         theta_stiffness = {1., 1.},
         theta_mass = {1., 1., 1., 1., 1.},
+        theta_damp = {1.},
+        alpha = 1.,
+        beta = 1.
     },
 
     error_statistics = {
