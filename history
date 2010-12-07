@@ -1,3 +1,43 @@
+Version 0.8 (2010-12-07)
+-----------
+
+* Methods
+
+- Added the reduced-order extended Kalman filter
+  ('ReducedOrderExtendedKalmanFilter').
+- Added the reduced-order unscented Kalman filter
+  ('ReducedOrderUnscentedKalmanFilter').
+- Added the reduced minimax filter ('ReducedMinimax').
+- Added support for Monte Carlo simulations ('MonteCarlo').
+- Modified 'UnscentedKalmanFilter' to manage model states of type
+  'VectorCollection'.
+
+* Observations
+
+- Improved the error management in 'LinearObservationManager'.
+- Enabled reading a sparse observation operator from file in
+  'LinearObservationManager'.
+
+* Example models
+
+- Added the model 'ParametricClampedBar'.
+
+* Miscellaneous
+
+- Added options to the SConstruct to provide Mumps and UMFPack compilation.
+- Configured Ops so that, when an error occurs, the program throws an
+  exception instead of aborting.
+- Added option '%{rank}' to the Logger definition file to enable each process
+  to have its own log file.
+
+* Bug fixes
+
+- The quadratic term was not properly computed in the method 'Forward' (and
+  therefore in 'ApplyOperator' as well) of 'QuadraticModel'.
+- The tangent linear model of 'QuadraticModel' was erroneous in case no
+  quadratic term and no linear term were defined.
+
+
 Version 0.7 (2010-09-05)
 -----------
 
