@@ -169,6 +169,7 @@ namespace Verdandi
 
         configuration.SetPrefix("reduced_minimax.output_saver.");
         output_saver_.Initialize(configuration);
+        output_saver_.Empty("forecast_state");
         output_saver_.Empty("full_analysis");
         output_saver_.Empty("reduced_analysis");
         output_saver_.Empty("projected_state");
@@ -442,6 +443,9 @@ namespace Verdandi
         for (int j = 0; j < Nstate_; j++)
             e0(j) *= D_tilde_inv_(j);
 
+        MessageHandler::Send(*this, "model", "forecast_state");
+        MessageHandler::Send(*this, "driver", "forecast_state");
+
         // Computes $F_0^T \widetilde D^{-\frac 12}\overline e$.
         state_.Reallocate(Nprojection_);
         MltAdd(T(1), SeldonTrans, F_check, e0, T(0), state_);
@@ -507,6 +511,9 @@ namespace Verdandi
         model_state forecast_state;
         model_.GetState(forecast_state);
         model_.ApplyOperator(forecast_state, true, false);
+
+        MessageHandler::Send(*this, "model", "forecast_state");
+        MessageHandler::Send(*this, "driver", "forecast_state");
 
         // Computes $\widecheck Q_t^{\frac 12}$.
 	Matrix<T, General, RowMajor> Q_sqrt_check = Q_sqrt;
@@ -899,6 +906,11 @@ namespace Verdandi
         {
             model_.GetState(state);
             output_saver_.Save(state, model_.GetTime(), "full_analysis");
+        }
+        else if (message.find("forecast_state") != string::npos)
+        {
+            model_.GetState(state);
+            output_saver_.Save(state, model_.GetTime(), "forecast_state");
         }
         else if (message.find("reduced_analysis") != string::npos)
             output_saver_.Save(state_, model_.GetTime(), "reduced_analysis");
