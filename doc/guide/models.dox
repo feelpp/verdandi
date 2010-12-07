@@ -44,14 +44,14 @@ the damp matrix and \f$F(\theta_f) = \sin(\frac{\pi t}{t_f}) M_{\theta_f} (1 ...
 
 The clamped bar model is solved numerically using a Newmark scheme (middle point) for integration in time:
 
-\f$ \ddot Y_{h + \frac{1}2} = \frac{\ddot Y_{h+1} + \ddot Y_{h} }2 =  \frac{\dot Y_{h+1} - \dot Y_{h} } {\Delta t} \f$  <br/>
-\f$ \dot Y_{h + \frac{1}2} = \frac{\dot Y_{h+1} + \dot Y_{h} }2 =  \frac{Y_{h+1} - Y_{h} } {\Delta t} \f$  <br/>
+\f$ \ddot Y_{h + \frac{1}{2}} = \frac{\ddot Y_{h+1} + \ddot Y_{h} }2 =  \frac{\dot Y_{h+1} - \dot Y_{h} } {\Delta t} \f$  <br/>
+\f$ \dot Y_{h + \frac{1}{2}} = \frac{\dot Y_{h+1} + \dot Y_{h} }2 =  \frac{Y_{h+1} - Y_{h} } {\Delta t} \f$  <br/>
 
 
 Algorithmically, it follows:
 
 \f$ \dot Y_{h + 1} = \frac{2}{\Delta t} (Y_{h+1} - Y_{h}) - \dot Y_{h} \f$  <br/>
-\f$ \left (\frac{1}2 K_{\theta_k} + \frac{1}{\Delta t} C_{\theta_c} +  \frac{2}{\Delta t^2} M_{\theta_m}) Y_{h+1} = (-\frac{1}2 K_{\theta_k} + \frac{1}{\Delta t} C_{\theta_c} + \frac{2}{\Delta t^2} M_{\theta_m}) Y_{h} + \frac{2}{\Delta t} M_{\theta_m} \dot Y_{h} + F_{h + \frac{1}2}(\theta_f) \f$  <br/>
+\f$ \left(\frac{1}2 K_{\theta_k} + \frac{1}{\Delta t} C_{\theta_c} +  \frac{2}{\Delta t^2} M_{\theta_m}\right) Y_{h+1} = (-\frac{1}2 K_{\theta_k} + \frac{1}{\Delta t} C_{\theta_c} + \frac{2}{\Delta t^2} M_{\theta_m}) Y_{h} + \frac{2}{\Delta t} M_{\theta_m} \dot Y_{h} + F_{h + \frac{1}{2}}(\theta_f) \f$  <br/>
 
 One can define several parameters:
 <ol>
