@@ -44,18 +44,22 @@ namespace Verdandi
     {
         int wait = 0;
         const size_t max_wait = 1000000;
-        int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_EXCL,
-                      S_IWRITE);
+#ifdef WIN32
+        int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_EXCL);
+#else
+        int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_EXCL, 0200);
+#endif
         while (fd < 0)
             if (errno == EEXIST && wait++ < int(max_wait))
             {
 #ifdef WIN32
                 Sleep(1000000);
+                fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_EXCL);
 #else
                 usleep(1000000);
-#endif
                 fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_EXCL,
-                          S_IWRITE);
+                          0200);
+#endif
             }
             else
                 return false;
