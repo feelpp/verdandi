@@ -1644,8 +1644,9 @@ namespace Verdandi
     /*!
       \return The inverse of the matrix of the observation error covariance.
     */
+    template <class T>
     const typename GridToNetworkObservationManager<T>::error_variance&
-    GridToNetworkObservationManager<T>::GetErrorVariance() const
+    GridToNetworkObservationManager<T>::GetErrorVarianceInverse() const
     {
         throw ErrorUndefined(
             "const typename"

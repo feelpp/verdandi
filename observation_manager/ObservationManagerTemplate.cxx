@@ -303,7 +303,7 @@ namespace Verdandi
       \return The inverse of the matrix of the observation error covariance.
     */
     const ObservationManagerTemplate::error_variance&
-    ObservationManagerTemplate::GetErrorVariance() const
+    ObservationManagerTemplate::GetErrorVarianceInverse() const
     {
         throw ErrorUndefined(
             "const typename"
