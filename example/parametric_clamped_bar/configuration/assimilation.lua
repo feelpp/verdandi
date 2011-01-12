@@ -153,7 +153,7 @@ unscented_kalman_filter = {
 }
 
 
--- Simulation with assimilation using UKF.
+-- Simulation with assimilation using ROUKF.
 reduced_order_unscented_kalman_filter = {
 
    data_assimilation = {
@@ -206,7 +206,7 @@ reduced_order_unscented_kalman_filter = {
 }
 
 
--- Simulation with assimilation using UKF.
+-- Simulation with assimilation using ROEKF.
 reduced_order_extended_kalman_filter = {
 
    data_assimilation = {
