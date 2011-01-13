@@ -20,8 +20,7 @@
 #ifndef VERDANDI_FILE_METHOD_MONTECARLO_HXX
 
 
-#include "BasePerturbationManager.cxx"
-#include "NewranPerturbationManager.cxx"
+#include "NewranPerturbationManager.hxx"
 
 
 namespace Verdandi
@@ -59,8 +58,8 @@ namespace Verdandi
 
         //! Iteration.
         int iteration_;
-        //! Date vector.
-        Vector<double> date_;
+        //! Time vector.
+        Vector<double> time_;
 
         /*** Configuration ***/
 
@@ -71,8 +70,8 @@ namespace Verdandi
 
         //! Should the iterations be displayed?
         bool show_iteration_;
-        //! Should the current date be displayed?
-        bool show_date_;
+        //! Should the current time be displayed?
+        bool show_time_;
 
         /*** Output saver ***/
 
@@ -95,13 +94,14 @@ namespace Verdandi
         template <class T0, class Storage0, class Allocator0>
         void SetDimension(Vector<T0, Storage0, Allocator0>& in,
                           Vector<T0, Storage0, Allocator0>& out);
-
         template <class T0, class Allocator0>
         void SetDimension(Vector<T0, Collection, Allocator0>& in,
                           Vector<T0, Collection, Allocator0>& out);
 
         template <class T0, class Allocator0>
         void Fill(Vector<T0, Collection, Allocator0>& in, string pdf);
+        template <class T0, class Storage0, class Allocator0>
+        void Fill(Vector<T0, Storage0, Allocator0>& in, string pdf);
 
         void Initialize();
         void InitializeStep();

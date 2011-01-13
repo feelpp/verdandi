@@ -21,6 +21,8 @@
 
 
 #include "MonteCarlo.hxx"
+#include "NewranPerturbationManager.cxx"
+
 
 namespace Verdandi
 {
@@ -63,8 +65,8 @@ namespace Verdandi
 
         // Should the iteration be displayed on screen?
         configuration.Set("display.show_iteration", show_iteration_);
-        // Should the date be displayed on screen?
-        configuration.Set("display.show_date", show_date_);
+        // Should the time be displayed on screen?
+        configuration.Set("display.show_time", show_time_);
 
         /*** Ouput saver ***/
 
@@ -167,7 +169,7 @@ namespace Verdandi
     }
 
 
-    /*! Fills an input vector collection according to its probability
+    /*! \brief Fills an input vector collection according to its probability
       distribution. */
     /*!
       \param[in,out] in input collection vector.
@@ -189,6 +191,25 @@ namespace Verdandi
     }
 
 
+    /*! \brief Fills an input vector according to its probability
+      distribution. */
+    /*!
+      \param[in,out] in input vector.
+      \param[in] pdf probability density function: Normal, NormalHomogeneous,
+      LogNormal or LogNormalHomogeneous.
+    */
+    template <class T, class ClassModel>
+    template <class T0, class Storage0, class Allocator0>
+    void MonteCarlo<T, ClassModel>
+    ::Fill(Vector<T0, Storage0, Allocator0>& in, string pdf)
+    {
+        if (pdf == "Normal" || pdf == "NormalHomogeneous")
+            in.Fill(T0(0));
+        else if (pdf == "LogNormal" || pdf == "LogNormalHomogeneous")
+            in.Fill(T0(1));
+    }
+
+
     //! Initializes the simulation.
     /*! Initializes the model and the perturbation manager. */
     template <class T, class ClassModel>
@@ -196,10 +217,10 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
-        if (show_date_)
-            Logger::StdOut(*this, "Date: " + to_str(model_.GetDate()));
+        if (show_time_)
+            Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
-            Logger::Log<-3>(*this, "Date: " + to_str(model_.GetDate()));
+            Logger::Log<-3>(*this, "Time: " + to_str(model_.GetTime()));
         if (show_iteration_)
             Logger::StdOut(*this, "Initialization");
         else
@@ -207,7 +228,7 @@ namespace Verdandi
 
         model_.Initialize(model_configuration_file_);
 
-        perturbation_manager_.Initialize(configuration_file);
+        perturbation_manager_.Initialize(model_configuration_file_);
 
         iteration_ = 0;
 
@@ -305,12 +326,12 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
-        date_.PushBack(model_.GetDate());
+        time_.PushBack(model_.GetTime());
 
-        if (show_date_)
-            Logger::StdOut(*this, "Date: " + to_str(model_.GetDate()));
+        if (show_time_)
+            Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
-            Logger::Log<-3>(*this, "Date: " + to_str(model_.GetDate()));
+            Logger::Log<-3>(*this, "Time: " + to_str(model_.GetTime()));
         if (show_iteration_)
             Logger::StdOut(*this, "Iteration " + to_str(iteration_) + " -> "
                            + to_str(iteration_ + 1));
@@ -388,7 +409,7 @@ namespace Verdandi
         {
             model_state state;
             model_.GetState(state);
-            output_saver_.Save(state, model_.GetDate(), "state_forecast");
+            output_saver_.Save(state, model_.GetTime(), "state_forecast");
         }
     }
 
