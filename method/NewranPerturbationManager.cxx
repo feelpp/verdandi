@@ -24,7 +24,7 @@
 
 
 #include "NewranPerturbationManager.hxx"
-#include "newran.h"
+#include "BasePerturbationManager.cxx"
 #include "share/LockFile.cxx"
 
 namespace Verdandi

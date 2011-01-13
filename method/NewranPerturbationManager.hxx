@@ -22,6 +22,7 @@
 
 #ifndef VERDANDI_FILE_METHOD_NEWRANPERTURBATIONMANAGER_HXX
 
+#include "BasePerturbationManager.hxx"
 #include "newran.h"
 
 namespace Verdandi
