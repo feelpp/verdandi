@@ -53,6 +53,7 @@ namespace Verdandi
         typedef Vector<T> state;
         typedef Matrix<T> matrix_state_observation;
         typedef Matrix<T> error_variance;
+        typedef Vector<T> uncertain_variable;
 
     protected:
 
@@ -89,6 +90,26 @@ namespace Verdandi
 
         //! Temporary variable that stores S times the state vector.
         Vector<T> S_state_;
+
+        /*** Uncertainty ***/
+
+        //! Correlations between the uncertain variables.
+        Vector<T> correlation_;
+
+        //! Name of the probability distribution of 'b_'.
+        string b_pdf_;
+
+        //! Mean of 'b_'.
+        Vector<T> b_mean_;
+
+        //! Covariance matrix for 'b_'.
+        Matrix<T, Symmetric, RowSymPacked> b_variance_;
+
+        //! PDF parameters for 'b_'.
+        Vector<T> b_parameter_;
+
+        //! Perturbation option for 'b_'.
+        string b_option_;
 
         /*** Errors ***/
 
@@ -136,6 +157,13 @@ namespace Verdandi
         void SetState(const state& state);
         void GetFullState(state& state) const;
         void SetFullState(const state& state);
+        int GetNuncertain();
+        uncertain_variable& GetUncertainVariable(int i);
+        Vector<T>& GetPDFCorrelation(int i);
+        string GetPDF(int i);
+        Matrix<T, Symmetric, RowSymPacked>& GetPDFVariance(int i);
+        Vector<T>& GetPDFParameter(int i);
+        string GetPerturbationOption(int i);
 
         // Errors.
         error_variance& GetErrorVariance();
