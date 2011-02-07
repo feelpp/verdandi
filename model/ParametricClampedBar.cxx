@@ -908,6 +908,11 @@ namespace Verdandi
             mass_matrix_.Val(i, i + 1) += theta(theta_index(i))
                 * mass_FEM_matrix_(0, 1);
         }
+
+        // Boundary condition by pseudo-elimination.
+        mass_matrix_.Val(0, 0) = 1;
+        mass_matrix_.Val(0, 1) = 0;
+        mass_matrix_.Val(1, 0) = 0;
     }
 
 
@@ -971,10 +976,11 @@ namespace Verdandi
                 * theta_stiffness_(theta_stiffness_index_(i));
         }
 
-        // Dirichlet conditions (should be better to read in the skeleton).
+        // Boundary condition by pseudo-elimination.
         Newmark_matrix_1_.Val(0, 0) = 1;
         Newmark_matrix_1_.Val(0, 1) = 0;
         Newmark_matrix_1_.Val(1, 0) = 0;
+
     }
 
 
@@ -986,7 +992,6 @@ namespace Verdandi
         Fill(T(0), damp_matrix_);
         for (int i = 0; i < Nx_; i++)
         {
-            // Newmark's matrix at time n+1.
             damp_matrix_.Val(i, i) +=
                 theta_damp_(theta_damp_index_(i)) *
                 alpha_ * mass_FEM_matrix_(0, 0) +
@@ -1003,6 +1008,11 @@ namespace Verdandi
                 beta_ * stiffness_FEM_matrix_(0, 1)
                 * theta_damp_(theta_damp_index_(i));
         }
+
+        // Boundary condition by pseudo-elimination.
+        damp_matrix_.Val(0, 0) = 1;
+        damp_matrix_.Val(0, 1) = 0;
+        damp_matrix_.Val(1, 0) = 0;
     }
 
 
