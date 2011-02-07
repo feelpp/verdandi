@@ -82,7 +82,7 @@ namespace Verdandi
 
         // Access methods.
         double GetTime() const;
-        void SetTime(double& time);
+        void SetTime(double time);
         int GetNstate() const;
         void GetState(state& state);
         void SetState(state& state);

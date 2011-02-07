@@ -163,9 +163,9 @@ namespace Verdandi
     /*!
       \param[in] time a given time.
     */
-    void ModelTemplate::SetTime(double& time)
+    void ModelTemplate::SetTime(double time)
     {
-        throw ErrorUndefined("ModelTemplate::SetTime(double& time)");
+        throw ErrorUndefined("ModelTemplate::SetTime(double time)");
     }
 
 

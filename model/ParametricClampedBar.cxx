@@ -643,7 +643,7 @@ namespace Verdandi
       \param[in] time a given time.
     */
     template <class T>
-    void ParametricClampedBar<T>::SetTime(double& time)
+    void ParametricClampedBar<T>::SetTime(double time)
     {
         time_= time;
     }
