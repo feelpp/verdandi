@@ -353,10 +353,9 @@ namespace Verdandi
         if (update_force)
         {
             AssembleMassMatrix(theta_force_, theta_force_index_);
-
             state ones(Ndof_);
             ones.Fill(T(1));
-            MltAdd(T(sin(Pi_ * time_ / final_time_)),
+            MltAdd(T(sin(Pi_ * (time_ + 0.5 * Delta_t_) / final_time_)),
                    mass_matrix_, ones, T(0), force_);
             force_(0) = T(0);
         }
@@ -546,7 +545,7 @@ namespace Verdandi
             AssembleMassMatrix(theta_force_, theta_force_index_);
             state ones(Ndof_);
             ones.Fill(T(1));
-            MltAdd(T(sin(Pi_ * time_ / final_time_)),
+            MltAdd(T(sin(Pi_ * (time_ + 0.5 * Delta_t_) / final_time_)),
                    mass_matrix_, ones, T(0), force);
             force(0) = T(0);
         }
