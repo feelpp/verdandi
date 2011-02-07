@@ -138,10 +138,24 @@ namespace Verdandi
                 Copy(tmp, tangent_operator_matrix_);
             }
             else
-                throw ErrorUndefined("LinearObservationManager::Initialize()",
-                                     "For a sparse operator, only scaled "
-                                     "identity matrices and file definitions "
-                                     "are supported.");
+            {
+                Matrix<T> tmp;
+                configuration.Set("operator.value", tmp);
+                if (tmp.GetN() % model.GetNstate() != 0)
+                    throw ErrorArgument("LinearObservationManager"
+                                        "::Initialize()",
+                                        "The total number of elements in the "
+                                        "tangent operator matrix ("
+                                        + to_str(tangent_operator_matrix_
+                                                 .GetN())
+                                        + ") is not a multiple of the"
+                                        " dimension of the model state ("
+                                        + to_str(model.GetNstate()) + ").");
+                tmp.Resize(tmp.GetN() / model.GetNstate(), model.GetNstate());
+                Matrix<T, General, ArrayRowSparse> tmp_array;
+                ConvertDenseToArrayRowSparse(tmp, tmp_array);
+                Copy(tmp_array, tangent_operator_matrix_);
+            }
             if (tangent_operator_matrix_.GetN() != model.GetNstate())
                 throw ErrorArgument("LinearObservationManager::Initialize()",
                                     "The number of columns of the tangent "
