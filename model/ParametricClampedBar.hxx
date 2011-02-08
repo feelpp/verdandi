@@ -94,8 +94,6 @@ namespace Verdandi
         double time_;
         //! Simulation duration.
         double final_time_;
-        //! Simulation times.
-        vector<double> time_vector_;
         //! Mass parameter.
         double mass_density_;
         //! Young's Modulus.

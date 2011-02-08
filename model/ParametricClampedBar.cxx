@@ -346,7 +346,6 @@ namespace Verdandi
         /*** Update time ***/
 
         time_ += Delta_t_;
-        time_vector_.push_back(time_);
 
         /*** Right hand side ***/
 
