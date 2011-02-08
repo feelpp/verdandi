@@ -855,35 +855,9 @@ namespace Verdandi
     ::BuildRegionIndex(int N, int Nregion, Vector<int>& index_vector)
     {
         index_vector.Reallocate(N);
-        int local_i, index, r, q;
-        local_i = 0;
-        index = 0 ;
-        r = N % Nregion;
-        q = int(N / Nregion);
-        for (int i = 0; i < N; i++)
-        {
-            if (local_i < q)
-            {
-                index_vector(i) = index;
-                local_i++;
-            }
-            else
-            {
-                if (r != 0)
-                {
-                    index_vector(i) = index;
-                    index++;
-                    r--;
-                    local_i = 0;
-                }
-                else
-                {
-                    index++;
-                    index_vector(i) = index;
-                    local_i = 1;
-                }
-            }
-        }
+        for(int i = 0; i < N; i++)
+            index_vector(i) = i % Nregion;
+        Sort(index_vector);
     }
 
 
