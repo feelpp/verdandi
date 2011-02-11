@@ -317,7 +317,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::SetAvailableTime(double time, LinearObservationManager<T>::time_vector&
+    ::SetAvailableTime(double time, time_vector&
                        available_time)
     {
         double time_inf, time_sup;
@@ -344,8 +344,7 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::SetAvailableTime(double time_inf, double time_sup,
-                       LinearObservationManager<T>::time_vector&
-                       available_time)
+                       time_vector& available_time)
     {
         available_time.Clear();
         double period = Delta_t_ * Nskip_;
@@ -372,8 +371,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::SetAvailableTime(double time, double time_inf, double time_sup,
                        int selection_policy,
-                       LinearObservationManager<T>::time_vector&
-                       available_time)
+                       time_vector& available_time)
     {
         available_time.Clear();
         time_inf = time_inf > initial_time_ ? time_inf : initial_time_;
@@ -502,8 +500,7 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetFlattenedObservation(double time,
-                              LinearObservationManager<T>::observation_vector&
-                              observation)
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -521,8 +518,7 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetFlattenedObservation(double time_inf, double time_sup,
-                              LinearObservationManager<T>::observation_vector&
-                              observation)
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -536,8 +532,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(
-        LinearObservationManager<T>::observation_vector& observation)
+    ::GetFlattenedObservation(observation_vector& observation)
     {
         GetFlattenedObservation(available_time_, observation);
     }
@@ -551,10 +546,8 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(const LinearObservationManager<T>::time_vector&
-                              available_time,
-                              LinearObservationManager<T>::observation_vector&
-                              observation)
+    ::GetFlattenedObservation(const time_vector& available_time,
+                              observation_vector& observation)
     {
         observation_vector2 observation2;
         GetRawObservation(available_time, observation2);
@@ -576,10 +569,8 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetFlattenedObservation(double time,
-                              LinearObservationManager<T>::variable_vector&
-                              observation_variable,
-                              LinearObservationManager<T>::observation_vector&
-                              observation)
+                              variable_vector& observation_variable,
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -600,10 +591,8 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetFlattenedObservation(double time_inf, double time_sup,
-                              LinearObservationManager<T>::variable_vector&
-                              observation_variable,
-                              LinearObservationManager<T>::observation_vector&
-                              observation)
+                              variable_vector& observation_variable,
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -620,9 +609,8 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::observation_vector& observation)
+    ::GetFlattenedObservation(variable_vector& observation_variable,
+                              observation_vector& observation)
     {
         GetFlattenedObservation(available_time_, observation_variable,
                                 observation);
@@ -639,12 +627,9 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(const LinearObservationManager<T>::time_vector&
-                              available_time,
-                              LinearObservationManager<T>::variable_vector&
-                              observation_variable,
-                              LinearObservationManager<T>::observation_vector&
-                              observation)
+    ::GetFlattenedObservation(const time_vector& available_time,
+                              variable_vector& observation_variable,
+                              observation_vector& observation)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
@@ -670,12 +655,9 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetFlattenedObservation(double time,
-                              LinearObservationManager<T>::variable_vector&
-                              observation_variable,
-                              LinearObservationManager<T>::index_vector&
-                              observation_index,
-                              LinearObservationManager<T>::observation_vector&
-                              observation)
+                              variable_vector& observation_variable,
+                              index_vector& observation_index,
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -697,12 +679,9 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetFlattenedObservation(double time_inf, double time_sup,
-                              LinearObservationManager<T>::variable_vector&
-                              observation_variable,
-                              LinearObservationManager<T>::index_vector&
-                              observation_index,
-                              LinearObservationManager<T>::observation_vector&
-                              observation)
+                              variable_vector& observation_variable,
+                              index_vector& observation_index,
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -720,10 +699,9 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetFlattenedObservation(
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::index_vector& observation_index,
-        LinearObservationManager<T>::observation_vector& observation)
+    ::GetFlattenedObservation(variable_vector& observation_variable,
+                              index_vector& observation_index,
+                              observation_vector& observation)
     {
         GetFlattenedObservation(available_time_, observation_variable,
                                 observation_index, observation);
@@ -742,10 +720,10 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetFlattenedObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::index_vector& observation_index,
-        LinearObservationManager<T>::observation_vector& observation)
+        const time_vector& available_time,
+        variable_vector& observation_variable,
+        index_vector& observation_index,
+        observation_vector& observation)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
@@ -776,7 +754,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
         double time,
-        LinearObservationManager<T>::observation_vector& observation)
+        observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -795,7 +773,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
         double time_inf, double time_sup,
-        LinearObservationManager<T>::observation_vector& observation)
+        observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -810,8 +788,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetAggregatedObservation(
-        LinearObservationManager<T>::observation_vector& observation)
+    ::GetAggregatedObservation(observation_vector& observation)
     {
         GetAggregatedObservation(available_time_, observation);
     }
@@ -825,9 +802,8 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetAggregatedObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::observation_vector& observation)
+    ::GetAggregatedObservation(const time_vector& available_time,
+                               observation_vector& observation)
     {
         observation_vector2 observation2;
         GetRawObservation(available_time, observation2);
@@ -851,8 +827,8 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
         double time,
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        variable_vector& observation_variable,
+        observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -874,8 +850,8 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
         double time_inf, double time_sup,
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        variable_vector& observation_variable,
+        observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -893,9 +869,8 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetAggregatedObservation(
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(variable_vector& observation_variable,
+                               observation_vector2& observation2)
     {
         GetAggregatedObservation(available_time_, observation_variable,
                                  observation2);
@@ -912,10 +887,9 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetAggregatedObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(const time_vector& available_time,
+                               variable_vector& observation_variable,
+                               observation_vector2& observation2)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
@@ -947,9 +921,9 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
         double time,
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::index_vector2& observation_index2,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        variable_vector& observation_variable,
+        index_vector2& observation_index2,
+        observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -972,9 +946,9 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
         double time_inf, double time_sup,
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::index_vector2& observation_index2,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        variable_vector& observation_variable,
+        index_vector2& observation_index2,
+        observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -994,9 +968,9 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::index_vector2& observation_index2,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        variable_vector& observation_variable,
+        index_vector2& observation_index2,
+        observation_vector2& observation2)
     {
         GetAggregatedObservation(available_time_, observation_variable,
                                  observation_index2, observation2);
@@ -1015,10 +989,10 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetAggregatedObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::variable_vector& observation_variable,
-        LinearObservationManager<T>::index_vector2& observation_index2,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        const time_vector& available_time,
+        variable_vector& observation_variable,
+        index_vector2& observation_index2,
+        observation_vector2& observation2)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
@@ -1054,7 +1028,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetRawObservation(
         double time,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -1072,7 +1046,7 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetRawObservation(
         double time_inf, double time_sup,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -1086,8 +1060,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetRawObservation(
-        LinearObservationManager<T>::observation_vector2& observation2)
+    ::GetRawObservation(observation_vector2& observation2)
     {
         GetRawObservation(available_time_, observation2);
     }
@@ -1101,8 +1074,8 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::observation_vector2& observation2)
+        const time_vector& available_time,
+        observation_vector2& observation2)
     {
         ReadObservation(available_time, observation2);
     }
@@ -1122,8 +1095,8 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetRawObservation(
         double time,
-        LinearObservationManager<T>::variable_vector2& observation_variable2,
-        LinearObservationManager<T>::observation_vector3& observation3)
+        variable_vector2& observation_variable2,
+        observation_vector3& observation3)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -1144,8 +1117,8 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetRawObservation(
         double time_inf, double time_sup,
-        LinearObservationManager<T>::variable_vector2& observation_variable2,
-        LinearObservationManager<T>::observation_vector3& observation3)
+        variable_vector2& observation_variable2,
+        observation_vector3& observation3)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -1164,8 +1137,8 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        LinearObservationManager<T>::variable_vector2& observation_variable2,
-        LinearObservationManager<T>::observation_vector3& observation3)
+        variable_vector2& observation_variable2,
+        observation_vector3& observation3)
     {
         GetRawObservation(available_time_, observation_variable2,
                           observation3);
@@ -1182,9 +1155,9 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::variable_vector2& observation_variable2,
-        LinearObservationManager<T>::observation_vector3& observation3)
+        const time_vector& available_time,
+        variable_vector2& observation_variable2,
+        observation_vector3& observation3)
     {
         ReadObservationVariable(available_time, observation_variable2);
         ReadObservation(available_time, observation_variable2, observation3);
@@ -1206,9 +1179,9 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetRawObservation(
         double time,
-        LinearObservationManager<T>::variable_vector2& observation_variable2,
-        LinearObservationManager<T>::index_vector3& observation_index3,
-        LinearObservationManager<T>::observation_vector3& observation3)
+        variable_vector2& observation_variable2,
+        index_vector3& observation_index3,
+        observation_vector3& observation3)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -1230,9 +1203,9 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetRawObservation(
         double time_inf, double time_sup,
-        LinearObservationManager<T>::variable_vector2& observation_variable2,
-        LinearObservationManager<T>::index_vector3& observation_index3,
-        LinearObservationManager<T>::observation_vector3& observation3)
+        variable_vector2& observation_variable2,
+        index_vector3& observation_index3,
+        observation_vector3& observation3)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -1252,9 +1225,9 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        LinearObservationManager<T>::variable_vector2& observation_variable2,
-        LinearObservationManager<T>::index_vector3& observation_index3,
-        LinearObservationManager<T>::observation_vector3& observation3)
+        variable_vector2& observation_variable2,
+        index_vector3& observation_index3,
+        observation_vector3& observation3)
     {
         GetRawObservation(available_time_, observation_variable2,
                           observation_index3, observation3);
@@ -1272,10 +1245,10 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetRawObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::variable_vector2& observation_variable2,
-        LinearObservationManager<T>::index_vector3& observation_index3,
-        LinearObservationManager<T>::observation_vector3& observation3)
+        const time_vector& available_time,
+        variable_vector2& observation_variable2,
+        index_vector3& observation_index3,
+        observation_vector3& observation3)
     {
         ReadObservationVariable(available_time, observation_variable2);
         ReadObservation(available_time, observation_variable2, observation3);
@@ -1298,8 +1271,8 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservationVariable(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::variable_vector2& observation_variable2)
+        const time_vector& available_time,
+        variable_vector2& observation_variable2)
         const
     {
         int Nt = available_time.GetSize();
@@ -1319,10 +1292,10 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        const LinearObservationManager<T>::variable_vector2&
+        const time_vector& available_time,
+        const variable_vector2&
         observation_variable2,
-        LinearObservationManager<T>::observation_vector3& observation3) const
+        observation_vector3& observation3) const
     {
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
@@ -1361,8 +1334,8 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservation(
-        const LinearObservationManager<T>::time_vector& available_time,
-        LinearObservationManager<T>::observation_vector2& observation2) const
+        const time_vector& available_time,
+        observation_vector2& observation2) const
     {
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
@@ -1395,7 +1368,7 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservation(ifstream& file_stream, double time, int variable,
-                      LinearObservationManager<T>::observation_vector&
+                      observation_vector&
                       observation) const
     {
         observation.Reallocate(Nobservation_);
@@ -1454,10 +1427,10 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::ReadObservationIndex(
-        const LinearObservationManager<T>::time_vector& available_time,
-        const LinearObservationManager<T>::variable_vector2&
+        const time_vector& available_time,
+        const variable_vector2&
         observation_variable2,
-        LinearObservationManager<T>::index_vector3& observation_index3) const
+        index_vector3& observation_index3) const
     {
         int Nvariable, Nt;
         Nt = available_time.GetSize();
@@ -1544,7 +1517,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetObservation(LinearObservationManager<T>::observation& observation)
+    ::GetObservation(observation& observation)
     {
         GetAggregatedObservation(observation);
     }
@@ -1564,7 +1537,7 @@ namespace Verdandi
     template <class state>
     void LinearObservationManager<T>
     ::GetInnovation(const state& x,
-                    LinearObservationManager<T>::observation& innovation)
+                    observation& innovation)
     {
         innovation.Reallocate(Nobservation_);
         observation observation;
@@ -1678,7 +1651,7 @@ namespace Verdandi
     template <class state>
     void LinearObservationManager<T>
     ::ApplyOperator(const state& x,
-                    LinearObservationManager<T>::observation& y) const
+                    observation& y) const
     {
         if (x.GetSize() == 0)
             return;
@@ -1704,7 +1677,7 @@ namespace Verdandi
     template <class state>
     void LinearObservationManager<T>
     ::ApplyTangentLinearOperator(const state& x,
-                                 LinearObservationManager<T>::observation& y)
+                                 observation& y)
         const
     {
         ApplyOperator(x, y);
@@ -1789,7 +1762,7 @@ namespace Verdandi
     template <class state>
     void LinearObservationManager<T>
     ::ApplyAdjointOperator(const state& x,
-                           LinearObservationManager<T>::observation& y) const
+                           observation& y) const
     {
         if (operator_scaled_identity_)
         {

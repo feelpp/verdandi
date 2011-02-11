@@ -284,7 +284,7 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::SetAvailableTime(double time,
-                       GridToNetworkObservationManager<T>::time_vector&
+                       time_vector&
                        available_time) const
     {
         double time_inf, time_sup;
@@ -309,7 +309,7 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::SetAvailableTime(double time_inf, double time_sup,
-                       GridToNetworkObservationManager<T>::time_vector&
+                       time_vector&
                        available_time) const
     {
         available_time.Clear();
@@ -343,9 +343,7 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double time,
-                              GridToNetworkObservationManager<T>
-                              ::observation_vector&
-                              observation)
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -363,9 +361,7 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double time_inf, double time_sup,
-                              GridToNetworkObservationManager<T>
-                              ::observation_vector&
-                              observation)
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -379,8 +375,7 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+    ::GetFlattenedObservation(observation_vector& observation)
     {
         GetFlattenedObservation(available_time_, observation);
     }
@@ -394,12 +389,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(const GridToNetworkObservationManager<T>
-                              ::time_vector&
-                              available_time,
-                              GridToNetworkObservationManager<T>
-                              ::observation_vector&
-                              observation)
+    ::GetFlattenedObservation(const time_vector& available_time,
+                              observation_vector& observation)
     {
         observation_vector2 observation2;
         GetRawObservation(available_time, observation2);
@@ -421,12 +412,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double time,
-                              GridToNetworkObservationManager<T>
-                              ::variable_vector&
-                              observation_variable,
-                              GridToNetworkObservationManager<T>
-                              ::observation_vector&
-                              observation)
+                              variable_vector& observation_variable,
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -447,12 +434,8 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double time_inf, double time_sup,
-                              GridToNetworkObservationManager<T>
-                              ::variable_vector&
-                              observation_variable,
-                              GridToNetworkObservationManager<T>
-                              ::observation_vector&
-                              observation)
+                              variable_vector& observation_variable,
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -469,11 +452,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>
-        ::observation_vector& observation)
+    ::GetFlattenedObservation(variable_vector& observation_variable,
+                              observation_vector& observation)
     {
         GetFlattenedObservation(available_time_, observation_variable,
                                 observation);
@@ -490,15 +470,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(const GridToNetworkObservationManager<T>
-                              ::time_vector&
-                              available_time,
-                              GridToNetworkObservationManager<T>
-                              ::variable_vector&
-                              observation_variable,
-                              GridToNetworkObservationManager<T>
-                              ::observation_vector&
-                              observation)
+    ::GetFlattenedObservation(const time_vector& available_time,
+                              variable_vector& observation_variable,
+                              observation_vector& observation)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
@@ -524,15 +498,9 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double time,
-                              GridToNetworkObservationManager<T>
-                              ::variable_vector&
-                              observation_variable,
-                              GridToNetworkObservationManager<T>
-                              ::index_vector&
-                              observation_index,
-                              GridToNetworkObservationManager<T>
-                              ::observation_vector&
-                              observation)
+                              variable_vector& observation_variable,
+                              index_vector& observation_index,
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -554,15 +522,9 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetFlattenedObservation(double time_inf, double time_sup,
-                              GridToNetworkObservationManager<T>
-                              ::variable_vector&
-                              observation_variable,
-                              GridToNetworkObservationManager<T>
-                              ::index_vector&
-                              observation_index,
-                              GridToNetworkObservationManager<T>
-                              ::observation_vector&
-                              observation)
+                              variable_vector& observation_variable,
+                              index_vector& observation_index,
+                              observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -580,13 +542,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>
-        ::index_vector& observation_index,
-        GridToNetworkObservationManager<T>
-        ::observation_vector& observation)
+    ::GetFlattenedObservation(variable_vector& observation_variable,
+                              index_vector& observation_index,
+                              observation_vector& observation)
     {
         GetFlattenedObservation(available_time_, observation_variable,
                                 observation_index, observation);
@@ -604,13 +562,10 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetFlattenedObservation(
-        const GridToNetworkObservationManager<T>
-        ::time_vector& available_time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::index_vector& observation_index,
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+    ::GetFlattenedObservation(const time_vector& available_time,
+                              variable_vector& observation_variable,
+                              index_vector& observation_index,
+                              observation_vector& observation)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
@@ -639,9 +594,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        double time,
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+    ::GetAggregatedObservation(double time,
+                               observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -658,9 +612,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        double time_inf, double time_sup,
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+    ::GetAggregatedObservation(double time_inf, double time_sup,
+                               observation_vector& observation)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -675,8 +628,7 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+    ::GetAggregatedObservation(observation_vector& observation)
     {
         GetAggregatedObservation(available_time_, observation);
     }
@@ -690,9 +642,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        const GridToNetworkObservationManager<T>::time_vector& available_time,
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+    ::GetAggregatedObservation(const time_vector& available_time,
+                               observation_vector& observation)
     {
         observation_vector2 observation2;
         GetRawObservation(available_time, observation2);
@@ -714,11 +665,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        double time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(double time,
+                               variable_vector& observation_variable,
+                               observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -738,11 +687,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        double time_inf, double time_sup,
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(double time_inf, double time_sup,
+                               variable_vector& observation_variable,
+                               observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -760,10 +707,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(variable_vector& observation_variable,
+                               observation_vector2& observation2)
     {
         GetAggregatedObservation(available_time_, observation_variable,
                                  observation2);
@@ -780,11 +725,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        const GridToNetworkObservationManager<T>::time_vector& available_time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(const time_vector& available_time,
+                               variable_vector& observation_variable,
+                               observation_vector2& observation2)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
@@ -814,12 +757,10 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        double time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::index_vector2& observation_index2,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(double time,
+                               variable_vector& observation_variable,
+                               index_vector2& observation_index2,
+                               observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -840,12 +781,10 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        double time_inf, double time_sup,
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::index_vector2& observation_index2,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(double time_inf, double time_sup,
+                               variable_vector& observation_variable,
+                               index_vector2& observation_index2,
+                               observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -864,11 +803,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::index_vector2& observation_index2,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(variable_vector& observation_variable,
+                               index_vector2& observation_index2,
+                               observation_vector2& observation2)
     {
         GetAggregatedObservation(available_time_, observation_variable,
                                  observation_index2, observation2);
@@ -886,12 +823,10 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetAggregatedObservation(
-        const GridToNetworkObservationManager<T>::time_vector& available_time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector& observation_variable,
-        GridToNetworkObservationManager<T>::index_vector2& observation_index2,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetAggregatedObservation(const time_vector& available_time,
+                               variable_vector& observation_variable,
+                               index_vector2& observation_index2,
+                               observation_vector2& observation2)
     {
         observation_vector3 observation3;
         variable_vector2 observation_variable2;
@@ -925,9 +860,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        double time,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetRawObservation(double time,
+                        observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -943,9 +877,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        double time_inf, double time_sup,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetRawObservation(double time_inf, double time_sup,
+                        observation_vector2& observation2)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -959,8 +892,7 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetRawObservation(observation_vector2& observation2)
     {
         GetRawObservation(available_time_, observation2);
     }
@@ -973,9 +905,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        const GridToNetworkObservationManager<T>::time_vector& available_time,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::GetRawObservation(const time_vector& available_time,
+                        observation_vector2& observation2)
     {
         ReadObservation(available_time, observation2);
     }
@@ -993,11 +924,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        double time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+    ::GetRawObservation(double time,
+                        variable_vector2& observation_variable2,
+                        observation_vector3& observation3)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -1016,11 +945,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        double time_inf, double time_sup,
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+    ::GetRawObservation(double time_inf, double time_sup,
+                        variable_vector2& observation_variable2,
+                        observation_vector3& observation3)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -1038,10 +965,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+    ::GetRawObservation(variable_vector2& observation_variable2,
+                        observation_vector3& observation3)
     {
         GetRawObservation(available_time_, observation_variable2,
                           observation3);
@@ -1057,12 +982,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        const GridToNetworkObservationManager<T>
-        ::time_vector& available_time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+    ::GetRawObservation(const time_vector& available_time,
+                        variable_vector2& observation_variable2,
+                        observation_vector3& observation3)
     {
         ReadObservationVariable(available_time, observation_variable2);
         ReadObservation(available_time, observation_variable2, observation3);
@@ -1082,14 +1004,10 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        double time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>
-        ::index_vector3& observation_index3,
-        GridToNetworkObservationManager<T>
-        ::observation_vector3& observation3)
+    ::GetRawObservation(double time,
+                        variable_vector2& observation_variable2,
+                        index_vector3& observation_index3,
+                        observation_vector3& observation3)
     {
         time_vector available_time;
         SetAvailableTime(time, available_time);
@@ -1109,12 +1027,10 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        double time_inf, double time_sup,
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>::index_vector3& observation_index3,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+    ::GetRawObservation(double time_inf, double time_sup,
+                        variable_vector2& observation_variable2,
+                        index_vector3& observation_index3,
+                        observation_vector3& observation3)
     {
         time_vector available_time;
         SetAvailableTime(time_inf, time_sup, available_time);
@@ -1133,11 +1049,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>::index_vector3& observation_index3,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+    ::GetRawObservation(variable_vector2& observation_variable2,
+                        index_vector3& observation_index3,
+                        observation_vector3& observation3)
     {
         GetRawObservation(available_time_, observation_variable2,
                           observation_index3, observation3);
@@ -1154,12 +1068,10 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetRawObservation(
-        const GridToNetworkObservationManager<T>::time_vector& available_time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2,
-        GridToNetworkObservationManager<T>::index_vector3& observation_index3,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+    ::GetRawObservation(const time_vector& available_time,
+                        variable_vector2& observation_variable2,
+                        index_vector3& observation_index3,
+                        observation_vector3& observation3)
     {
         ReadObservationVariable(available_time, observation_variable2);
         ReadObservation(available_time, observation_variable2, observation3);
@@ -1181,11 +1093,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::ReadObservationVariable(
-        const GridToNetworkObservationManager<T>
-        ::time_vector& available_time,
-        GridToNetworkObservationManager<T>
-        ::variable_vector2& observation_variable2)
+    ::ReadObservationVariable(const time_vector& available_time,
+                              variable_vector2& observation_variable2)
         const
     {
         int Nt = available_time.GetSize();
@@ -1204,11 +1113,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::ReadObservation(
-        const GridToNetworkObservationManager<T>::time_vector& available_time,
-        const GridToNetworkObservationManager<T>::variable_vector2&
-        observation_variable2,
-        GridToNetworkObservationManager<T>::observation_vector3& observation3)
+    ::ReadObservation(const time_vector& available_time,
+                      const variable_vector2& observation_variable2,
+                      observation_vector3& observation3)
         const
     {
         int Nvariable, Nt;
@@ -1233,9 +1140,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::ReadObservation(
-        const GridToNetworkObservationManager<T>::time_vector& available_time,
-        GridToNetworkObservationManager<T>::observation_vector2& observation2)
+    ::ReadObservation(const time_vector& available_time,
+                      observation_vector2& observation2)
         const
     {
         int Nt = available_time.GetSize();
@@ -1253,9 +1159,8 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::ReadObservation(
-        double time, int variable,
-        GridToNetworkObservationManager<T>::observation_vector& observation)
+    ::ReadObservation(double time, int variable,
+                      observation_vector& observation)
         const
     {
         observation.Reallocate(Nobservation_);
@@ -1297,11 +1202,9 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::ReadObservationIndex(
-        const GridToNetworkObservationManager<T>::time_vector& available_time,
-        const GridToNetworkObservationManager<T>::variable_vector2&
-        observation_variable2,
-        GridToNetworkObservationManager<T>::index_vector3& observation_index3)
+    ::ReadObservationIndex(const time_vector& available_time,
+                           const variable_vector2& observation_variable2,
+                           index_vector3& observation_index3)
         const
     {
         int Nvariable, Nt;
@@ -1331,8 +1234,7 @@ namespace Verdandi
     */
     template <class T>
     void GridToNetworkObservationManager<T>
-    ::GetObservation(
-        GridToNetworkObservationManager<T>::observation& observation)
+    ::GetObservation(observation& observation)
     {
         GetAggregatedObservation(observation);
     }
@@ -1351,9 +1253,8 @@ namespace Verdandi
     template <class T>
     template <class state>
     void GridToNetworkObservationManager<T>
-    ::GetInnovation(
-        const state& x,
-        GridToNetworkObservationManager<T>::observation& innovation)
+    ::GetInnovation(const state& x,
+                    observation& innovation)
     {
         innovation.Reallocate(Nobservation_);
         observation observation;
@@ -1530,8 +1431,7 @@ namespace Verdandi
     template <class T>
     void GridToNetworkObservationManager<T>
     ::GetTangentLinearOperatorRow(int row,
-                                  GridToNetworkObservationManager<T>
-                                  ::tangent_linear_operator_row&
+                                  tangent_linear_operator_row&
                                   tangent_operator_row)
         const
     {
