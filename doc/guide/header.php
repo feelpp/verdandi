@@ -71,7 +71,8 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "extended_kalman_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "unscented_kalman_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_unscented_kalman_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_extended_kalman_filter"
-or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_minimax_filter")
+or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_minimax_filter"
+or basename($_SERVER['REQUEST_URI'], ".php") == "monte_carlo")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "optimal_interpolation", "Optimal Interpolation");
@@ -90,6 +91,9 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_minimax_filter")
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "reduced_minimax_filter", "Reduced Minimax Filter");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "monte_carlo", "Monte Carlo");
   echo '</li> </ul>';
 } ?>
 
@@ -113,6 +117,18 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "observation_aggregator")
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "observation_aggregator", "Observation Aggregator");
+  echo '</li> </ul>';
+} ?>
+
+</li>
+
+<li class="jelly"> <?php HL($file, "tools", "Tools");?>
+
+<?php if (basename($_SERVER['REQUEST_URI'], ".php") == "tools"
+or basename($_SERVER['REQUEST_URI'], ".php") == "perturbation_manager")
+{
+  echo '<ul class="navsubul"> <li class="jelly">';
+  HL($file, "perturbation_manager", "Perturbation Manager"); 
   echo '</li> </ul>';
 } ?>
 
