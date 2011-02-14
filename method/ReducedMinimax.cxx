@@ -578,20 +578,6 @@ namespace Verdandi
         MltAdd(T(-1), SeldonNoTrans, mtmp, SeldonTrans, mtmp, T(1), Vinv);
         GetInverse(Vinv);
 
-        /*** Computes $B_t$ and lets the model perform one time step ***/
-
-        // Computes $B_t$.
-        B_ = G_MtM;
-        mtmp.Reallocate(Nprevious_projection_, Nmode_Q_);
-        MltAdd(T(1), SeldonTrans, M_check,
-               SeldonNoTrans, Q_sqrt_check, T(0), mtmp);
-
-        mtmp_1.Reallocate(Nprevious_projection_, Nmode_Q_);
-        MltAdd(T(1), mtmp, IQtQinv, T(0), mtmp_1);
-
-        MltAdd(T(-1), SeldonNoTrans, mtmp_1, SeldonTrans, mtmp, T(1), B_);
-        GetInverse(B_);
-
         /*** Observation-related variables ***/
 
         // Observation operator and data.

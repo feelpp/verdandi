@@ -138,8 +138,6 @@ namespace Verdandi
 
         //! Minimax gain.
         Matrix<T, General, RowMajor> G_;
-        //! Matrix B from the algorithm.
-        Matrix<T, General, RowMajor> B_;
 
         //! Diagonal part of the model error.
 	Vector<T> D_tilde_inv_;
