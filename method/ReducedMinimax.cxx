@@ -172,9 +172,9 @@ namespace Verdandi
 
         configuration.SetPrefix("reduced_minimax.output_saver.");
         output_saver_.Initialize(configuration);
-        output_saver_.Empty("forecast_state");
-        output_saver_.Empty("full_analysis");
-        output_saver_.Empty("reduced_analysis");
+        output_saver_.Empty("state_forecast");
+        output_saver_.Empty("state_analysis");
+        output_saver_.Empty("reduced_state_analysis");
         output_saver_.Empty("projected_state");
         output_saver_.Empty("projection");
         output_saver_.Empty("minimax_gain");
@@ -263,11 +263,12 @@ namespace Verdandi
             {
                 FilterInitialization();
 
-                MessageHandler::Send(*this, "model", "full_analysis");
+                MessageHandler::Send(*this, "model", "state_analysis");
                 MessageHandler::Send(*this, "observation_manager",
-                                     "full_analysis");
-                MessageHandler::Send(*this, "driver", "full_analysis");
-                MessageHandler::Send(*this, "driver", "reduced_analysis");
+                                     "state_analysis");
+                MessageHandler::Send(*this, "driver", "state_analysis");
+                MessageHandler::Send(*this, "driver",
+                                     "reduced_state_analysis");
             }
 
             // In other windows, there is no such special case. The error
@@ -325,11 +326,11 @@ namespace Verdandi
         {
             Propagation();
 
-            MessageHandler::Send(*this, "model", "full_analysis");
+            MessageHandler::Send(*this, "model", "state_analysis");
             MessageHandler::Send(*this, "observation_manager",
-                                 "full_analysis");
-            MessageHandler::Send(*this, "driver", "full_analysis");
-            MessageHandler::Send(*this, "driver", "reduced_analysis");
+                                 "state_analysis");
+            MessageHandler::Send(*this, "driver", "state_analysis");
+            MessageHandler::Send(*this, "driver", "reduced_state_analysis");
         }
 
         iteration_++;
@@ -447,8 +448,8 @@ namespace Verdandi
         for (int j = 0; j < Nstate_; j++)
             e0(j) *= D_tilde_inv_(j);
 
-        MessageHandler::Send(*this, "model", "forecast_state");
-        MessageHandler::Send(*this, "driver", "forecast_state");
+        MessageHandler::Send(*this, "model", "state_forecast");
+        MessageHandler::Send(*this, "driver", "state_forecast");
 
         // Computes $F_0^T \widetilde D^{-\frac 12}\overline e$.
         state_.Reallocate(Nprojection_);
@@ -516,8 +517,8 @@ namespace Verdandi
         model_.GetState(forecast_state);
         model_.ApplyOperator(forecast_state, true, false);
 
-        MessageHandler::Send(*this, "model", "forecast_state");
-        MessageHandler::Send(*this, "driver", "forecast_state");
+        MessageHandler::Send(*this, "model", "state_forecast");
+        MessageHandler::Send(*this, "driver", "state_forecast");
 
         // Computes $\widecheck Q_t^{\frac 12}$.
 	Matrix<T, General, RowMajor> Q_sqrt_check = Q_sqrt;
@@ -906,18 +907,20 @@ namespace Verdandi
     void ReducedMinimax<T, Model, ObservationManager>::Message(string message)
     {
         model_state state;
-        if (message.find("full_analysis") != string::npos)
+        if (message.find("state_analysis") != string::npos
+            && message.find("reduced_state_analysis") == string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, model_.GetTime(), "full_analysis");
+            output_saver_.Save(state, model_.GetTime(), "state_analysis");
         }
-        else if (message.find("forecast_state") != string::npos)
+        else if (message.find("state_forecast") != string::npos)
         {
             model_.GetState(state);
-            output_saver_.Save(state, model_.GetTime(), "forecast_state");
+            output_saver_.Save(state, model_.GetTime(), "state_forecast");
         }
-        else if (message.find("reduced_analysis") != string::npos)
-            output_saver_.Save(state_, model_.GetTime(), "reduced_analysis");
+        else if (message.find("reduced_state_analysis") != string::npos)
+            output_saver_.Save(state_, model_.GetTime(),
+                               "reduced_state_analysis");
     }
 
 
