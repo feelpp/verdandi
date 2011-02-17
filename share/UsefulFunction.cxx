@@ -379,7 +379,7 @@ namespace Verdandi
       epsilon.
     */
     template<class T>
-    bool is_equal(T x, T y, T epsilon = 1.e-6)
+    bool is_equal(T x, T y, T epsilon)
     {
         return abs(x - y) <=  0.5 * epsilon * (abs(x) + abs(y));
     }
@@ -394,7 +394,7 @@ namespace Verdandi
       epsilon.
     */
     template<class T>
-    bool is_multiple(T x, T d, T epsilon = 1.e-6)
+    bool is_multiple(T x, T d, T epsilon)
     {
         int i = int(x / d + .5);
         return is_equal(x, T(i) * d, epsilon);
