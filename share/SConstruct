@@ -83,7 +83,7 @@ def add_argument(name, value_list = None):
 
 # Returns the debug flags.
 def debug_flag(name):
-    if ARGUMENTS[name] == "-1" or env['PLATFORM'] == 'win32':
+    if ARGUMENTS[name] == "-1" or env['PLATFORM'] in ['win32', 'win64']:
         return ""
     elif ARGUMENTS[name] == "0":
         return "-O2"
@@ -280,7 +280,7 @@ for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
                 "umfpack", "amd", "cppunit"]:
     if library not in library_list:
         library_list += [library]
-if env['PLATFORM'] == 'win32' and library not in library_list:
+if env['PLATFORM'] in ['win32', 'win64'] and "lua" not in library_list:
     library_list += ["lua"]
 for flag in to_string_list("link_flag"):
     env.Append(LINKFLAGS = flag)
@@ -345,7 +345,7 @@ for filename in target_list[:]:
     if filename in exclude_target or filename[:-4] in exclude_target:
         target_list.remove(filename)
 for filename in target_list:
-    if env['PLATFORM'] == 'win32':
+    if env['PLATFORM'] in ['win32', 'win64']:
         env.Program(filename[:-4], [filename])
     if env['PLATFORM'] != 'win32':
         env.Program(filename[:-4], [filename, lua_library])
