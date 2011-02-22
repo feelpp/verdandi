@@ -232,6 +232,7 @@ namespace Verdandi
         void AssembleNewMarkMatrix0();
         void AssembleNewMarkMatrix1();
         void AssembleDampMatrix();
+        void AllocateSparseMatrix();
     };
 
 

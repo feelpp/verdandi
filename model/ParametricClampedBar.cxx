@@ -91,63 +91,31 @@ namespace Verdandi
         configuration.Set("Nx", Nx_);
         configuration.Set("Delta_t", Delta_t_);
         configuration.Set("final_time", final_time_);
-
         configuration.SetPrefix("parametric_clamped_bar.error_statistics.");
         configuration.Set("state_error_variance", "v >= 0",
                           state_error_variance_value_);
         configuration.Set("state_error_scale", "v > 0",
                           Balgovind_scale_background_);
-
-        Ndof_ = Nx_ + 1;
-
         configuration.SetPrefix("parametric_clamped_bar.physics.");
         configuration.Set("Young_modulus", Young_modulus_);
         configuration.Set("mass_density", mass_density_);
 
-        vector<string> theta_force_vector;
-        configuration.Set("theta_force", theta_force_vector);
-        T value;
-        for (int i = 0; i < int(theta_force_vector.size()); i++)
-        {
-            to_num(theta_force_vector[i], value);
-            theta_force_.PushBack(value);
-        }
+        configuration.Set("theta_force", theta_force_);
         Ntheta_force_ = theta_force_.GetSize();
+        Ndof_ = Nx_ + 1;
         BuildRegionIndex(Ndof_, Ntheta_force_, theta_force_index_);
-
-        vector<string> theta_stiffness_vector;
-        configuration.Set("theta_stiffness", theta_stiffness_vector);
-        for (int i = 0; i < int(theta_stiffness_vector.size()); i++)
-        {
-            to_num(theta_stiffness_vector[i], value);
-            theta_stiffness_.PushBack(value);
-        }
+        configuration.Set("theta_stiffness", theta_stiffness_);
         Ntheta_stiffness_ = theta_stiffness_.GetSize();
         BuildRegionIndex(Ndof_, Ntheta_stiffness_, theta_stiffness_index_);
-
-        vector<string> theta_mass_vector;
-        configuration.Set("theta_mass", theta_mass_vector);
-        for (int i = 0; i < int(theta_mass_vector.size()); i++)
-        {
-            to_num(theta_mass_vector[i], value);
-            theta_mass_.PushBack(value);
-        }
+        configuration.Set("theta_mass", theta_mass_);
         Ntheta_mass_ = theta_mass_.GetSize();
         BuildRegionIndex(Ndof_, Ntheta_mass_, theta_mass_index_);
-
-        vector<string> theta_damp_vector;
-        configuration.Set("theta_damp", theta_damp_vector);
-        for (int i = 0; i < int(theta_damp_vector.size()); i++)
-        {
-            to_num(theta_damp_vector[i], value);
-            theta_damp_.PushBack(value);
-        }
+        configuration.Set("theta_damp", theta_damp_);
         Ntheta_damp_ = theta_damp_.GetSize();
         BuildRegionIndex(Ndof_, Ntheta_damp_, theta_damp_index_);
 
         configuration.Set("alpha", alpha_);
         configuration.Set("beta", beta_);
-
         configuration.SetPrefix("parametric_clamped_bar.");
         vector<string> stable;
         configuration.Set("state","ops_in(v, {'displacement', 'velocity', "
@@ -174,100 +142,26 @@ namespace Verdandi
         /*** Allocation ***/
 
         Delta_x_ = bar_length_ / Nx_;
-        time_vector_.reserve(floor(final_time_ / Delta_t_));
-        time_vector_ = vector<double>(1, 0.);
-        time_ = 0.;
+        AllocateSparseMatrix();
 
-        // Skeleton.
-        int NvalSkel = 3 * (Nx_- 1) + 4;
-        Vector<T> values_0(NvalSkel);
-        values_0.Fill(T(0.));
-        Vector<int> columns_0(NvalSkel);
-        columns_0.Fill();
-        Vector<int> rowindex_0(Ndof_ + 1);
-        rowindex_0.Fill();
-        columns_0(0) = 0;
-        columns_0(1) = 1;
-        rowindex_0(0) = 0;
-        rowindex_0(1) = 2;
+        /*** Elementary mass matrix construction ***/
 
-        for (int i = 1; i < Nx_; i++)
-        {
-            columns_0(3 * (i - 1) + 2) = i - 1;
-            columns_0(3 * (i -1) + 3) = i;
-            columns_0(3 * (i - 1) + 4) = i + 1;
-            rowindex_0(i + 1) = rowindex_0(i) + 3;
-        }
-
-        columns_0(3 * (Nx_ - 1) + 2) = Ndof_ - 2;
-        columns_0(3 * (Nx_ - 1) + 3) = Ndof_ - 1;
-        rowindex_0(Ndof_) = 3 * (Nx_ - 1) + 4;
-
-        // Store the upper part of the Newmark
-        // matrix in a symmetric sparse data structure.
-        int nnz = (NvalSkel + Ndof_) / 2;
-
-        Vector<int> sym_col_0(nnz), sym_row_0(Ndof_ + 1);
-        Vector<T> sym_values_0(nnz);
-
-        int val_ind = 0, col_ind = 0;
-        bool first_nz;
-        for(int i = 0; i < Ndof_; i++)
-        {
-            first_nz = true;
-            for(int j = rowindex_0(i); j < rowindex_0(i + 1); j++)
-                if(columns_0(j) >= i)
-                {
-                    sym_values_0(val_ind) = values_0(j);
-                    val_ind++;
-                    sym_col_0(col_ind) = columns_0(j);
-                    col_ind++;
-                    if(first_nz)
-                    {
-                        sym_row_0(i)= col_ind - 1;
-                        first_nz=false;
-                    }
-                }
-        }
-
-        sym_row_0(Ndof_) = nnz;
-
-        Vector<T> sym_values_1(sym_values_0);
-        Vector<int> sym_col_1(sym_col_0);
-        Vector<int> sym_row_1(sym_row_0);
-        Vector<T> sym_values_m(sym_values_0);
-        Vector<int> sym_col_m(sym_col_0);
-        Vector<int> sym_row_m(sym_row_0);
-        Vector<T> sym_values_c(sym_values_0);
-        Vector<int> sym_col_c(sym_col_0);
-        Vector<int> sym_row_c(sym_row_0);
-
-        // Remark: values, rowindex and colums are unlinked after used in
-        // SetData therefore, we need one of each for each global matrix.
-        Newmark_matrix_0_.SetData(Ndof_, Ndof_, sym_values_0,
-                                  sym_row_0, sym_col_0);
-        Newmark_matrix_1_.SetData(Ndof_, Ndof_, sym_values_1,
-                                  sym_row_1, sym_col_1);
-        mass_matrix_.SetData(Ndof_, Ndof_, sym_values_m,
-                             sym_row_m, sym_col_m);
-        damp_matrix_.SetData(Ndof_, Ndof_, sym_values_c,
-                             sym_row_c, sym_col_c);
-
-        // Elementary mass matrix construction.
         mass_FEM_matrix_.Reallocate(2, 2);
         T mass_lin = T(mass_density_ * Delta_x_ / 3);
         mass_FEM_matrix_(0, 0) = mass_lin;
         mass_FEM_matrix_(1, 1) = mass_lin;
         mass_FEM_matrix_(0, 1) = mass_lin / 2;
 
-        // Elementary stifness matrix construction.
+        /*** Elementary stifness matrix construction ***/
+
         stiffness_FEM_matrix_.Reallocate(2, 2);
         T stiff_lin = T(Young_modulus_ / Delta_x_);
         stiffness_FEM_matrix_(0, 0) = stiff_lin;
         stiffness_FEM_matrix_(1, 1) = stiff_lin;
         stiffness_FEM_matrix_(0, 1) = -stiff_lin;
 
-        // Vector initialization.
+        /*** State initialization ***/
+
         disp_0_.Reallocate(Ndof_);
         velo_0_.Reallocate(Ndof_);
         force_.Reallocate(Ndof_);
@@ -275,7 +169,6 @@ namespace Verdandi
         velo_0_.Fill(T(0));
         force_.Fill(T(1));
 
-        // Initial condition.
         for (int i = 0; i < Ndof_; i++)
             disp_0_(i) = T(i) / T(Ndof_ - 1);
 
@@ -986,6 +879,88 @@ namespace Verdandi
         damp_matrix_.Val(0, 0) = 1;
         damp_matrix_.Val(0, 1) = 0;
         damp_matrix_.Val(1, 0) = 0;
+    }
+
+
+    //! Builds skeleton newmark, mass and damp matrices.
+    template <class T>
+    void ParametricClampedBar<T>
+    ::AllocateSparseMatrix()
+    {
+        // Skeleton.
+        int NvalSkel = 3 * (Nx_- 1) + 4;
+        Vector<T> values_0(NvalSkel);
+        values_0.Fill(T(0.));
+        Vector<int> columns_0(NvalSkel);
+        columns_0.Fill();
+        Vector<int> rowindex_0(Ndof_ + 1);
+        rowindex_0.Fill();
+        columns_0(0) = 0;
+        columns_0(1) = 1;
+        rowindex_0(0) = 0;
+        rowindex_0(1) = 2;
+
+        for (int i = 1; i < Nx_; i++)
+        {
+            columns_0(3 * (i - 1) + 2) = i - 1;
+            columns_0(3 * (i -1) + 3) = i;
+            columns_0(3 * (i - 1) + 4) = i + 1;
+            rowindex_0(i + 1) = rowindex_0(i) + 3;
+        }
+
+        columns_0(3 * (Nx_ - 1) + 2) = Ndof_ - 2;
+        columns_0(3 * (Nx_ - 1) + 3) = Ndof_ - 1;
+        rowindex_0(Ndof_) = 3 * (Nx_ - 1) + 4;
+
+        // Store the upper part of the Newmark
+        // matrix in a symmetric sparse data structure.
+        int nnz = (NvalSkel + Ndof_) / 2;
+
+        Vector<int> sym_col_0(nnz), sym_row_0(Ndof_ + 1);
+        Vector<T> sym_values_0(nnz);
+
+        int val_ind = 0, col_ind = 0;
+        bool first_nz;
+        for(int i = 0; i < Ndof_; i++)
+        {
+            first_nz = true;
+            for(int j = rowindex_0(i); j < rowindex_0(i + 1); j++)
+                if(columns_0(j) >= i)
+                {
+                    sym_values_0(val_ind) = values_0(j);
+                    val_ind++;
+                    sym_col_0(col_ind) = columns_0(j);
+                    col_ind++;
+                    if(first_nz)
+                    {
+                        sym_row_0(i)= col_ind - 1;
+                        first_nz=false;
+                    }
+                }
+        }
+
+        sym_row_0(Ndof_) = nnz;
+
+        Vector<T> sym_values_1(sym_values_0);
+        Vector<int> sym_col_1(sym_col_0);
+        Vector<int> sym_row_1(sym_row_0);
+        Vector<T> sym_values_m(sym_values_0);
+        Vector<int> sym_col_m(sym_col_0);
+        Vector<int> sym_row_m(sym_row_0);
+        Vector<T> sym_values_c(sym_values_0);
+        Vector<int> sym_col_c(sym_col_0);
+        Vector<int> sym_row_c(sym_row_0);
+
+        // Remark: values, rowindex and colums are unlinked after used in
+        // SetData therefore, we need one of each for each global matrix.
+        Newmark_matrix_0_.SetData(Ndof_, Ndof_, sym_values_0,
+                                  sym_row_0, sym_col_0);
+        Newmark_matrix_1_.SetData(Ndof_, Ndof_, sym_values_1,
+                                  sym_row_1, sym_col_1);
+        mass_matrix_.SetData(Ndof_, Ndof_, sym_values_m,
+                             sym_row_m, sym_col_m);
+        damp_matrix_.SetData(Ndof_, Ndof_, sym_values_c,
+                             sym_row_c, sym_col_c);
     }
 
 
