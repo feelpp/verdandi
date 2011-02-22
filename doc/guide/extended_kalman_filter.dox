@@ -44,12 +44,12 @@ while (!driver.HasFinished()) [6]
 
 <ol>
         <li>Prediction:
-            - \f$x_h^f = \mathcal{M}_{h-1}(x_{h-1}^a)\f$<br>
-            - \f$P_h^f = M_{h-1} P_{h-1}^a M_{h-1}^T \f$</li>
+            - \f$x_{h+1}^f = \mathcal{M}_{h+1|h}(x_{h}^a)\f$<br>
+            - \f$P_{h+1}^f = M_{h+1|h} P_{h}^a M_{h+1|h}^T \f$</li>
         <li>Update:
-            - \f$K_h = P_h^fH_h^{T}(H_hP_h^fH_h^{T} + R_h)^{-1}\f$<br>
-            - \f$x_h^a = x_h^f + K_h(y_h - \mathcal{H}_h(x_h^f))\f$<br>
-            - \f$P_h^a = (I - K_hH_h)P_h^f\f$</li>
+            - \f$K_{h+1} = P_{h+1}^fH_{h+1}^{T}(H_{h+1}P_{h+1}^fH_{h+1}^{T} + R_{h+1})^{-1}\f$<br>
+            - \f$x_{h+1}^a = x_{h+1}^f + K_{h+1}(y_{h+1} - \mathcal{H}_{h+1}(x_{h+1}^f))\f$<br>
+            - \f$P_h^a = (I - K_{h+1}H_{h+1})P_{h+1}^f\f$</li>
 </ol>
 With: <br>
 \f$x_h^f\f$ forecast state vector; <br>
