@@ -66,6 +66,7 @@ namespace Verdandi
     ParametricClampedBar<T>::~ParametricClampedBar()
     {
         x_.Nullify();
+        x_full_.Nullify();
     }
 
 
@@ -172,20 +173,24 @@ namespace Verdandi
         for (int i = 0; i < Ndof_; i++)
             disp_0_(i) = T(i) / T(Ndof_ - 1);
 
-        // Initialize vector collection.
+        // Initialize full vector collection.
         state working_vector;
+        working_vector.SetData(Ndof_ - 1, disp_0_.GetData() + 1);
+        x_full_.AddVector(working_vector, "displacement");
+        working_vector.Nullify();
+        working_vector.SetData(Ndof_ - 1, velo_0_.GetData() + 1);
+        x_full_.AddVector(working_vector, "velocity");
+        working_vector.Nullify();
+        x_full_.AddVector(theta_force_, "theta_force");
+        x_full_.AddVector(theta_stiffness_, "theta_stiffness");
+        x_full_.AddVector(theta_mass_, "theta_mass");
+        x_full_.AddVector(theta_damp_, "theta_damp");
+
+        // Initialize vector collection.
         if (stable_.find("displacement") != stable_.end())
-        {
-            working_vector.SetData(Ndof_ - 1, disp_0_.GetData() + 1);
-            x_.AddVector(working_vector, "displacement");
-            working_vector.Nullify();
-        }
+            x_.AddVector(x_full_.GetVector("displacement"), "displacement");
         if (stable_.find("velocity") != stable_.end())
-        {
-            working_vector.SetData(Ndof_ - 1, velo_0_.GetData() + 1);
-            x_.AddVector(working_vector, "velocity");
-            working_vector.Nullify();
-        }
+            x_.AddVector(x_full_.GetVector("velocity"), "velocity");
         if (stable_.find("theta_force") != stable_.end())
             x_.AddVector(theta_force_, "theta_force");
         if (stable_.find("theta_stiffness") != stable_.end())
@@ -591,10 +596,11 @@ namespace Verdandi
       \param[out] state the full state vector.
     */
     template <class T>
-    void ParametricClampedBar<T>::GetFullState(state& state) const
+    void ParametricClampedBar<T>::GetFullState(state& x) const
     {
-        throw ErrorUndefined("ParametricClampedBar"
-                             "::GetFullState()");
+        x.Reallocate(x_full_.GetM());
+        for (int i = 0; i < x_full_.GetM(); i++)
+            x(i) = x_full_(i);
     }
 
 
@@ -603,10 +609,16 @@ namespace Verdandi
       \param[in] state the full state vector.
     */
     template <class T>
-    void ParametricClampedBar<T>::SetFullState(const state& state)
+    void ParametricClampedBar<T>::SetFullState(const state& x)
     {
-        throw ErrorUndefined("ParametricClampedBar"
-                             "::SetFullState()");
+        if (x_full_.GetM() != x.GetM())
+            throw ErrorProcessing("ParametricClampedBar::SetState()",
+                                  "Operation not permitted:\n x_full_ is a "
+                                  "vector of length " + to_str(x_full_.GetM())
+                                  + ";\n x is a vector of length "
+                                  + to_str(x.GetM()) + ".");
+        for (int i = 0; i < x_.GetM(); i++)
+            x_full_(i) = x(i);
     }
 
 

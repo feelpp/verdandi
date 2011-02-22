@@ -120,8 +120,10 @@ namespace Verdandi
         //! Damp parameter region of elements.
         Vector<int> theta_damp_index_;
 
-        // State collection.
+        //! State collection.
         state_collection x_;
+        //! Full state collection.
+        state_collection x_full_;
 
         //! Mass parameter
         Vector<T> theta_mass_;
