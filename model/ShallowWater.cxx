@@ -443,6 +443,17 @@ namespace Verdandi
     }
 
 
+    //! Sets the current time.
+    /*!
+      \param[in] time the current time.
+    */
+    template <class T>
+    void ShallowWater<T>::SetTime(double time)
+    {
+        time_ = time;
+    }
+
+
     //! Returns the number of points along x (in the grid for height).
     /*!
       \return The number of points along x (in the grid for height).

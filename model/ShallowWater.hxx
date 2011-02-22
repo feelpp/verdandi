@@ -210,6 +210,7 @@ namespace Verdandi
 
         // Access methods.
         double GetTime() const;
+        void SetTime(double time);
         int GetNx() const;
         int GetNy() const;
         int GetNz() const;
