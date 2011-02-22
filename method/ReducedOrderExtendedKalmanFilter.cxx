@@ -288,11 +288,6 @@ namespace Verdandi
     void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
     ::PropagateCovarianceMatrix()
     {
-        double saved_time;
-        model_state saved_state;
-        saved_time = model_.GetTime();
-        model_.GetState(saved_state);
-
         // One column of L.
         model_state L_col(Nstate_);
         for (int j = 0; j < Nreduced_; j++)
@@ -301,9 +296,6 @@ namespace Verdandi
             model_.ApplyOperator(L_col, false, false);
             SetCol(L_col, j, L_);
         }
-
-        model_.SetTime(saved_time);
-        model_.SetState(saved_state);
     }
 
 

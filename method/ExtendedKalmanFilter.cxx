@@ -240,11 +240,6 @@ namespace Verdandi
     void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::PropagateCovarianceMatrix_vector()
     {
-        double saved_time;
-        model_state saved_state;
-        saved_time = model_.GetTime();
-        model_.GetState(saved_state);
-
         // One column of covariance matrix P.
         model_state_error_variance_row error_covariance_column(Nstate_);
 
@@ -278,9 +273,6 @@ namespace Verdandi
 #endif
             SetCol(error_covariance_column, j, state_error_variance_);
         }
-
-        model_.SetTime(saved_time);
-        model_.SetState(saved_state);
     }
 
 
