@@ -364,7 +364,7 @@ namespace Verdandi
             saved_time = GetTime();
 
         if (preserve_state)
-            GetState(saved_state);
+            GetFullState(saved_state);
 
         SetState(x);
         Forward(update_force);
@@ -374,7 +374,7 @@ namespace Verdandi
             SetTime(saved_time);
 
         if (preserve_state)
-            SetState(saved_state);
+            SetFullState(saved_state);
     }
 
 
@@ -389,7 +389,7 @@ namespace Verdandi
         double saved_time = 0;
         state saved_state;
         saved_time = GetTime();
-        GetState(saved_state);
+        GetFullState(saved_state);
 
         // Saves state parameters.
         Vector<T> theta_force(Ntheta_force_), theta_damp(Ntheta_damp_),
@@ -502,7 +502,7 @@ namespace Verdandi
         GetState(increment);
 
         SetTime(saved_time);
-        SetState(saved_state);
+        SetFullState(saved_state);
     }
 
 
