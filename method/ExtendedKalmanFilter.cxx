@@ -182,6 +182,8 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
+        time_ = model_.GetTime();
+
         model_.Forward();
 
         PropagateCovarianceMatrix();
@@ -240,6 +242,9 @@ namespace Verdandi
     void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::PropagateCovarianceMatrix_vector()
     {
+        double saved_time = model_.GetTime();
+        model_.SetTime(time_);
+
         // One column of covariance matrix P.
         model_state_error_variance_row error_covariance_column(Nstate_);
 
@@ -273,6 +278,8 @@ namespace Verdandi
 #endif
             SetCol(error_covariance_column, j, state_error_variance_);
         }
+
+        model_.SetTime(saved_time);
     }
 
 
@@ -281,6 +288,9 @@ namespace Verdandi
     void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::PropagateCovarianceMatrix_matrix()
     {
+        double saved_time = model_.GetTime();
+        model_.SetTime(time_);
+
         model_tangent_linear_operator A;
         model_.GetTangentLinearOperator(A);
 
@@ -288,6 +298,8 @@ namespace Verdandi
 
         MltAdd(T(1.), SeldonNoTrans, state_error_variance_,
                SeldonTrans, A, T(0.), state_error_variance_);
+
+        model_.SetTime(saved_time);
     }
 
 

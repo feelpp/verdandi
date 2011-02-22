@@ -93,6 +93,8 @@ namespace Verdandi
         int Nobservation_;
         //! Should an analysis be computed at the first step?
         bool analyze_first_step_;
+        //! Current time.
+        double time_;
 
         //! Computation mode for BLUE: "vector" or "matrix".
         string blue_computation_;
