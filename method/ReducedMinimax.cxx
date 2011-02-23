@@ -655,6 +655,7 @@ namespace Verdandi
             forecast_state(i) *= D_tilde_inv_(i);
 
         // $\widecheck F_{t+1}^T (\widecheck M_t \widehat x_t)$.
+        state_.Reallocate(Nprojection_);
         Mlt(SeldonTrans, F_check, forecast_state, state_);
 
         // $(\widecheck F_{t+1}^T \widecheck U_t) \widecheck U_t^T
