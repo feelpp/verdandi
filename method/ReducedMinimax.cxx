@@ -121,9 +121,11 @@ namespace Verdandi
             configuration.Set("pod.acceptable_error",
                               "v >= 0 and v <= 1",
                               acceptable_error_);
-            configuration.Set("pod.Nsnapshot", "v > 1", Nsnapshot_);
-            // There cannot be more projection modes than snapshots.
-            Nprojection_max_ = min(Nprojection_max_, Nsnapshot_);
+            configuration.Set("pod.Nstep_snapshot", "v > 1", Nstep_snapshot_);
+            configuration.Set("pod.with_Hty_HtHx", with_Hty_HtHx_);
+            if (with_Hty_HtHx_)
+                configuration.Set("pod.Nobservation_step_per_snapshot",
+                                  "v >= 0.", Nobservation_step_per_snapshot_);
         }
 
         /*** Model options ***/
@@ -289,8 +291,16 @@ namespace Verdandi
             model_state state;
             model_.GetState(state);
 
-            snapshot_.Reallocate(Nstate_, Nsnapshot_);
-            SetCol(state, inner_iteration_++, snapshot_);
+            // Allocates the predicted size for the snapshots.
+            if (with_Hty_HtHx_)
+                snapshot_.Reallocate(Nstate_, Nstep_snapshot_
+                                     + 2 * int(Nobservation_step_per_snapshot_
+                                               * double(Nstep_snapshot_)));
+            else
+                snapshot_.Reallocate(Nstate_, Nstep_snapshot_);
+            SetCol(state, 0, snapshot_);
+            Nsnapshot_ = 1;
+            inner_iteration_++;
 
             if (show_time_ || show_iteration_)
                 Logger::StdOut(*this, "Starting POD sequence");
@@ -680,7 +690,8 @@ namespace Verdandi
         }
 
         inner_iteration_++;
-        if (reduction_method_ != "none" && inner_iteration_ == Nsnapshot_ - 1)
+        if (reduction_method_ != "none"
+            && inner_iteration_ == Nstep_snapshot_ - 1)
         {
             inner_iteration_ = 0;
             mode_ = 0;
@@ -731,14 +742,46 @@ namespace Verdandi
         model_.Forward();
         model_state state;
         model_.GetState(state);
-        SetCol(state, inner_iteration_, snapshot_);
+
+        // Observation operator and data.
+	observation_tangent_linear_operator H_tilde;
+	Vector<T> y;
+
+        observation_manager_.SetTime(model_, model_.GetTime());
+
+        if (with_Hty_HtHx_ && observation_manager_.HasObservation())
+        {
+            observation_manager_.GetObservation(y);
+            Nobservation_ = y.GetLength();
+            for (int i = 0; i < Nobservation_; i++)
+                y(i) -= eta_;
+            H_tilde = observation_manager_.GetTangentLinearOperator();
+
+            model_state Hty(Nstate_);
+            MltAdd(T(1), SeldonTrans, H_tilde, y, T(0), Hty);
+
+            if (Nsnapshot_ + 3 > snapshot_.GetN())
+                snapshot_.Resize(Nstate_, Nsnapshot_ + 3);
+
+            SetCol(Hty, Nsnapshot_++, snapshot_);
+
+            Mlt(H_tilde, state, y);
+            MltAdd(T(1), SeldonTrans, H_tilde, y, T(0), Hty);
+            SetCol(Hty, Nsnapshot_++, snapshot_);
+        }
+        else if (Nsnapshot_ + 1 > snapshot_.GetN())
+            snapshot_.Resize(Nstate_, Nsnapshot_ + 1);
+
+        SetCol(state, Nsnapshot_++, snapshot_);
 
         inner_iteration_++;
 
         /*** POD ***/
 
-        if (inner_iteration_ == Nsnapshot_)
+        if (inner_iteration_ == Nstep_snapshot_)
         {
+            snapshot_.Resize(snapshot_.GetM(), Nsnapshot_);
+
             output_saver_.Save(snapshot_, "snapshot");
 
             // SVD decomposition.
@@ -769,7 +812,7 @@ namespace Verdandi
             T energy = 0;
             // Collects the main modes for the projection.
             int i;
-            for (i = 0; i < Nprojection_max_
+            for (i = 0; i < min(Nprojection_max_, Nsnapshot_)
                      && energy <= (1. - acceptable_error_) * total_energy;
                  i++)
                 energy += singular_value_(i);
@@ -799,7 +842,7 @@ namespace Verdandi
 
             inner_iteration_ = 0;
             mode_ = 1;
-            iteration_ -= Nsnapshot_ - 1;
+            iteration_ -= Nstep_snapshot_ - 1;
         }
     }
 

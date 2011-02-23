@@ -80,11 +80,19 @@ namespace Verdandi
 
         /*** POD ***/
 
-        //! Number of snapshots for POD.
-        int Nsnapshot_;
+        /*! \brief Width of the simulation window (in number of time steps)
+          for the snapshot recording. */
+        int Nstep_snapshot_;
+        /*! \brief Should \f$ H^T y \f$ and \f$ H^T H x \f$ be included in the
+          snapshots? */
+        bool with_Hty_HtHx_;
+        //! Approximate number of observations per state snapshots.
+        double Nobservation_step_per_snapshot_;
 
-        //! Snapshots of the state to be used for POD.
+        //! Snapshots to be used for POD.
         Matrix<T, General, RowMajor> snapshot_;
+        //! Current number of snapshots stored in matrix 'snapshot_'.
+        int Nsnapshot_;
 
         //! Singular values.
         Vector<T> singular_value_;
