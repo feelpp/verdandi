@@ -135,6 +135,8 @@ namespace Verdandi
 
         /*** Filter options ***/
 
+        configuration.Set("model_error.diagonal",
+                          is_model_error_variance_diagonal_);
         T diagonal_part;
         if (configuration.Is<T>("model_error.diagonal_part"))
         {
@@ -413,7 +415,13 @@ namespace Verdandi
 
         // Computes $\widecheck Q^{\frac 12}$.
 	model_state_error_variance Q_sqrt_check;
-        Q_sqrt_check = model_.GetStateErrorVarianceSqrt();
+        if (is_model_error_variance_diagonal_)
+        {
+            Q_sqrt_check.Reallocate(Nstate_, 1);
+            Q_sqrt_check.Zero();
+        }
+        else
+            Q_sqrt_check = model_.GetStateErrorVarianceSqrt();
         Nmode_Q_= Q_sqrt_check.GetN();
         for (int i = 0; i < Nstate_; i++)
             for (int j = 0; j < Nmode_Q_; j++)
@@ -519,7 +527,13 @@ namespace Verdandi
 
         // Model error.
         model_error_variance Q_sqrt;
-        Q_sqrt = model_.GetErrorVarianceSqrt();
+        if (is_model_error_variance_diagonal_)
+        {
+            Q_sqrt.Reallocate(Nstate_, 1);
+            Q_sqrt.Zero();
+        }
+        else
+            Q_sqrt = model_.GetErrorVarianceSqrt();
         Nmode_Q_= Q_sqrt.GetN();
 
         // Forecast step.

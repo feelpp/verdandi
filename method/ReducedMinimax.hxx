@@ -147,6 +147,8 @@ namespace Verdandi
         //! Minimax gain.
         Matrix<T, General, RowMajor> G_;
 
+        //! Is the model error variance composed of its diagonal part only?
+        bool is_model_error_variance_diagonal_;
         //! Diagonal part of the model error.
 	Vector<T> D_tilde_inv_;
         //! Number of modes in the square root $\widetilde Q^{\frac 12}$.
