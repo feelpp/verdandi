@@ -5,7 +5,7 @@
 /*!
 \page installation Installation
 
-%Verdandi is supposed to be fully compliant with the <b>C++ standard</b>. This ensures portability on many platforms. It compiles at least on \ref linux, \ref macos and \ref windows. It is compatible with IDEs such as Xcode and Microsoft Visual Studio.
+%Verdandi is supposed to be fully compliant with the <b>C++ standard</b>. This ensures portability on many platforms. It compiles at least on \ref linux, \ref macos and \ref windows. It is compatible with IDEs such as Xcode and Microsoft Visual Studio (tested on Visual C++ 2010).
 
 \section dependencies Dependencies
 %Verdandi requires:
@@ -17,33 +17,37 @@
 Note that in %Verdandi tarball, you will also find:
 <ul>
   <li> the linear algebra library <a href="http://seldon.sourceforge.net/">Seldon</a>. </li>
+  <li> <a href="http://www.lua.org">Lua</a>, a scripting language. </li>
+  <li> Ops, a library for reading Lua configuration files. </li>
 </ul>
 
 \section linux Linux
 
 \subsection installation_linux Installation
 
-Download the source code (<a href="http://verdandi.gforge.inria.fr/">Verdandi homepage</a>), usually available in a compressed file, e.g. Verdandi-[version].tar.bz2. Uncompress the file, e.g. in command line: <code>tar -xvjf Verdandi-[version].tar.bz2</code>. This will create the directory <code>Verdandi-[version]/</code> in which you will find %Verdandi.
+Download the source code (<a href="http://verdandi.gforge.inria.fr/">Verdandi homepage</a>), usually available in a compressed file, e.g., verdandi-[version].tar.bz2. Uncompress the file, e.g., in command line: <code>tar -xvjf verdandi-[version].tar.bz2</code>. This will create the directory <code>verdandi-[version]/</code> in which you will find %Verdandi.
 
 \subsection tests_linux Testing the installation
 
 In order to start with %Verdandi, it is sufficient to install SCons. Make sure that the executable <code>scons</code> is available.
 
-To compile the examples provided with %Verdandi, run <code>scons</code> in the directory <code>example/shallow_water/</code>:
+To compile one of the examples provided with %Verdandi, run <code>scons</code> in the directory <code>example/quadratic_model/</code>:
 
 \precode
 $ scons
 \endprecode
 
-Then to run the examples, execute the following commands:
+Then to run the quadratic model example, execute the following commands:
 \precode
-$ forward configuration/river-truth.cfg [1]
-$ optimal_interpolation configuration/river.cfg [2]
+$ forward configuration/truth.lua [1.]
+$ optimal_interpolation configuration/assimilation.lua [2.]
 \endprecode
 
+This should generate results in the form of .bin files found in the directory <code>example/quadratic_model/result/</code>.
+
 \comment
-        <li>This program generates the true observations by running the model with the true initial conditions described in <code>river-truth.cfg</code>, without any error. It performs steps forward with the shallow-water model without data assimilation.</li>
-        <li>This program applies the optimal interpolation, starting from erroneous initial conditions described in <code>river.cfg</code>. The observations are those generated above by <code>forward</code>.</li>
+        <li>This program generates the observations by running the model with the true initial conditions described in <code>truth.lua</code>, without any error. It performs steps forward with the quadratic model without data assimilation.</li>
+        <li>This program applies the optimal interpolation, starting from erroneous initial conditions described in <code>assimilation.lua</code>. The observations are those generated above by <code>forward</code>.</li>
 \endcomment
 
 \section macos MacOS
@@ -53,64 +57,73 @@ $ optimal_interpolation configuration/river.cfg [2]
 \subsection dependencies Install the dependencies
 <ul> 
 
-<li> <b>SCons</b>: <br>
-First install Python, version 2.6 for example. Install <a href="http://www.scons.org/">SCons</a>. Add the path of the SCons program to the system variable <code>Path</code> (environment variable in your system properties).</li>
+<li> <b>SCons</b> <br>
+First install a 2.x version of <a href="http://www.python.org/download/">Python</a> (preferably the latest 2.x version, but any version from 2.4 should be fine). Then install <a href="http://www.scons.org/">SCons</a>. Add the path of the SCons program to the environment variable <code>PATH</code> (right-click on My Computer -> Properties -> Advanced -> Environment Variables).</li>
 
 
-<li> <b>Download precompiled libraries:</b> <br>
+<li> <b>Download precompiled libraries</b> <br>
 
-<a href="http://www.fi.muni.cz/~xsvobod2/misc/lapack/">Blas and Lapack</a> (tested with the shared version, statically-linked, release). Rename the libraries in <code>blas.lib</code> and <code>lapack.lib</code>. Add the directories containing the <code>.dll</code> to your <code>PATH</code> environment variable. <br>
+Not all the libraries are needed for all the methods, select and install the ones you will want to use in your assimilation.
 
-<a href="http://www.netlib.org/atlas/archives/windows/">Atlas and Cblas</a> (tested with
-<code>atlas330_WinNT_P4SSE2.zip</code>). Rename the libraries in <code>atlas.lib</code> and <code>cblas.lib</code>. <br>
-
-<a href="http://code.google.com/p/luaforwindows/">Lua</a> (tested with lua 5.1). Rename the libraries in <code>lua.lib</code>. Add the directories containing the <code>.dll</code> to your <code>PATH</code> environment variable.
+- Lua (always required). On <a href="http://code.google.com/p/luaforwindows/">the luaforwindows webpage</a>, download the latest executable corresponding to Lua 5.1.x (at the time this page is written: <code>LuaForWindows_v5.1.4-40.exe</code>). The executable will copy the Lua library, by default in <code>C:\\Program Files\\Lua\\5.1\\lib\\</code>. In this directory, rename <code>lua51.lib</code> in <code>lua.lib</code>.
 </li>
 
+- Blas and Lapack (highly recommended). Download on <a href="http://www.fi.muni.cz/~xsvobod2/misc/lapack/">this webpage</a> the archive for the shared version, statically-linked. Extract the archive to some directory. Add this directory to your <code>PATH</code> environment variable. Inside the directory, rename <code>blas_win32_MT.lib</code> in <code>blas.lib</code> and <code>lapack_win32_MT.lib</code> in <code>lapack.lib</code>. <br>
 
-<li> <b>Create SuperLU library:</b> <br>
+- Atlas (highly recommended). Download on <a href="http://www.netlib.org/atlas/archives/windows/">this webpage</a> the file <code>atlas330_WinNT_P4SSE2.zip</code>. Extract the archive and put the extracted directory <code>WinNT_P4SSE2</code> in your <code>PATH</code> environment variable. Inside this directory, rename the <code>libcblas.a</code> in <code>cblas.lib</code> and <code>libatlas.a</code> in <code>atlas.lib</code>. <br>
 
-Download <a href="http://crd.lbl.gov/~xiaoye/SuperLU/">SuperLU</a>. <br> 
+- If you need SuperLU (needed only if one uses sparse matrices), see the section below.
 
-Within Microsoft Visual Studio, create a new Win32 Console Application. Start with an empty project. Then add to the project all the <code>.c</code> and <code>.h</code> files from <code>SuperLU/SRC</code> directory (Project -> Add existing item). Change the configuration to build a release version (Build -> Configuration Manager -> Configuration -> Release). <br>
+<li> <b>Create SuperLU library</b> (optional) <br>
 
-Specify the <code>SuperLU/SRC</code> location in <code>Additional Include Directories</code> (Project -> Properties -> Configuration Properties -> C/C++ -> General). Change the property of the project to make the output as Library file <code>.lib</code> (neither <code>.exe</code> nor <code>.dll</code> file) instead of Application(<code>.exe</code>) (Project -> Properties -> Configuration Properties -> General -> Configuration Type). <br>
+Download the SuperLU archive at <a href="http://crd.lbl.gov/~xiaoye/SuperLU/">SuperLU</a>. Take the sequential version 4.1 and expand it. <br>
 
-Compile the project to produce the library file, e.g. <code>superlu.lib</code> (Build -> Build Solution).
+Within Microsoft Visual Studio, create a new Win32 Console Application. Start with an empty project. Then add to the project all the <code>.c</code> and <code>.h</code> files from <code>SuperLU_4.1\\SRC</code> directory (Project -> Add existing item). Change the configuration to build a release version (Build -> Configuration Manager -> Configuration -> Release). <br>
+
+Specify the <code>SuperLU\\SRC</code> location in <code>Additional Include Directories</code> (Project -> Properties -> Configuration Properties -> C/C++ -> General). Change the property of the project to make the output as Library file <code>.lib</code> (neither <code>.exe</code> nor <code>.dll</code> file), in Project -> Properties -> Configuration Properties -> General -> Configuration Type. <br>
+
+Compile the project to produce the library file <code>superlu.lib</code> (Build -> Build Solution).
 </li>
 
-
-<li> <b>Seldon:</b> <br>
-   Download <a href="http://seldon.sourceforge.net/download.php">Seldon</a>.
-</li>
 
 </ul>
 
 \subsection project Create a Verdandi project
 <ul>
-<li> Download %Verdandi and expand it to the directory of your choice (for example <code>MY_VERDANDI_PATH</code>). </li>
+<li> Download %Verdandi and expand it to the directory of your choice. </li>
 
-<li> Create a Verdandi project within Microsoft Visual Studio (File -> New -> Project). In Visual C++/General, select Makefile Project. Choose a name and a location for the solution (for example <code>Verdandi_solution</code>). The build command line is <code>scons</code>, the clean command line is <code>scons -c</code> and the rebuild command line is <code>scons -c && scons</code>.</li>
+<li> Create a %Verdandi project within Microsoft Visual Studio (File -> New -> Project). In Visual C++/General, select Makefile Project. Choose a name and a location (for example <code>Verdandi_solution</code> and <code>C:\\Projects</code>). The generic build command line is <code>scons</code>, the clean command line is <code>scons -c</code> and the rebuild command line is <code>scons -c && scons</code>.</li>
 </ul>
 
 \subsection test Run a test
 <ul>
 
-<li> In the directory containing the project, copy the SConstruct file from <code>verdandi/src/example/clamped-bar</code>. Also copy an example to test, for example <code>forward.cpp</code>, and copy the directory <code>configuration</code>. Edit the <code>SConstruct</code> file. Set <code>verdandi_path</code> to <code>MY_VERDANDI_PATH</code> and add the following lines before the last line:
+<li> In the directory <code>C:\\Projects\\Verdandi_solution</code> (or in whatever directory you put your Makefile Project): (1) copy the <code>SConstruct</code> file from <code>verdandi-[version]\\src\\example\\quadratic_model\\</code>, (2) copy an example like <code>verdandi-[version]\\src\\example\\quadratic_model\\forward.cpp</code>, and its configuration directory <code>verdandi-[version]\\src\\example\\quadratic_model\\configuration\\</code>, and (3) create an empty directory <code>result\\</code>. Then edit the <code>SConstruct</code> file so that it looks like this : 
 
 \precode
+import os
+
+# Put the path to Verdandi.
+# Also editable from command line with option "verdandi".
+verdandi_path = "C:\\verdandi-0.8"
+
 flag_cpp = "/nologo /EHsc /MD"
 linker = "LINK"
 # Put here the list of directories containing the library files to be included.
-include_path = ["Lua_path\include", "SuperLU_path\SRC", "Ops_parent_directory_path", "Seldon_parent_directory_path"]
-# Put here the list of directories containing the library (.lib files).
-library_path = ["Library_folder_1", "Library_folder_2"]
+include_path = [""]
+# Put here the list of directories containing the .lib files.
+library_path = ["C:\\Program Files\\Lua\\5.1\\lib", "C:\\Program Files\\Blas_Lapack",
+                "C:\\Program Files\\WinNT_P4SSE2"]
+
+execfile(os.path.join(verdandi_path, "share\\SConstruct"))
 \endprecode
 </li>
 
+The quadratic model has dependencies to the Lua, Blas, Lapack and Cblas libraries, but other models can require to add some more paths to the <code>include_path</code> and <code>library_path</code> variables.
+
 <li> Edit the Project -> Properties. In Configuration Properties -> NMake, set the build command line to <code>scons forward.exe</code> and the rebuild command line to <code>scons -c && scons forward.exe</code>. Set the output to <code>forward.exe</code>. </li>
 
-<li> Compile with Build -> Build solution. The linker may raise errors for unfound libraries. In this case, build once again the solution. Specify <code>configuration\bar-truth.lua</code> in Configuration Properties/Debugging/Command Arguments. Create an empty directory <code>result\bar-truth</code> in the folder containing the <code>SConstruct</code> file you copied above. To run the example, launch Debug -> Start Without Debugging. If you are told that the executable is out of date, check the box so that you will not be asked again and click on <code>No</code> (do not rebuild the project). </li>
+<li> Compile with Build -> Build solution. Specify the argument for <code>forward.exe</code>; i.e., put <code>configuration\truth.lua</code> in Configuration Properties -> Debugging -> Command Arguments. To run the example, launch Debug -> Start Without Debugging. If you are told that the executable is out of date, check the box so that you will not be asked again and click on <code>No</code> (do not rebuild the project). </li>
 
 </ul>
 */
