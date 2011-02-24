@@ -32,6 +32,70 @@
 using namespace Verdandi;
 
 
+template <class T>
+class IdentityStateErrorVariance
+{
+public:
+    typedef Vector<T> state_error_variance_row;
+protected:
+    int Nstate_;
+public:
+    IdentityStateErrorVariance(int Nstate): Nstate_(Nstate)
+    {
+    }
+    int GetNstate() const
+    {
+        return Nstate_;
+    }
+    void GetStateErrorVarianceRow(int i, state_error_variance_row& row)
+    {
+        row.Reallocate(Nstate_);
+        row.Zero();
+        row(i) = T(1);
+    }
+};
+
+
+template <class T>
+class IdentityObservationManager
+{
+public:
+    typedef Vector<T> tangent_linear_operator_row;
+protected:
+    int Nobservation_;
+    int Nstate_;
+public:
+    IdentityObservationManager(int Nobservation, int Nstate):
+        Nobservation_(Nobservation), Nstate_(Nstate)
+    {
+    }
+    int GetNobservation() const
+    {
+        return Nobservation_;
+    }
+    T GetTangentLinearOperator(int i, int j)
+    {
+        if (i == j)
+            return T(1);
+        else
+            return T(0);
+    }
+    void GetTangentLinearOperatorRow(int i, tangent_linear_operator_row& row)
+    {
+        row.Reallocate(Nstate_);
+        row.Zero();
+        row(i) = T(1);
+    }
+    T GetErrorVariance(int i, int j)
+    {
+        if (i == j)
+            return T(1);
+        else
+            return T(0);
+    }
+};
+
+
 class BLUETest: public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(BLUETest);
@@ -126,13 +190,16 @@ public:
     void compute_BLUE()
     {
         int i, j;
+
+        typedef typename StateVector::value_type T;
+
         {
             StateErrorVariance B(Nx_, Nx_);
             ObservationOperator H(Ny_, Nx_);
             CrossedMatrix tmp;
             ObservationVector y(Ny_);
             ObservationErrorVariance R(Ny_, Ny_);
-            StateVector x(Nx_), analysis;
+            StateVector x(Nx_), analysis_matrix, analysis_vector;
 
             B.SetIdentity();
             H.SetIdentity();
@@ -141,18 +208,29 @@ public:
             Mlt(3., y);
             x.Fill();
 
-            analysis = x;
-            ComputeBLUE_matrix(B, H, tmp, y, R, analysis);
+            analysis_matrix = x;
+            ComputeBLUE_matrix(B, H, tmp, y, R, analysis_matrix);
+
+            IdentityStateErrorVariance<T> model(Nx_);
+            IdentityObservationManager<T> observation_manager(Ny_, Nx_);
+            ObservationVector innovation(Ny_);
+            innovation.Fill();
+            Mlt(2., innovation);
+            analysis_vector = x;
+            ComputeBLUE_vector(model, observation_manager,
+                               innovation, analysis_vector);
 
             for (i = 0; i < min(Nx_, Ny_); i++)
-                CPPUNIT_ASSERT(analysis(i) == 2. * x(i));
+                CPPUNIT_ASSERT(analysis_matrix(i) == 2. * x(i));
+            for (i = 0; i < min(Nx_, Ny_); i++)
+                CPPUNIT_ASSERT(analysis_vector(i) == 2. * x(i));
             // No observations for this part of the state.
             for (i = min(Nx_, Ny_); i < Nx_; i++)
-                CPPUNIT_ASSERT(analysis(i) == x(i));
+                CPPUNIT_ASSERT(analysis_matrix(i) == x(i));
+            for (i = min(Nx_, Ny_); i < Nx_; i++)
+                CPPUNIT_ASSERT(analysis_vector(i) == x(i));
         }
         {
-            typedef typename StateVector::value_type T;
-
             StateErrorVariance B(Nx_, Nx_);
             ObservationOperator H;
             CrossedMatrix tmp;
