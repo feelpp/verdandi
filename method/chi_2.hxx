@@ -15,40 +15,28 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
-//
-// For more information, visit the Verdandi web site:
-//      http://verdandi.gforge.inria.fr/
 
 
-#define SELDON_DEBUG_LEVEL_4
-#define VERDANDI_WITH_ABORT
+#ifndef VERDANDI_FILE_METHOD_CHI_2_HXX
 
-#include "blue.hpp"
-#include "chi_2.hpp"
-#include "cholesky.hpp"
-#include "useful_function.hpp"
 
-#include <cppunit/TestResult.h>
-#include <cppunit/ui/text/TestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
-using namespace CppUnit;
-
-CPPUNIT_TEST_SUITE_REGISTRATION(BLUETest);
-CPPUNIT_TEST_SUITE_REGISTRATION(Chi2Test);
-CPPUNIT_TEST_SUITE_REGISTRATION(CholeskyTest);
-CPPUNIT_TEST_SUITE_REGISTRATION(UsefulFunctionTest);
-
-int main()
+namespace Verdandi
 {
-  TRY;
 
-  TextUi::TestRunner runner;
 
-  TestFactoryRegistry &registry = TestFactoryRegistry::getRegistry();
+    template <class StateErrorVariance, class ObservationOperator,
+              class ObservationVector, class ObservationErrorVariance,
+              class StateVector>
+    typename StateVector::value_type
+    chi_2(const StateVector& x,
+          const StateErrorVariance& B,
+          const ObservationOperator& H,
+          const ObservationVector& y,
+          const ObservationErrorVariance& R);
 
-  runner.addTest(registry.makeTest());
 
-  return runner.run("", false);
+} // namespace Verdandi.
 
-  END;
-}
+
+#define VERDANDI_FILE_METHOD_CHI_2_HXX
+#endif
