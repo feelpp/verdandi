@@ -100,6 +100,9 @@ namespace Verdandi
         int Ny = y.GetLength();
         int Nx = x.GetLength();
 
+        if (Ny == 0) // No observations.
+            return;
+
         // Temporary matrices.
         MatrixStateObservation working_matrix_xy(Nx, Ny);
 
