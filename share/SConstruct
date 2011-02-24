@@ -275,7 +275,7 @@ env.Replace(LINK = linker)
 # Checks for the libraries, and sets the link flags.
 library_list = to_string_list("library_list")
 for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
-                "newran", "superlu_3.1", "cblas", "pthread", "mpiseq",
+                "newran", "superlu", "cblas", "pthread", "mpiseq",
                 "dmumps", "zmumps", "mumps_common", "pord", "metis", "m",
                 "umfpack", "amd", "cppunit"]:
     if library not in library_list:
