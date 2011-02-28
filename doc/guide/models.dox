@@ -5,6 +5,24 @@
 /*!
 \page models Models
 
+\section quadratic_model Quadratic Model
+
+In order to define the quadratic model, we introduce:
+- \f$n\f$ matrices \f$ S_i \in \mathbb{R}^{n \times n} \f$ for the quadratic part of the model,
+- one matrix \f$ L \in \mathbb{R}^{n \times n} \f$ for the linear part of the model, and
+- a vector \f$b \in \mathbb{R}^n \f$ for the constant part of the model.
+
+The equation of the \f$i\f$th state component of the quadratic model (\f$ i \in \{1,\ldots,n\}\f$) is
+\f[
+\frac{\mathrm{d} x_i}{\mathrm{d} t} = x^T S_i x + L_i x + b_i,
+\f]
+where \f$L_i\f$ is the \f$i\f$th line of \f$L\f$.
+
+In case the model has no quadratic part, the state equation is simply
+\f[
+\frac{\mathrm{d} x}{\mathrm{d} t} = L x + b.
+\f]
+
 \section shallow_water Shallow-water
 The shallow-water equations (also called Saint Venant equations) are a set of hyperbolic partial differential equations that describe the flow below a pressure surface in a fluid. It is suitable for flows with a free surface and small depth. For instance, these equations can be applied to model the behavior of a lake or a river. The model describes the evolution of the water height \f$h(x,y)\f$ and the horizontal velocity \f$(u(x,y),v(x,y))\f$. A simplified expression of the model is: <br>
 
