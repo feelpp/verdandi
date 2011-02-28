@@ -55,17 +55,22 @@ namespace Verdandi
         Err.CoutWhat();                                         \
         return 1;                                               \
       }                                                         \
-    catch (std::exception& Err)                                 \
+    catch(::Ops::Error& Err)                            \
+      {                                                         \
+        Err.CoutWhat();                                         \
+        return 1;                                               \
+      }                                                         \
+    catch(std::exception& Err)                                  \
       {                                                         \
         cout << "C++ exception: " << Err.what() << endl;        \
         return 1;                                               \
       }                                                         \
-    catch (std::string& str)                                    \
+    catch(std::string& str)                                     \
       {                                                         \
         cout << str << endl;                                    \
         return 1;                                               \
       }                                                         \
-    catch (const char* str)                                     \
+    catch(const char* str)                                      \
       {                                                         \
         cout << str << endl;                                    \
         return 1;                                               \
