@@ -315,26 +315,35 @@ if ARGUMENTS["omp"] == "yes":
 
 
 # Dependency list.
+dependency_list = to_string_list("dependency_list")
+# In case there is a list of dependencies to be excluded.
+exclude_dependency = to_string_list("exclude_dependency")
+for expression in exclude_dependency:
+    for dependency in dependency_list[:]:
+        import re
+        if re.search(expression, dependency) is not None:
+            dependency_list.remove(dependency)
+
+# For Lua 5.1.4.
 if os.name == "posix":
     env_lua.Append(CFLAGS = "-DLUA_USE_POSIX")
-# For Lua 5.1.4.
 if env_lua['PLATFORM'] != 'win32':
-    dependency_list = ["lapi", "lcode", "ldebug", "ldo", "ldump", "lfunc",
-                       "lgc", "llex", "lmem", "lobject", "lopcodes",
-                       "lparser", "lstate", "lstring", "ltable", "ltm",
-                       "lundump", "lvm", "lzio", "lauxlib", "lbaselib",
-                       "ldblib", "liolib", "lmathlib", "loslib", "ltablib",
-                       "lstrlib", "loadlib", "linit"]
-    dependency_list_c = [os.path.join(verdandi_path, "include/lua/src/"
+    lua_dependency_list = ["lapi", "lcode", "ldebug", "ldo", "ldump", "lfunc",
+                           "lgc", "llex", "lmem", "lobject", "lopcodes",
+                           "lparser", "lstate", "lstring", "ltable", "ltm",
+                           "lundump", "lvm", "lzio", "lauxlib", "lbaselib",
+                           "ldblib", "liolib", "lmathlib", "loslib",
+                           "ltablib", "lstrlib", "loadlib", "linit"]
+    lua_dependency_list_c = [os.path.join(verdandi_path, "include/lua/src/"
                                       + t + ".c")
-                         for t in dependency_list]
+                             for t in lua_dependency_list]
     # Makes sure that the library is compiled only if not already
     # available. Indeed, if the library was compiled using the Lua makefile or
     # if another version of Lua is used, it should not be combined by
     # SCons. In addition, "scons -c" should not remove the library.
     lua_library = os.path.join(verdandi_path, "include/lua/src/liblua.a")
     if not os.path.isfile(lua_library):
-        env_lua.StaticLibrary(lua_library, dependency_list_c)
+        env_lua.StaticLibrary(lua_library, lua_dependency_list_c)
     if "g++" in env["CXX"]:
         env_lua.Append(CFLAGS = "-fPIC") # for SWIG.
 
@@ -346,6 +355,6 @@ for filename in target_list[:]:
         target_list.remove(filename)
 for filename in target_list:
     if env['PLATFORM'] in ['win32', 'win64']:
-        env.Program(filename[:-4], [filename])
-    if env['PLATFORM'] != 'win32':
-        env.Program(filename[:-4], [filename, lua_library])
+        env.Program(filename[:-4], [filename] + dependency_list)
+    else:
+        env.Program(filename[:-4], [filename, lua_library] + dependency_list)
