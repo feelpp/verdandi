@@ -184,6 +184,7 @@ namespace Verdandi
         output_saver_.Empty("singular_value");
         output_saver_.Empty("left_singular_vector");
         output_saver_.Empty("right_singular_vector");
+        output_saver_.Empty("model_error_variance_sqrt");
 
         /*** Logger and read configuration ***/
 
@@ -529,7 +530,10 @@ namespace Verdandi
             Q_sqrt.Zero();
         }
         else
+        {
             Q_sqrt = model_.GetErrorVarianceSqrt();
+            output_saver_.Save(Q_sqrt, time, "model_error_variance_sqrt");
+        }
         Nmode_Q_= Q_sqrt.GetN();
 
         // Forecast step.
