@@ -32,20 +32,20 @@ Not all assimilation methods are compatible with all example models, because the
 <td> \ref optimal_interpolation "Optimal interpolation" </td>
 <td><code>yes</code></td>
 <td><code>yes</code></td>
-<td><code>yes</code></td>
+<td><code>no</code></td>
 <td><code>yes</code></td>
 </tr>
 <tr>
 <td>\ref extended_kalman_filter "Extended Kalman filter" </td>
 <td><code>yes</code></td>
-<td><code>yes</code></td>
+<td><code>no</code></td>
 <td><code>no</code></td>
 <td><code>yes</code></td>
 </tr>
 <tr>
 <td>\ref unscented_kalman_filter "Unscented Kalman filter" </td>
 <td><code>yes</code></td>
-<td><code>yes</code></td>
+<td><code>no</code></td>
 <td><code>no</code></td>
 <td><code>yes</code></td>
 </tr>
