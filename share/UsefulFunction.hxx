@@ -112,9 +112,11 @@ namespace Verdandi
     template <class T>
     void Fill(T value, Matrix<T, Symmetric, RowSymSparse>& M);
 
+#ifndef SWIG
     template <class T, template <class U> class Allocator>
     void GetRowPointer(const Matrix<T, General, RowMajor, Allocator<T> >& M,
                        int i, Vector<T, VectFull, Allocator<T> >& V);
+#endif
 
 
 } // namespace Verdandi.
