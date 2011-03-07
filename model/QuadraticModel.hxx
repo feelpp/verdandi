@@ -161,7 +161,7 @@ namespace Verdandi
         uncertain_variable& GetUncertainVariable(int i);
         Vector<T>& GetPDFCorrelation(int i);
         string GetPDF(int i);
-        Matrix<T, Symmetric, RowSymPacked>& GetPDFVariance(int i);
+        Matrix<T, Symmetric, Seldon::RowSymPacked>& GetPDFVariance(int i);
         Vector<T>& GetPDFParameter(int i);
         string GetPerturbationOption(int i);
 
