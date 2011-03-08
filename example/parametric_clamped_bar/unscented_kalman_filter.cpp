@@ -9,7 +9,6 @@
 #define SELDON_WITH_MUMPS
 
 #include "Verdandi.hxx"
-using namespace Verdandi;
 #include "seldon/SeldonSolver.hxx"
 
 #include "UnscentedKalmanFilter.cxx"
@@ -26,14 +25,15 @@ int main(int argc, char** argv)
     {
         string mesg  = "Usage:\n";
         mesg += string("  ") + argv[0] + " [configuration file]";
-        cout << mesg << endl;
+        std::cout << mesg << std::endl;
         return 1;
     }
 
     typedef double real;
 
-    UnscentedKalmanFilter<real, ParametricClampedBar<real>,
-        LinearObservationManager<real> > driver(argv[1]);
+    Verdandi::UnscentedKalmanFilter<real,
+        Verdandi::ParametricClampedBar<real>,
+        Verdandi::LinearObservationManager<real> > driver(argv[1]);
 
     driver.Initialize();
 

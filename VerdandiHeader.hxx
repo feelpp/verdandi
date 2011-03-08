@@ -55,29 +55,30 @@ namespace Verdandi
         Err.CoutWhat();                                         \
         return 1;                                               \
       }                                                         \
-    catch(::Ops::Error& Err)                            \
+    catch(::Ops::Error& Err)                                    \
       {                                                         \
         Err.CoutWhat();                                         \
         return 1;                                               \
       }                                                         \
     catch(std::exception& Err)                                  \
       {                                                         \
-        cout << "C++ exception: " << Err.what() << endl;        \
+        std::cout << "C++ exception: "                          \
+            << Err.what() << std::endl;                         \
         return 1;                                               \
       }                                                         \
     catch(std::string& str)                                     \
       {                                                         \
-        cout << str << endl;                                    \
+        std::cout << str << std::endl;                          \
         return 1;                                               \
       }                                                         \
     catch(const char* str)                                      \
       {                                                         \
-        cout << str << endl;                                    \
+        std::cout << str << std::endl;                          \
         return 1;                                               \
       }                                                         \
     catch(...)                                                  \
       {                                                         \
-        cout << "Unknown exception..." << endl;                 \
+        std::cout << "Unknown exception..." << std::endl;       \
         return 1;                                               \
       }
 #endif

@@ -6,7 +6,6 @@
 #define VERDANDI_WITH_ABORT
 
 #include "Verdandi.hxx"
-using namespace Verdandi;
 
 #include "model/QuadraticModel.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
@@ -22,14 +21,14 @@ int main(int argc, char** argv)
     {
         string mesg  = "Usage:\n";
         mesg += string("  ") + argv[0] + " [configuration file]";
-        cout << mesg << endl;
+        std::cout << mesg << std::endl;
         return 1;
     }
 
     typedef double real;
 
-    OptimalInterpolation<real, QuadraticModel<real>,
-        LinearObservationManager<real> > driver(argv[1]);
+    Verdandi::OptimalInterpolation<real, Verdandi::QuadraticModel<real>,
+        Verdandi::LinearObservationManager<real> > driver(argv[1]);
 
     driver.Initialize();
 

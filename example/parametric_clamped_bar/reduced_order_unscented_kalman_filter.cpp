@@ -21,7 +21,6 @@
 #endif
 
 #include "Verdandi.hxx"
-using namespace Verdandi;
 #include "seldon/SeldonSolver.hxx"
 
 #include "model/ParametricClampedBar.cxx"
@@ -38,7 +37,7 @@ int main(int argc, char** argv)
     {
         string mesg  = "Usage:\n";
         mesg += string("  ") + argv[0] + " [configuration file]";
-        cout << mesg << endl;
+        std::cout << mesg << std::endl;
         return 1;
     }
 
@@ -48,8 +47,9 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    ReducedOrderUnscentedKalmanFilter<real, ParametricClampedBar<real>,
-        LinearObservationManager<real> > driver(argv[1]);
+    Verdandi::ReducedOrderUnscentedKalmanFilter<real,
+        Verdandi::ParametricClampedBar<real>,
+        Verdandi::LinearObservationManager<real> > driver(argv[1]);
 
     driver.Initialize();
 

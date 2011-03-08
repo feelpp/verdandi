@@ -6,10 +6,9 @@
 #define VERDANDI_DENSE
 
 #define VERDANDI_WITH_DIRECT_SOLVER
-#define SELDON_WITH_SUPERLU
+#define SELDON_WITH_MUMPS
 
 #include "Verdandi.hxx"
-using namespace Verdandi;
 #include "seldon/SeldonSolver.hxx"
 
 #include "model/ParametricClampedBar.cxx"
@@ -25,11 +24,12 @@ int main(int argc, char** argv)
     {
         string mesg  = "Usage:\n";
         mesg += string("  ") + argv[0] + " [configuration file]";
-        cout << mesg << endl;
+        std::cout << mesg << std::endl;
         return 1;
     }
 
-    ForwardDriver<ParametricClampedBar<double> > driver(argv[1]);
+    Verdandi::ForwardDriver<Verdandi::ParametricClampedBar<double> >
+        driver(argv[1]);
 
     driver.Initialize();
 
