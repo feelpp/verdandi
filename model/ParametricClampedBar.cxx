@@ -46,7 +46,7 @@ namespace Verdandi
 
     //! Constructor.
     template <class T>
-    ParametricClampedBar<T>::ParametricClampedBar()
+    ParametricClampedBar<T>::ParametricClampedBar(): time_(0.)
     {
     }
 
@@ -56,7 +56,8 @@ namespace Verdandi
       \param[in] configuration_file path to the configuration file.
     */
     template <class T>
-    ParametricClampedBar<T>::ParametricClampedBar(string configuration_file)
+    ParametricClampedBar<T>::ParametricClampedBar(string configuration_file):
+        time_(0.)
     {
     }
 
