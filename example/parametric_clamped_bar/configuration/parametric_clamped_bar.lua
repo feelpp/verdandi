@@ -24,7 +24,7 @@ parametric_clamped_bar = {
 
         Young_modulus = 1.,
         mass_density = 1.,
-        theta_force = {1., 2., 2., 4.},
+        theta_force = {1., 1., 1., 1.},
         theta_stiffness = {1., 1.},
         theta_mass = {1., 1., 1., 1., 1.},
         theta_damp = {1.},

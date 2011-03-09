@@ -18,9 +18,9 @@ output_mode_scalar = "text"
 
 dofile("configuration/parametric_clamped_bar.lua")
 
-
--- The configuration of the model is modified.
-parametric_clamped_bar.physics.mass_density = 1.
+-- In order to demonstrate the assimilation, errors are introduced in the
+-- model.
+parametric_clamped_bar.physics.theta_force = {1., 2., 2., 4.}
 
 
 -------------------------------- OBSERVATION ---------------------------------
@@ -47,7 +47,7 @@ optimal_interpolation = {
    display = {
 
       show_iteration = false,
-      show_time = false
+      show_time = true
    },
 
    output_saver = {
@@ -248,7 +248,7 @@ forward = {
    display = {
 
       show_iteration = false,
-      show_time = false
+      show_time = true
 
    },
 

@@ -35,7 +35,7 @@ forward = {
    display = {
 
       show_iteration = false,
-      show_time = false
+      show_time = true
 
    },
 
