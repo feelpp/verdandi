@@ -214,15 +214,17 @@ namespace Verdandi
         build_diagonal_sparse_matrix(GetNstate(),
                                      state_error_variance_value_,
                                      state_error_variance_);
+        build_diagonal_sparse_matrix(GetNstate(),
+                                     T(1) / state_error_variance_value_,
+                                     state_error_variance_inverse_);
 #else
         state_error_variance_.Reallocate(GetNstate(), GetNstate());
         state_error_variance_.SetIdentity();
         Mlt(T(state_error_variance_value_), state_error_variance_);
+        state_error_variance_inverse_.Reallocate(GetNstate(), GetNstate());
+        state_error_variance_inverse_.SetIdentity();
+        Mlt(T(state_error_variance_value_), state_error_variance_inverse_);
 #endif
-
-        Copy(state_error_variance_, state_error_variance_inverse_);
-        GetInverse(state_error_variance_inverse_);
-
         is_adjoint_initialized_ = false;
     }
 
