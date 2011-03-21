@@ -277,7 +277,7 @@ library_list = to_string_list("library_list")
 for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
                 "newran", "superlu", "cblas", "pthread", "mpiseq",
                 "dmumps", "zmumps", "mumps_common", "pord", "metis", "m",
-                "umfpack", "amd", "cppunit"]:
+                "umfpack", "amd", "cppunit", "nlopt"]:
     if library not in library_list:
         library_list += [library]
 if env['PLATFORM'] in ['win32', 'win64'] and "lua" not in library_list:

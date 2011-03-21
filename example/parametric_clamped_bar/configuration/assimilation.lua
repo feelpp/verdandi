@@ -242,6 +242,52 @@ reduced_order_extended_kalman_filter = {
 }
 
 
+-- Simulation with assimilation using 4D-VAR.
+four_dimensional_variational = {
+
+   nlopt = {
+
+      -- Optimization algorithm (LD_VAR1, LD_LBFGS, LD_SLSQP, LD_MMA,
+      -- LD_TNEWTON ...).
+      algorithm = "LD_VAR1",
+
+      -- If you do not want to use a particular tolerance termination, you can
+      -- just set that tolerance to zero and it will be ignored.
+      -- Relative tolerance on the optimization parameters.
+      parameter_tolerance = 1.e-6,
+      -- Relative tolerance on the cost function.
+      cost_function_tolerance = 1.e-6
+
+   },
+
+   display = {
+
+      show_optimization_iteration = true,
+      show_iteration = false,
+      show_time = true
+
+   },
+
+   output_saver = {
+
+      variable_list = {"state_forecast", "state_analysis"},
+      file = output_directory .. "4dvar-%{name}.%{extension}",
+      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      mode = output_mode,
+      mode_scalar = output_mode_scalar
+
+   },
+
+   output = {
+
+     configuration = output_directory .. "4dvar.lua",
+     log = output_directory .. "4dvar.log"
+
+   },
+
+}
+
+
 -- Forward simulation.
 forward = {
 
