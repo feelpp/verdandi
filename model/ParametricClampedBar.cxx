@@ -68,6 +68,13 @@ namespace Verdandi
     {
         x_.Nullify();
         x_full_.Nullify();
+        // Deallocate q.
+        if (is_adjoint_initialized_)
+        {
+            state working_vector;
+            working_vector.SetData(q_.GetM(), q_.GetVector(0).GetData());
+            q_.Nullify();
+        }
     }
 
 
@@ -212,6 +219,31 @@ namespace Verdandi
         state_error_variance_.SetIdentity();
         Mlt(T(state_error_variance_value_), state_error_variance_);
 #endif
+
+        Copy(state_error_variance_, state_error_variance_inverse_);
+        GetInverse(state_error_variance_inverse_);
+
+        is_adjoint_initialized_ = false;
+    }
+
+
+    //! Initializes the adjoint model.
+    template <class T>
+    void ParametricClampedBar<T>::InitializeAdjoint()
+    {
+
+        /*** Allocate adjoint variables ***/
+
+        state working_vector(Nstate_);
+        working_vector.Fill(T(0));
+        SetShape(working_vector, q_);
+        working_vector.Nullify();
+
+        /*** Allocate stiffness matrix ***/
+
+        Copy(mass_matrix_, stiffness_matrix_);
+
+        is_adjoint_initialized_ = true;
     }
 
 
@@ -337,6 +369,207 @@ namespace Verdandi
     {
         output_saver_.Save(disp_0_, time_, "disp_0");
         output_saver_.Save(velo_0_, time_, "velo_0");
+    }
+
+
+    //! Performs one step backward in adjoint model.
+    /*!
+      \param[in] observation_term \f$ H^T R^{-1}(y - Hx) \f$.
+    */
+    template <class T>
+    void ParametricClampedBar<T>::BackwardAdjoint(state& observation_term)
+    {
+        if (!is_adjoint_initialized_)
+            InitializeAdjoint();
+
+        state_collection source_term;
+        SetShape(observation_term, source_term);
+
+        state force_active;
+        force_active.SetData(Ndof_ - 1, force_.GetData() + 1);
+
+        /*** Computes p_f_n ***/
+
+        if (stable_.find("theta_force") != stable_.end())
+        {
+            state e_i(theta_force_.GetM());
+            for (int i = 0; i < theta_force_.GetM(); i++)
+            {
+                e_i.Fill(T(0));
+                e_i(i) = T(1);
+                AssembleMassMatrix(e_i, theta_force_index_);
+                state ones(Ndof_);
+                ones.Fill(T(1));
+                MltAdd(T(sin(Pi_ * (time_ + 0.5 * Delta_t_) / final_time_)),
+                       mass_matrix_, ones, T(0), force_);
+                force_(0) = T(0);
+                q_.GetVector("theta_force")(i)
+                    += DotProd(q_.GetVector("velocity"), force_active);
+            }
+        }
+
+        /*** Computes p_s_n and p_m_n ***/
+
+        if (stable_.find("theta_stiffness") != stable_.end() ||
+            stable_.find("theta_mass") != stable_.end())
+        {
+
+            // Computes x_{n+1} + x_n  and v_{n+1} - v_n.
+            state disp(Ndof_), velo(Ndof_);
+            Copy(disp_0_, disp);
+            Copy(velo_0_, velo);
+
+            Forward(true);
+
+            time_ -= Delta_t_;
+
+            Add(T(1), disp_0_, disp);
+            Mlt(T(-1), velo);
+            Add(T(1), velo_0_, velo);
+
+            if (stable_.find("theta_stiffness") != stable_.end())
+            {
+                state e_i(Ntheta_stiffness_);
+                for (int i = 0; i < Ntheta_stiffness_; i++)
+                {
+                    e_i.Fill(T(0));
+                    e_i(i) = T(1);
+                    AssembleStiffnessMatrix(e_i, theta_stiffness_index_);
+                    MltAdd(T(0.5), stiffness_matrix_, disp, T(0), force_);
+                    q_.GetVector("theta_stiffness")(i)
+                        -= DotProd(q_.GetVector("velocity"), force_active);
+                }
+            }
+            if (stable_.find("theta_mass") != stable_.end())
+            {
+                state e_i(Ntheta_mass_);
+                for (int i = 0; i < Ntheta_mass_; i++)
+                {
+                    e_i.Fill(T(0));
+                    e_i(i) = T(1);
+                    AssembleMassMatrix(e_i, theta_mass_index_);
+                    MltAdd(T(1) / Delta_t_, mass_matrix_, velo, T(0), force_);
+                    q_.GetVector("theta_mass")(i)
+                        -= DotProd(q_.GetVector("velocity"), force_active);
+                }
+            }
+        }
+
+        if (stable_.find("theta_damp") != stable_.end())
+            throw ErrorUndefined("BackwardAdjoint(state& observation_term)",
+                                 "theta_damp");
+
+        state rhs(Ndof_), rhs_active;
+        rhs.Fill(T(0));
+        rhs_active.SetData(Ndof_ - 1, rhs.GetData() + 1);
+
+
+        if (stable_.find("theta_force") != stable_.end())
+            Add(T(1), source_term.GetVector("theta_force"),
+                q_.GetVector("theta_force"));
+        if (stable_.find("theta_stiffness") != stable_.end())
+            Add(T(1), source_term.GetVector("theta_stiffness"),
+                q_.GetVector("theta_stiffness"));
+        if (stable_.find("theta_mass") != stable_.end())
+            Add(T(1), source_term.GetVector("theta_mass"),
+                q_.GetVector("theta_mass"));
+        if (stable_.find("theta_damp") != stable_.end())
+            Add(T(1), source_term.GetVector("theta_damp"),
+                q_.GetVector("theta_damp"));
+
+        /*** Assembling process ***/
+
+        AssembleMassMatrix(theta_mass_, theta_mass_index_);
+        AssembleDampMatrix();
+        AssembleStiffnessMatrix(theta_stiffness_, theta_stiffness_index_);
+        AssembleNewMarkMatrix0();
+        AssembleNewMarkMatrix1();
+
+#if defined(VERDANDI_WITH_DIRECT_SOLVER)
+#if defined(SELDON_WITH_UMFPACK)
+        MatrixUmfPack<T> N1_lu, K_lu;
+#elif defined(SELDON_WITH_SUPERLU)
+        MatrixSuperLU<T> N1_lu, K_lu;
+#elif defined(SELDON_WITH_MUMPS)
+        MatrixMumps<T> N1_lu, K_lu;
+#endif
+        GetLU(Newmark_matrix_1_, N1_lu, true);
+        GetLU(stiffness_matrix_, K_lu, true);
+#endif
+
+        /*** Computes K_inv * source_term ***/
+
+        state K_inv_Sd(Ndof_), K_inv_Sd_active;
+        K_inv_Sd(0) = 0;
+        K_inv_Sd_active.SetData(Ndof_ - 1, K_inv_Sd.GetData() + 1);
+        Copy(source_term.GetVector("displacement"), K_inv_Sd_active);
+#ifdef VERDANDI_WITH_DIRECT_SOLVER
+        SolveLU(K_lu, K_inv_Sd);
+#else
+        state b(K_inv_Sd);
+        int nb_max_iter = 1000;
+        double tolerance = 1e-6;
+        Iteration<double> iter(nb_max_iter, tolerance);
+        Preconditioner_Base precond;
+        iter.SetRestart(5);
+        iter.HideMessages();
+        K_inv_Sd.Fill(T(0));
+        Gmres(stiffness_matrix_, K_inv_Sd, b, precond, iter);
+#endif
+
+        state_collection q_disp_1, q_velo_1;
+        state q_disp_1_0(1), q_velo_1_0(1);
+        q_disp_1_0(0) = q_velo_1_0(0) = T(0);
+
+        q_disp_1.AddVector(q_disp_1_0, "inactive");
+        q_disp_1.AddVector(q_.GetVector("displacement"), "active");
+        q_velo_1.AddVector(q_velo_1_0, "inactive");
+        q_velo_1.AddVector(q_.GetVector("velocity"), "active");
+
+        /*** Computes right-hand side ***/
+
+        rhs.Fill(T(0));
+        MltAdd(T(-2) / Delta_t_, mass_matrix_, q_velo_1, T(0), rhs);
+        MltAdd(T(2) / Delta_t_, mass_matrix_, K_inv_Sd, T(1), rhs);
+        MltAdd(T(1), damp_matrix_, K_inv_Sd, T(1), rhs);
+        Add(T(-1), source_term.GetVector("velocity"), rhs_active);
+        MltAdd(T(1), Newmark_matrix_0_, q_disp_1, T(1), rhs);
+        rhs(0) = T(0);
+
+        /*** Computes q_disp_n ***/
+
+        state q_disp(Ndof_), q_disp_active;
+        q_disp(0) = T(0);
+        q_disp_active.SetData(Ndof_ - 1, q_disp.GetData() + 1);
+#ifdef VERDANDI_WITH_DIRECT_SOLVER
+        Copy(rhs_active, q_disp_active);
+        SolveLU(N1_lu, q_disp);
+#else
+        Iteration<double> iter2(nb_max_iter, tolerance);
+        Preconditioner_Base precond2;
+        iter2.SetRestart(5);
+        iter2.HideMessages();
+        q_disp.Fill(T(0));
+        Gmres(Newmark_matrix_1_, q_disp, rhs, precond2, iter2);
+#endif
+
+        /*** Computes q_velo_n ***/
+
+        Add(T(-1), q_disp_active, q_disp_1.GetVector("active"));
+        Mlt(T(-1), q_velo_1.GetVector("active"));
+        Add(T(2), K_inv_Sd_active, q_velo_1.GetVector("active"));
+        Add(T(2) / Delta_t_, q_disp_1.GetVector("active"),
+            q_velo_1.GetVector("active"));
+
+        Copy(q_disp_active, q_disp_1.GetVector("active"));
+
+        source_term.Nullify();
+        q_disp_1.Nullify();
+        q_velo_1.Nullify();
+        force_active.Nullify();
+        rhs_active.Nullify();
+        K_inv_Sd_active.Nullify();
+        q_disp_active.Nullify();
     }
 
 
@@ -592,6 +825,30 @@ namespace Verdandi
     }
 
 
+    //! Provides the state lower bound.
+    /*!
+      \param[out] lower_bound the state lower bound (componentwise).
+    */
+    template <class T>
+    void ParametricClampedBar<T>
+    ::GetStateLowerBound(state& lower_bound) const
+    {
+        lower_bound.Clear();
+    }
+
+
+    //! Provides the state upper bound.
+    /*!
+      \param[out] upper_bound the state upper bound (componentwise).
+    */
+    template <class T>
+    void ParametricClampedBar<T>
+    ::GetStateUpperBound(state& upper_bound) const
+    {
+        upper_bound.Clear();
+    }
+
+
     //! Provides the full state vector.
     /*!
       \param[out] state the full state vector.
@@ -620,6 +877,96 @@ namespace Verdandi
                                   + to_str(x.GetM()) + ".");
         for (int i = 0; i < x_.GetM(); i++)
             x_full_(i) = x(i);
+    }
+
+
+    //! Returns the adjoint state vector.
+    /*!
+      \param[in] state_adjoint the adjoint state vector.
+    */
+    template <class T>
+    void ParametricClampedBar<T>::GetAdjointState(state& state_adjoint)
+    {
+        if (!is_adjoint_initialized_)
+            InitializeAdjoint();
+
+        state_collection p;
+        SetShape(state_adjoint, p);
+
+        AssembleMassMatrix(theta_mass_, theta_mass_index_);
+        AssembleDampMatrix();
+        AssembleStiffnessMatrix(theta_stiffness_, theta_stiffness_index_);
+
+        state_collection p_disp, p_velo;
+        state p_disp_0(1), p_velo_0(1);
+        p_disp_0(0) = p_velo_0(0) = T(0);
+        p.GetVector("displacement").Fill(T(0));
+        p.GetVector("velocity").Fill(T(0));
+
+        p_disp.AddVector(p_disp_0, "inactive");
+        p_disp.AddVector(p.GetVector("displacement"), "active");
+        p_velo.AddVector(p_velo_0, "inactive");
+        p_velo.AddVector(p.GetVector("velocity"), "active");
+
+        /*** Computes p_disp_n ***/
+
+        state q_velo(Ndof_), q_velo_active;
+        q_velo(0) = T(0);
+        q_velo_active.SetData(Ndof_ - 1, q_velo.GetData() + 1);
+        Copy(q_.GetVector("velocity"), q_velo_active);
+        Mlt(T(0.5), q_velo_active);
+        Add(T(1) / Delta_t_, q_.GetVector("displacement"),
+            q_velo_active);
+        MltAdd(T(1), stiffness_matrix_, q_velo, T(0), p_disp);
+
+        /*** Computes p_velo_n ***/
+
+        state q_disp(Ndof_), q_disp_active;
+        q_disp(0) = T(0);
+        q_disp_active.SetData(Ndof_ - 1, q_disp.GetData() + 1);
+        Copy(q_.GetVector("displacement"), q_disp_active);
+        MltAdd(T(-0.5), stiffness_matrix_, q_disp, T(0), p_velo);
+
+        q_velo(0) = T(0);
+        Copy(q_.GetVector("velocity"), q_velo_active);
+        MltAdd(T(0.5), damp_matrix_, q_velo, T(1), p_velo);
+        MltAdd(T(1) / Delta_t_, mass_matrix_, q_velo, T(1), p_velo);
+
+        if (stable_.find("theta_force") != stable_.end())
+            Copy(q_.GetVector("theta_force"), p.GetVector("theta_force"));
+        if (stable_.find("theta_stiffness") != stable_.end())
+            Copy(q_.GetVector("theta_stiffness"),
+                 p.GetVector("theta_stiffness"));
+        if (stable_.find("theta_mass") != stable_.end())
+            Copy(q_.GetVector("theta_mass"), p.GetVector("theta_mass"));
+        if (stable_.find("theta_damp") != stable_.end())
+            Copy(q_.GetVector("theta_damp"), p.GetVector("theta_damp"));
+
+        p.Nullify();
+        q_disp_active.Nullify();
+        q_velo_active.Nullify();
+    }
+
+
+    //! Sets the adjoint state vector.
+    /*!
+      \param[out] state_adjoint the adjoint state vector.
+    */
+    template <class T>
+    void ParametricClampedBar<T>::SetAdjointState(const state& state_adjoint)
+    {
+        if (!is_adjoint_initialized_)
+            InitializeAdjoint();
+
+        if (q_.GetM() != state_adjoint.GetM())
+            throw ErrorProcessing("ParametricClampedBar::SetStateAdjoint()",
+                                  "Operation not permitted:\n p_ is a vector"
+                                  " of length " + to_str(q_.GetM()) +
+                                  ";\n  state_adjoint is a vector of length "
+                                  + to_str(state_adjoint.GetM()) + ".");
+
+        for (int i = 0; i < q_.GetM(); i++)
+            q_(i) = state_adjoint(i);
     }
 
 
@@ -707,6 +1054,18 @@ namespace Verdandi
             U_array(i, i) = T(T(1) / state_error_variance_value_);
         Copy(U_array, U);
 #endif
+    }
+
+
+    //! Returns the inverse of the background error variance (\f$B^{-1}\f$).
+    /*!
+      \return The inverse of the background error variance (\f$B^{-1}\f$).
+    */
+    template <class T>
+    const typename ParametricClampedBar<T>::state_error_variance&
+    ParametricClampedBar<T>::GetStateErrorVarianceInverse() const
+    {
+        return state_error_variance_inverse_;
     }
 
 
@@ -895,6 +1254,34 @@ namespace Verdandi
     }
 
 
+    //! Assembles stiffness matrix.
+    /*
+      \param[in] theta vector of 'theta' value.
+      \param[in] theta_index vector that indicates for each element
+      the 'theta' value index of the element.
+    */
+    template <class T>
+    void ParametricClampedBar<T>
+    ::AssembleStiffnessMatrix(Vector<T>& theta, Vector<int>& theta_index)
+    {
+        Fill(T(0), stiffness_matrix_);
+        for (int i = 0; i < Nx_; i++)
+        {
+            stiffness_matrix_.Val(i, i) += stiffness_FEM_matrix_(0, 0)
+                * theta(theta_index(i));
+            stiffness_matrix_.Val(i + 1, i + 1) += stiffness_FEM_matrix_(1, 1)
+                * theta(theta_index(i));
+            stiffness_matrix_.Val(i, i + 1) += stiffness_FEM_matrix_(0, 1)
+                * theta(theta_index(i));
+        }
+
+        // Boundary condition by pseudo-elimination.
+        stiffness_matrix_.Val(0, 0) = 1;
+        stiffness_matrix_.Val(0, 1) = 0;
+        stiffness_matrix_.Val(1, 0) = 0;
+    }
+
+
     //! Builds skeleton newmark, mass and damp matrices.
     template <class T>
     void ParametricClampedBar<T>
@@ -974,6 +1361,63 @@ namespace Verdandi
                              sym_row_m, sym_col_m);
         damp_matrix_.SetData(Ndof_, Ndof_, sym_values_c,
                              sym_row_c, sym_col_c);
+    }
+
+
+    //! Builds a state shape collection over \a x.
+    /*
+      \param[in] x a given state.
+      \param[out] x_collection collection encapsulating \a x.
+    */
+    template <class T>
+    void ParametricClampedBar<T>
+    ::SetShape(state& x, state_collection& x_collection) const
+    {
+        x_collection.Clear();
+        state working_vector;
+        int position = 0;
+        if (stable_.find("displacement") != stable_.end())
+        {
+            working_vector.SetData(Ndof_ - 1, x.GetData());
+            x_collection.AddVector(working_vector, "displacement");
+            working_vector.Nullify();
+            position += Ndof_ - 1;
+        }
+        if (stable_.find("velocity") != stable_.end())
+        {
+            working_vector.SetData(Ndof_ - 1, x.GetData() + position);
+            x_collection.AddVector(working_vector, "velocity");
+            working_vector.Nullify();
+            position += Ndof_ - 1;
+        }
+        if (stable_.find("theta_force") != stable_.end())
+        {
+            working_vector.SetData(Ntheta_force_, x.GetData() + position);
+            x_collection.AddVector(working_vector, "theta_force");
+            working_vector.Nullify();
+            position += Ntheta_force_;
+        }
+        if (stable_.find("theta_stiffness") != stable_.end())
+        {
+            working_vector.SetData(Ntheta_stiffness_, x.GetData() + position);
+            x_collection.AddVector(working_vector, "theta_stiffness");
+            working_vector.Nullify();
+            position += Ntheta_stiffness_;
+        }
+        if (stable_.find("theta_mass") != stable_.end())
+        {
+            working_vector.SetData(Ntheta_mass_, x.GetData() + position);
+            x_collection.AddVector(working_vector, "theta_mass");
+            working_vector.Nullify();
+            position += Ntheta_mass_;
+        }
+        if (stable_.find("theta_damp") != stable_.end())
+        {
+            working_vector.SetData(Ntheta_damp_, x.GetData() + position);
+            x_collection.AddVector(working_vector, "theta_damp");
+            working_vector.Nullify();
+            position += Ntheta_damp_;
+        }
     }
 
 

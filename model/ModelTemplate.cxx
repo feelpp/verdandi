@@ -90,6 +90,16 @@ namespace Verdandi
     }
 
 
+    //! Performs one step backward in adjoint model.
+    /*!
+      \param[in] observation_term \f$ H^T R^{-1}(y - Hx) \f$.
+    */
+    void ModelTemplate::BackwardAdjoint(state& observation_term)
+    {
+        throw ErrorUndefined("ModelTemplate::BackwardAdjoint(state&)");
+    }
+
+
     //! Checks whether the model has finished.
     /*!
       \return True if the simulation is done, false otherwise.
@@ -201,6 +211,30 @@ namespace Verdandi
     }
 
 
+    //! Provides the state lower bound.
+    /*!
+      \param[out] lower_bound the state lower bound (componentwise).
+    */
+    void ModelTemplate
+    ::GetStateLowerBound(state& lower_bound) const
+    {
+        throw ErrorUndefined("ModelTemplate"
+                             "::GetStateLowerBound(state& lower_bound)");
+    }
+
+
+    //! Provides the state upper bound.
+    /*!
+      \param[out] upper_bound the state upper bound (componentwise).
+    */
+    void ModelTemplate
+    ::GetStateUpperBound(state& upper_bound) const
+    {
+        throw ErrorUndefined("ModelTemplate"
+                             "::GetStateUpperBound(state& upper_bound)");
+    }
+
+
     //! Provides the full state vector.
     /*!
       \param[out] state the full state vector.
@@ -218,6 +252,28 @@ namespace Verdandi
     void ModelTemplate::SetFullState(state& state)
     {
         throw ErrorUndefined("ModelTemplate::SetFullState(state& state)");
+    }
+
+
+    //! Returns the adjoint state vector.
+    /*!
+      \param[out] state_adjoint the adjoint state vector.
+    */
+    void ModelTemplate::GetAdjointState(state& state_adjoint)
+    {
+        throw ErrorUndefined("ModelTemplate::GetAdjointState(state& "
+                             "state_adjoint)");
+    }
+
+
+    //! Sets the adjoint state vector.
+    /*!
+      \param[out] state_adjoint the adjoint state vector.
+    */
+    void ModelTemplate::SetAdjointState(const state& state_adjoint)
+    {
+        throw ErrorUndefined("ModelTemplate::SetAdjointState(const state& "
+                             "state_adjoint)");
     }
 
 
@@ -264,6 +320,17 @@ namespace Verdandi
         throw ErrorUndefined("ModelTemplate::GetStateErrorVarianceSqrt("
                              "state_error_variance& L, "
                              "state_error_variance& U)");
+    }
+
+
+    //! Returns the inverse of the background error variance (\f$B^{-1}\f$).
+    /*!
+      \return The inverse of the background error variance (\f$B^{-1}\f$).
+    */
+    const typename ModelTemplate::state_error_variance&
+    ModelTemplate::GetStateErrorVarianceInverse() const
+    {
+        throw ErrorUndefined("ModelTemplate::GetStateErrorVarianceInverse()");
     }
 
 

@@ -162,6 +162,9 @@ namespace Verdandi
         //! Damp beta coefficient.
         double beta_;
 
+        //! Stiffness matrix (K).
+        Matrix<T, Symmetric, RowSymSparse> stiffness_matrix_;
+
         //! Balgovind scale for background covariance.
         double Balgovind_scale_background_;
         //! Background error variance.
@@ -169,6 +172,8 @@ namespace Verdandi
 
         //! Background error covariance matrix (B).
         state_error_variance state_error_variance_;
+        //! Inverse of the background error covariance matrix (B^-1).
+        state_error_variance state_error_variance_inverse_;
 
         //! Number of the row of B currently stored.
         int current_row_;
@@ -178,6 +183,13 @@ namespace Verdandi
         state_error_variance_row state_error_variance_row_;
         //! PI.
         static const double Pi_;
+
+        /***  Adjoint model ***/
+
+        //! To indicate if the adjoint variables are allocated or not.
+        bool is_adjoint_initialized_;
+        //! Adjoint variables;
+        state_collection q_;
 
         /*** Output saver ***/
 
@@ -192,11 +204,13 @@ namespace Verdandi
         void Initialize(string configuration_file);
         void InitializeFirstStep();
         void InitializeStep();
+        void InitializeAdjoint();
 
         // Processing.
         void Forward(bool update_force = true);
         bool HasFinished() const;
         void Save();
+        void BackwardAdjoint(state& state_innovation);
 
         // Operators.
         void ApplyOperator(state& x, bool forward = false,
@@ -211,8 +225,12 @@ namespace Verdandi
         int GetNstate() const;
         void GetState(state& state) const;
         void SetState(state& state);
+        void GetStateLowerBound(state& upper_bound) const;
+        void GetStateUpperBound(state& upper_bound) const;
         void GetFullState(state& state) const;
         void SetFullState(const state& state);
+        void GetAdjointState(state& state_adjoint);
+        void SetAdjointState(const state& state_adjoint);
 
         void GetStateErrorVarianceRow(int row, state_error_variance_row&
                                       state_error_variance_row);
@@ -222,6 +240,7 @@ namespace Verdandi
 #endif
         void GetStateErrorVarianceSqrt(state_error_variance& L,
                                        state_error_variance& U);
+        const state_error_variance& GetStateErrorVarianceInverse() const;
 
         bool IsErrorSparse() const;
 
@@ -234,7 +253,11 @@ namespace Verdandi
         void AssembleNewMarkMatrix0();
         void AssembleNewMarkMatrix1();
         void AssembleDampMatrix();
+
+        void AssembleStiffnessMatrix(Vector<T>& theta,
+                                     Vector<int>& theta_index);
         void AllocateSparseMatrix();
+        void SetShape(state& x, state_collection& x_collection) const;
     };
 
 

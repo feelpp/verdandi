@@ -72,6 +72,7 @@ namespace Verdandi
 
         // Processing.
         void Forward();
+        void BackwardAdjoint(state& observation_term);
         bool HasFinished() const;
 
         // Operators.
@@ -86,8 +87,12 @@ namespace Verdandi
         int GetNstate() const;
         void GetState(state& state);
         void SetState(state& state);
+        void GetStateLowerBound(state& lower_bound) const;
+        void GetStateUpperBound(state& upper_bound) const;
         void GetFullState(state& state);
         void SetFullState(state& state);
+        void GetAdjointState(state& state_adjoint);
+        void SetAdjointState(const state& state_adjoint);
 
         // Errors.
         void GetStateErrorVarianceRow(int row,
@@ -95,6 +100,7 @@ namespace Verdandi
         state_error_variance& GetStateErrorVariance();
         void GetStateErrorVarianceSqrt(state_error_variance& L,
                                        state_error_variance& U);
+        const state_error_variance& GetStateErrorVarianceInverse() const;
 
         string GetName() const;
         void Message(string message);
