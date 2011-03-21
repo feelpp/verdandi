@@ -171,6 +171,7 @@ namespace Verdandi
         template <class Model>
         void Initialize(const Model& model, string configuration_file);
 
+        void DiscardObservation(bool discard_observation);
         int CreateTrack();
         void SetTrack(int track);
 

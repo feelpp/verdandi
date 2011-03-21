@@ -71,6 +71,20 @@ namespace Verdandi
     }
 
 
+    //! Activates or deactivates the option 'discard_observation'.
+    /*!
+      \param[in] discard_observation if set to true, each observation will be
+      used at most one time.
+    */
+    void ObservationManagerTemplate
+    ::DiscardObservation(bool discard_observation)
+    {
+        throw ErrorUndefined(
+            "void ObservationManagerTemplate"
+            "::DiscardObservation(bool discard_observation)");
+    }
+
+
     //! Sets the time of observations to be loaded.
     /*!
       \param[in] model the model.

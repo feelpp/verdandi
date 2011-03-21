@@ -67,6 +67,7 @@ namespace Verdandi
         template <class Model>
         void Initialize(const Model& model, string configuration_file);
 
+        void DiscardObservation(bool discard_observation);
         template <class Model>
         void SetTime(const Model& model, double time);
 

@@ -83,7 +83,7 @@ namespace Verdandi
         ~ObservationAggregator();
 
         void Initialize(string configuration_file);
-
+        void DiscardObservation(bool discard_observation);
         void GetContributionInterval(double time, double& time_inf,
                                      double& time_sup, int& selection_policy)
             const;

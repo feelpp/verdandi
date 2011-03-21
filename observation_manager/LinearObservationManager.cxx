@@ -256,6 +256,19 @@ namespace Verdandi
     /////////////////////////////
 
 
+    //! Activates or deactivates the option 'discard_observation'.
+    /*!
+      \param[in] discard_observation if set to true, each observation will be
+      used at most one time.
+    */
+    template <class T>
+    void LinearObservationManager<T>
+    ::DiscardObservation(bool discard_observation)
+    {
+        observation_aggregator_.DiscardObservation(discard_observation);
+    }
+
+
     //! Creates a new track.
     /*!
       \return The index of the new track.

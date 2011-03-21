@@ -103,6 +103,19 @@ namespace Verdandi
     }
 
 
+    //! Activates or deactivates the option 'discard_observation'.
+    /*!
+      \param[in] discard_observation if set to true, each observation will be
+      used at most one time.
+    */
+    template <class T>
+    void ObservationAggregator<T>
+    ::DiscardObservation(bool discard_observation)
+    {
+        discard_observation_ = discard_observation;
+    }
+
+
     //! Returns the contribution time interval corresponding to a given time.
     /*! This method returns the time interval into which observations have a
       non-zero contribution at time \a time. An integer is associated to this
