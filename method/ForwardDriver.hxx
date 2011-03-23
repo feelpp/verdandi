@@ -77,7 +77,7 @@ namespace Verdandi
 
         /*** Methods ***/
 
-        void Initialize();
+        void Initialize(bool initialize_model = true);
         void InitializeStep();
         void Forward();
 

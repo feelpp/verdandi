@@ -139,16 +139,18 @@ namespace Verdandi
       the analysis of the first step. */
     template <class T, class Model, class ObservationManager>
     void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
-    ::Initialize()
+    ::Initialize(bool initialize_model, bool initialize_observation_manager)
     {
 
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
         /*** Initializations ***/
 
-        model_.Initialize(model_configuration_file_);
-        observation_manager_.Initialize(model_,
-                                        observation_configuration_file_);
+        if (initialize_model)
+            model_.Initialize(model_configuration_file_);
+        if (initialize_observation_manager)
+            observation_manager_.Initialize(model_,
+                                            observation_configuration_file_);
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
@@ -171,8 +173,11 @@ namespace Verdandi
         if (analyze_first_step_)
             Analyze();
 
-        MessageHandler::Send(*this, "model", "initial condition");
-        MessageHandler::Send(*this, "driver", "initial condition");
+        if (initialize_model)
+        {
+            MessageHandler::Send(*this, "model", "initial condition");
+            MessageHandler::Send(*this, "driver", "initial condition");
+        }
 
         MessageHandler::Send(*this, "all", "::Initialize end");
     }

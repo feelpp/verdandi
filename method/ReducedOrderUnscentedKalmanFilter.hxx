@@ -180,7 +180,8 @@ namespace Verdandi
 
         /*** Methods ***/
 
-        void Initialize();
+        void Initialize(bool initialize_model = true,
+                        bool initialize_observation_manager = true);
 
         void InitializeStep();
 

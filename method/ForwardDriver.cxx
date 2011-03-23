@@ -104,7 +104,7 @@ namespace Verdandi
       model initialization method.
     */
     template <class Model>
-    void ForwardDriver<Model>::Initialize()
+    void ForwardDriver<Model>::Initialize(bool initialize_model)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
@@ -113,11 +113,16 @@ namespace Verdandi
         else
             Logger::Log<-3>(*this, "Initialization");
 
-        model_.Initialize(model_configuration_file_);
+        if (initialize_model)
+            model_.Initialize(model_configuration_file_);
+
         iteration_ = 0;
 
-        MessageHandler::Send(*this, "model", "initial condition");
-        MessageHandler::Send(*this, "driver", "initial condition");
+        if (initialize_model)
+        {
+            MessageHandler::Send(*this, "model", "initial condition");
+            MessageHandler::Send(*this, "driver", "initial condition");
+        }
 
         MessageHandler::Send(*this, "all", "::Initialize end");
     }

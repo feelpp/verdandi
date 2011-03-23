@@ -79,8 +79,9 @@ namespace Verdandi
       the analysis of the first step. */
     template <class T, class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T, Model, ObservationManager,
-                                    Optimization>::Initialize()
+    void FourDimensionalVariational<T,
+                                    Model, ObservationManager, Optimization>
+    ::Initialize(bool initialize_model, bool initialize_observation_manager)
     {
 
 
@@ -141,12 +142,15 @@ namespace Verdandi
 
         /*** Model and observation manager initialization ***/
 
-        model_.Initialize(model_configuration_file_);
+        if (initialize_model)
+            model_.Initialize(model_configuration_file_);
         initial_time_ = model_.GetTime();
-        observation_manager_.Initialize(model_,
-                                        observation_configuration_file_);
-        observation_manager_.DiscardObservation(false);
-
+        if (initialize_observation_manager)
+        {
+            observation_manager_.Initialize(model_,
+                                            observation_configuration_file_);
+            observation_manager_.DiscardObservation(false);
+        }
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
@@ -170,8 +174,11 @@ namespace Verdandi
 
         model_.GetState(state_first_guess_);
 
-        MessageHandler::Send(*this, "model", "initial condition");
-        MessageHandler::Send(*this, "driver", "initial condition");
+        if (initialize_model)
+        {
+            MessageHandler::Send(*this, "model", "initial condition");
+            MessageHandler::Send(*this, "driver", "initial condition");
+        }
     }
 
 

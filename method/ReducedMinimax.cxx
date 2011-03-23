@@ -69,7 +69,8 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. */
     template <class T, class Model, class ObservationManager>
-    void ReducedMinimax<T, Model, ObservationManager>::Initialize()
+    void ReducedMinimax<T, Model, ObservationManager>
+    ::Initialize(bool initialize_model, bool initialize_observation_manager)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
@@ -84,13 +85,15 @@ namespace Verdandi
 
         configuration.Set("model.configuration_file",
                           model_configuration_file_);
-        model_.Initialize(model_configuration_file_);
+        if (initialize_model)
+            model_.Initialize(model_configuration_file_);
         Nstate_ = model_.GetNstate();
 
         configuration.Set("observation_manager.configuration_file",
                           observation_configuration_file_);
-        observation_manager_.Initialize(model_,
-                                        observation_configuration_file_);
+        if (initialize_observation_manager)
+            observation_manager_.Initialize(model_,
+                                            observation_configuration_file_);
 
 
         /***************************
@@ -227,7 +230,8 @@ namespace Verdandi
         else
             Logger::Log<-3>(*this, "Initialization");
 
-        MessageHandler::Send(*this, "model", "initial condition");
+        if (initialize_model)
+            MessageHandler::Send(*this, "model", "initial condition");
 
         MessageHandler::Send(*this, "all", "::Initialize end");
     }
