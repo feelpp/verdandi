@@ -26,8 +26,6 @@
 
 #include "seldon/vector/VectorCollection.cxx"
 
-#include "SigmaPoint.cxx"
-
 #include "seldon/computation/solver/SparseCholeskyFactorisation.cxx"
 
 
@@ -201,7 +199,11 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
+        time_ = model_.GetTime();
+
         model_.Forward();
+
+        PropagateCovarianceMatrix();
 
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
@@ -235,10 +237,6 @@ namespace Verdandi
             observation_manager_.GetInnovation(x, y);
             Nobservation_ = y.GetSize();
 
-            /*** Updated matrix L ***/
-
-            PropagateCovarianceMatrix();
-
             /*** Updated matrix U ***/
 
             dense_matrix HL(Nobservation_, Nreduced_),
@@ -255,7 +253,9 @@ namespace Verdandi
             dense_matrix U_inv(U_), K(Nstate_, Nobservation_),
                 working_matrix_ro(Nreduced_, Nobservation_),
                 working_matrix_ro2(Nreduced_, Nobservation_);
+
             GetInverse(U_inv);
+
 #ifdef VERDANDI_DENSE
             MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans,
                    observation_manager_.GetErrorVarianceInverse(),
@@ -293,14 +293,19 @@ namespace Verdandi
     void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
     ::PropagateCovarianceMatrix()
     {
+        double saved_time = model_.GetTime();
+        model_.SetTime(time_);
+
         // One column of L.
         model_state L_col(Nstate_);
         for (int j = 0; j < Nreduced_; j++)
         {
             GetCol(L_, j, L_col);
-            model_.ApplyOperator(L_col, false, false);
+            model_.ApplyTangentLinearOperator(L_col);
             SetCol(L_col, j, L_);
         }
+
+        model_.SetTime(saved_time);
     }
 
 

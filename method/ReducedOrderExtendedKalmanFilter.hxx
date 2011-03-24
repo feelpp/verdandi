@@ -104,6 +104,8 @@ namespace Verdandi
         bool analyze_first_step_;
         //! Indicates how R is stored (matrix, matrix_inverse, vector).
         string observation_error_variance_;
+         //! Current time.
+        double time_;
 
         /*** Output saver ***/
 

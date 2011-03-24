@@ -54,7 +54,7 @@ without needing to compute P.
            <li>Prediction:
             - \f$ x_{h+1}^f = \mathcal{M}_{h+1|h}(x_{h}^{a}) + Q_{h+1}\f$<br>
            <li>Update:
-            - \f$ L_{h+1} = \mathcal{M}_{h+1|h}L_h\f$<br>
+            - \f$ L_{h+1} = M_{h+1|h}L_h\f$<br>
             - \f$ U_{h+1} = U_h +  (H_{h+1}L_{h+1})^T R_{h+1} H_{h+1}L_{h+1}\f$<br>
             - \f$ x_{h+1}^a = x_{h+1}^f + L_{h+1}U_{h+1}^{-1}(H_{h+1}L_{h+1})^T R_{h+1}^{-1} (y_{h+1}-H_{h+1}x_{h+1}^f)\f$<br>
            </li>
