@@ -141,22 +141,27 @@ namespace Verdandi
     {
         recipient_map::iterator my_map_iterator;
         for (my_map_iterator = recipient_map_.begin();
-             my_map_iterator != recipient_map_.end(); ++my_map_iterator)
+             my_map_iterator != recipient_map_.end(); )
         {
-            recipient_list::iterator my_list_iterator;
-            recipient_list my_list = my_map_iterator->second;
-            for (my_list_iterator = my_list.begin();
-                 my_list_iterator != my_list.end(); ++my_list_iterator)
-                if (my_list_iterator->first
-                    == reinterpret_cast<void*>(&object))
-                {
-                    my_list.erase(my_list_iterator);
-                    my_map_iterator->second = my_list;
-                    if (my_list.empty())
-                        recipient_map_.erase(my_map_iterator);
-                    // The object cannot be twice in the same list.
-                    break;
-                }
+            recipient_list::iterator my_map_list_iterator;
+            recipient_list my_list;
+            for (my_map_list_iterator = my_map_iterator->second.begin();
+                 my_map_list_iterator != my_map_iterator->second.end();
+                 ++my_map_list_iterator)
+                if (my_map_list_iterator->first
+                    != reinterpret_cast<void*>(&object))
+                    my_list.push_back(*my_map_list_iterator);
+
+            // 'my_list' now contains all remaining objects for the current
+            // entry in the map. If it is empty, the map entry should be
+            // removed.
+            if (my_list.empty())
+                recipient_map_.erase(my_map_iterator++);
+            else
+            {
+                my_map_iterator->second = my_list;
+                ++my_map_iterator;
+            }
         }
     }
 
