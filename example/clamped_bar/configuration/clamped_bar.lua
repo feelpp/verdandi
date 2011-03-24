@@ -1,7 +1,7 @@
 ----------------------------------- MODEL ------------------------------------
 
 
-parametric_clamped_bar = {
+clamped_bar = {
 
     -- Components of the state vector.
     state = {"displacement", "velocity", "theta_force"},
@@ -11,9 +11,9 @@ parametric_clamped_bar = {
     domain = {
 
         -- Time step.
-        Delta_t = Delta_t_parametric_clamped_bar,
+        Delta_t = Delta_t_clamped_bar,
         -- Simulation time.
-        final_time = final_time_parametric_clamped_bar,
+        final_time = final_time_clamped_bar,
 
         bar_length = 1.,
         Nx = 100
@@ -45,7 +45,7 @@ parametric_clamped_bar = {
 
         variable_list = {"disp_0", "velo_0"},
         file = output_directory .. "/%{name}.bin",
-        time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+        time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
         mode = output_mode,
         mode_scalar = output_mode_scalar
 

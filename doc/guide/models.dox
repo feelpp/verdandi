@@ -87,7 +87,7 @@ One can define several parameters:
         <li><code> theta_force </code>: vector that contains the initial values of \f$\theta_f\f$. </li>
 </ol>
 
-The clamped-bar model is implemented in <code>ParametricClampedBar.hxx</code> and <code>ParametricClampedBar.cxx</code>. The class \link Verdandi::ParametricClampedBar ParametricClampedBar\endlink is a template class: <code>ParametricClampedBar<T></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>).
+The clamped-bar model is implemented in <code>ClampedBar.hxx</code> and <code>ClampedBar.cxx</code>. The class \link Verdandi::ClampedBar ClampedBar\endlink is a template class: <code>ClampedBar<T></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>).
 
 The state may contain:
 <ul>

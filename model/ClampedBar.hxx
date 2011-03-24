@@ -17,7 +17,7 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_MODEL_PARAMETRICCLAMPEDBAR_HXX
+#ifndef VERDANDI_FILE_MODEL_CLAMPEDBAR_HXX
 
 #include "seldon/SeldonSolver.hxx"
 
@@ -30,17 +30,17 @@ namespace Verdandi
 {
 
 
-    ////////////////////////////////
-    // PARAMETRICCLAMPEDBAR MODEL //
-    ////////////////////////////////
+    //////////////////////
+    // CLAMPEDBAR MODEL //
+    //////////////////////
 
 
-    //! This class is a parametric clamped-bar model.
+    //! This class is a clamped-bar model.
     /*!
       \tparam T the type of floating-point numbers.
     */
     template <class T>
-    class ParametricClampedBar: public VerdandiBase
+    class ClampedBar: public VerdandiBase
     {
     public:
         //! The numerical type (e.g., double).
@@ -198,9 +198,9 @@ namespace Verdandi
 
     public:
         // Constructor and destructor.
-        ParametricClampedBar();
-        ParametricClampedBar(string configuration_file);
-        ~ParametricClampedBar();
+        ClampedBar();
+        ClampedBar(string configuration_file);
+        ~ClampedBar();
         void Initialize(string configuration_file);
         void InitializeFirstStep();
         void InitializeStep();
@@ -264,5 +264,5 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_MODEL_PARAMETRICCLAMPEDBAR_HXX
+#define VERDANDI_FILE_MODEL_CLAMPEDBAR_HXX
 #endif

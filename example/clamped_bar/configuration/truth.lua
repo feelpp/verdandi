@@ -1,8 +1,8 @@
 ----------------------------------- GLOBAL -----------------------------------
 
 
-Delta_t_parametric_clamped_bar = 0.01
-final_time_parametric_clamped_bar = 10.0
+Delta_t_clamped_bar = 0.01
+final_time_clamped_bar = 10.0
 -- Saving period.
 Nskip_save = 1
 
@@ -14,7 +14,7 @@ output_mode_scalar = "text"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/parametric_clamped_bar.lua")
+dofile("configuration/clamped_bar.lua")
 
 
 ----------------------------------- METHOD -----------------------------------
@@ -26,7 +26,7 @@ forward = {
 
       variable_list = {"state_forecast"},
       file = output_directory .. "truth-%{name}.%{extension}",
-      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
 

@@ -1,8 +1,8 @@
 ----------------------------------- GLOBAL -----------------------------------
 
 
-Delta_t_parametric_clamped_bar = 0.01
-final_time_parametric_clamped_bar = 10.0
+Delta_t_clamped_bar = 0.01
+final_time_clamped_bar = 10.0
 -- Saving period.
 Nskip_save = 1
 
@@ -16,11 +16,11 @@ output_mode_scalar = "text"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/parametric_clamped_bar.lua")
+dofile("configuration/clamped_bar.lua")
 
 -- In order to demonstrate the assimilation, errors are introduced in the
 -- model.
-parametric_clamped_bar.physics.theta_force = {1., 2., 2., 4.}
+clamped_bar.physics.theta_force = {1., 2., 2., 4.}
 
 
 -------------------------------- OBSERVATION ---------------------------------
@@ -54,7 +54,7 @@ optimal_interpolation = {
 
       variable_list = {"state_forecast", "state_analysis"},
       file = output_directory .. "oi-%{name}.%{extension}",
-      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
 
@@ -94,7 +94,7 @@ extended_kalman_filter = {
 
       variable_list = {"state_forecast", "state_analysis"},
       file = output_directory .. "ekf-%{name}.%{extension}",
-      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
 
@@ -137,7 +137,7 @@ unscented_kalman_filter = {
 
       variable_list = {"state_forecast", "state_analysis"},
       file = output_directory .. "ukf-%{name}.%{extension}",
-      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
 
@@ -184,7 +184,7 @@ reduced_order_unscented_kalman_filter = {
 
       variable_list = {"state_forecast", "state_analysis"},
       file = output_directory .. "roukf-%{name}.%{extension}",
-      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
 
@@ -226,7 +226,7 @@ reduced_order_extended_kalman_filter = {
 
       variable_list = {"state_forecast", "state_analysis"},
       file = output_directory .. "roekf-%{name}.%{extension}",
-      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
 
@@ -272,7 +272,7 @@ four_dimensional_variational = {
 
       variable_list = {"state_forecast", "state_analysis"},
       file = output_directory .. "4dvar-%{name}.%{extension}",
-      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
 
@@ -302,7 +302,7 @@ forward = {
 
       variable_list = {"state_forecast"},
       file = output_directory .. "forward-%{name}.%{extension}",
-      time = "step " .. Delta_t_parametric_clamped_bar * Nskip_save .. " 1.e-6",
+      time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar
 

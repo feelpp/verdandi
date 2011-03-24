@@ -9,11 +9,13 @@
 #define SELDON_WITH_MUMPS
 
 #include "Verdandi.hxx"
-#include "seldon/SeldonSolver.hxx"
 
-#include "model/ParametricClampedBar.cxx"
+#include "seldon/SeldonSolver.hxx"
+#include "seldon/computation/optimization/NLoptSolver.cxx"
+
+#include "model/ClampedBar.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
-#include "method/ReducedOrderExtendedKalmanFilter.cxx"
+#include "method/FourDimensionalVariational.cxx"
 
 
 int main(int argc, char** argv)
@@ -31,19 +33,20 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::ReducedOrderExtendedKalmanFilter<real,
-        Verdandi::ParametricClampedBar<real>,
-        Verdandi::LinearObservationManager<real> > driver(argv[1]);
+    Verdandi::FourDimensionalVariational<real,
+        Verdandi::ClampedBar<real>,
+        Verdandi::LinearObservationManager<real>,
+        Seldon::NLoptSolver> driver(argv[1]);
 
     driver.Initialize();
+
+    driver.Analyze();
 
     while (!driver.HasFinished())
     {
         driver.InitializeStep();
 
         driver.Forward();
-
-        driver.Analyze();
     }
 
     END;

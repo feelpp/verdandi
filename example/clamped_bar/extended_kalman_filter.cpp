@@ -11,8 +11,9 @@
 #include "Verdandi.hxx"
 #include "seldon/SeldonSolver.hxx"
 
-#include "model/ParametricClampedBar.cxx"
-#include "method/ForwardDriver.cxx"
+#include "ExtendedKalmanFilter.cxx"
+#include "LinearObservationManager.cxx"
+#include "ClampedBar.cxx"
 
 
 int main(int argc, char** argv)
@@ -28,15 +29,20 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Verdandi::ForwardDriver<Verdandi::ParametricClampedBar<double> >
-        driver(argv[1]);
+    typedef double real;
+
+    Verdandi::ExtendedKalmanFilter<real, Verdandi::ClampedBar<real>,
+        Verdandi::LinearObservationManager<real> > driver(argv[1]);
 
     driver.Initialize();
 
     while (!driver.HasFinished())
     {
         driver.InitializeStep();
+
         driver.Forward();
+
+        driver.Analyze();
     }
 
     END;

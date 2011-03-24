@@ -17,10 +17,10 @@
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
 
-#ifndef VERDANDI_FILE_MODEL_PARAMETRICCLAMPEDBAR_CXX
+#ifndef VERDANDI_FILE_MODEL_CLAMPEDBAR_CXX
 
 
-#include "ParametricClampedBar.hxx"
+#include "ClampedBar.hxx"
 
 #include "OutputSaver.cxx"
 
@@ -36,7 +36,7 @@ namespace Verdandi
 
 
     template <class T>
-    const double ParametricClampedBar<T>::Pi_ = 3.141592653589793238462;
+    const double ClampedBar<T>::Pi_ = 3.141592653589793238462;
 
 
     ////////////////////////////////
@@ -46,7 +46,7 @@ namespace Verdandi
 
     //! Constructor.
     template <class T>
-    ParametricClampedBar<T>::ParametricClampedBar(): time_(0.)
+    ClampedBar<T>::ClampedBar(): time_(0.)
     {
     }
 
@@ -56,7 +56,7 @@ namespace Verdandi
       \param[in] configuration_file path to the configuration file.
     */
     template <class T>
-    ParametricClampedBar<T>::ParametricClampedBar(string configuration_file):
+    ClampedBar<T>::ClampedBar(string configuration_file):
         time_(0.)
     {
     }
@@ -64,7 +64,7 @@ namespace Verdandi
 
     //! Destructor.
     template <class T>
-    ParametricClampedBar<T>::~ParametricClampedBar()
+    ClampedBar<T>::~ClampedBar()
     {
         x_.Nullify();
         x_full_.Nullify();
@@ -88,24 +88,24 @@ namespace Verdandi
       \param[in] configuration_file configuration file.
     */
     template <class T>
-    void ParametricClampedBar<T>::Initialize(string configuration_file)
+    void ClampedBar<T>::Initialize(string configuration_file)
     {
 
         /*** Configuration ***/
 
         Ops configuration(configuration_file);
 
-        configuration.SetPrefix("parametric_clamped_bar.domain.");
+        configuration.SetPrefix("clamped_bar.domain.");
         configuration.Set("bar_length", bar_length_);
         configuration.Set("Nx", Nx_);
         configuration.Set("Delta_t", Delta_t_);
         configuration.Set("final_time", final_time_);
-        configuration.SetPrefix("parametric_clamped_bar.error_statistics.");
+        configuration.SetPrefix("clamped_bar.error_statistics.");
         configuration.Set("state_error_variance", "v >= 0",
                           state_error_variance_value_);
         configuration.Set("state_error_scale", "v > 0",
                           Balgovind_scale_background_);
-        configuration.SetPrefix("parametric_clamped_bar.physics.");
+        configuration.SetPrefix("clamped_bar.physics.");
         configuration.Set("Young_modulus", Young_modulus_);
         configuration.Set("mass_density", mass_density_);
 
@@ -125,14 +125,14 @@ namespace Verdandi
 
         configuration.Set("alpha", alpha_);
         configuration.Set("beta", beta_);
-        configuration.SetPrefix("parametric_clamped_bar.");
+        configuration.SetPrefix("clamped_bar.");
         vector<string> stable;
         configuration.Set("state","ops_in(v, {'displacement', 'velocity', "
                           "'theta_force', 'theta_stiffness', 'theta_mass', "
                           "'theta_damp'})",
                           stable);
         if (stable.size() <= 0)
-            throw ErrorArgument("void ParametricClampedBar<T>::Initialize"
+            throw ErrorArgument("void ClampedBar<T>::Initialize"
                                 "(string configuration_file)", "The name of"
                                 " the underlying state vector (state) are "
                                 "not defined.");
@@ -144,7 +144,7 @@ namespace Verdandi
         /*** Ouput saver ***/
 
         output_saver_.Initialize(configuration_file,
-                                 "parametric_clamped_bar.output_saver.");
+                                 "clamped_bar.output_saver.");
         output_saver_.Empty("disp_0");
         output_saver_.Empty("velo_0");
 
@@ -229,7 +229,7 @@ namespace Verdandi
 
     //! Initializes the adjoint model.
     template <class T>
-    void ParametricClampedBar<T>::InitializeAdjoint()
+    void ClampedBar<T>::InitializeAdjoint()
     {
 
         /*** Allocate adjoint variables ***/
@@ -245,14 +245,14 @@ namespace Verdandi
 
     //! Initializes the first time step for the model.
     template <class T>
-    void ParametricClampedBar<T>::InitializeFirstStep()
+    void ClampedBar<T>::InitializeFirstStep()
     {
     }
 
 
     //! Initializes the current time step for the model.
     template <class T>
-    void ParametricClampedBar<T>::InitializeStep()
+    void ClampedBar<T>::InitializeStep()
     {
     }
 
@@ -268,7 +268,7 @@ namespace Verdandi
       updated or not.
     */
     template <class T>
-    void ParametricClampedBar<T>::Forward(bool update_force)
+    void ClampedBar<T>::Forward(bool update_force)
     {
         /*** Update time ***/
 
@@ -349,7 +349,7 @@ namespace Verdandi
       \return True if no more data assimilation is required, false otherwise.
     */
     template <class T>
-    bool ParametricClampedBar<T>::HasFinished() const
+    bool ClampedBar<T>::HasFinished() const
     {
         return time_ >= final_time_;
     }
@@ -359,7 +359,7 @@ namespace Verdandi
     /*! It saves the displacement 'disp_0_' and  the velocity 'velo_0_'.
      */
     template <class T>
-    void ParametricClampedBar<T>::Save()
+    void ClampedBar<T>::Save()
     {
         output_saver_.Save(disp_0_, time_, "disp_0");
         output_saver_.Save(velo_0_, time_, "velo_0");
@@ -371,7 +371,7 @@ namespace Verdandi
       \param[in] observation_term \f$ H^T R^{-1}(y - Hx) \f$.
     */
     template <class T>
-    void ParametricClampedBar<T>::BackwardAdjoint(state& observation_term)
+    void ClampedBar<T>::BackwardAdjoint(state& observation_term)
     {
         if (!is_adjoint_initialized_)
             InitializeAdjoint();
@@ -582,9 +582,9 @@ namespace Verdandi
       be preserved.
     */
     template <class T>
-    void ParametricClampedBar<T>::ApplyOperator(state& x, bool forward,
-                                                bool preserve_state,
-                                                bool update_force)
+    void ClampedBar<T>::ApplyOperator(state& x, bool forward,
+                                      bool preserve_state,
+                                      bool update_force)
     {
         double saved_time = 0;
         state saved_state;
@@ -611,7 +611,7 @@ namespace Verdandi
       \param[in,out] increment the increment.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::ApplyTangentLinearOperator(state& increment_state)
     {
         double saved_time = 0;
@@ -685,10 +685,10 @@ namespace Verdandi
       \param[out] A the matrix of the tangent linear model.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::GetTangentLinearOperator(tangent_linear_operator& A) const
     {
-        throw ErrorUndefined("ParametricClampedBar::GetTangentLinearOperator"
+        throw ErrorUndefined("ClampedBar::GetTangentLinearOperator"
                              "(tangent_linear_operator& A) const");
     }
 
@@ -703,7 +703,7 @@ namespace Verdandi
       \return The current time.
     */
     template <class T>
-    double ParametricClampedBar<T>::GetTime() const
+    double ClampedBar<T>::GetTime() const
     {
         return time_;
     }
@@ -714,7 +714,7 @@ namespace Verdandi
       \param[in] time a given time.
     */
     template <class T>
-    void ParametricClampedBar<T>::SetTime(double time)
+    void ClampedBar<T>::SetTime(double time)
     {
         time_= time;
     }
@@ -725,7 +725,7 @@ namespace Verdandi
       \return The state vector size.
     */
     template <class T>
-    int ParametricClampedBar<T>::GetNstate() const
+    int ClampedBar<T>::GetNstate() const
     {
         return Nstate_;
     }
@@ -736,7 +736,7 @@ namespace Verdandi
       \param[out] state the reduced state vector.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::GetState(state& x) const
     {
         x.Reallocate(x_.GetM());
@@ -751,11 +751,11 @@ namespace Verdandi
       \param[in] state the reduced state vector.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::SetState(state& x)
     {
         if (x_.GetM() != x.GetM())
-            throw ErrorProcessing("ParametricClampedBar::SetState()",
+            throw ErrorProcessing("ClampedBar::SetState()",
                                   "Operation not permitted:\n x_ is a vector"
                                   " of length " + to_str(x_.GetM()) +
                                   ";\n x is a vector of length "
@@ -770,7 +770,7 @@ namespace Verdandi
       \param[out] lower_bound the state lower bound (componentwise).
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::GetStateLowerBound(state& lower_bound) const
     {
         lower_bound.Clear();
@@ -782,7 +782,7 @@ namespace Verdandi
       \param[out] upper_bound the state upper bound (componentwise).
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::GetStateUpperBound(state& upper_bound) const
     {
         upper_bound.Clear();
@@ -794,7 +794,7 @@ namespace Verdandi
       \param[out] state the full state vector.
     */
     template <class T>
-    void ParametricClampedBar<T>::GetFullState(state& x) const
+    void ClampedBar<T>::GetFullState(state& x) const
     {
         x.Reallocate(x_full_.GetM());
         for (int i = 0; i < x_full_.GetM(); i++)
@@ -807,10 +807,10 @@ namespace Verdandi
       \param[in] state the full state vector.
     */
     template <class T>
-    void ParametricClampedBar<T>::SetFullState(const state& x)
+    void ClampedBar<T>::SetFullState(const state& x)
     {
         if (x_full_.GetM() != x.GetM())
-            throw ErrorProcessing("ParametricClampedBar::SetState()",
+            throw ErrorProcessing("ClampedBar::SetState()",
                                   "Operation not permitted:\n x_full_ is a "
                                   "vector of length " + to_str(x_full_.GetM())
                                   + ";\n x is a vector of length "
@@ -825,7 +825,7 @@ namespace Verdandi
       \param[in] state_adjoint the adjoint state vector.
     */
     template <class T>
-    void ParametricClampedBar<T>::GetAdjointState(state& state_adjoint)
+    void ClampedBar<T>::GetAdjointState(state& state_adjoint)
     {
         if (!is_adjoint_initialized_)
             InitializeAdjoint();
@@ -893,13 +893,13 @@ namespace Verdandi
       \param[out] state_adjoint the adjoint state vector.
     */
     template <class T>
-    void ParametricClampedBar<T>::SetAdjointState(const state& state_adjoint)
+    void ClampedBar<T>::SetAdjointState(const state& state_adjoint)
     {
         if (!is_adjoint_initialized_)
             InitializeAdjoint();
 
         if (q_.GetM() != state_adjoint.GetM())
-            throw ErrorProcessing("ParametricClampedBar::SetStateAdjoint()",
+            throw ErrorProcessing("ClampedBar::SetStateAdjoint()",
                                   "Operation not permitted:\n p_ is a vector"
                                   " of length " + to_str(q_.GetM()) +
                                   ";\n  state_adjoint is a vector of length "
@@ -916,7 +916,7 @@ namespace Verdandi
       \param[out] error_covariance_row the value of row number \a row.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::GetStateErrorVarianceRow(int row, state_error_variance_row&
                                state_error_variance_row)
     {
@@ -929,8 +929,8 @@ namespace Verdandi
       \return The matrix of the background error covariance.
     */
     template <class T>
-    typename ParametricClampedBar<T>::state_error_variance&
-    ParametricClampedBar<T>::GetStateErrorVariance()
+    typename ClampedBar<T>::state_error_variance&
+    ClampedBar<T>::GetStateErrorVariance()
     {
         return state_error_variance_;
     }
@@ -941,8 +941,8 @@ namespace Verdandi
       \return The matrix of the background error covariance.
     */
     template <class T>
-    const typename ParametricClampedBar<T>::state_error_variance&
-    ParametricClampedBar<T>::GetStateErrorVariance() const
+    const typename ClampedBar<T>::state_error_variance&
+    ClampedBar<T>::GetStateErrorVariance() const
     {
         return state_error_variance_;
     }
@@ -956,7 +956,7 @@ namespace Verdandi
       \param[out] U the matrix \f$U\f$.
     */
     template <class T>
-    void ParametricClampedBar<T>::GetStateErrorVarianceSqrt(
+    void ClampedBar<T>::GetStateErrorVarianceSqrt(
         state_error_variance& L,
         state_error_variance& U)
     {
@@ -1002,8 +1002,8 @@ namespace Verdandi
       \return The inverse of the background error variance (\f$B^{-1}\f$).
     */
     template <class T>
-    const typename ParametricClampedBar<T>::state_error_variance&
-    ParametricClampedBar<T>::GetStateErrorVarianceInverse() const
+    const typename ClampedBar<T>::state_error_variance&
+    ClampedBar<T>::GetStateErrorVarianceInverse() const
     {
         return state_error_variance_inverse_;
     }
@@ -1014,7 +1014,7 @@ namespace Verdandi
       \return True if there is a sparse error matrix, false otherwise.
     */
     template <class T>
-    bool ParametricClampedBar<T>::IsErrorSparse() const
+    bool ClampedBar<T>::IsErrorSparse() const
     {
 #ifdef VERDANDI_STATE_ERROR_SPARSE
         return true;
@@ -1027,9 +1027,9 @@ namespace Verdandi
 
     //! Returns the name of the class.
     template <class T>
-    string ParametricClampedBar<T>::GetName() const
+    string ClampedBar<T>::GetName() const
     {
-        return "ParametricClampedBar";
+        return "ClampedBar";
     }
 
 
@@ -1038,7 +1038,7 @@ namespace Verdandi
       \param[in] message the received message.
     */
     template <class T>
-    void ParametricClampedBar<T>::Message(string message)
+    void ClampedBar<T>::Message(string message)
     {
         if (message.find("initial condition") != string::npos
             || message.find("forecast") != string::npos)
@@ -1055,7 +1055,7 @@ namespace Verdandi
       \param[out] index_vector the vector of indexes.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::BuildRegionIndex(int N, int Nregion, Vector<int>& index_vector)
     {
         index_vector.Reallocate(N);
@@ -1072,7 +1072,7 @@ namespace Verdandi
       the 'theta' value index of the element.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::AssembleMassMatrix(Vector<T>& theta, Vector<int>& theta_index)
     {
         Fill(T(0), mass_matrix_);
@@ -1096,7 +1096,7 @@ namespace Verdandi
 
     //! Assembles the NewMark matrices.
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::AssembleNewMarkMatrix0()
     {
         Fill(T(0), Newmark_matrix_0_);
@@ -1127,7 +1127,7 @@ namespace Verdandi
 
     //! Assembles the NewMark matrices.
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::AssembleNewMarkMatrix1()
     {
         Fill(T(0), Newmark_matrix_1_);
@@ -1164,7 +1164,7 @@ namespace Verdandi
 
     //! Assembles damp matrix.
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::AssembleDampMatrix()
     {
         Fill(T(0), damp_matrix_);
@@ -1201,7 +1201,7 @@ namespace Verdandi
       the 'theta' value index of the element.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::AssembleStiffnessMatrix(Vector<T>& theta, Vector<int>& theta_index)
     {
         if (stiffness_matrix_.GetM() == 0)
@@ -1227,7 +1227,7 @@ namespace Verdandi
 
     //! Builds skeleton newmark, mass and damp matrices.
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::AllocateSparseMatrix()
     {
         // Skeleton.
@@ -1313,7 +1313,7 @@ namespace Verdandi
       \param[out] x_collection collection encapsulating \a x.
     */
     template <class T>
-    void ParametricClampedBar<T>
+    void ClampedBar<T>
     ::SetShape(state& x, state_collection& x_collection) const
     {
         x_collection.Clear();
@@ -1366,5 +1366,5 @@ namespace Verdandi
 
 }
 
-#define VERDANDI_FILE_MODEL_PARAMETRICCLAMPEDBAR_CXX
+#define VERDANDI_FILE_MODEL_CLAMPEDBAR_CXX
 #endif

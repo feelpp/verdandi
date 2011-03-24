@@ -3,29 +3,17 @@
 #define SELDON_WITH_LAPACK
 
 #define VERDANDI_WITH_ABORT
-#define VERDANDI_SPARSE
+#define VERDANDI_DENSE
 
-//#define VERDANDI_WITH_DIRECT_SOLVER
-//#define SELDON_WITH_MUMPS
-//#define VERDANDI_WITH_MPI
-//#define VERDANDI_WITH_OMP
-
-//#define VERDANDI_LOGGING_LEVEL -7
-
-#if defined(VERDANDI_WITH_MPI)
-#include <mpi.h>
-#endif
-
-#if defined(VERDANDI_WITH_OMP)
-#include <omp.h>
-#endif
+#define VERDANDI_WITH_DIRECT_SOLVER
+#define SELDON_WITH_MUMPS
 
 #include "Verdandi.hxx"
 #include "seldon/SeldonSolver.hxx"
 
-#include "model/ParametricClampedBar.cxx"
-#include "observation_manager/LinearObservationManager.cxx"
-#include "method/ReducedOrderUnscentedKalmanFilter.cxx"
+#include "UnscentedKalmanFilter.cxx"
+#include "LinearObservationManager.cxx"
+#include "ClampedBar.cxx"
 
 
 int main(int argc, char** argv)
@@ -41,14 +29,10 @@ int main(int argc, char** argv)
         return 1;
     }
 
-#if defined(VERDANDI_WITH_MPI)
-    MPI::Init(argc, argv);
-#endif
-
     typedef double real;
 
-    Verdandi::ReducedOrderUnscentedKalmanFilter<real,
-        Verdandi::ParametricClampedBar<real>,
+    Verdandi::UnscentedKalmanFilter<real,
+        Verdandi::ClampedBar<real>,
         Verdandi::LinearObservationManager<real> > driver(argv[1]);
 
     driver.Initialize();
@@ -61,10 +45,6 @@ int main(int argc, char** argv)
 
         driver.Analyze();
     }
-
-#if defined(VERDANDI_WITH_MPI)
-    MPI::Finalize();
-#endif
 
     END;
 

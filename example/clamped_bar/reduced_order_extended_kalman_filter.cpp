@@ -3,7 +3,7 @@
 #define SELDON_WITH_LAPACK
 
 #define VERDANDI_WITH_ABORT
-#define VERDANDI_SPARSE
+#define VERDANDI_DENSE
 
 #define VERDANDI_WITH_DIRECT_SOLVER
 #define SELDON_WITH_MUMPS
@@ -11,9 +11,9 @@
 #include "Verdandi.hxx"
 #include "seldon/SeldonSolver.hxx"
 
-#include "model/ParametricClampedBar.cxx"
+#include "model/ClampedBar.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
-#include "method/OptimalInterpolation.cxx"
+#include "method/ReducedOrderExtendedKalmanFilter.cxx"
 
 
 int main(int argc, char** argv)
@@ -31,7 +31,8 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::OptimalInterpolation<real, Verdandi::ParametricClampedBar<real>,
+    Verdandi::ReducedOrderExtendedKalmanFilter<real,
+        Verdandi::ClampedBar<real>,
         Verdandi::LinearObservationManager<real> > driver(argv[1]);
 
     driver.Initialize();
