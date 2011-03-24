@@ -239,10 +239,6 @@ namespace Verdandi
         SetShape(working_vector, q_);
         working_vector.Nullify();
 
-        /*** Allocate stiffness matrix ***/
-
-        Copy(mass_matrix_, stiffness_matrix_);
-
         is_adjoint_initialized_ = true;
     }
 
@@ -310,9 +306,7 @@ namespace Verdandi
         GetLU(Newmark_matrix_1_, mat_lu, true);
 #endif
 
-        // FEM Vector (disp 1).
         state disp_1(Ndof_);
-        // FEM Vector (velo 1).
         state velo_1(Ndof_);
         velo_1.Fill(T(0));
 
@@ -618,28 +612,16 @@ namespace Verdandi
     */
     template <class T>
     void ParametricClampedBar<T>
-    ::ApplyTangentLinearOperator(state& increment)
+    ::ApplyTangentLinearOperator(state& increment_state)
     {
         double saved_time = 0;
         state saved_state;
         saved_time = GetTime();
         GetFullState(saved_state);
 
-        // Saves state parameters.
-        Vector<T> theta_force(Ntheta_force_), theta_damp(Ntheta_damp_),
-            theta_stiffness(Ntheta_stiffness_), theta_mass(Ntheta_mass_);
-        if (stable_.find("theta_force") != stable_.end())
-            Copy(theta_force_, theta_force);
-        if (stable_.find("theta_stiffness") != stable_.end())
-            Copy(theta_stiffness_, theta_stiffness);
-        if (stable_.find("theta_mass") != stable_.end())
-            Copy(theta_mass_, theta_mass);
-        if (stable_.find("theta_damp") != stable_.end())
-            Copy(theta_damp_, theta_damp);
+        /*** Computes x_{n+1} + x_n and v_{n+1} - v_n ***/
 
-        // Computes x_{n+1} + x_n and v_{n+1} - v_n.
         state disp(Ndof_), velo(Ndof_);
-
         Copy(disp_0_, disp);
         Copy(velo_0_, velo);
 
@@ -652,88 +634,46 @@ namespace Verdandi
         /*** Right hand side ***/
 
         SetTime(saved_time);
-        SetState(increment);
+        state_collection increment;
+        SetShape(increment_state, increment);
 
-        // Saves increment parameters.
-        Vector<T> delta_theta_force(Ntheta_force_),
-            delta_theta_damp(Ntheta_damp_),
-            delta_theta_stiffness(Ntheta_stiffness_),
-            delta_theta_mass(Ntheta_mass_);
-        if (stable_.find("theta_force") != stable_.end())
-            Copy(theta_force_, delta_theta_force);
-        if (stable_.find("theta_stiffness") != stable_.end())
-            Copy(theta_stiffness_, delta_theta_stiffness);
-        if (stable_.find("theta_mass") != stable_.end())
-            Copy(theta_mass_, delta_theta_mass);
-        if (stable_.find("theta_damp") != stable_.end())
-            Copy(theta_damp_, delta_theta_damp);
-
-        state force(Ndof_);
-        force.Fill(0);
-        // Assemble F.
+        force_.Fill(0);
         if (stable_.find("theta_force") != stable_.end())
         {
-            AssembleMassMatrix(theta_force_, theta_force_index_);
+            AssembleMassMatrix(increment.GetVector("theta_force"),
+                               theta_force_index_);
             state ones(Ndof_);
             ones.Fill(T(1));
             MltAdd(T(sin(Pi_ * (time_ + 0.5 * Delta_t_) / final_time_)),
-                   mass_matrix_, ones, T(0), force);
-            force(0) = T(0);
+                   mass_matrix_, ones, T(0), force_);
         }
-
         // Assemble K.
         if (stable_.find("theta_stiffness") != stable_.end())
         {
-            Fill(T(0), Newmark_matrix_0_);
-            for (int i = 0; i < Nx_; i++)
-            {
-                Newmark_matrix_0_.Val(i, i) += stiffness_FEM_matrix_(0, 0)
-                    * theta_stiffness_(theta_stiffness_index_(i));
-                Newmark_matrix_0_.Val(i + 1, i + 1) +=
-                    stiffness_FEM_matrix_(1, 1)
-                    * theta_stiffness_(theta_stiffness_index_(i));
-                Newmark_matrix_0_.Val(i, i + 1) += stiffness_FEM_matrix_(0, 1)
-                    * theta_stiffness_(theta_stiffness_index_(i));
-            }
-            MltAdd(T(-0.5), Newmark_matrix_0_, disp, T(1), force);
-            force(0) = T(0);
+            AssembleStiffnessMatrix(increment.GetVector("theta_stiffness"),
+                                    theta_stiffness_index_);
+            MltAdd(T(-0.5), stiffness_matrix_, disp, T(1), force_);
         }
-
         // Assemble M.
         if (stable_.find("theta_mass") != stable_.end())
         {
-            AssembleMassMatrix(theta_mass_, theta_mass_index_);
-            MltAdd(T(T(-1) / Delta_t_), mass_matrix_, velo, T(1), force);
-            force(0) = T(0);
+            AssembleMassMatrix(increment.GetVector("theta_mass"),
+                               theta_mass_index_);
+            MltAdd(T(-1) / Delta_t_, mass_matrix_, velo, T(1), force_);
         }
-
-        Copy(force, force_);
+        force_(0) = T(0);
 
         /*** Computes delta_y ***/
 
-        // Sets state parameters.
-        if (stable_.find("theta_force") != stable_.end())
-            Copy(theta_force, theta_force_);
-        if (stable_.find("theta_stiffness") != stable_.end())
-            Copy(theta_stiffness, theta_stiffness_);
-        if (stable_.find("theta_mass") != stable_.end())
-            Copy(theta_mass, theta_mass_);
-        if (stable_.find("theta_damp") != stable_.end())
-            Copy(theta_damp, theta_damp_);
+        Copy(increment.GetVector("displacement"),
+             x_.GetVector("displacement"));
+        Copy(increment.GetVector("velocity"), x_.GetVector("velocity"));
 
         Forward(false);
 
-        // Sets increment parameters.
-        if (stable_.find("theta_force") != stable_.end())
-            Copy(delta_theta_force, theta_force_);
-        if (stable_.find("theta_stiffness") != stable_.end())
-            Copy(delta_theta_stiffness, theta_stiffness_);
-        if (stable_.find("theta_mass") != stable_.end())
-            Copy(delta_theta_mass, theta_mass_);
-        if (stable_.find("theta_damp") != stable_.end())
-            Copy(delta_theta_damp, theta_damp_);
-
-        GetState(increment);
+        Copy(x_.GetVector("displacement"),
+             increment.GetVector("displacement"));
+        Copy(x_.GetVector("velocity"), increment.GetVector("velocity"));
 
         SetTime(saved_time);
         SetFullState(saved_state);
@@ -1264,6 +1204,9 @@ namespace Verdandi
     void ParametricClampedBar<T>
     ::AssembleStiffnessMatrix(Vector<T>& theta, Vector<int>& theta_index)
     {
+        if (stiffness_matrix_.GetM() == 0)
+            Copy(mass_matrix_, stiffness_matrix_);
+
         Fill(T(0), stiffness_matrix_);
         for (int i = 0; i < Nx_; i++)
         {
