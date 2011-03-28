@@ -72,8 +72,6 @@ namespace Verdandi
     void ReducedMinimax<T, Model, ObservationManager>
     ::Initialize(bool initialize_model, bool initialize_observation_manager)
     {
-        MessageHandler::Send(*this, "all", "::Initialize begin");
-
         Ops configuration(configuration_file_);
         configuration.SetPrefix("reduced_minimax.");
 
@@ -236,8 +234,6 @@ namespace Verdandi
 
         if (initialize_model)
             MessageHandler::Send(*this, "model", "initial condition");
-
-        MessageHandler::Send(*this, "all", "::Initialize end");
     }
 
 
