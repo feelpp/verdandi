@@ -37,9 +37,7 @@ namespace Verdandi
       \param[in] configuration_file configuration file.
     */
     template <class T, class Model, class ObservationManager>
-    ReducedMinimax<T, Model, ObservationManager>
-    ::ReducedMinimax(string configuration_file):
-        configuration_file_(configuration_file)
+    ReducedMinimax<T, Model, ObservationManager>::ReducedMinimax()
     {
 
         /*** Initializations ***/
@@ -70,9 +68,10 @@ namespace Verdandi
     /*! Initializes the model and the observation manager. */
     template <class T, class Model, class ObservationManager>
     void ReducedMinimax<T, Model, ObservationManager>
-    ::Initialize(bool initialize_model, bool initialize_observation_manager)
+    ::Initialize(Ops& configuration,
+                 bool initialize_model, bool initialize_observation_manager)
     {
-        Ops configuration(configuration_file_);
+        configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("reduced_minimax.");
 
 

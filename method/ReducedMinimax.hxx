@@ -180,12 +180,13 @@ namespace Verdandi
 
         /*** Constructor and destructor ***/
 
-        ReducedMinimax(string configuration_file);
+        ReducedMinimax();
         ~ReducedMinimax();
 
         /*** Methods ***/
 
-        void Initialize(bool initialize_model = true,
+        void Initialize(Ops& configuration,
+                        bool initialize_model = true,
                         bool initialize_observation_manager = true);
 
         void InitializeStep();
