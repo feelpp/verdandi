@@ -316,6 +316,7 @@ namespace Verdandi
             }
 
             Add(typename T1::value_type(1), perturbation, output);
+            perturbation.Deallocate();
         }
 
         else if (Nvector == 1 && pdf == "LogNormal")
@@ -356,6 +357,7 @@ namespace Verdandi
 
             for (int k = 0; k < perturbation.GetM(); k++)
                 output(k) *= exp(perturbation(k));
+            perturbation.Deallocate();
         }
     }
 
@@ -555,6 +557,7 @@ namespace Verdandi
             }
 
             Add(1., perturbation, output);
+            perturbation.Deallocate();
         }
 
         else if (Nvector == 1 && pdf == "LogNormalHomogeneous")
@@ -590,6 +593,7 @@ namespace Verdandi
 
             for (int k = 0; k < perturbation.GetM(); k++)
                 output(k) *= exp(perturbation(k));
+            perturbation.Deallocate();
         }
     }
 
