@@ -292,8 +292,9 @@ namespace Verdandi
             // Allocates the predicted size for the snapshots.
             if (with_Hty_HtHx_)
                 snapshot_.Reallocate(Nstate_, Nstep_snapshot_
-                                     + 2 * int(Nobservation_step_per_snapshot_
-                                               * double(Nstep_snapshot_)));
+                                     + int(Nobservation_step_per_snapshot_
+                                           * double(2 * Nstep_snapshot_)
+                                           + 0.5));
             else
                 snapshot_.Reallocate(Nstate_, Nstep_snapshot_);
             SetCol(state, 0, snapshot_);
