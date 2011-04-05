@@ -827,7 +827,8 @@ namespace Verdandi
             T energy = 0;
             // Collects the main modes for the projection.
             int i;
-            for (i = 0; i < min(Nprojection_max_, Nsnapshot_)
+            for (i = 0;
+                 i < min(Nprojection_max_, min(snapshot_.GetM(), Nsnapshot_))
                      && energy <= (1. - acceptable_error_) * total_energy;
                  i++)
                 energy += singular_value_(i);
