@@ -47,11 +47,15 @@ else
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "getting_started"
 or basename($_SERVER['REQUEST_URI'], ".php") == "installation"
+or basename($_SERVER['REQUEST_URI'], ".php") == "example_programs"
 or basename($_SERVER['REQUEST_URI'], ".php") == "notation"
 or basename($_SERVER['REQUEST_URI'], ".php") == "overview")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "installation", "Installation");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "example_programs", "Example Programs");
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "notation", "Notation");
