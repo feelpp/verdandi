@@ -82,7 +82,7 @@ Installation instructions for MacOS and Linux are nearly identical, except for a
 
 </ul>
 
-\section windows Windows
+\section windows Windows, 32-bit computer
 
 \subsection dependencies Install the dependencies
 <ul> 
@@ -95,12 +95,13 @@ First install a 2.x version of <a href="http://www.python.org/download/">Python<
 
 Not all the libraries are needed for all the methods, select and install the ones you will want to use in your assimilation.
 
-- Lua (always required). On <a href="http://code.google.com/p/luaforwindows/">the luaforwindows webpage</a>, download the latest executable corresponding to Lua 5.1.x (at the time this page is written: <code>LuaForWindows_v5.1.4-40.exe</code>). The executable will copy the Lua library, by default in <code>C:\\Program Files\\Lua\\5.1\\lib\\</code>. In this directory, rename <code>lua51.lib</code> in <code>lua.lib</code>.
-</li>
+- Lua (always required). On <a href="http://luabinaries.sourceforge.net/download.html">the Lua Binaries webpage</a>, download the archive containing the Windows x86 DLL and Includes (at the time this page is written: <code>lua5_1_4_Win32_dll8_lib.zip</code>). Extract the archive and put the extracted directory in your PATH environment variable. In this directory, rename <code>lua51.lib</code> in <code>lua.lib</code>.
 
 - Blas and Lapack (highly recommended). Download on <a href="http://www.fi.muni.cz/~xsvobod2/misc/lapack/">this webpage</a> the archive for the shared version, statically-linked. Extract the archive to some directory. Add this directory to your <code>PATH</code> environment variable. Inside the directory, rename <code>blas_win32_MT.lib</code> in <code>blas.lib</code> and <code>lapack_win32_MT.lib</code> in <code>lapack.lib</code>. <br>
 
 - Atlas (highly recommended). Download on <a href="http://www.netlib.org/atlas/archives/windows/">this webpage</a> the file <code>atlas330_WinNT_P4SSE2.zip</code>. Extract the archive and put the extracted directory <code>WinNT_P4SSE2</code> in your <code>PATH</code> environment variable. Inside this directory, rename the <code>libcblas.a</code> in <code>cblas.lib</code> and <code>libatlas.a</code> in <code>atlas.lib</code>. <br>
+
+</li>
 
 - If you need SuperLU (needed only if one uses sparse matrices), see the section below.
 
