@@ -163,7 +163,6 @@ namespace Verdandi
         ConvertArrayRowSparseToDense(L_array, L_);
         ConvertArrayRowSparseToDense(U_array, U_);
 #endif
-        GetInverse(U_);
         Nreduced_ = U_.GetN();
 
         /*** Assimilation ***/
@@ -243,8 +242,8 @@ namespace Verdandi
                 working_matrix_or(Nobservation_, Nreduced_);
             MltAdd(T(1), observation_manager_.GetTangentLinearOperator(),
                    L_, T(0), HL);
-            MltAdd(T(1), observation_manager_.GetErrorVariance(), HL, T(0),
-                   working_matrix_or);
+            MltAdd(T(1), observation_manager_.GetErrorVarianceInverse(), HL,
+                   T(0), working_matrix_or);
             MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, working_matrix_or,
                    T(1), U_);
 
