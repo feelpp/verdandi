@@ -1073,7 +1073,10 @@ namespace Verdandi
 
             // Computes K;
             sigma_point_matrix K(Nstate_, Nobservation_);
-            Copy(working_matrix_po, tmp);
+
+            tmp.Reallocate(Nreduced_, Nobservation_);
+            tmp.Fill(T(0));
+
             MltAdd(T(1), U_inv_, working_matrix_po, T(0), tmp);
             MltAdd(T(1), L_, tmp, T(0), K);
 
