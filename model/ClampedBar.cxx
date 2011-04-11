@@ -103,8 +103,6 @@ namespace Verdandi
         configuration.SetPrefix("clamped_bar.error_statistics.");
         configuration.Set("state_error_variance", "v >= 0",
                           state_error_variance_value_);
-        configuration.Set("state_error_scale", "v > 0",
-                          Balgovind_scale_background_);
         configuration.SetPrefix("clamped_bar.physics.");
         configuration.Set("Young_modulus", Young_modulus_);
         configuration.Set("mass_density", mass_density_);

@@ -16,7 +16,7 @@ clamped_bar = {
         final_time = final_time_clamped_bar,
 
         bar_length = 1.,
-        Nx = 100
+        Nx = 10
 
     },
 
@@ -24,9 +24,9 @@ clamped_bar = {
 
         Young_modulus = 1.,
         mass_density = 1.,
-        theta_force = {1., 1., 1., 1.},
+        theta_force = {1.5, 1.7},
         theta_stiffness = {1., 1.},
-        theta_mass = {1., 1., 1., 1., 1.},
+        theta_mass = {1., 1., 1.},
         theta_damp = {1.},
         alpha = 1.,
         beta = 1.
@@ -35,9 +35,7 @@ clamped_bar = {
     error_statistics = {
 
         -- Diagonal value of "B".
-        state_error_variance = 100.,
-        -- Decorrelation length in Balgovind formula.
-        state_error_scale = 1.,
+        state_error_variance = 1.,
 
     },
 

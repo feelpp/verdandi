@@ -165,8 +165,6 @@ namespace Verdandi
         //! Stiffness matrix (K).
         Matrix<T, Symmetric, RowSymSparse> stiffness_matrix_;
 
-        //! Balgovind scale for background covariance.
-        double Balgovind_scale_background_;
         //! Background error variance.
         double state_error_variance_value_;
 

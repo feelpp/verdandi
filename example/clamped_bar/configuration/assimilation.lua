@@ -20,7 +20,7 @@ dofile("configuration/clamped_bar.lua")
 
 -- In order to demonstrate the assimilation, errors are introduced in the
 -- model.
-clamped_bar.physics.theta_force = {1., 2., 2., 4.}
+clamped_bar.physics.theta_force = {1., 1.}
 
 
 -------------------------------- OBSERVATION ---------------------------------
