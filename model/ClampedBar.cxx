@@ -179,7 +179,7 @@ namespace Verdandi
         force_.Fill(T(1));
 
         for (int i = 0; i < Ndof_; i++)
-            disp_0_(i) = T(i) / T(Ndof_ - 1);
+            disp_0_(i) = T(0);
 
         // Initialize full vector collection.
         state working_vector;
