@@ -256,7 +256,10 @@ four_dimensional_variational = {
       -- Relative tolerance on the optimization parameters.
       parameter_tolerance = 1.e-6,
       -- Relative tolerance on the cost function.
-      cost_function_tolerance = 1.e-6
+      cost_function_tolerance = 1.e-6,
+      -- Maximum number of function evaluations. Criterion is disabled
+      -- if the value is non-positive.
+      Niteration_max = -1
 
    },
 

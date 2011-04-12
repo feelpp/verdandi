@@ -180,8 +180,10 @@ namespace Verdandi
         double parameter_tolerance, cost_function_tolerance;
         configuration.Set("parameter_tolerance", parameter_tolerance);
         configuration.Set("cost_function_tolerance", cost_function_tolerance);
+        int Niteration_max;
+        configuration.Set("Niteration_max", Niteration_max);
         optimization_.Initialize(Nstate_, algorithm, parameter_tolerance,
-                                 cost_function_tolerance);
+                                 cost_function_tolerance, Niteration_max);
 
 #ifdef VERDANDI_WITH_TRAJECTORY_MANAGER
 
