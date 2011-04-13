@@ -24,8 +24,6 @@
 
 #include "ReducedOrderExtendedKalmanFilter.hxx"
 
-#include "seldon/vector/VectorCollection.cxx"
-
 #include "seldon/computation/solver/SparseCholeskyFactorisation.cxx"
 
 
