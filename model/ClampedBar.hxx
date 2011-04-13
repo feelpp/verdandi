@@ -19,8 +19,6 @@
 
 #ifndef VERDANDI_FILE_MODEL_CLAMPEDBAR_HXX
 
-#include "seldon/SeldonSolver.hxx"
-
 #include "seldon/vector/VectorCollection.hxx"
 
 #include "OutputSaver.hxx"
