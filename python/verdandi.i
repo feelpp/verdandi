@@ -24,7 +24,7 @@
 // SWIG interface to Verdandi.
 %module verdandi
 %{
-#define VERDANDI_SPARSE
+#define VERDANDI_DENSE
 #define SELDON_WITH_BLAS
 #define SELDON_WITH_LAPACK
 
