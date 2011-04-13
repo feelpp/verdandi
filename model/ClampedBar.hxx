@@ -23,6 +23,10 @@
 
 #include "OutputSaver.hxx"
 
+#include <iostream>
+
+#include <set>
+
 
 namespace Verdandi
 {

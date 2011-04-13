@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2010, INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Author(s): Vivien Mallet, Claire Mouton, Marc Fragu
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -22,6 +22,7 @@
 #define VSWIG_REAL double
 
 #define VSWIG_MODEL QuadraticModel<VSWIG_REAL>
+#define VSWIG_MODEL1 ClampedBar<VSWIG_REAL>
 
 #define VSWIG_GRID_TO_NETWORK_OBSERVATION GridToNetworkObservationManager<VSWIG_REAL>
 #define VSWIG_LINEAR_OBSERVATION LinearObservationManager<VSWIG_REAL>
@@ -29,4 +30,8 @@
 // Instantiate one or several of the following methods.
 #define VSWIG_METHOD ForwardDriver<VSWIG_MODEL >
 #define VSWIG_METHOD1 OptimalInterpolation<VSWIG_REAL, VSWIG_MODEL, \
+                                          VSWIG_LINEAR_OBSERVATION >
+#define VSWIG_METHOD2 ForwardDriver<VSWIG_MODEL1 >
+#define VSWIG_METHOD3 ReducedOrderExtendedKalmanFilter<VSWIG_REAL, \
+                                          VSWIG_MODEL1, \
                                           VSWIG_LINEAR_OBSERVATION >

@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2010, INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Author(s): Vivien Mallet, Claire Mouton, Marc Fragu
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -37,10 +37,12 @@
 #include "seldon/SeldonSolver.hxx"
 
 #include "model/QuadraticModel.cxx"
+#include "model/ClampedBar.cxx"
 #include "observation_manager/GridToNetworkObservationManager.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
 #include "method/OptimalInterpolation.cxx"
 #include "method/ForwardDriver.cxx"
+#include "method/ReducedOrderExtendedKalmanFilter.cxx"
 
 
 namespace Verdandi
@@ -48,10 +50,13 @@ namespace Verdandi
 
 
     template class VSWIG_MODEL;
+    template class VSWIG_MODEL1;
     template class VSWIG_GRID_TO_NETWORK_OBSERVATION;
     template class VSWIG_LINEAR_OBSERVATION;
     template class VSWIG_METHOD;
     template class VSWIG_METHOD1;
+    template class VSWIG_METHOD2;
+    template class VSWIG_METHOD3;
 
 
 }
