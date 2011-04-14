@@ -650,8 +650,30 @@ namespace Verdandi
         // Assemble K.
         if (stable_.find("theta_stiffness") != stable_.end())
         {
-            AssembleStiffnessMatrix(increment.GetVector("theta_stiffness"),
-                                    theta_stiffness_index_);
+            if (stiffness_matrix_.GetM() == 0)
+                Copy(mass_matrix_, stiffness_matrix_);
+            Fill(T(0), stiffness_matrix_);
+            for (int i = 0; i < Nx_; i++)
+            {
+                stiffness_matrix_.Val(i, i) += stiffness_FEM_matrix_(0, 0)
+                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)))
+                * increment.GetVector("theta_stiffness")
+                    (theta_stiffness_index_(i));
+                stiffness_matrix_.Val(i + 1, i + 1) += stiffness_FEM_matrix_(1, 1)
+                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)))
+                * increment.GetVector("theta_stiffness")
+                    (theta_stiffness_index_(i));
+                stiffness_matrix_.Val(i, i + 1) += stiffness_FEM_matrix_(0, 1)
+                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)))
+                * increment.GetVector("theta_stiffness")
+                    (theta_stiffness_index_(i));
+            }
+
+            // Boundary condition by pseudo-elimination.
+            stiffness_matrix_.Val(0, 0) = 1;
+            stiffness_matrix_.Val(0, 1) = 0;
+            stiffness_matrix_.Val(1, 0) = 0;
+
             MltAdd(T(-0.5), stiffness_matrix_, disp, T(1), force_);
         }
         // Assemble M.
@@ -1211,11 +1233,11 @@ namespace Verdandi
         for (int i = 0; i < Nx_; i++)
         {
             stiffness_matrix_.Val(i, i) += stiffness_FEM_matrix_(0, 0)
-                * theta(theta_index(i));
+                * pow(T(2), theta(theta_index(i)));
             stiffness_matrix_.Val(i + 1, i + 1) += stiffness_FEM_matrix_(1, 1)
-                * theta(theta_index(i));
+                * pow(T(2), theta(theta_index(i)));
             stiffness_matrix_.Val(i, i + 1) += stiffness_FEM_matrix_(0, 1)
-                * theta(theta_index(i));
+                * pow(T(2), theta(theta_index(i)));
         }
 
         // Boundary condition by pseudo-elimination.
