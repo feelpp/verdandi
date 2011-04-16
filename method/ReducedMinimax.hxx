@@ -67,6 +67,9 @@ namespace Verdandi
         //! Should the current time be displayed?
         bool show_time_;
 
+        //! Should the filter be applied?
+        bool with_filtering_;
+
         //! Model configuration file.
         string model_configuration_file_;
         //! Configuration file for the observation manager.

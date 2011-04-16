@@ -146,6 +146,8 @@ namespace Verdandi
 
         /*** Filter options ***/
 
+        configuration.Set("with_filtering", with_filtering_);
+
         configuration.Set("model_error.diagonal",
                           is_model_error_variance_diagonal_);
         T diagonal_part;
@@ -368,6 +370,27 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::FilterInitialization begin");
 
+        if (!with_filtering_)
+        {
+            // Without minimax filtering, just projects the state on the
+            // reduced space.
+            model_state state(model_.GetNstate());
+            model_state reduced_state(Nprojection_);
+            model_.GetState(state);
+            MltAdd(T(1), projection_, state, T(0), reduced_state);
+            MltAdd(T(1), SeldonTrans, projection_, reduced_state,
+                   T(0), state);
+            model_.SetState(state);
+
+            output_saver_.Save(projection_, "projection");
+
+            MessageHandler::Send(*this, "model", "state_forecast");
+            MessageHandler::Send(*this, "driver", "state_forecast");
+            MessageHandler::Send(*this, "all", "::FilterInitialization end");
+
+            return;
+        }
+
         // Model state.
         double time = model_.GetTime();
         model_state full_state;
@@ -514,6 +537,37 @@ namespace Verdandi
     void ReducedMinimax<T, Model, ObservationManager>::Propagation()
     {
         MessageHandler::Send(*this, "all", "::Propagation begin");
+
+        if (!with_filtering_)
+        {
+            // Without minimax filtering, just applies the model and projects
+            // the state on the reduced space.
+            model_.Forward();
+
+            model_state state(model_.GetNstate());
+            model_state reduced_state(Nprojection_);
+            model_.GetState(state);
+            MltAdd(T(1), projection_, state, T(0), reduced_state);
+            MltAdd(T(1), SeldonTrans, projection_, reduced_state,
+                   T(0), state);
+            model_.SetState(state);
+
+            output_saver_.Save(projection_, "projection");
+
+            inner_iteration_++;
+            if (reduction_method_ != "none"
+                && inner_iteration_ == Nstep_snapshot_ - 1)
+            {
+                inner_iteration_ = 0;
+                mode_ = 0;
+            }
+
+            MessageHandler::Send(*this, "model", "state_forecast");
+            MessageHandler::Send(*this, "driver", "state_forecast");
+            MessageHandler::Send(*this, "all", "::Propagation end");
+
+            return;
+        }
 
         // Model state.
         double time = model_.GetTime();
