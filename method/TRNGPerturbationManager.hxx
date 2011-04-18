@@ -1,5 +1,5 @@
-// Copyright (C) 2010 INRIA
-// Author(s): Vivien Mallet, Anne Tilloy
+// Copyright (C) 2010-2011 INRIA
+// Author(s): Kévin Charpentier, Vivien Mallet, Anne Tilloy
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -20,43 +20,42 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#ifndef VERDANDI_FILE_METHOD_NEWRANPERTURBATIONMANAGER_HXX
+#ifndef VERDANDI_FILE_METHOD_TRNGPERTURBATIONMANAGER_HXX
+#define VERDANDI_FILE_METHOD_TRNGPERTURBATIONMANAGER_HXX
+
 
 #include "BasePerturbationManager.hxx"
-#include "newran/newran.h"
+#include "trng/yarn5.hpp"
+
 
 namespace Verdandi
 {
 
 
-    ///////////////////////////////
-    // NEWRANPERTURBATIONMANAGER //
-    ///////////////////////////////
+    /////////////////////////////
+    // TRNGPERTURBATIONMANAGER //
+    /////////////////////////////
 
 
-    //! This class generates random samples using Newran.
-    class NewranPerturbationManager:
-    public BasePerturbationManager<NewranPerturbationManager>
+    //! This class generates random samples using TRNG.
+    class TRNGPerturbationManager:
+        public BasePerturbationManager<TRNGPerturbationManager>
     {
     protected:
-        //! Uniform random number generator.
-        NEWRAN::LGM_mixed* urng_;
-
-        //! Path to the Newran seed directory.
-        string seed_path_;
+        //! Normal random number generator.
+        trng::yarn5* nrng_;
 
     public:
 
         /*** Constructors and destructor ***/
 
-        NewranPerturbationManager();
-        NewranPerturbationManager(string configuration_file);
-        ~NewranPerturbationManager();
+        TRNGPerturbationManager();
+        TRNGPerturbationManager(string configuration_file);
+        ~TRNGPerturbationManager();
 
         /*** Methods ***/
 
         void Initialize(string configuration_file);
-        void Reinitialize();
         void Finalize();
 
         double Normal(double mean, double variance,
@@ -83,22 +82,21 @@ namespace Verdandi
         void NormalHomogeneous(T0 variance,
                                Vector<double, VectFull>& parameter,
                                Vector<T1, VectFull, Allocator1>& output);
+
         template <class T0,
                   class T1, class Allocator1>
         void LogNormalHomogeneous(T0 variance,
-                                  Vector<double, VectFull>& parameter,
+                           Vector<double, VectFull>& parameter,
                                   Vector<T1, VectFull, Allocator1>& output);
         template <class T0,
                   class T1, class Allocator0>
         bool NormalClipping(Vector<T0, VectFull>& diagonal,
-                            Vector<double, VectFull>& parameter,
-                            Vector<T1, VectFull, Allocator0>& output);
-
+                         Vector<double, VectFull>& parameter,
+                         Vector<T1, VectFull, Allocator0>& output);
     };
 
 
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_METHOD_NEWRANPERTURBATIONMANAGER_HXX
 #endif

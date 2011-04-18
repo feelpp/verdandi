@@ -250,7 +250,7 @@ if fortran_compiler is not None:
 # In case of GNU compilers, a few options may be added.
 if "g++" in env["CXX"] and ARGUMENTS["mode_cpp"] == "strict":
     cpp_compilation_option += " -Wall -ansi -pedantic -Wno-unused" \
-        + " -Wno-parentheses -Wno-variadic-macros"
+        + " -Wno-parentheses -Wno-variadic-macros -Wno-long-long"
     # For latest GCC versions.
     import commands
     s, o = commands.getstatusoutput(env["CXX"] + " -dumpversion")
@@ -277,7 +277,8 @@ library_list = to_string_list("library_list")
 for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
                 "newran", "superlu", "cblas", "pthread", "mpiseq",
                 "dmumps", "zmumps", "mumps_common", "pord", "metis", "m",
-                "umfpack", "amd", "cppunit", "nlopt"]:
+                "umfpack", "amd", "cppunit", "nlopt", "trng4"]:
+
     if library not in library_list:
         library_list += [library]
 if env['PLATFORM'] in ['win32', 'win64'] and "lua" not in library_list:

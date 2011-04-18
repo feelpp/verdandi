@@ -1,5 +1,5 @@
 // Copyright (C) 2010 INRIA
-// Author(s): Vivien Mallet, Anne Tilloy
+// Author(s): Vivien Mallet, Anne Tilloy, Kévin Charpentier
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -34,6 +34,7 @@ namespace Verdandi
 
 
     //! This class generates and applies pertubations.
+    template<class Derived>
     class BasePerturbationManager: public VerdandiBase
     {
     public:
@@ -77,43 +78,6 @@ namespace Verdandi
                     Vector<double, VectFull>& parameter,
                     Vector<double, VectFull>& correlation,
                     Vector<T1, Collection, Allocator1>& output);
-
-        template <class T0, class Prop0, class Allocator0,
-                  class T1, class Allocator1>
-        void Normal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
-                    Vector<double, VectFull>& parameter,
-                    Vector<T1, VectFull, Allocator1>& output);
-
-        template <class T0, class Prop0, class Allocator0,
-                  class T1, class Allocator1>
-        void LogNormal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
-                       Vector<double, VectFull>& parameter,
-                       Vector<T1, VectFull, Allocator1>& output);
-
-        template <class T0,
-                  class T1, class Allocator1>
-        void NormalHomogeneous(T0 variance,
-                               Vector<double, VectFull>& parameter,
-                               Vector<T1, VectFull, Allocator1>& output);
-
-        template <class T0,
-                  class T1, class Allocator1>
-        void LogNormalHomogeneous(T0 variance,
-                                  Vector<double, VectFull>& parameter,
-                                  Vector<T1, VectFull, Allocator1>& output);
-
-        template <class T0,
-                  class T1, class Allocator1>
-        bool NormalClipping(Vector<T0, VectFull>& diagonal,
-                            Vector<double, VectFull>& parameter,
-                            Vector<T1, VectFull, Allocator1>& output);
-
-        virtual double Normal(double mean, double variance,
-                              Vector<double, VectFull>& parameter);
-
-        virtual void Normal(double mean, double variance,
-                            Vector<double, VectFull>& parameter,
-                            Vector<double>& output);
 
     };
 

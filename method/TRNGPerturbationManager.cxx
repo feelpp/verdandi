@@ -1,5 +1,5 @@
-// Copyright (C) 2010 INRIA
-// Author(s): Vivien Mallet, Anne Tilloy
+// Copyright (C) 2010-2011 INRIA
+// Author(s): Kévin Charpentier, Vivien Mallet, Anne Tilloy
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -20,12 +20,16 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#ifndef VERDANDI_FILE_METHOD_NEWRANPERTURBATIONMANAGER_CXX
+#ifndef VERDANDI_FILE_METHOD_TRNGPERTURBATIONMANAGER_CXX
+#define VERDANDI_FILE_METHOD_TRNGPERTURBATIONMANAGER_CXX
 
 
-#include "NewranPerturbationManager.hxx"
+#include "TRNGPerturbationManager.hxx"
 #include "BasePerturbationManager.cxx"
-#include "share/LockFile.cxx"
+#include "trng/normal_dist.hpp"
+#include "trng/lognormal_dist.hpp"
+#include "trng/truncated_normal_dist.hpp"
+
 
 namespace Verdandi
 {
@@ -37,9 +41,9 @@ namespace Verdandi
 
 
     //! Default constructor.
-    NewranPerturbationManager
-    ::NewranPerturbationManager():
-      BasePerturbationManager<NewranPerturbationManager>(), urng_(NULL)
+    TRNGPerturbationManager
+    ::TRNGPerturbationManager():
+        BasePerturbationManager<TRNGPerturbationManager>(), nrng_(NULL)
     {
     }
 
@@ -48,19 +52,19 @@ namespace Verdandi
     /*! Builds the manager and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    NewranPerturbationManager
-    ::NewranPerturbationManager(string configuration_file):
-        BasePerturbationManager<NewranPerturbationManager>(), urng_(NULL)
+    TRNGPerturbationManager
+    ::TRNGPerturbationManager(string configuration_file):
+        BasePerturbationManager<TRNGPerturbationManager>(), nrng_(NULL)
     {
         Initialize(configuration_file);
     }
 
 
     //! Destructor.
-    NewranPerturbationManager::~NewranPerturbationManager()
+    TRNGPerturbationManager::~TRNGPerturbationManager()
     {
-        if (urng_ != NULL)
-            delete urng_;
+        if (nrng_ != NULL)
+            delete nrng_;
     }
 
 
@@ -73,56 +77,22 @@ namespace Verdandi
     /*!
       \param[in] configuration_file configuration file.
     */
-    void NewranPerturbationManager::Initialize(string configuration_file)
+    void TRNGPerturbationManager::Initialize(string configuration_file)
     {
         Ops configuration_stream(configuration_file);
-
-        configuration_stream.SetPrefix("perturbation_manager.newran.");
-
-        configuration_stream.Set("seed_path", seed_path_);
-        NEWRAN::Random::SetDirectory(seed_path_.c_str());
-        urng_ = new NEWRAN::LGM_mixed;
-        NEWRAN::Random::Set(*urng_);
-        if (!Lock(seed_path_ + "lock"))
-            throw ErrorIO("NewranPerturbationManager::Initialize(string)",
-                          "Unable to create the Newran lock file \""
-                          + seed_path_ + "lock\".");
-
-        NEWRAN::Random::CopySeedFromDisk();
+        nrng_ = new trng::yarn5(time(NULL));
     }
 
 
-    //! Reinitializes the manager.
-    /*! Locks and reloads the seed. */
-    void NewranPerturbationManager::Reinitialize()
+    //! Does nothing.
+    void TRNGPerturbationManager::Finalize()
     {
-        Finalize();
-
-        if (!Lock(seed_path_ + "lock"))
-            throw ErrorIO("NewranPerturbationManager::Reinitialize()",
-                          "Unable to create the Newran lock file \""
-                          + seed_path_ + "lock\".");
-
-        NEWRAN::Random::CopySeedFromDisk();
-    }
-
-
-    //! Copies the seed to disk.
-    /*! Saves and unlocks the seed. */
-    void NewranPerturbationManager::Finalize()
-    {
-        NEWRAN::Random::CopySeedToDisk();
-
-        if (!Unlock(seed_path_ + "lock"))
-            throw ErrorIO("NewranPerturbationManager::Finalize()",
-                          "Unable to remove the Newran lock file \""
-                          + seed_path_ + "lock\".");
     }
 
 
     //! Generates a random number with a normal distribution.
     /*!
-      \param[in] mean mean of the normal distribution.
+      \param[in] mean mean of the distribution.
       \param[in] variance variance of the random variable.
       \param[in] parameter vector of parameters. The vector may either be
       empty or contain two clipping parameters \f$ (a, b) \f$. With the
@@ -132,29 +102,34 @@ namespace Verdandi
       \return A random number following the previously described normal
       distribution.
     */
-    double NewranPerturbationManager
+    double TRNGPerturbationManager
     ::Normal(double mean, double variance,
              Vector<double, VectFull>& parameter)
     {
-        NEWRAN::Normal N;
-        double value = N.Next();
+        double value = 0;
+
+        trng::normal_dist<> N(mean, variance);
+        value = N(*nrng_);
         if (parameter.GetLength() == 2)
-            while (value < parameter(0) || value > parameter(1))
-                value = N.Next();
+        {
+            trng::truncated_normal_dist<>
+                Ntruncated(mean, variance, parameter(0), parameter(1));
+            value = Ntruncated(*nrng_);
+        }
         else if (parameter.GetLength() != 0)
-            throw ErrorArgument("NewranPerturbationManager"
+            throw ErrorArgument("TRNGPerturbationManager"
                                 "::Normal(double, double, Vector)",
                                 "The vector of parameters should be either "
                                 "empty or of length 2, but it contains "
                                 + to_str(parameter.GetLength())
                                 + " element(s).");
-        return mean + sqrt(variance) * value;
+        return value;
     }
 
 
     //! Generates a random number with a log-normal distribution.
     /*!
-      \param[in] mean mean of the normal distribution.
+      \param[in] mean mean of the distribution.
       \param[in] variance variance of the random variable.
       \param[in] parameter vector of parameters. The vector may either be
       empty or contain two clipping parameters \f$ (a, b) \f$. With the
@@ -164,22 +139,29 @@ namespace Verdandi
       \return A random number following the previously described normal
       distribution.
     */
-    double NewranPerturbationManager
+    double TRNGPerturbationManager
     ::LogNormal(double mean, double variance,
-             Vector<double, VectFull>& parameter)
+                Vector<double, VectFull>& parameter)
     {
-        if (parameter.GetLength() != 0 && parameter.GetLength() != 2)
-            throw ErrorArgument("NewranPerturbationManager"
+        double value = 0;
+        trng::lognormal_dist<> LN(mean, variance);
+        value = LN(*nrng_);
+        if (parameter.GetLength() == 2)
+            while (value < parameter(0) || value > parameter(1))
+                value = LN(*nrng_);
+
+        else if (parameter.GetLength() != 0)
+            throw ErrorArgument("TRNGPerturbationManager"
                                 "::LogNormal(double, double, Vector)",
                                 "The vector of parameters should be either "
                                 "empty or of length 2, but it contains "
                                 + to_str(parameter.GetLength())
                                 + " element(s).");
-        return exp(Normal(mean, variance, parameter));
+        return value;
     }
 
 
-    //! Generates a vector of random numbers with normal distribution.
+    //! Generates a vector of random numbers with a normal distribution.
     /*! Each component of the random vector is generated independently.
       \param[in] mean mean of the normal distribution.
       \param[in] variance variance of the random variable.
@@ -191,16 +173,17 @@ namespace Verdandi
       \param[out] output the generated random vector.
     */
     template <class T0, class T1,
-              class Prop0, class Allocator0>
-    void NewranPerturbationManager
+                  class Prop0, class Allocator0>
+    void TRNGPerturbationManager
     ::Normal(double mean,
              Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
              Vector<double, VectFull>& parameter,
              Vector<T1, VectFull, Allocator0>& output)
     {
         if (parameter.GetLength() != 0 && parameter.GetLength() != 2)
-            throw ErrorArgument("NewranPerturbationManager"
-                                "::Normal(double, double, Vector, Vector)",
+            throw ErrorArgument("TRNGPerturbationManager"
+                                "::Normal(string, double, double,"
+                                "Vector, Vector)",
                                 "The vector of parameters should be either "
                                 "empty or of length 2, but it contains "
                                 + to_str(parameter.GetLength())
@@ -211,15 +194,19 @@ namespace Verdandi
         bool satisfy_constraint = false;
         while(!satisfy_constraint)
         {
-            NEWRAN::Normal N;
+            trng::normal_dist<> N(T0(0), T1(1));
             double value;
             int size = sample.GetSize();
             for (int i = 0; i < size; i++)
             {
-                value = N.Next();
+                value = N(*nrng_);
                 if (parameter.GetLength() == 2)
-                    while (value < parameter(0) || value > parameter(1))
-                        value = N.Next();
+                {
+                    trng::truncated_normal_dist<>
+                        Ntruncated(T0(0), T1(1),
+                                   parameter(0), parameter(1));
+                    value = Ntruncated(*nrng_);
+                }
                 sample(i) = value;
             }
 
@@ -240,13 +227,13 @@ namespace Verdandi
             satisfy_constraint = NormalClipping(diagonal,
                                                 parameter, output);
         }
-
     }
 
 
     //! Generate a random vector with a log-normal distribution.
     /*
-      \param[in] variance variance of the normal distribution.
+      \param[in] mean mean of the normal distribution.
+      \param[in] variance variance of the log-normal distribution.
       \param[in] parameter vector of parameters. The vector may either be
       empty or contain two clipping parameters \f$ (a, b) \f$. With the
       clipping parameters, for a normal distribution, any random value lies in
@@ -257,7 +244,7 @@ namespace Verdandi
     */
     template <class T0, class Prop0, class Allocator0,
               class T1, class Allocator1>
-    void NewranPerturbationManager
+    void TRNGPerturbationManager
     ::LogNormal(double mean,
                 Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
                 Vector<double, VectFull>& parameter,
@@ -272,20 +259,20 @@ namespace Verdandi
     }
 
 
-   //! Generate a random vector with a homogeneous normal distribution.
-   /*
-     \param[in] variance variance of the normal distribution.
-     \param[in] parameter vector of parameters. The vector may either be
-     empty or contain two clipping parameters \f$ (a, b) \f$. With the
-     clipping parameters, for a normal distribution, any random value lies in
-     \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ \mu \f$ is the mean
-     of the random variable and \f$ \sigma \f$ is its standard deviation.
-     \param[in,out] output output on entry, the mean vector; on exit,
-     the sample.
+    //! Generate a random vector with a homogeneous normal distribution.
+    /*
+      \param[in] variance variance of the normal distribution.
+      \param[in] parameter vector of parameters. The vector may either be
+      empty or contain two clipping parameters \f$ (a, b) \f$. With the
+      clipping parameters, for a normal distribution, any random value lies in
+      \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ \mu \f$ is the mean
+      of the random variable and \f$ \sigma \f$ is its standard deviation.
+      \param[in,out] output output on entry, the mean vector; on exit,
+      the sample.
     */
     template <class T0,
               class T1, class Allocator1>
-    void NewranPerturbationManager
+    void TRNGPerturbationManager
     ::NormalHomogeneous(T0 variance,
                         Vector<double, VectFull>& parameter,
                         Vector<T1, VectFull, Allocator1>& output)
@@ -311,7 +298,7 @@ namespace Verdandi
     */
     template <class T0,
               class T1, class Allocator1>
-    void NewranPerturbationManager
+    void TRNGPerturbationManager
     ::LogNormalHomogeneous(T0 variance,
                            Vector<double, VectFull>& parameter,
                            Vector<T1, VectFull, Allocator1>& output)
@@ -339,7 +326,7 @@ namespace Verdandi
     */
     template <class T0,
               class T1, class Allocator1>
-    bool NewranPerturbationManager
+    bool TRNGPerturbationManager
     ::NormalClipping(Vector<T0, VectFull>& diagonal,
                      Vector<double, VectFull>& parameter,
                      Vector<T1, VectFull, Allocator1>& output)
@@ -347,14 +334,14 @@ namespace Verdandi
         if (parameter.GetLength() == 0)
             return true;
         if (parameter.GetLength() != 2)
-            throw ErrorArgument("NewranPerturbationManager::NormalClipping",
+            throw ErrorArgument("TRNGPerturbationManager::NormalClipping",
                                 "The vector of parameters should be either "
                                 "empty or of length 2, but it contains "
                                 + to_str(parameter.GetLength())
                                 + " element(s).");
 
         if (diagonal.GetLength() != output.GetLength())
-            throw ErrorArgument("NewranPerturbationManager::NormalClipping",
+            throw ErrorArgument("TRNGPerturbationManager::NormalClipping",
                                 "The size of the covariance matrix ("
                                 + to_str(diagonal.GetLength())
                                 + " x " + to_str(diagonal.GetLength()) + ") "
@@ -377,5 +364,4 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_METHOD_NEWRANPERTURBATIONMANAGER_CXX
 #endif

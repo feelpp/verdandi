@@ -1,5 +1,5 @@
-// Copyright (C) 2010 INRIA
-// Author(s): Anne Tilloy, Vivien Mallet
+// Copyright (C) 2010-2011 INRIA
+// Author(s): Anne Tilloy, Vivien Mallet, Kévin Charpentier
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -38,7 +38,8 @@ namespace Verdandi
 
     //! Default constructor.
     /*! Builds the manager. */
-    BasePerturbationManager::BasePerturbationManager()
+    template <class Derived>
+    BasePerturbationManager<Derived>::BasePerturbationManager()
     {
         /*** Initializations ***/
 
@@ -51,7 +52,8 @@ namespace Verdandi
     /*! Builds the manager.
       \param[in] configuration_file configuration file.
     */
-    BasePerturbationManager
+    template <class Derived>
+    BasePerturbationManager<Derived>
     ::BasePerturbationManager(string configuration_file)
     {
         MessageHandler::AddRecipient("perturbation_manager", *this,
@@ -60,7 +62,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    BasePerturbationManager::~BasePerturbationManager()
+    template <class Derived>
+    BasePerturbationManager<Derived>::~BasePerturbationManager()
     {
     }
 
@@ -74,7 +77,8 @@ namespace Verdandi
     /*!
       \param[in] configuration_file configuration file.
     */
-    void BasePerturbationManager::Initialize(string configuration_file)
+    template <class Derived>
+    void BasePerturbationManager<Derived>::Initialize(string configuration_file)
     {
     }
 
@@ -104,9 +108,10 @@ namespace Verdandi
       sample. If the size of \a output is not a multiple of \f$ N \f$, an
       exception is thrown.
     */
+    template<class Derived>
     template <class T0, class Prop0, class Allocator0,
               class T1, class Allocator1>
-    void BasePerturbationManager
+    void BasePerturbationManager<Derived>
     ::Sample(string pdf,
              Matrix<T0, Prop0, RowSymPacked, Allocator0>& variance,
              Vector<double, VectFull>& parameter,
@@ -143,8 +148,16 @@ namespace Verdandi
                                 + to_str(correlation.GetLength())
                                 + " correlation(s) is/are given.");
 
+        if(pdf != "Normal" && pdf != "LogNormal")
+            throw ErrorArgument("BasePerturbationManager"
+                                "::Sample(string, Matrix, Vector,"
+                                " Vector, Vector)",
+                                "The distribution \""
+                                + pdf + "\" is not supported.");
+
         if (Nvector == 1 && pdf == "Normal")
-            Normal(variance, parameter, output);
+            static_cast<Derived*>(this)->Normal(T1(0), variance,
+                                                parameter, output);
 
         else if (pdf == "Normal")
         {
@@ -154,7 +167,8 @@ namespace Verdandi
             Vector<T1, VectFull, Allocator1> first_vector;
             first_vector.SetData(N, &perturbation(0));
 
-            Normal(variance, parameter, first_vector);
+            static_cast<Derived*>(this)->Normal(T1(0), variance,
+                                                parameter, first_vector);
 
             for (int i = 1; i < Nvector; i++)
             {
@@ -165,7 +179,9 @@ namespace Verdandi
                     Copy(first_vector, vector_i);
                 else
                 {
-                    Normal(variance, parameter, vector_i);
+                    static_cast<Derived*>(this)->Normal(T1(0),
+                                                        variance, parameter,
+                                                        vector_i);
                     if (correlation.GetLength() != 0)
                     {
                         Mlt(T1(1. - correlation(i - 1)), vector_i);
@@ -181,7 +197,8 @@ namespace Verdandi
         }
 
         else if (Nvector == 1 && pdf == "LogNormal")
-            LogNormal(variance, parameter, output);
+           static_cast<Derived*>(this)->LogNormal(T1(0), variance,
+                                                  parameter, output);
 
         else if (pdf == "LogNormal")
         {
@@ -191,7 +208,8 @@ namespace Verdandi
             Vector<T1, VectFull, Allocator1> first_vector;
             first_vector.SetData(N, &perturbation(0));
 
-            Normal(variance, parameter, first_vector);
+            static_cast<Derived*>(this)->LogNormal(T1(0), variance,
+                                                   parameter, first_vector);
 
             for (int i = 1; i < Nvector; i++)
             {
@@ -202,7 +220,10 @@ namespace Verdandi
                     Copy(first_vector, vector_i);
                 else
                 {
-                    Normal(variance, parameter, vector_i);
+                    static_cast<Derived*>(this)->LogNormal(T1(0),
+                                                           variance, parameter,
+                                                           vector_i);
+
                     if (correlation.GetLength() != 0)
                     {
                         Mlt(T1(1. - correlation(i - 1)), vector_i);
@@ -237,9 +258,10 @@ namespace Verdandi
       \param[in,out] output on entry, mean or median vectors; on exit, the
       sample in the form of a vector collection.
     */
+    template <class Derived>
     template <class T0, class Prop0, class Allocator0,
               class T1, class Allocator1>
-    void BasePerturbationManager
+    void BasePerturbationManager<Derived>
     ::Sample(string pdf,
              Matrix<T0, Prop0, RowSymPacked, Allocator0>& variance,
              Vector<double, VectFull>& parameter,
@@ -279,8 +301,17 @@ namespace Verdandi
                                 + to_str(correlation.GetLength())
                                 + " correlation(s) is/are given.");
 
+
+        if(pdf != "Normal" && pdf != "LogNormal")
+            throw ErrorArgument("BasePerturbationManager"
+                                "::Sample(string, Matrix, Vector,"
+                                " Vector, VectorCollection)",
+                                "The distribution \""
+                                + pdf + "\" is not supported.");
+
         if (Nvector == 1 && pdf == "Normal")
-            Normal(variance, parameter, output.GetVector(0));
+           static_cast<Derived*>(this)-> Normal(variance, parameter,
+                                                output.GetVector(0));
 
         else if (pdf == "Normal")
         {
@@ -295,7 +326,8 @@ namespace Verdandi
                 delete tmp;
             }
 
-            Normal(variance, parameter, perturbation.GetVector(0));
+            static_cast<Derived*>(this)->Normal(variance, parameter,
+                                                perturbation.GetVector(0));
 
             for (int i = 1; i < Nvector; i++)
             {
@@ -303,7 +335,11 @@ namespace Verdandi
                     perturbation.GetVector(i) = perturbation.GetVector(0);
                 else
                 {
-                    Normal(variance, parameter, perturbation.GetVector(i));
+                    static_cast<Derived*>(this)->
+                        Normal(variance,
+                               parameter,
+                               perturbation.GetVector(i));
+
                     if (correlation.GetLength() != 0)
                     {
                         Mlt(typename T1::value_type(1. - correlation(i - 1)),
@@ -320,7 +356,10 @@ namespace Verdandi
         }
 
         else if (Nvector == 1 && pdf == "LogNormal")
-            LogNormal(variance, parameter, output.GetVector(0));
+        static_cast<Derived*>(this)->
+            LogNormal(variance, parameter,
+                      output.GetVector(0));
+
 
         else if (pdf == "LogNormal")
         {
@@ -335,7 +374,10 @@ namespace Verdandi
                 delete tmp;
             }
 
-            Normal(variance, parameter, perturbation.GetVector(0));
+            static_cast<Derived*>(this)->
+                LogNormal(variance,
+                          parameter,
+                          perturbation.GetVector(0));
 
             for (int i = 1; i < Nvector; i++)
             {
@@ -343,7 +385,10 @@ namespace Verdandi
                     perturbation.GetVector(i) = perturbation.GetVector(0);
                 else
                 {
-                    Normal(variance, parameter, perturbation.GetVector(i));
+                    static_cast<Derived*>(this)->
+                        Normal(variance, parameter,
+                               perturbation.GetVector(i));
+
                     if (correlation.GetLength() != 0)
                     {
                         Mlt(typename T1::value_type(1. - correlation(i - 1)),
@@ -392,9 +437,10 @@ namespace Verdandi
       sample. If the size of \a output is not a multiple of that of \a
       correlation plus one, an exception is thrown.
     */
+    template <class Derived>
     template <class T0,
               class T1, class Allocator1>
-    void BasePerturbationManager
+    void BasePerturbationManager<Derived>
     ::Sample(string pdf, T0 variance,
              Vector<double, VectFull>& parameter,
              Vector<double, VectFull>& correlation,
@@ -412,8 +458,16 @@ namespace Verdandi
         int Nvector = correlation.GetLength() + 1;
         int N = output.GetLength() / Nvector;
 
+        if(pdf != "NormalHomogeneous" && pdf != "LogNormalHomogeneous")
+            throw ErrorArgument("BasePerturbationManager"
+                                "::Sample(string, double, Vector,"
+                                " Vector, VectorCollection)",
+                                "The distribution \""
+                                + pdf + "\" is not supported.");
+
         if (Nvector == 1 && pdf == "NormalHomogeneous")
-            NormalHomogeneous(variance, parameter, output);
+            static_cast<Derived*>(this)->NormalHomogeneous(variance,
+                                                           parameter, output);
 
         else if (pdf == "NormalHomogeneous")
         {
@@ -423,12 +477,16 @@ namespace Verdandi
             Vector<T1, VectFull, Allocator1> first_vector(N), vector_i(N);
             first_vector.SetData(N, &perturbation(0));
 
-            NormalHomogeneous(variance, parameter, first_vector);
+            static_cast<Derived*>(this)->NormalHomogeneous(variance,
+                                                           parameter,
+                                                           first_vector);
 
             for (int i = 1; i < Nvector; i++)
             {
                 vector_i.SetData(N, &perturbation(i * N));
-                NormalHomogeneous(variance, parameter, vector_i);
+                static_cast<Derived*>(this)->NormalHomogeneous(variance,
+                                                               parameter,
+                                                               vector_i);
                 Mlt(T1(1. - correlation(i - 1)), vector_i);
                 Add(T1(correlation(i - 1)), first_vector, vector_i);
                 vector_i.Nullify();
@@ -439,7 +497,9 @@ namespace Verdandi
         }
 
         else if (Nvector == 1 && pdf == "LogNormalHomogeneous")
-            LogNormalHomogeneous(variance, parameter, output);
+            static_cast<Derived*>(this)->LogNormalHomogeneous(variance,
+                                                              parameter,
+                                                              output);
 
         else if (pdf == "LogNormalHomogeneous")
         {
@@ -449,12 +509,16 @@ namespace Verdandi
             Vector<T1, VectFull, Allocator1> first_vector(N), vector_i(N);
             first_vector.SetData(N, &perturbation(0));
 
-            NormalHomogeneous(variance, parameter, first_vector);
+            static_cast<Derived*>(this)->NormalHomogeneous(variance,
+                                                           parameter,
+                                                           first_vector);
 
             for (int i = 1; i < Nvector; i++)
             {
                 vector_i.SetData(N, &perturbation(i * N));
-                NormalHomogeneous(variance, parameter, vector_i);
+                static_cast<Derived*>(this)->NormalHomogeneous(variance,
+                                                               parameter,
+                                                               vector_i);
                 Mlt(T1(1. - correlation(i - 1)), vector_i);
                 Add(T1(correlation(i - 1)), first_vector, vector_i);
                 vector_i.Nullify();
@@ -493,9 +557,10 @@ namespace Verdandi
       vector collection; on exit, the sample in the form of a vector
       collection.
     */
+    template <class Derived>
     template <class T0,
               class T1, class Allocator1>
-    void BasePerturbationManager
+    void BasePerturbationManager<Derived>
     ::Sample(string pdf, T0 variance,
              Vector<double, VectFull>& parameter,
              Vector<double, VectFull>& correlation,
@@ -524,8 +589,18 @@ namespace Verdandi
                                 + to_str(correlation.GetLength())
                                 + " correlation(s) is/are given.");
 
+        if(pdf != "NormalHomogeneous" && pdf != "LogNormalHomogeneous")
+            throw ErrorArgument("BasePerturbationManager"
+                                "::Sample(string, double, Vector,"
+                                " Vector, VectorCollection)",
+                                "The distribution \""
+                                + pdf + "\" is not supported.");
+
         if (Nvector == 1 && pdf == "NormalHomogeneous")
-            NormalHomogeneous(variance, parameter, output.GetVector(0));
+            static_cast<Derived*>(this)->
+                NormalHomogeneous(variance,
+                                  parameter,
+                                  output.GetVector(0));
 
         else if (pdf == "NormalHomogeneous")
         {
@@ -540,12 +615,18 @@ namespace Verdandi
                 delete tmp;
             }
 
-            NormalHomogeneous(variance, parameter, perturbation.GetVector(0));
+            static_cast<Derived*>(this)->
+                NormalHomogeneous(variance,
+                                  parameter,
+                                  perturbation.GetVector(0));
 
             for (int i = 1; i < Nvector; i++)
             {
-                NormalHomogeneous(variance, parameter,
-                                  perturbation.GetVector(i));
+                static_cast<Derived*>(this)->
+                    NormalHomogeneous(variance,
+                                      parameter,
+                                      perturbation.GetVector(i));
+
                 if (correlation.GetLength() != 0)
                 {
                     Mlt(typename T1::value_type(1. - correlation(i - 1)),
@@ -561,7 +642,10 @@ namespace Verdandi
         }
 
         else if (Nvector == 1 && pdf == "LogNormalHomogeneous")
-            LogNormalHomogeneous(variance, parameter, output.GetVector(0));
+            static_cast<Derived*>(this)->
+                LogNormalHomogeneous(variance,
+                                     parameter,
+                                     output.GetVector(0));
 
         else if (pdf == "LogNormalHomogeneous")
         {
@@ -576,12 +660,17 @@ namespace Verdandi
                 delete tmp;
             }
 
-            NormalHomogeneous(variance, parameter, perturbation.GetVector(0));
+            static_cast<Derived*>(this)->
+                NormalHomogeneous(variance,
+                                  parameter,
+                                  perturbation.GetVector(0));
 
             for (int i = 1; i < Nvector; i++)
             {
-                NormalHomogeneous(variance, parameter,
-                                  perturbation.GetVector(i));
+                static_cast<Derived*>(this)->
+                    NormalHomogeneous(variance,
+                                      parameter,
+                                      perturbation.GetVector(i));
 
                 if (correlation.GetLength() != 0)
                 {
@@ -596,218 +685,6 @@ namespace Verdandi
             perturbation.Deallocate();
         }
     }
-
-
-    //! Generates a random vector with normal distribution.
-    /*!
-      \param[in] variance covariance matrix of the distribution.
-      \param[in] parameter vector of parameters. The vector may either be
-      empty or contain two clipping parameters \f$ (a, b) \f$. With the
-      clipping parameters, for a normal distribution, any random value lies in
-      \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ \mu \f$ is the mean
-      of the random variable and \f$ \sigma \f$ is its standard deviation.
-      \param[in,out] output on entry, the mean vector; on exit, the generated
-      vector.
-    */
-    template <class T0, class Prop0, class Allocator0,
-              class T1, class Allocator1>
-    void BasePerturbationManager
-    ::Normal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
-             Vector<double, VectFull>& parameter,
-             Vector<T1, VectFull, Allocator1>& output)
-    {
-        if (variance.GetM() != variance.GetN())
-            throw ErrorArgument("BasePerturbationManager::Normal(Matrix, "
-                                "Vector)",
-                                "The covariance matrix must be a square "
-                                "matrix, but a " + to_str(variance.GetM())
-                                + " x " + to_str(variance.GetN())
-                                + " matrix was provided.");
-
-        if (variance.GetN() != output.GetLength())
-            throw ErrorArgument("BasePerturbationManager::Normal(Matrix, "
-                                "Vector)",
-                                "The " + to_str(variance.GetM())
-                                + " x " + to_str(variance.GetN())
-                                + " covariance matrix has dimensions "
-                                + "incompatible with the size of the mean ("
-                                + to_str(output.GetLength()) + ").");
-
-        int m = variance.GetM();
-        Vector<T0, VectFull> diagonal(m);
-        for (int i = 0; i < m; i++)
-            diagonal(i) = sqrt(variance(i, i));
-
-        GetCholesky(variance);
-        Matrix<T1, General, RowMajor> standard_deviation(m, m);
-        standard_deviation.Zero();
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j <= i; j++)
-                standard_deviation(i, j) = variance(i, j);
-
-        Vector<T1, VectFull, Allocator1> standard_normal(m);
-        bool satisfy_constraint = false;
-
-        while (!satisfy_constraint)
-        {
-            this->Normal(T1(0), T1(1), parameter, standard_normal);
-            Mlt(standard_deviation, standard_normal, output);
-
-            satisfy_constraint = NormalClipping(diagonal, parameter, output);
-        }
-    }
-
-
-    //! Generates a random vector with log-normal distribution.
-    /*!
-      \param[in] variance covariance matrix of the distribution.
-      \param[in] parameter vector of parameters. The vector may either be
-      empty or contain two clipping parameters \f$ (a, b) \f$. With the
-      clipping parameters, for a log-normal distribution, any random value
-      lies in \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ (\mu, \sigma)
-      \f$ are the mean and the standard deviation of the logarithm of the
-      random variable.
-      \param[in,out] output output on entry, the median vector; on exit,
-      the sample.
-    */
-    template <class T0, class Prop0, class Allocator0,
-              class T1, class Allocator1>
-    void BasePerturbationManager
-    ::LogNormal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
-                Vector<double, VectFull>& parameter,
-                Vector<T1, VectFull, Allocator1>& output)
-    {
-        int m = variance.GetM();
-        for (int i = 0; i < m; i++)
-            output(i) = log(output(i));
-        Normal(variance, parameter, output);
-        for (int i = 0; i < m; i++)
-            output(i) = exp(output(i));
-    }
-
-
-    //! Generate a random vector with a homogeneous normal distribution.
-    /*
-      \param[in] variance variance of the normal distribution.
-      \param[in] parameter vector of parameters. The vector may either be
-      empty or contain two clipping parameters \f$ (a, b) \f$. With the
-      clipping parameters, for a normal distribution, any random value lies in
-      \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ \mu \f$ is the mean
-      of the random variable and \f$ \sigma \f$ is its standard deviation.
-      \param[in,out] output output on entry, the mean vector; on exit,
-      the sample.
-    */
-    template <class T0,
-              class T1, class Allocator1>
-    void BasePerturbationManager
-    ::NormalHomogeneous(T0 variance,
-                        Vector<double, VectFull>& parameter,
-                        Vector<T1, VectFull, Allocator1>& output)
-    {
-        T1 value;
-        value = this->Normal(T0(0), variance, parameter);
-        for (int i = 0; i < output.GetLength(); i++)
-            output(i) += value;
-    }
-
-
-    //! Generates a random vector with a homogeneous log normal distribution.
-    /*
-      \param[in] variance  variance of the log-normal distribution.
-      \param[in] parameter vector of parameters. The vector may either be
-      empty or contain two clipping parameters \f$ (a, b) \f$. With the
-      clipping parameters, for a log-normal distribution, any random value
-      lies in \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ (\mu, \sigma)
-      \f$ are the mean and the standard deviation of the logarithm of the
-      random variable.
-      \param[out] output output on entry, the median vector; on exit,
-      the sample.
-    */
-    template <class T0,
-              class T1, class Allocator1>
-    void BasePerturbationManager
-    ::LogNormalHomogeneous(T0 variance,
-                           Vector<double, VectFull>& parameter,
-                           Vector<T1, VectFull, Allocator1>& output)
-    {
-        for (int i = 0; i < output.GetLength(); i++)
-            output(i) = log(output(i));
-        NormalHomogeneous(variance, parameter, output);
-        for (int i = 0; i < output.GetLength(); i++)
-            output(i) = exp(output(i));
-    }
-
-
-    //! Tests if a vector satisfies clipping constraints.
-    /*!
-      \param[in] diagonal diagonal coefficients of the covariance matrix.
-      \param[in] permutation vector of permutations done during the Cholesky
-      decomposition.
-      \param[in] parameter vector of parameters. The vector may either be
-      empty or contain two clipping parameters \f$ (a, b) \f$. With the
-      clipping parameters, for a normal distribution, any random value lies in
-      \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ \mu \f$ is the mean
-      of the random variable and \f$ \sigma \f$ is its standard deviation.
-      \param[in] output vector to be tested. This vector was generated using
-      a covariance matrix with diagonal \a diagonal.
-      \return true if the vector satisfies the constraints.
-    */
-    template <class T0,
-              class T1, class Allocator1>
-    bool BasePerturbationManager
-    ::NormalClipping(Vector<T0, VectFull>& diagonal,
-                     Vector<double, VectFull>& parameter,
-                     Vector<T1, VectFull, Allocator1>& output)
-    {
-        if (parameter.GetLength() == 0)
-            return true;
-        if (parameter.GetLength() != 2)
-            throw ErrorArgument("BasePerturbationManager::NormalClipping",
-                                "The vector of parameters should be either "
-                                "empty or of length 2, but it contains "
-                                + to_str(parameter.GetLength())
-                                + " element(s).");
-
-        if (diagonal.GetLength() != output.GetLength())
-            throw ErrorArgument("BasePerturbationManager::NormalClipping",
-                                "The size of the covariance matrix ("
-                                + to_str(diagonal.GetLength())
-                                + " x " + to_str(diagonal.GetLength()) + ") "
-                                + "is incompatible with that of the output ("
-                                + to_str(output.GetLength()) + ").");
-
-        int i = 0;
-        T1 value;
-        while (i < output.GetLength())
-        {
-            value = output(i) / diagonal(i);
-            if (value < parameter(0) || value > parameter(1))
-                return false;
-            i++;
-        }
-        return true;
-    }
-
-
-    //! Undefined method.
-    double BasePerturbationManager
-    ::Normal(double mean, double variance,
-             Vector<double, VectFull>& parameter)
-    {
-        throw ErrorUndefined("BasePerturbationManager"
-                             "::Normal(double, double, Vector)");
-    }
-
-
-    //! Undefined method.
-    void BasePerturbationManager
-    ::Normal(double mean, double variance,
-             Vector<double, VectFull>& parameter, Vector<double>& output)
-    {
-        throw ErrorUndefined ("BasePerturbationManager"
-                              "::Normal(double, double, Vector, Vector)");
-    }
-
 
 } // namespace Verdandi.
 
