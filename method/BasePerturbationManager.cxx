@@ -184,7 +184,8 @@ namespace Verdandi
                                                         vector_i);
                     if (correlation.GetLength() != 0)
                     {
-                        Mlt(T1(1. - correlation(i - 1)), vector_i);
+                        Mlt(T1(sqrt(1. - correlation(i-1) * correlation(i-1))),
+                            vector_i);
                         Add(T1(correlation(i - 1)), first_vector, vector_i);
                     }
                 }
@@ -226,7 +227,8 @@ namespace Verdandi
 
                     if (correlation.GetLength() != 0)
                     {
-                        Mlt(T1(1. - correlation(i - 1)), vector_i);
+                        Mlt(T1(sqrt(1. - correlation(i-1)*correlation(i-1))),
+                            vector_i);
                         Add(T1(correlation(i - 1)), first_vector, vector_i);
                     }
                 }
@@ -342,7 +344,9 @@ namespace Verdandi
 
                     if (correlation.GetLength() != 0)
                     {
-                        Mlt(typename T1::value_type(1. - correlation(i - 1)),
+                        Mlt(typename T1::value_type(
+                                sqrt(1. -
+                                     correlation(i-1) * correlation(i-1))),
                             perturbation.GetVector(i));
                         Add(typename T1::value_type(correlation(i - 1)),
                             perturbation.GetVector(0),
@@ -391,7 +395,9 @@ namespace Verdandi
 
                     if (correlation.GetLength() != 0)
                     {
-                        Mlt(typename T1::value_type(1. - correlation(i - 1)),
+                        Mlt(typename T1::value_type(
+                                sqrt(1. -
+                                     correlation(i-1) * correlation(i-1))),
                             perturbation.GetVector(i));
                         Add(typename T1::value_type(correlation(i - 1)),
                             perturbation.GetVector(0),
@@ -519,7 +525,8 @@ namespace Verdandi
                 static_cast<Derived*>(this)->NormalHomogeneous(variance,
                                                                parameter,
                                                                vector_i);
-                Mlt(T1(1. - correlation(i - 1)), vector_i);
+                Mlt(T1(sqrt(1. - correlation(i - 1) * correlation(i - 1))),
+                    vector_i);
                 Add(T1(correlation(i - 1)), first_vector, vector_i);
                 vector_i.Nullify();
             }
@@ -629,7 +636,8 @@ namespace Verdandi
 
                 if (correlation.GetLength() != 0)
                 {
-                    Mlt(typename T1::value_type(1. - correlation(i - 1)),
+                    Mlt(typename T1::value_type(
+                            sqrt(1. - correlation(i-1) * correlation(i-1))),
                         perturbation.GetVector(i));
                     Add(typename T1::value_type(correlation(i - 1)),
                         perturbation.GetVector(0),
@@ -674,7 +682,8 @@ namespace Verdandi
 
                 if (correlation.GetLength() != 0)
                 {
-                    Mlt(1. - correlation(i - 1), perturbation.GetVector(i));
+                    Mlt(sqrt(1. - correlation(i - 1) * correlation(i - 1)),
+                        perturbation.GetVector(i));
                     Add(correlation(i - 1), perturbation.GetVector(0),
                         perturbation.GetVector(i));
                 }
