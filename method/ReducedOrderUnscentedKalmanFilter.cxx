@@ -46,8 +46,7 @@ namespace Verdandi
     */
     template <class T, class Model, class ObservationManager>
     ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
-    ::ReducedOrderUnscentedKalmanFilter(string configuration_file):
-        configuration_file_(configuration_file)
+    ::ReducedOrderUnscentedKalmanFilter()
     {
 
         /*** Initializations ***/
@@ -69,24 +68,65 @@ namespace Verdandi
 #if defined(VERDANDI_WITH_MPI)
         }
 #endif
+    }
+
+
+    //! Destructor.
+    template <class T, class Model, class ObservationManager>
+    ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ::~ReducedOrderUnscentedKalmanFilter()
+    {
+    }
+
+
+    /////////////
+    // METHODS //
+    /////////////
+
+
+    //! Initializes the driver.
+    /*! Initializes the model and the observation manager. Optionally computes
+      the analysis of the first step. */
+    template <class T, class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ::Initialize(string configuration_file,
+                 bool initialize_model, bool initialize_observation_manager)
+    {
+        Ops configuration(configuration_file);
+        Initialize(configuration);
+    }
+
+    //! Initializes the driver.
+    /*! Initializes the model and the observation manager. Optionally computes
+      the analysis of the first step. */
+    template <class T, class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ::Initialize(Ops& configuration,
+                 bool initialize_model, bool initialize_observation_manager)
+    {
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+#endif
+            MessageHandler::Send(*this, "all", "::Initialize begin");
+
 
         /***************************
          * Reads the configuration *
          ***************************/
 
 
-        Ops configuration(configuration_file_);
+        configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("reduced_order_unscented_kalman_filter.");
 
         /*** Model ***/
 
-        configuration.Set("model.configuration_file", "", configuration_file,
+        configuration.Set("model.configuration_file", "", configuration_file_,
                           model_configuration_file_);
 
         /*** Observation manager ***/
 
         configuration.Set("observation_manager.configuration_file", "",
-                          configuration_file,
+                          configuration_file_,
                           observation_configuration_file_);
 
         /*** Display options ***/
@@ -156,38 +196,9 @@ namespace Verdandi
 #if defined(VERDANDI_WITH_MPI)
         }
 #endif
-        configuration.SetPrefix("reduced_order_unscented_kalman_filter.");
 
         if (configuration.Exists("output.log"))
             Logger::SetFileName(configuration.Get<string>("output.log"));
-
-    }
-
-
-    //! Destructor.
-    template <class T, class Model, class ObservationManager>
-    ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
-    ::~ReducedOrderUnscentedKalmanFilter()
-    {
-    }
-
-
-    /////////////
-    // METHODS //
-    /////////////
-
-
-    //! Initializes the driver.
-    /*! Initializes the model and the observation manager. Optionally computes
-      the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
-    ::Initialize(bool initialize_model, bool initialize_observation_manager)
-    {
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-#endif
-            MessageHandler::Send(*this, "all", "::Initialize begin");
 
         /*** Initializations ***/
 

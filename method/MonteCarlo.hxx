@@ -82,7 +82,7 @@ namespace Verdandi
 
         /*** Constructor and destructor ***/
 
-        MonteCarlo(string configuration_file);
+        MonteCarlo();
         ~MonteCarlo();
         template <class T0, class Storage0, class Allocator0>
         void Clear(Vector<T0, Storage0, Allocator0>& V);
@@ -103,7 +103,8 @@ namespace Verdandi
         template <class T0, class Storage0, class Allocator0>
         void Fill(Vector<T0, Storage0, Allocator0>& in, string pdf);
 
-        void Initialize();
+        void Initialize(string configuration_file);
+        void Initialize(Ops& configuration);
         void InitializeStep();
         void Forward();
 
@@ -111,6 +112,8 @@ namespace Verdandi
 
         /*** Access methods ***/
 
+        string GetInstanceName() const;
+        void SetInstanceName(string instance_name);
         const ClassModel& GetModel() const;
         ClassModel& GetModel();
         string GetName() const;

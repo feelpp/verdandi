@@ -37,52 +37,18 @@ namespace Verdandi
 
     //! Main constructor.
     /*! Builds the driver and reads option keys in the configuration file.
-      \param[in] configuration_file configuration file.
+      \param[in] configuration configuration file.
     */
     template <class Model>
-    ForwardDriver<Model>::ForwardDriver(string configuration_file):
-        iteration_(-1), configuration_file_(configuration_file)
+    ForwardDriver<Model>::ForwardDriver():
+        iteration_(-1)
     {
-        Ops configuration(configuration_file_);
-        configuration.SetPrefix("forward.");
 
         /*** Initializations ***/
 
         MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      ForwardDriver::StaticMessage);
-
-        /*** Model ***/
-
-        configuration.Set("model.configuration_file", "", configuration_file,
-                          model_configuration_file_);
-
-        /*** Display options ***/
-
-        // Should the iteration be displayed on screen?
-        configuration.Set("display.show_iteration", show_iteration_);
-        // Should the time be displayed on screen?
-        configuration.Set("display.show_time", show_time_);
-
-        /*** Ouput saver ***/
-
-        configuration.SetPrefix("forward.output_saver.");
-        output_saver_.Initialize(configuration);
-        output_saver_.Empty("state_forecast");
-
-        /*** Logger and read configuration ***/
-
-        configuration.SetPrefix("forward.");
-
-        if (configuration.Exists("output.log"))
-            Logger::SetFileName(configuration.Get<string>("output.log"));
-
-        if (configuration.Exists("output.configuration"))
-        {
-            string output_configuration;
-            configuration.Set("output.configuration", output_configuration);
-            configuration.WriteLuaDefinition(output_configuration);
-        }
     }
 
 
@@ -104,19 +70,77 @@ namespace Verdandi
       model initialization method.
     */
     template <class Model>
-    void ForwardDriver<Model>::Initialize(bool initialize_model)
+    void ForwardDriver<Model>::Initialize(string configuration_file,
+                                          bool initialize_model)
+    {
+        Ops configuration(configuration_file);
+        Initialize(configuration, initialize_model);
+    }
+
+
+    //! Initializes the simulation.
+    /*! Initializes the model.
+      \param[in] configuration configuration file to be given to the
+      model initialization method.
+    */
+    template <class Model>
+    void ForwardDriver<Model>::Initialize(Ops& configuration,
+                                          bool initialize_model)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
+
+        configuration_file_ = configuration.GetFilePath();
+        configuration.SetPrefix("forward.");
+
+
+        /*********
+         * Model *
+         *********/
+
+
+        configuration.Set("model.configuration_file", "",
+                          configuration_file_,
+                          model_configuration_file_);
+        if (initialize_model)
+            model_.Initialize(model_configuration_file_);
+
+
+        /***************************
+         * Reads the configuration *
+         ***************************/
+
+
+        /*** Display options ***/
+
+        // Should the iteration be displayed on screen?
+        configuration.Set("display.show_iteration", show_iteration_);
+        // Should the time be displayed on screen?
+        configuration.Set("display.show_time", show_time_);
 
         if (show_iteration_)
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
 
-        if (initialize_model)
-            model_.Initialize(model_configuration_file_);
-
         iteration_ = 0;
+
+        /*** Ouput saver ***/
+
+        configuration.SetPrefix("forward.output_saver.");
+        output_saver_.Initialize(configuration);
+        output_saver_.Empty("state_forecast");
+
+        /*** Logger and read configuration ***/
+
+        if (configuration.Exists("output.log"))
+            Logger::SetFileName(configuration.Get<string>("output.log"));
+
+        if (configuration.Exists("output.configuration"))
+        {
+            string output_configuration;
+            configuration.Set("output.configuration", output_configuration);
+            configuration.WriteLuaDefinition(output_configuration);
+        }
 
         if (initialize_model)
         {

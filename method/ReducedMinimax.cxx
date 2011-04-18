@@ -68,6 +68,20 @@ namespace Verdandi
     /*! Initializes the model and the observation manager. */
     template <class T, class Model, class ObservationManager>
     void ReducedMinimax<T, Model, ObservationManager>
+    ::Initialize(string configuration_file,
+                 bool initialize_model, bool initialize_observation_manager)
+    {
+        Ops configuration(configuration_file);
+        Initialize(configuration,
+                   initialize_model, initialize_observation_manager);
+
+    }
+
+
+    //! Initializes the driver.
+    /*! Initializes the model and the observation manager. */
+    template <class T, class Model, class ObservationManager>
+    void ReducedMinimax<T, Model, ObservationManager>
     ::Initialize(Ops& configuration,
                  bool initialize_model, bool initialize_observation_manager)
     {

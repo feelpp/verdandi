@@ -41,13 +41,10 @@ namespace Verdandi
     */
     template <class T, class Model, class ObservationManager>
     HamiltonJacobiBellman<T, Model, ObservationManager>
-    ::HamiltonJacobiBellman(string configuration_file):
-        model_(configuration_file),
-        observation_manager_(model_, configuration_file),
+    ::HamiltonJacobiBellman():
         time_step_(0)
     {
-        Ops configuration(configuration_file);
-
+       
         /*** Initializations ***/
 
         MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
@@ -56,6 +53,62 @@ namespace Verdandi
                                      ObservationManager::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      HamiltonJacobiBellman::StaticMessage);
+
+    }
+
+
+    //! Destructor.
+    template <class T, class Model, class ObservationManager>
+    HamiltonJacobiBellman<T, Model, ObservationManager>
+    ::~HamiltonJacobiBellman()
+    {
+    }
+
+
+    /////////////
+    // METHODS //
+    /////////////
+
+
+    //! Initializes the solver.
+    /*! Initializes the model and the observation manager. Optionally computes
+      the analysis of the first step.
+      \param[in] configuration_file configuration file.
+    */
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>
+    ::Initialize(string configuration_file)
+    {
+      Ops configuration(configuration_file);
+      Initialize(configuration);
+    }
+
+
+    //! Initializes the solver.
+    /*! Initializes the model and the observation manager. Optionally computes
+      the analysis of the first step.
+      \param[in] configuration_file configuration file.
+    */
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>
+    ::Initialize(Ops& configuration)
+    {
+        string configuration_file = configuration.GetFilePath();
+        configuration.SetPrefix("hjb.");
+        MessageHandler::Send(*this, "all", "::Initialize begin");
+
+        if (option_display_["show_time"])
+            Logger::StdOut(*this, "Time: "
+                           + to_str(T(time_step_) * Delta_t_));
+        else
+            Logger::Log<-3>(*this, "Time: "
+                            + to_str(T(time_step_) * Delta_t_));
+        if (option_display_["show_iteration"])
+            Logger::StdOut(*this, "Iteration " + to_str(time_step_) + " -> "
+                           + to_str(time_step_ + 1));
+        else
+            Logger::Log<-3>(*this, "Iteration " + to_str(time_step_) + " -> "
+                            + to_str(time_step_ + 1));
 
 
         /***************************
@@ -275,45 +328,6 @@ namespace Verdandi
             configuration.Set("output.configuration", output_configuration);
             configuration.WriteLuaDefinition(output_configuration);
         }
-    }
-
-
-    //! Destructor.
-    template <class T, class Model, class ObservationManager>
-    HamiltonJacobiBellman<T, Model, ObservationManager>
-    ::~HamiltonJacobiBellman()
-    {
-    }
-
-
-    /////////////
-    // METHODS //
-    /////////////
-
-
-    //! Initializes the solver.
-    /*! Initializes the model and the observation manager. Optionally computes
-      the analysis of the first step.
-      \param[in] configuration_file configuration file.
-    */
-    template <class T, class Model, class ObservationManager>
-    void HamiltonJacobiBellman<T, Model, ObservationManager>
-    ::Initialize(string configuration_file)
-    {
-        MessageHandler::Send(*this, "all", "::Initialize begin");
-
-        if (option_display_["show_time"])
-            Logger::StdOut(*this, "Time: "
-                           + to_str(T(time_step_) * Delta_t_));
-        else
-            Logger::Log<-3>(*this, "Time: "
-                            + to_str(T(time_step_) * Delta_t_));
-        if (option_display_["show_iteration"])
-            Logger::StdOut(*this, "Iteration " + to_str(time_step_) + " -> "
-                           + to_str(time_step_ + 1));
-        else
-            Logger::Log<-3>(*this, "Iteration " + to_str(time_step_) + " -> "
-                            + to_str(time_step_ + 1));
 
         /*** Initializations ***/
 

@@ -43,8 +43,7 @@ namespace Verdandi
     template <class T, class Model, class ObservationManager,
               class Optimization>
     FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
-    ::FourDimensionalVariational(string configuration_file):
-    configuration_file_(configuration_file)
+    ::FourDimensionalVariational()
     {
 
         /*** Initializations ***/
@@ -81,7 +80,24 @@ namespace Verdandi
               class Optimization>
     void FourDimensionalVariational<T,
                                     Model, ObservationManager, Optimization>
-    ::Initialize(bool initialize_model, bool initialize_observation_manager)
+    ::Initialize(string configuration_file,
+                 bool initialize_model, bool initialize_observation_manager)
+    {
+        Ops configuration(configuration_file);
+        Initialize(configuration,
+                   initialize_model, initialize_observation_manager);
+    }
+
+
+    //! Initializes the driver.
+    /*! Initializes the model and the observation manager. Optionally computes
+      the analysis of the first step. */
+    template <class T, class Model, class ObservationManager,
+              class Optimization>
+    void FourDimensionalVariational<T,
+                                    Model, ObservationManager, Optimization>
+    ::Initialize(Ops& configuration,
+                 bool initialize_model, bool initialize_observation_manager)
     {
 
 
@@ -90,7 +106,7 @@ namespace Verdandi
          ***************************/
 
 
-        Ops configuration(configuration_file_);
+        configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("four_dimensional_variational.");
 
         /*** Model ***/

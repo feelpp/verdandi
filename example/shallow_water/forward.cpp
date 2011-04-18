@@ -21,9 +21,9 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Verdandi::ForwardDriver<Verdandi::ShallowWater<double> > driver(argv[1]);
+    Verdandi::ForwardDriver<Verdandi::ShallowWater<double> > driver;
 
-    driver.Initialize();
+    driver.Initialize(argv[1]);
 
     while (!driver.HasFinished())
     {

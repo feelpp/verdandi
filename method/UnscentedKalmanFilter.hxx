@@ -132,12 +132,16 @@ namespace Verdandi
 
         /*** Constructor and destructor ***/
 
-        UnscentedKalmanFilter(string configuration_file);
+        UnscentedKalmanFilter();
         ~UnscentedKalmanFilter();
 
         /*** Methods ***/
 
-        void Initialize(bool initialize_model = true,
+        void Initialize(string configuration_file,
+                        bool initialize_model = true,
+                        bool initialize_observation_manager = true);
+        void Initialize(Ops& configuration,
+                        bool initialize_model = true,
                         bool initialize_observation_manager = true);
 
         void InitializeStep();

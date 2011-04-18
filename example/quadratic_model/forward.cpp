@@ -1,4 +1,6 @@
 #define SELDON_DEBUG_LEVEL_4
+#define SELDON_WITH_BLAS
+#define SELDON_WITH_LAPACK
 
 #define VERDANDI_WITH_ABORT
 
@@ -21,9 +23,9 @@ int main(int argc, char** argv)
     }
 
     Verdandi::ForwardDriver<Verdandi::QuadraticModel<double> >
-        driver(argv[1]);
+        driver;
 
-    driver.Initialize();
+    driver.Initialize(argv[1]);
 
     while (!driver.HasFinished())
     {

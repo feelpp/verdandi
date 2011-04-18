@@ -145,12 +145,13 @@ namespace Verdandi
 
         /*** Constructor and destructor ***/
 
-        HamiltonJacobiBellman(string configuration_file);
+        HamiltonJacobiBellman();
         ~HamiltonJacobiBellman();
 
         /*** Methods ***/
 
         void Initialize(string configuration_file);
+        void Initialize(Ops& configuration);
 
         void InitializeStep();
 

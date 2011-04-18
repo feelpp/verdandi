@@ -36,9 +36,9 @@ int main(int argc, char** argv)
     Verdandi::FourDimensionalVariational<real,
         Verdandi::ClampedBar<real>,
         Verdandi::LinearObservationManager<real>,
-        Seldon::NLoptSolver> driver(argv[1]);
+        Seldon::NLoptSolver> driver;
 
-    driver.Initialize();
+    driver.Initialize(argv[1]);
 
     driver.Analyze();
 

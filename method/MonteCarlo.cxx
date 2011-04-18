@@ -38,56 +38,13 @@ namespace Verdandi
       \param[in] configuration_file configuration file.
     */
     template <class T, class ClassModel>
-    MonteCarlo<T, ClassModel>::MonteCarlo(string configuration_file):
-        iteration_(-1), configuration_file_(configuration_file)
+    MonteCarlo<T, ClassModel>::MonteCarlo():
+        iteration_(-1)
     {
-
-        /*** Initializations ***/
-
         MessageHandler::AddRecipient("model", model_,
                                      ClassModel::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      MonteCarlo::StaticMessage);
-
-        /***************************
-         * Reads the configuration *
-         ***************************/
-
-        Ops configuration(configuration_file);
-        configuration.SetPrefix("monte_carlo.");
-
-        /*** Model ***/
-
-        configuration.Set("model.configuration_file", "", configuration_file,
-                          model_configuration_file_);
-
-        /*** Display options ***/
-
-        // Should the iteration be displayed on screen?
-        configuration.Set("display.show_iteration", show_iteration_);
-        // Should the time be displayed on screen?
-        configuration.Set("display.show_time", show_time_);
-
-        /*** Ouput saver ***/
-
-        configuration.SetPrefix("monte_carlo.output_saver.");
-        output_saver_.Initialize(configuration);
-        output_saver_.Empty("perturbation");
-        output_saver_.Empty("state");
-
-        /*** Logger and read configuration ***/
-
-        configuration.SetPrefix("monte_carlo.");
-
-        if (configuration.Exists("output.log"))
-            Logger::SetFileName(configuration.Get<string>("output.log"));
-
-        if (configuration.Exists("output.configuration"))
-        {
-            string output_configuration;
-            configuration.Set("output.configuration", output_configuration);
-            configuration.WriteLuaDefinition(output_configuration);
-        }
     }
 
 
@@ -213,9 +170,64 @@ namespace Verdandi
     //! Initializes the simulation.
     /*! Initializes the model and the perturbation manager. */
     template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::Initialize()
+    void MonteCarlo<T, ClassModel>::Initialize(string configuration_file)
+    {
+        Ops configuration(configuration_file);
+        Initialize(configuration);
+    }
+
+
+    //! Initializes the simulation.
+    /*! Initializes the model and the perturbation manager. */
+    template <class T, class ClassModel>
+    void MonteCarlo<T, ClassModel>::Initialize(Ops& configuration)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
+
+        configuration_file_ = configuration.GetFilePath();
+        configuration.SetPrefix("monte_carlo.");
+
+
+        /***************************
+         * Reads the configuration *
+         ***************************/
+
+
+        /*** Model ***/
+
+        configuration.Set("model.configuration_file", "",
+                          configuration_file_,
+                          model_configuration_file_);
+
+        /*** Display options ***/
+
+        // Should the iteration be displayed on screen?
+        configuration.Set("display.show_iteration", show_iteration_);
+        // Should the time be displayed on screen?
+        configuration.Set("display.show_time", show_time_);
+
+        /*** Ouput saver ***/
+
+        configuration.SetPrefix("monte_carlo.output_saver.");
+
+        output_saver_.Initialize(configuration);
+        output_saver_.Empty("perturbation");
+        output_saver_.Empty("state");
+
+        /*** Logger and read configuration ***/
+
+        configuration.SetPrefix("monte_carlo.");
+
+        if (configuration.Exists("output.log"))
+            Logger::SetFileName(configuration.Get<string>("output.log"));
+
+        if (configuration.Exists("output.configuration"))
+        {
+            string output_configuration;
+            configuration.Set("output.configuration", output_configuration);
+            configuration.WriteLuaDefinition(output_configuration);
+        }
+
 
         if (show_time_)
             Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
@@ -225,6 +237,7 @@ namespace Verdandi
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
+
 
         model_.Initialize(model_configuration_file_);
 
@@ -341,7 +354,6 @@ namespace Verdandi
 
         model_.Forward();
         iteration_++;
-
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "driver", "forecast");
 
@@ -363,6 +375,28 @@ namespace Verdandi
     ////////////////////
     // ACCESS METHODS //
     ////////////////////
+
+
+    //! Returns the name of the instance.
+    /*!
+      \return The current time.
+    */
+    template <class T, class ClassModel>
+    string MonteCarlo<T, ClassModel>::GetInstanceName() const
+    {
+        return instance_name_;
+    }
+
+
+    //! Sets the name of the instance..
+    /*!
+      \param[in] time the current time.
+    */
+    template <class T, class ClassModel>
+    void MonteCarlo<T, ClassModel>::SetInstanceName(string instance_name)
+    {
+        instance_name_ = instance_name;
+    }
 
 
     //! Returns the model.

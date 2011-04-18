@@ -72,12 +72,14 @@ namespace Verdandi
 
         /*** Constructor and destructor ***/
 
-        ForwardDriver(string configuration_file);
+        ForwardDriver();
         ~ForwardDriver();
 
         /*** Methods ***/
 
-        void Initialize(bool initialize_model = true);
+        void Initialize(string configuration_file,
+                        bool initialize_model = true);
+        void Initialize(Ops& configuration, bool initialize_model = true);
         void InitializeStep();
         void Forward();
 

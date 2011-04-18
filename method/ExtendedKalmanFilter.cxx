@@ -37,13 +37,11 @@ namespace Verdandi
 
 
     //! Main constructor.
-    /*! Builds the driver and reads option keys in the configuration file.
-      \param[in] configuration_file configuration file.
+    /*! Builds the driver.
     */
     template <class T, class Model, class ObservationManager>
     ExtendedKalmanFilter<T, Model, ObservationManager>
-    ::ExtendedKalmanFilter(string configuration_file):
-        configuration_file_(configuration_file)
+    ::ExtendedKalmanFilter()
     {
 
         /*** Initializations ***/
@@ -54,26 +52,79 @@ namespace Verdandi
                                      ObservationManager::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      ExtendedKalmanFilter::StaticMessage);
+    }
+
+
+    //! Destructor.
+    template <class T, class Model, class ObservationManager>
+    ExtendedKalmanFilter<T, Model, ObservationManager>
+    ::~ExtendedKalmanFilter()
+    {
+    }
+
+
+    /////////////
+    // METHODS //
+    /////////////
+
+
+
+    //! Initializes the optimal interpolation driver.
+    /*! Initializes the model and the observation manager. */
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>
+    ::Initialize(string configuration_file,
+                 bool initialize_model, bool initialize_observation_manager)
+    {
+        Ops configuration(configuration_file);
+        Initialize(configuration,
+                   initialize_model, initialize_observation_manager);
+
+    }
+
+
+    //! Initializes the optimal interpolation driver.
+    /*! Initializes the model and the observation manager. Optionally computes
+      the analysis of the first step. */
+    template <class T, class Model, class ObservationManager>
+    void ExtendedKalmanFilter<T, Model, ObservationManager>
+    ::Initialize(Ops& configuration,
+                 bool initialize_model, bool initialize_observation_manager)
+    {
+        MessageHandler::Send(*this, "all", "::Initialize begin");
+
+        configuration_file_ = configuration.GetFilePath();
+        configuration.SetPrefix("extended_kalman_filter.");
+
+
+        /*********************************
+         * Model and observation manager *
+         *********************************/
+
+
+        configuration.Set("model.configuration_file", "",
+                          configuration_file_,
+                          model_configuration_file_);
+        if (initialize_model)
+            model_.Initialize(model_configuration_file_);
+        Nstate_ = model_.GetNstate();
+
+        configuration.Set("observation_manager.configuration_file", "",
+                          configuration_file_,
+                          observation_configuration_file_);
+        if (initialize_observation_manager)
+            observation_manager_.Initialize(model_,
+                                            observation_configuration_file_);
+
+        Nobservation_  = observation_manager_.GetNobservation();
+
+        state_error_variance_.Copy(model_.GetStateErrorVariance());
 
 
         /***************************
          * Reads the configuration *
          ***************************/
 
-
-        Ops configuration(configuration_file_);
-        configuration.SetPrefix("extended_kalman_filter.");
-
-        /*** Model ***/
-
-        configuration.Set("model.configuration_file", "", configuration_file,
-                          model_configuration_file_);
-
-        /*** Observation manager ***/
-
-        configuration.Set("observation_manager.configuration_file", "",
-                          configuration_file,
-                          observation_configuration_file_);
 
         /*** Display options ***/
 
@@ -115,43 +166,6 @@ namespace Verdandi
             configuration.Set("output.configuration", output_configuration);
             configuration.WriteLuaDefinition(output_configuration);
         }
-    }
-
-
-    //! Destructor.
-    template <class T, class Model, class ObservationManager>
-    ExtendedKalmanFilter<T, Model, ObservationManager>
-    ::~ExtendedKalmanFilter()
-    {
-    }
-
-
-    /////////////
-    // METHODS //
-    /////////////
-
-
-    //! Initializes the optimal interpolation driver.
-    /*! Initializes the model and the observation manager. Optionally computes
-      the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void ExtendedKalmanFilter<T, Model, ObservationManager>
-    ::Initialize(bool initialize_model, bool initialize_observation_manager)
-    {
-        MessageHandler::Send(*this, "all", "::Initialize begin");
-
-        /*** Initializations ***/
-
-        if (initialize_model)
-            model_.Initialize(model_configuration_file_);
-        if (initialize_observation_manager)
-            observation_manager_.Initialize(model_,
-                                            observation_configuration_file_);
-
-        Nstate_ = model_.GetNstate();
-        Nobservation_  = observation_manager_.GetNobservation();
-
-        state_error_variance_.Copy(model_.GetStateErrorVariance());
 
         /*** Assimilation ***/
 

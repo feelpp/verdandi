@@ -113,12 +113,16 @@ namespace Verdandi
 
         /*** Constructor and destructor ***/
 
-        ReducedOrderExtendedKalmanFilter(string configuration_file);
+        ReducedOrderExtendedKalmanFilter();
         ~ReducedOrderExtendedKalmanFilter();
 
         /*** Methods ***/
 
-        void Initialize(bool initialize_model = true,
+        void Initialize(Ops& configuration,
+                        bool initialize_model = true,
+                        bool initialize_observation_manager = true);
+        void Initialize(string configuration_file,
+                        bool initialize_model = true,
                         bool initialize_observation_manager = true);
 
         void InitializeStep();

@@ -185,6 +185,10 @@ namespace Verdandi
 
         /*** Methods ***/
 
+        void Initialize(string configuration_file,
+                        bool initialize_model = true,
+                        bool initialize_observation_manager = true);
+
         void Initialize(Ops& configuration,
                         bool initialize_model = true,
                         bool initialize_observation_manager = true);

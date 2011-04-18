@@ -33,9 +33,9 @@ int main(int argc, char** argv)
 
     Verdandi::UnscentedKalmanFilter<real,
         Verdandi::ClampedBar<real>,
-        Verdandi::LinearObservationManager<real> > driver(argv[1]);
+        Verdandi::LinearObservationManager<real> > driver;
 
-    driver.Initialize();
+    driver.Initialize(argv[1]);
 
     while (!driver.HasFinished())
     {

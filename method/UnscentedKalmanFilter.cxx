@@ -47,8 +47,7 @@ namespace Verdandi
     */
     template <class T, class Model, class ObservationManager>
     UnscentedKalmanFilter<T, Model, ObservationManager>
-    ::UnscentedKalmanFilter(string configuration_file):
-        configuration_file_(configuration_file)
+    ::UnscentedKalmanFilter()
     {
 
         /*** Initializations ***/
@@ -59,6 +58,46 @@ namespace Verdandi
                                      ObservationManager::StaticMessage);
         MessageHandler::AddRecipient("driver", *this,
                                      UnscentedKalmanFilter::StaticMessage);
+    }
+
+
+    //! Destructor.
+    template <class T, class Model, class ObservationManager>
+    UnscentedKalmanFilter<T, Model, ObservationManager>
+    ::~UnscentedKalmanFilter()
+    {
+        sigma_point_collection_.Deallocate();
+    }
+
+
+    /////////////
+    // METHODS //
+    /////////////
+
+
+    //! Initializes the driver.
+    /*! Initializes the model and the observation manager. Optionally computes
+      the analysis of the first step. */
+    template <class T, class Model, class ObservationManager>
+    void UnscentedKalmanFilter<T, Model, ObservationManager>
+    ::Initialize(string configuration_file,
+                 bool initialize_model, bool initialize_observation_manager)
+    {
+        Ops configuration(configuration_file);
+        Initialize(configuration);
+    }
+
+
+    //! Initializes the driver.
+    /*! Initializes the model and the observation manager. Optionally computes
+      the analysis of the first step. */
+    template <class T, class Model, class ObservationManager>
+    void UnscentedKalmanFilter<T, Model, ObservationManager>
+    ::Initialize(Ops& configuration,
+                 bool initialize_model, bool initialize_observation_manager)
+    {
+        MessageHandler::Send(*this, "all", "::Initialize begin");
+        configuration_file_ = configuration.GetFilePath();
 
 
         /***************************
@@ -66,18 +105,18 @@ namespace Verdandi
          ***************************/
 
 
-        Ops configuration(configuration_file_);
         configuration.SetPrefix("unscented_kalman_filter.");
 
         /*** Model ***/
 
-        configuration.Set("model.configuration_file", "", configuration_file,
+        configuration.Set("model.configuration_file", "",
+                          configuration_file_ ,
                           model_configuration_file_);
 
         /*** Observation manager ***/
 
         configuration.Set("observation_manager.configuration_file", "",
-                          configuration_file,
+                          configuration_file_,
                           observation_configuration_file_);
 
         /*** Display options ***/
@@ -119,31 +158,6 @@ namespace Verdandi
             configuration.Set("output.configuration", output_configuration);
             configuration.WriteLuaDefinition(output_configuration);
         }
-    }
-
-
-    //! Destructor.
-    template <class T, class Model, class ObservationManager>
-    UnscentedKalmanFilter<T, Model, ObservationManager>
-    ::~UnscentedKalmanFilter()
-    {
-        sigma_point_collection_.Deallocate();
-    }
-
-
-    /////////////
-    // METHODS //
-    /////////////
-
-
-    //! Initializes the driver.
-    /*! Initializes the model and the observation manager. Optionally computes
-      the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>
-    ::Initialize(bool initialize_model, bool initialize_observation_manager)
-    {
-        MessageHandler::Send(*this, "all", "::Initialize begin");
 
         /*** Initializations ***/
 

@@ -2,18 +2,14 @@
 #define SELDON_WITH_BLAS
 #define SELDON_WITH_LAPACK
 
-#define VERDANDI_WITH_ABORT
 #define VERDANDI_DENSE
-
-#define VERDANDI_WITH_DIRECT_SOLVER
-#define SELDON_WITH_MUMPS
+#define VERDANDI_WITH_ABORT
 
 #include "Verdandi.hxx"
-#include "seldon/SeldonSolver.hxx"
 
-#include "model/ClampedBar.cxx"
-#include "method/ForwardDriver.cxx"
-
+#include "model/QuadraticModel.cxx"
+#include "observation_manager/LinearObservationManager.cxx"
+#include "method/MonteCarlo.cxx"
 
 int main(int argc, char** argv)
 {
@@ -28,7 +24,9 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Verdandi::ForwardDriver<Verdandi::ClampedBar<double> >
+    typedef double real;
+
+    Verdandi::MonteCarlo<real, Verdandi::QuadraticModel<real> >
         driver;
 
     driver.Initialize(argv[1]);
@@ -38,7 +36,6 @@ int main(int argc, char** argv)
         driver.InitializeStep();
         driver.Forward();
     }
-
     END;
 
     return 0;
