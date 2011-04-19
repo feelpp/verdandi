@@ -56,8 +56,8 @@ The principle of the UKF filter is to replace the means and covariances of the K
 <ol>
             <li>Prediction:
             - \f$x_{h}^{(i)a} = x_h^a + \sqrt{P_h^a} I^{(i)} \f$<br>
-            - \f$x_{h+1}^f = E_{\alpha}(\mathcal{M}_{h+1|h}(x_h^{(*)a}))\f$<br>
-            - \f$P_{h+1}^f = Cov_{\alpha}(\mathcal{M}_{h+1|h}(x_h^{(*)a}))\f$</li>
+            - \f$x_{h+1}^f = E_{\alpha}(\mathcal{M}_{h}(x_h^{(*)a}))\f$<br>
+            - \f$P_{h+1}^f = Cov_{\alpha}(\mathcal{M}_{h}(x_h^{(*)a}))\f$</li>
            <li>Update:
             - \f$x_{h+1}^{(i)f} = x_{h+1}^f + \sqrt{P_{h+1}^f} I^{(i)} \f$<br>
             - \f$y_{h+1}^{(i)} = \mathcal{H}_{h+1}(x_{h+1}^{(i)f})\f$<br>

@@ -62,12 +62,12 @@ these sigma-points denoted by \f$ [V^{*}] \in \mathcal{M}_{r,p}\f$ and the matri
             - \f$ x_{h}^{(i)a} = x_h^a + L_hC_hI^{(i)} \textrm{, } \quad 1\leq i \leq p+1 \f$<br>
             </li>
             <li>Prediction:
-            - \f$ x_{h+1}^f = E_\alpha(\mathcal{M}_{h+1|h}(x_{h+1}^{(*)a})) \f$<br>
+            - \f$ x_{h+1}^f = E_\alpha(\mathcal{M}_{h}(x_{h+1}^{(*)a})) \f$<br>
             - \f$ x_{h+1}^{(i)f} =  \left|
             \begin{array}{ll}
-			x_{h+1}^f + [\mathcal{M}_{h+1|h}(x_{h}^{*a})]D_\alpha [V^*]^T ([V^*] D_\alpha [V^*]^T)^{-1/2}I^{(i)}& \textrm{with  resampling} \\
+			x_{h+1}^f + [\mathcal{M}_{h}(x_{h}^{*a})]D_\alpha [V^*]^T ([V^*] D_\alpha [V^*]^T)^{-1/2}I^{(i)}& \textrm{with  resampling} \\
 			\textrm{or} & \\
-			\mathcal{M}_{h+1|h}(x_{h}^{(i)a}) & \textrm{without resampling}
+			\mathcal{M}_{h}(x_{h}^{(i)a}) & \textrm{without resampling}
 			\end{array}\right. \\ \f$
             - \f$ L_{h+1} = [x_{h+1}^{(*)f}]D_\alpha [V^*]^T \in \mathcal{M}_{n,p} \f$<br>
             - \f$ P_{h+1}^f = L_{h+1} (P_{\alpha}^V)^{-1} L_{h+1}^T \f$</li>
@@ -101,8 +101,8 @@ Given adequate sampling rules, precompute the corresponding
             - \f$ x_{h}^{(i)a} = x_h^a + L_hC_hI^{(i)} \textrm{, } \quad 1\leq i \leq p+1 \f$<br>
             </li>
             <li>Prediction:
-            - \f$ x_{h+1}^f = E_\alpha(\mathcal{M}_{h+1|h}(x_{h+1}^{(*)a})) \f$<br>
-            - \f$ x_{h+1}^{(i)f} = x_{h+1}^f + [\mathcal{M}_{h+1|h}(x_{h}^{*a}) - x_{h+1}^f]D_{\alpha}^{1/2} \Upsilon_p I^(i), \textrm{ resampling with SVD} \f$<br>
+            - \f$ x_{h+1}^f = E_\alpha(\mathcal{M}_{h}(x_{h+1}^{(*)a})) \f$<br>
+            - \f$ x_{h+1}^{(i)f} = x_{h+1}^f + [\mathcal{M}_{h}(x_{h}^{*a}) - x_{h+1}^f]D_{\alpha}^{1/2} \Upsilon_p I^(i), \textrm{ resampling with SVD} \f$<br>
             - \f$ L_{h+1} = [x_{h+1}^{(*)f}]D_\alpha [V^*]^T \in \mathcal{M}_{n,p} \f$<br>
             - \f$ P_{h+1}^f = L_{h+1} (P_{\alpha}^V)^{-1} L_{h+1}^T \f$</li>
            <li>Update:
