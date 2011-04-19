@@ -10,9 +10,9 @@ The Monte Carlo method is implemented in <code>MonteCarlo.hxx</code> and <code>M
 Here is how you may use the \link Verdandi::MonteCarlo MonteCarlo\endlink class:
 
 \precode
-MonteCarlo<real,  QuadraticModel<real> > driver(configuration_file); [1]
+MonteCarlo<real,  QuadraticModel<real> > driver; [1]
 
-driver.Initialize(); [2]
+driver.Initialize(argv[1]); [2]
 
 while (!driver.HasFinished()) [5]
 {
@@ -22,9 +22,9 @@ while (!driver.HasFinished()) [5]
 \endprecode
 
 \comment
-  <li> First build the \link Verdandi::MonteCarlo MonteCarlo\endlink driver and read option keys in the configuration file with the construction \link Verdandi::MonteCarlo::MonteCarlo(string c_f) MonteCarlo(configuration_file)\endlink. </li>
+  <li> First build the \link Verdandi::MonteCarlo MonteCarlo\endlink driver with the construction \link Verdandi::MonteCarlo::MonteCarlo() MonteCarlo\endlink. </li>
 
-  <li> Then initialize the driver, the model and the perturbation manager with the method \link Verdandi::MonteCarlo::Initialize() Initialize()\endlink. Model parameters are perturbed at that stage. </li>
+  <li> Then initialize the driver, the model and the perturbation manager,and read option keys in the configuration file with the method \link Verdandi::MonteCarlo::Initialize(string configuration_file) Initialize(configuration_file)\endlink. Model parameters are perturbed at that stage. </li>
 
   <li> Optionally initialize the model before a time step with the method \link Verdandi::MonteCarlo::InitializeStep() MonteCarlo()\endlink. Pertubations are applied to model parameters. </li>
 

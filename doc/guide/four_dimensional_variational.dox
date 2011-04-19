@@ -15,9 +15,9 @@ Here is how you may use the \link Verdandi::FourDimensionalVariational FourDimen
 
 \precode
 FourDimensionalVariational<real, ClampedBar<real>,
-        LinearObservationManager<real>, Seldon::NLoptSolver> driver(argv[1]); [1]
+        LinearObservationManager<real>, Seldon::NLoptSolver> driver; [1]
 
-driver.Initialize(); [2]
+driver.Initialize(argv[1]); [2]
 
 driver.Analyze(); [3]
 
@@ -30,9 +30,9 @@ while (!driver.HasFinished()) [6]
 \endprecode
 
 \comment
-  <li> First build the \link Verdandi::FourDimensionalVariational FourDimensionalVariational\endlink driver and read option keys in the configuration file with the construction \link Verdandi::FourDimensionalVariational::FourDimensionalVariational(string c_f) FourDimensionalVariational(configuration_file)\endlink. </li>
+  <li> First build the \link Verdandi::FourDimensionalVariational FourDimensionalVariational\endlink driver with the construction \link Verdandi::FourDimensionalVariational::FourDimensionalVariational() FourDimensionalVariational\endlink. </li>
 
-  <li> Then initialize the driver, the model and the observation manager with \link Verdandi::FourDimensionalVariational::Initialize() Initialize()\endlink.</li>
+  <li> Then initialize the driver, the model and the observation manager, and read option keys in the configuration file with \link Verdandi::FourDimensionalVariational::Initialize(string configuration_file, bool initialize_model, bool initialize_observation_manager) Initialize(configuration_file)\endlink.</li>
 
   <li> Compute the initial condition with \link Verdandi::FourDimensionalVariational::Analyze() Analyze()\endlink, whenever observations are available. </li>
 

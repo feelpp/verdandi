@@ -22,9 +22,9 @@ ReducedMinimax\endlink class:
 
 \precode
 ReducedMinimax<real, ClampedBar<real>,
-        LinearObservationManager<real> > driver(argv[1]); [1]
+        LinearObservationManager<real> > driver; [1]
 
-driver.Initialize(); [2]
+driver.Initialize(argv[1]); [2]
 
 while (!driver.HasFinished()) [5]
 {
@@ -35,10 +35,9 @@ while (!driver.HasFinished()) [5]
 \endprecode
 
 \comment
-  <li> First build the \link Verdandi::ReducedMinimax ReducedMinimax\endlink driver and read option keys in the configuration file with the construction \link Verdandi::ReducedMinimax::ReducedMinimax(string configuration_file) ReducedMinimax(configuration_file)\endlink. </li>
+  <li> First build the \link Verdandi::ReducedMinimax ReducedMinimax\endlink driver with the construction \link Verdandi::ReducedMinimax::ReducedMinimax() ReducedMinimax\endlink. </li>
 
-  <li> Then initialize the driver, the model and the observation manager
-with \link Verdandi::ReducedMinimax::Initialize() Initialize()\endlink. </li>
+  <li> Then initialize the driver, the model and the observation manager, and read option keys in the configuration file with \link Verdandi::ReducedMinimax::Initialize(string configuration_file, bool initialize_model, bool initialize_observation_manager) Initialize(configuration_file)\endlink. </li>
 
   <li> Initialize a step with \link Verdandi::ReducedMinimax::InitializeStep() InitializeStep()\endlink. This initializes a step for the model. </li>
 

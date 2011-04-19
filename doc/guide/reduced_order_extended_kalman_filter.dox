@@ -11,7 +11,7 @@ Here is how you may use the \link Verdandi::ReducedOrderExtendedKalmanFilter Red
 
 \precode
 ReducedOrderExtendedKalmanFilter<real, ClampedBar<real>,
-        LinearObservationManager<real> > driver(argv[1]); [1]
+        LinearObservationManager<real> > driver; [1]
 
 driver.Initialize(argv[1]); [2]
 
@@ -26,9 +26,9 @@ while (!driver.HasFinished()) [6]
 \endprecode
 
 \comment
-  <li> First build the \link Verdandi::ReducedOrderExtendedKalmanFilter ReducedOrderExtendedKalmanFilter\endlink driver and read option keys in the configuration file with the construction \link Verdandi::ReducedOrderExtendedKalmanFilter::ReducedOrderExtendedKalmanFilter(string c_f) ReducedOrderExtendedKalmanFilter(configuration_file)\endlink. </li>
+  <li> First build the \link Verdandi::ReducedOrderExtendedKalmanFilter ReducedOrderExtendedKalmanFilter\endlink driver with the construction \link Verdandi::ReducedOrderExtendedKalmanFilter::ReducedOrderExtendedKalmanFilter() ReducedOrderExtendedKalmanFilter\endlink. </li>
 
-  <li> Then initialize the driver, the model and the observation manager with \link Verdandi::ReducedOrderExtendedKalmanFilter::Initialize(string configuration_file) Initialize(configuration_file)\endlink. This optionally computes an analysis with the model initial condition. </li>
+  <li> Then initialize the driver, the model and the observation manager, and read option keys in the configuration file with \link Verdandi::ReducedOrderExtendedKalmanFilter::Initialize(string configuration_file, bool initialize_model, bool initialize_observation_manager) Initialize(configuration_file)\endlink. This optionally computes an analysis with the model initial condition. </li>
 
   <li> Optionally intialize a step with \link Verdandi::ReducedOrderExtendedKalmanFilter::InitializeStep() InitializeStep()\endlink. This initializes a step for the model. </li>
 
