@@ -49,55 +49,6 @@ You may define either <code>VERDANDI_DENSE</code> or <code>VERDANDI_SPARSE</code
 
 A level of priority for the logger messages can be set by defining <code>VERDANDI_LOGGING_LEVEL</code>.
 
-\section configuration_file Building and reading a configuration file
-
-Configuration files must be written in <a href="http://www.lua.org/manual/5.1/">Lua 5.1</a> and are read by the library <a href="http://gitorious.org/libops/pages/Home/">Ops</a>. Here is an example of a file called <code>my_configuration.lua</code>:
-
-\precode
--- Lines starting with "--" are comment lines.
-
--- This defines an integer. 
-Nx = 100
--- Calculations are possible.
-Ny = 2 * Nx - 10
-
--- This defines a floating number in double precision.
-Delta_t_model = 0.03
--- Another example calculation:
-Delta_t_sqrt = math.sqrt(Delta_t_model) * 1.5e-7
-
--- Here is a string.
-output_directory = "result/"
--- Concatenation of strings is carried out by "..".
-output_file = output_directory .. "output.bin"
-
-
------------------------------------ MODEL ------------------------------------
-
-
--- Configuration entries are provided in sections and subsections.
-model = {
-
-   definition = {
-
-      -- You can provide a vector.
-      initial_state = {0.3, 0.3},
-
-      -- Binary options (Boolean).
-      with_linear_term = true,
-      with_constant_term = true,
-
-      -- Reference to a previously defined entry.
-      Delta_t = Delta_t_model
-
-   }
-}
-
--- Entries can be overwritten:
-model.definition.initial_state =  {1.,
-                                   1.6}
-\endprecode
-
 \section matrix_vector Seldon matrices and vectors
 
 The structures manipulated in %Verdandi are <a href="http://seldon.sourceforge.net/">Seldon</a> vectors and matrices.

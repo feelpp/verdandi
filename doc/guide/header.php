@@ -157,7 +157,24 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_observation")
 
 </li>
 
-<li class="jelly"> <?php HL($file, "tips", "Tips");?>  </li>
+<li class="jelly"> <?php HL($file, "using_verdandi", "Using Verdandi");?>
+
+<?php if (basename($_SERVER['REQUEST_URI'], ".php") == "using_verdandi"
+or basename($_SERVER['REQUEST_URI'], ".php") == "tips"
+or basename($_SERVER['REQUEST_URI'], ".php") == "configuration_files"
+or basename($_SERVER['REQUEST_URI'], ".php") == "scons")
+{
+  echo '<ul class="navsubul"> <li class="jelly">';
+  HL($file, "configuration_files", "Lua Configuration Files");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "scons", "SCons");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "tips", "Tips");
+  echo '</li> </ul>';
+} ?>
+</li>
 
 <li class="jelly"> <?php HL($file, "debugging", "Debugging");?>  </li>
 
