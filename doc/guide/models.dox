@@ -5,100 +5,17 @@
 /*!
 \page models Models
 
-\section quadratic_model Quadratic Model
+Several <b>models</b> have been implemented in %Verdandi.
 
-In order to define the quadratic model, we introduce:
-- \f$n\f$ matrices \f$ S_i \in \mathbb{R}^{n \times n} \f$ for the quadratic part of the model,
-- one matrix \f$ L \in \mathbb{R}^{n \times n} \f$ for the linear part of the model, and
-- a vector \f$b \in \mathbb{R}^n \f$ for the constant part of the model.
+Follow the links below for a description of three available <b>models</b>:
 
-The equation of the \f$i\f$th state component of the quadratic model (\f$ i \in \{1,\ldots,n\}\f$) is
-\f[
-\frac{\mathrm{d} x_i}{\mathrm{d} t} = x^T S_i x + L_i x + b_i,
-\f]
-where \f$L_i\f$ is the \f$i\f$th line of \f$L\f$.
-
-In case the model has no quadratic part, the state equation is simply
-\f[
-\frac{\mathrm{d} x}{\mathrm{d} t} = L x + b.
-\f]
-
-\section shallow_water Shallow-water
-The shallow-water equations (also called Saint Venant equations) are a set of hyperbolic partial differential equations that describe the flow below a pressure surface in a fluid. It is suitable for flows with a free surface and small depth. For instance, these equations can be applied to model the behavior of a lake or a river. The model describes the evolution of the water height \f$h(x,y)\f$ and the horizontal velocity \f$(u(x,y),v(x,y))\f$. A simplified expression of the model is: <br>
-
-<center>
-\f$\partial_th + \partial_x(hu) + \partial_y(hv) = 0\f$  <br>
-\f$\partial_t(hu) + \partial_x(huu) + \partial_y(huv) +\frac{1}2g\partial_xh^2 = 0\f$ <br>
-\f$\partial_t(hv) + \partial_x(huv) + \partial_y(hvv) +\frac{1}2g\partial_yh^2 = 0\f$  <br>
-</center>
-
-One can define several boundary conditions:
-<ol>
-        <li>an incoming flow rate \f$q_b = h_bu_b\f$ (or \f$q_b = h_bv_b\f$ along \f$y\f$), with the sign of \f$u_b\f$ (or \f$v_b\f$) being determined by the considered boundary (for instance, \f$u \le 0\f$ on the right boundary); </li>
-        <li>a homogeneous Neumann condition for \f$(h, u, v)\f$; </li>
-        <li> an impermeability condition: the flow rate is zero at the boundary; </li>
-        <li>a fixed height \f$h_b\f$.</li>
-</ol>
-
-The shallow-water model is implemented in <code>ShallowWater.hxx</code> and <code>ShallowWater.cxx</code>. The class \link Verdandi::ShallowWater ShallowWater\endlink is a template class: <code>ShallowWater<T></code>. <code>T</code> is the numerical type of the variables (e.g., <code>double</code>).
-
-The state contains:
 <ul>
-<li> the water height (stored in the matrix <code>h_</code>); </li>
-<li> the horizontal velocity along x (stored in matrix <code>u_</code>); </li>
-<li> the horizontal velocity along y (stored in matrix <code>v_</code>). </li>
+<li> \ref quadratic_model "Quadratic Model"; </li>
+<li> \ref shallow_water_model "Shallow-water"; </li>
+<li> \ref clamped_bar_model "Clamped Bar". </li>
 </ul>
 
-\section clamped_bar Clamped Bar
-
-The clamped bar model describes the vibration of a still bar clamped at one end. The bar is discretized with <code>Nx</code> finite elements of the same length. With the hypothesis of "small displacements", it follows the set of linear equations:
-
-<center>
-\f$ M_{\theta_m} \ddot Y + C_{\theta_c} \dot Y + K_{\theta_k} Y = F_{\theta_f}\f$  <br/>
-</center>
-
-where \f$M_{\theta_m}\f$ is the mass matrix, \f$K_{\theta_k}\f$ is the stiffness matrix, \f$C_{\theta_c} = \alpha M_{\theta_c} + \beta M_{\theta_c} \f$ is
-the damp matrix and \f$F(\theta_f) = \sin(\frac{\pi t}{t_f}) M_{\theta_f} (1 ... 1)^T\f$ is the effort vector.
-
-The clamped bar model is solved numerically using a Newmark scheme (middle point) for integration in time:
-
-\f$ \ddot Y_{h + \frac{1}{2}} = \frac{\ddot Y_{h+1} + \ddot Y_{h} }2 =  \frac{\dot Y_{h+1} - \dot Y_{h} } {\Delta t} \f$  <br/>
-\f$ \dot Y_{h + \frac{1}{2}} = \frac{\dot Y_{h+1} + \dot Y_{h} }2 =  \frac{Y_{h+1} - Y_{h} } {\Delta t} \f$  <br/>
-
-
-Algorithmically, it follows:
-
-\f$ \dot Y_{h + 1} = \frac{2}{\Delta t} (Y_{h+1} - Y_{h}) - \dot Y_{h} \f$  <br/>
-\f$ \left(\frac{1}2 K_{\theta_k} + \frac{1}{\Delta t} C_{\theta_c} +  \frac{2}{\Delta t^2} M_{\theta_m}\right) Y_{h+1} = (-\frac{1}2 K_{\theta_k} + \frac{1}{\Delta t} C_{\theta_c} + \frac{2}{\Delta t^2} M_{\theta_m}) Y_{h} + \frac{2}{\Delta t} M_{\theta_m} \dot Y_{h} + F_{h + \frac{1}{2}}(\theta_f) \f$  <br/>
-
-One can define several parameters:
-<ol>
-        <li> <code>bar_length</code>: the length of the bar; </li>
-        <li><code>Nx</code>: the number of elements; </li>
-        <li><code>Delta_t</code>: the time step; </li>
-        <li> <code>final_time</code>: the duration of the simulation; </li>
-        <li><code>Young_modulus</code>: the Young's modulus; </li>
-        <li><code>mass_density</code>: the mass density; </li>
-        <li><code> theta_mass </code>: vector that contains the initial values of \f$\theta_m\f$; </li>
-        <li><code> theta_damp </code>: vector that contains the initial values of \f$\theta_c\f$; </li>
-        <li><code> alpha </code>: damp coefficient \f$\alpha\f$; </li>
-        <li><code> beta </code>: damp coefficient \f$\beta\f$; </li>
-        <li><code> theta_stiffness </code>: vector that contains the initial values of \f$\theta_k\f$; </li>
-        <li><code> theta_force </code>: vector that contains the initial values of \f$\theta_f\f$. </li>
-</ol>
-
-The clamped-bar model is implemented in <code>ClampedBar.hxx</code> and <code>ClampedBar.cxx</code>. The class \link Verdandi::ClampedBar ClampedBar\endlink is a template class: <code>ClampedBar<T></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>).
-
-The state may contain:
-<ul>
-<li> <code>"displacement"</code>: the vertical displacement along y; </li>
-<li> <code>"velocity"</code>: the vertical velocity along y; </li>
-<li> <code>"theta_mass"</code>: the vector \f$\theta_m\f$; </li>
-<li> <code>"theta_damp"</code>: the vector \f$\theta_c\f$;
-<li> <code>"theta_stiffness"</code>: the vector \f$\theta_k\f$; </li>
-<li><code>"theta_force"</code>: the vector \f$\theta_f\f$. </li>
-</ul>
-
-<br> The displacement and the velocity at the first point are equal to zero since the bar is clamped. These zeroes are removed from the state. The size of the state is therefore  <code> 2 (Nx - 1) + Ntheta_mass + Ntheta_damp + Ntheta_stiffness + Ntheta_force </code>.
+For details about how to apply <b>data assimilation methods</b> on these models see
+\ref example_programs.
 
 */
