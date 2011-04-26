@@ -5,8 +5,8 @@
 #define VERDANDI_WITH_ABORT
 #define VERDANDI_DENSE
 
-#define VERDANDI_WITH_DIRECT_SOLVER
-#define SELDON_WITH_MUMPS
+//#define VERDANDI_WITH_DIRECT_SOLVER
+//#define SELDON_WITH_MUMPS
 
 #include "Verdandi.hxx"
 #include "seldon/SeldonSolver.hxx"
