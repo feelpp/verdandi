@@ -260,6 +260,22 @@ four_dimensional_variational = {
 
    },
 
+   trajectory_manager = {
+
+      -- Checkpoint recording mode (memory or disk).
+      checkpoint_recording_mode = "disk",
+      -- Checkpoint recording file
+      checkpoint_recording_file = "checkpoint.bin",
+      -- Trajectory recording mode.
+      trajectory_recording_mode = "memory",
+      -- Trajectory recording file.
+      trajectory_recording_file = "trajectory.bin",
+      -- Recording period.
+      Nskip_step = 10,
+
+
+   },
+
    display = {
 
       show_optimization_iteration = true,

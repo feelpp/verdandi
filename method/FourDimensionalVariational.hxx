@@ -19,6 +19,7 @@
 
 #ifndef VERDANDI_FILE_METHOD_FOURDIMENSIONALVARIATIONAL_HXX
 
+#include "TrajectoryManager.hxx"
 
 namespace Verdandi
 {
@@ -92,6 +93,13 @@ namespace Verdandi
         //! Should an analysis be computed at the first step?
         bool analyze_first_step_;
         int Ncall_cost_;
+
+        /*** Trajectory ***/
+
+#ifdef VERDANDI_WITH_TRAJECTORY_MANAGER
+        //! Trajectory manager.
+        TrajectoryManager<T, Model> trajectory_manager_;
+#endif
 
         /*** Optimization ***/
 

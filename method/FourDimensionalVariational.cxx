@@ -24,6 +24,8 @@
 
 #include "FourDimensionalVariational.hxx"
 
+#include "TrajectoryManager.cxx"
+
 #include "seldon/vector/VectorCollection.cxx"
 
 
@@ -180,6 +182,33 @@ namespace Verdandi
         configuration.Set("cost_function_tolerance", cost_function_tolerance);
         optimization_.Initialize(Nstate_, algorithm, parameter_tolerance,
                                  cost_function_tolerance);
+
+#ifdef VERDANDI_WITH_TRAJECTORY_MANAGER
+
+        /*** Trajectory manager initialization ***/
+
+        configuration.SetPrefix("four_dimensional_variational."
+                                "trajectory_manager.");
+        string checkpoint_recording_mode;
+        configuration.Set("checkpoint_recording_mode",
+                          checkpoint_recording_mode);
+        string checkpoint_recording_file;
+        configuration.Set("checkpoint_recording_file",
+                          checkpoint_recording_file);
+        string trajectory_recording_mode;
+        configuration.Set("trajectory_recording_mode",
+                          trajectory_recording_mode);
+        string trajectory_recording_file;
+        configuration.Set("trajectory_recording_file",
+                          trajectory_recording_file);
+        int Nskip_step;
+        configuration.Set("Nskip_step", Nskip_step);
+        trajectory_manager_.Initialize(checkpoint_recording_mode,
+                                       checkpoint_recording_file,
+                                       trajectory_recording_mode,
+                                       trajectory_recording_file,
+                                       Nskip_step);
+#endif
 
         model_state lower_bound, upper_bound;
         model_.GetStateLowerBound(lower_bound);
@@ -364,6 +393,8 @@ namespace Verdandi
 
         /*** Observation contribution ***/
 
+#ifndef VERDANDI_WITH_TRAJECTORY_MANAGER
+
         Vector<model_state, Collection> trajectory;
 
         T cost_observation(0);
@@ -435,6 +466,80 @@ namespace Verdandi
         trajectory.Deallocate();
 
         return T(0.5) * (cost_background + cost_observation);
+
+#else
+
+        T cost_observation(0);
+        Copy(x, delta);
+        model_.SetState(delta);
+        model_.SetTime(initial_time_);
+        while (!model_.HasFinished())
+        {
+            model_.GetState(delta);
+
+            observation y, Rinv_y;
+            observation_manager_.SetTime(model_, model_.GetTime());
+            if (observation_manager_.HasObservation())
+            {
+                observation_manager_.GetInnovation(delta, y);
+                Nobservation_ = y.GetSize();
+                Rinv_y.Reallocate(Nobservation_);
+                observation_error_variance
+                    Rinv = observation_manager_.GetErrorVarianceInverse();
+                MltAdd(T(1), Rinv, y, T(0), Rinv_y);
+                cost_observation += DotProd(y, Rinv_y);
+            }
+
+            time.PushBack(model_.GetTime());
+            trajectory_manager_.Save(delta, model_.GetTime());
+
+            model_.InitializeStep();
+            model_.Forward();
+        }
+
+        if (!with_gradient)
+            return T(0.5) * (cost_background + cost_observation);
+
+        /*** Backward loop ***/
+
+        model_state adjoint_source(Nstate_);
+        adjoint_source.Fill(T(0));
+        model_.SetAdjointState(adjoint_source);
+        for (int t = time.GetM() - 1; t >= 0; t--)
+        {
+            model_.SetTime(time(t));
+            trajectory_manager_.SetTime(model_, model_.GetTime());
+            model_.SetState(trajectory_manager_.GetState());
+            observation y, Rinv_y;
+            observation_manager_.SetTime(model_, model_.GetTime());
+            if (observation_manager_.HasObservation())
+            {
+                observation_manager_.
+                    GetInnovation(trajectory_manager_.GetState(), y);
+                Nobservation_ = y.GetSize();
+                Rinv_y.Reallocate(Nobservation_);
+                observation_error_variance
+                    Rinv(observation_manager_.GetErrorVarianceInverse());
+                MltAdd(T(1), Rinv, y, T(0), Rinv_y);
+                MltAdd(T(1), SeldonTrans, observation_manager_.
+                       GetTangentLinearOperator(), Rinv_y, T(0),
+                       adjoint_source);
+            }
+            else
+                adjoint_source.Fill(T(0));
+
+            model_.InitializeStep();
+            model_.BackwardAdjoint(adjoint_source);
+        }
+
+        model_.GetAdjointState(gradient);
+        Mlt(T(-1), gradient);
+        Add(T(1), x_b, gradient);
+        trajectory_manager_.Deallocate();
+
+        return T(0.5) * (cost_background + cost_observation);
+
+#endif
     }
 
 
