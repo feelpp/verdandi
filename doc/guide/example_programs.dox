@@ -20,7 +20,7 @@ in the directory <code>example/shallow_water</code>. This will compile an exampl
 
 \subsection observations Generate observations
 
-Since no observations are given yet, we have to generate some. Execute the following command: 
+Since no observations are given yet, we have to generate some. Execute the following command:
 \precode
 $ forward configuration/truth.lua
 \endprecode
@@ -48,9 +48,9 @@ The initial condition is a rectangular function in the center and the boundary c
 
 \subsection assimilation Data assimilation with optimal interpolation
 
-The observations are here managed by the \ref linear_observation_manager "linear observation manager". The parameters for the observations are stored in <code>example/shallow_water/configuration/observation.lua</code>. By default, the observation operator is a scaled identity matrix with diagonal values of 1, which mean the whole state is observed. For a more illustrative example, we can choose to restrain the observations to specific components of the state.
+The observations are here managed by the \ref linear_observation_manager "linear observation manager". The parameters for the observations are stored in <code>example/shallow_water/configuration/observation.lua</code>. By default, the observation operator is a scaled identity matrix with diagonal values of 1, which means that the whole state is observed. For a more illustrative example, we can choose to restrain the observations to specific components of the state.
 
-In the file <code>example/shallow_water/configuration/observation.lua</code>, change the parameter <code>observation.operator.scaled_identity</code> from <code>true</code> to <code>false</code> and put the following code at the end of the file : 
+In the file <code>example/shallow_water/configuration/observation.lua</code>, change the parameter <code>observation.operator.scaled_identity</code> from <code>true</code> to <code>false</code> and put the following code at the end of the file :
 \precode
 for i = 1, 100 do
    for j = 1, 3 do
@@ -62,13 +62,13 @@ observation.operator.value[80] = 1.
 observation.operator.value[100 + 81] = 1.
 observation.operator.value[200 + 82] = 1.
 \endprecode
-This will restrict the observations to three components of the water height vector with indexes 79, 80 and 81. See the \ref linear_observation_manager linear documentation about LinearObservationManager for further details. Note that the indexes in Lua structures start at 1 while the indexes in the rest of Verdandi (Python, C++, documentation, integers given in the configuration) start at 0. 
+This will restrict the observations to three components of the water height vector with indexes 79, 80 and 81. See the \ref linear_observation_manager linear documentation about LinearObservationManager for further details. Note that the indexes in Lua structures start at 1 while the indexes in the rest of Verdandi (Python, C++, documentation, integers given in the configuration) start at 0.
 
 To use the \ref optimal_interpolation "Optimal Interpolation" method, execute the following command.
 \precode
 $ optimal_interpolation configuration/assimilation.lua
 \endprecode
-This runs the model with the initial conditions described in <code>example/shallow_water/configuration/assimilation.lua</code>. This should generate several files in the directory <code>result/</code>. The analysis states \f$x^a_h\f$ are stored in the file <code>result/oi-state_analysis.bin</code>, the forecast state  \f$x^f_h\f$ in <code>oi-state_forecast.bin</code> and the horizontal velocity along x and y in respectively <code>result/u.bin</code> and <code>result/v.bin</code>.
+This runs the model with the initial conditions described in <code>example/shallow_water/configuration/assimilation.lua</code>. This should generate several files in the directory <code>result/</code>. The analysis states \f$x^a_h\f$ are stored in the file <code>result/oi-state_analysis.bin</code>, the forecasted state  \f$x^f_h\f$ in <code>oi-state_forecast.bin</code> and the horizontal velocity along x and y in respectively <code>result/u.bin</code> and <code>result/v.bin</code>.
 
 We can now observe the results of data assimilation.
 \precode
@@ -81,7 +81,7 @@ In  [4]: oi_state_analysis = load_vector_list("result/oi-state_analysis.bin")
 In  [5]: x=10; plot(truth[x]); plot(oi_state_forecast[x]); plot(oi_state_analysis[x])
 \endprecode
 
-This should plot: 
+This should plot:
 
 \image html shallow_water_t10.png
 
@@ -97,7 +97,7 @@ In  [7]: x=20; plot(truth[x]); plot(oi_state_forecast[x]); plot(oi_state_analysi
 for the following result:
 
 \image html shallow_water_t20.png
-Here, the observed wave originating from the rectangular initial condition has reached the observed locations. This produces an analysis which corrects the forecast state \f$x_h^f\f$ (in green) according to the observations. This analysis \f$x^a_h\f$ is then reinjected in the model for the next time step \f$h+1\f$.
+Here, the observed wave originating from the rectangular initial condition has reached the observed locations. This produces an analysis which corrects the forecasted state \f$x_h^f\f$ (in green) according to the observations. This analysis \f$x^a_h\f$ is then reinjected in the model for the next time step \f$h+1\f$.
 
 More pronounced at t=30:
 
@@ -125,7 +125,7 @@ In  [5]: x=30; plot(truth[x]); plot(oi_state_forecast[x]); plot(oi_state_analysi
 
 \image html shallow_water_t30_2.png
 
-Since we lowered the variance of the state error (diagonal of \f$B_h\f$), the analysis stays closer to the forecast. 
+Since we lowered the variance of the state error (diagonal of \f$B_h\f$), the analysis stays closer to the forecast.
 
 
 \section clamped_bar Clamped Bar
