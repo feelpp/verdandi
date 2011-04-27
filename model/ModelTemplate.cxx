@@ -327,7 +327,7 @@ namespace Verdandi
     /*!
       \return The inverse of the background error variance (\f$B^{-1}\f$).
     */
-    const typename ModelTemplate::state_error_variance&
+    const ModelTemplate::state_error_variance&
     ModelTemplate::GetStateErrorVarianceInverse() const
     {
         throw ErrorUndefined("ModelTemplate::GetStateErrorVarianceInverse()");
