@@ -559,11 +559,9 @@ namespace Verdandi
 
             /*** Updated K ***/
 
-            dense_matrix U_inv(U_), K(Nstate_, Nobservation_),
+            dense_matrix U_inv(U_),
                 working_matrix_ro(Nreduced_, Nobservation_),
                 working_matrix_ro2(Nreduced_, Nobservation_);
-
-            GetInverse(U_inv);
 
 #ifdef VERDANDI_DENSE
             MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans,
@@ -576,12 +574,14 @@ namespace Verdandi
             MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv_dense,
                    T(0), working_matrix_ro);
 #endif
-            MltAdd(T(1), U_inv, working_matrix_ro, T(0), working_matrix_ro2);
-            MltAdd(T(1), L_, working_matrix_ro2, T(0), K);
 
-            /*** Updated x ***/
+            model_state state_innovation(Nreduced_);
+            MltAdd(T(1), working_matrix_ro, y, T(0), state_innovation);
 
-            MltAdd(T(1), K, y, T(1), x);
+            Vector<T> correction(Nreduced_);
+            GetInverse(U_inv);
+            MltAdd(T(1), U_inv, state_innovation, T(0), correction);
+            MltAdd(T(1), L_, correction, T(1), x);
 
             model_.SetState(x);
 
