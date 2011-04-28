@@ -26,7 +26,7 @@ $ forward configuration/truth.lua
 \endprecode
 to run the model with the initial conditions described in <code>truth.lua</code>, without data assimilation. This should generate a few result files in the directory <code>example/shallow_water/result/</code>. The water height is stored in the file <code>truth-state_forecast.bin</code>, and the horizontal velocity along x and y in respectively <code>u.bin</code> and <code>v.bin</code>. These files store time trajectories.
 
-The generated state (water height) will serve as observations for the assimilation. To plot it, you can use <a href="http://ipython.scipy.org/">IPython</a> with the module pylab.
+The generated state (water height) will serve as observations for the assimilation. To plot it, you can use <a href="http://ipython.scipy.org/">IPython</a> with the module pylab. Refer to the \ref python section to make sure you can use the Python interface of Verdandi.
 
 The following code will plot the water height at time t=0 and t=10.
 \precode
@@ -156,7 +156,7 @@ $ forward configuration/truth.lua
 to run the model with the initial conditions described in <code>truth.lua</code>, without data assimilation.
 This should generate a result file (<code>truth-state_forecast.bin</code>) in the directory <code>example/clamped_bar/result/</code>. This file store the state (displacement, velocity, \f$ \theta_{f} \f$) trajectory.
 
-The generated state (displacement, velocity, \f$ \theta_{f} \f$) will serve as observations for the assimilation. To plot it, you can use <a href="http://ipython.scipy.org/">IPython</a> with the module pylab.
+The generated state (displacement, velocity, \f$ \theta_{f} \f$) will serve as observations for the assimilation. To plot it, you can use <a href="http://ipython.scipy.org/">IPython</a> with the module pylab. Refer to the \ref python section to make sure you can use the Python interface of Verdandi.
 
 The following code will plot the displacement at time t=0 and t=10.
 \precode
