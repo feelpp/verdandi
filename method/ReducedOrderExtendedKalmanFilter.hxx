@@ -104,6 +104,35 @@ namespace Verdandi
          //! Current time.
         double time_;
 
+#if defined(VERDANDI_WITH_MPI)
+
+        /*** Parallel data ***/
+
+        //! Process rank.
+        int rank_;
+        //! Number of processes.
+        int Nprocess_;
+        //! Number of local column in L_.
+        int Nlocal_reduced_;
+        //! Local column of L_.
+        Vector<int> local_reduced_column_;
+        //! Local columns sum.
+        Vector<int> Nlocal_reduced_column_sum_;
+        //! Parameter displs relative to the first MPI Allgatherv call.
+        int *displacement_gather_1_;
+        //! Parameter recvcounts relative to the first MPI Allgatherv call.
+        int *recvcount_gather_1_;
+        //! Parameter displs relative to the second MPI Allgatherv call.
+        int *displacement_gather_2_;
+        //! Parameter recvcounts relative to the second Allgatherv call.
+        int *recvcount_gather_2_;
+        //! Parameter displs relative to the third MPI Allgatherv call.
+        int *displacement_gather_3_;
+        //! Parameter recvcounts relative to the third MPI Allgatherv call.
+        int *recvcount_gather_3_;
+#endif
+
+
         /*** Output saver ***/
 
         //! Output saver.

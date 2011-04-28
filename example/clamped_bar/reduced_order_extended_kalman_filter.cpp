@@ -8,6 +8,11 @@
 //#define VERDANDI_WITH_DIRECT_SOLVER
 //#define SELDON_WITH_MUMPS
 
+#if defined(VERDANDI_WITH_MPI)
+#include <mpi.h>
+#endif
+
+
 #include "Verdandi.hxx"
 #include "seldon/SeldonSolver.hxx"
 
@@ -29,6 +34,10 @@ int main(int argc, char** argv)
         return 1;
     }
 
+#if defined(VERDANDI_WITH_MPI)
+    MPI::Init(argc, argv);
+#endif
+
     typedef double real;
 
     Verdandi::ReducedOrderExtendedKalmanFilter<real,
@@ -45,6 +54,10 @@ int main(int argc, char** argv)
 
         driver.Analyze();
     }
+
+#if defined(VERDANDI_WITH_MPI)
+    MPI::Finalize();
+#endif
 
     END;
 
