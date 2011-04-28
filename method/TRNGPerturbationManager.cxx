@@ -41,10 +41,13 @@ namespace Verdandi
 
 
     //! Default constructor.
+    /*! The seed is initialized from the system clock.
+    */
     TRNGPerturbationManager
     ::TRNGPerturbationManager():
         BasePerturbationManager<TRNGPerturbationManager>(), nrng_(NULL)
     {
+        nrng_ = new trng::yarn5(time(NULL));
     }
 
 

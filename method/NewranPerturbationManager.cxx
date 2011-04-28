@@ -37,10 +37,16 @@ namespace Verdandi
 
 
     //! Default constructor.
+    /*! The seed is initialized from the system clock.
+    */
     NewranPerturbationManager
     ::NewranPerturbationManager():
       BasePerturbationManager<NewranPerturbationManager>(), urng_(NULL)
     {
+        srand(time(NULL));
+        double seed = rand()/(double(RAND_MAX) + 1);
+        urng_ = new NEWRAN::LGM_mixed(seed);
+        NEWRAN::Random::Set(*urng_);
     }
 
 
