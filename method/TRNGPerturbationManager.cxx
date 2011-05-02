@@ -222,7 +222,7 @@ namespace Verdandi
                 for (int j = 0; j <= i; j++)
                     standard_deviation(i, j) = variance(i, j);
 
-            Mlt(standard_deviation, sample, output);
+            MltAdd(T0(1), standard_deviation, sample, T1(1), output);
 
             satisfy_constraint = NormalClipping(diagonal,
                                                 parameter, output);
