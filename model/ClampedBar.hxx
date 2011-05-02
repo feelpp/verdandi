@@ -1,5 +1,6 @@
 // Copyright (C) 2008-2009 INRIA
-// Author(s): Dominique Chapelle, Philippe Moireau, Marc Fragu
+// Author(s): Dominique Chapelle, Philippe Moireau, Marc Fragu,
+//            Akos Matszangosz
 //
 // This file is part of the data assimilation library Verdandi.
 //
