@@ -112,8 +112,6 @@ namespace Verdandi
 
         /*** Access methods ***/
 
-        string GetInstanceName() const;
-        void SetInstanceName(string instance_name);
         const ClassModel& GetModel() const;
         ClassModel& GetModel();
         string GetName() const;

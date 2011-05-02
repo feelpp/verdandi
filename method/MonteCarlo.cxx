@@ -377,28 +377,6 @@ namespace Verdandi
     ////////////////////
 
 
-    //! Returns the name of the instance.
-    /*!
-      \return The current time.
-    */
-    template <class T, class ClassModel>
-    string MonteCarlo<T, ClassModel>::GetInstanceName() const
-    {
-        return instance_name_;
-    }
-
-
-    //! Sets the name of the instance..
-    /*!
-      \param[in] time the current time.
-    */
-    template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::SetInstanceName(string instance_name)
-    {
-        instance_name_ = instance_name;
-    }
-
-
     //! Returns the model.
     /*!
       \return The model.
