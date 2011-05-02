@@ -1245,80 +1245,21 @@ namespace Verdandi
     void ClampedBar<T>
     ::AllocateSparseMatrix()
     {
+        Matrix<T, General, ArrayRowSymSparse> tridiagonal(Ndof_, Ndof_);
+
         // Skeleton.
-        int NvalSkel = 3 * (Nx_- 1) + 4;
-        Vector<T> values_0(NvalSkel);
-        values_0.Fill(T(0.));
-        Vector<int> columns_0(NvalSkel);
-        columns_0.Fill();
-        Vector<int> rowindex_0(Ndof_ + 1);
-        rowindex_0.Fill();
-        columns_0(0) = 0;
-        columns_0(1) = 1;
-        rowindex_0(0) = 0;
-        rowindex_0(1) = 2;
-
-        for (int i = 1; i < Nx_; i++)
+        for (int i = 0; i < Ndof_ - 1; i++)
         {
-            columns_0(3 * (i - 1) + 2) = i - 1;
-            columns_0(3 * (i -1) + 3) = i;
-            columns_0(3 * (i - 1) + 4) = i + 1;
-            rowindex_0(i + 1) = rowindex_0(i) + 3;
+            tridiagonal(i, i) = 0;
+            tridiagonal(i, i + 1) = 0;
         }
+        tridiagonal(Ndof_ - 1, Ndof_ - 1) = 0;
 
-        columns_0(3 * (Nx_ - 1) + 2) = Ndof_ - 2;
-        columns_0(3 * (Nx_ - 1) + 3) = Ndof_ - 1;
-        rowindex_0(Ndof_) = 3 * (Nx_ - 1) + 4;
+        Copy(tridiagonal, Newmark_matrix_0_);
+        Copy(Newmark_matrix_0_, Newmark_matrix_1_);
+        Copy(Newmark_matrix_0_, mass_matrix_);
+        Copy(Newmark_matrix_0_, damp_matrix_);
 
-        // Store the upper part of the Newmark
-        // matrix in a symmetric sparse data structure.
-        int nnz = (NvalSkel + Ndof_) / 2;
-
-        Vector<int> sym_col_0(nnz), sym_row_0(Ndof_ + 1);
-        Vector<T> sym_values_0(nnz);
-
-        int val_ind = 0, col_ind = 0;
-        bool first_nz;
-        for(int i = 0; i < Ndof_; i++)
-        {
-            first_nz = true;
-            for(int j = rowindex_0(i); j < rowindex_0(i + 1); j++)
-                if(columns_0(j) >= i)
-                {
-                    sym_values_0(val_ind) = values_0(j);
-                    val_ind++;
-                    sym_col_0(col_ind) = columns_0(j);
-                    col_ind++;
-                    if(first_nz)
-                    {
-                        sym_row_0(i)= col_ind - 1;
-                        first_nz=false;
-                    }
-                }
-        }
-
-        sym_row_0(Ndof_) = nnz;
-
-        Vector<T> sym_values_1(sym_values_0);
-        Vector<int> sym_col_1(sym_col_0);
-        Vector<int> sym_row_1(sym_row_0);
-        Vector<T> sym_values_m(sym_values_0);
-        Vector<int> sym_col_m(sym_col_0);
-        Vector<int> sym_row_m(sym_row_0);
-        Vector<T> sym_values_c(sym_values_0);
-        Vector<int> sym_col_c(sym_col_0);
-        Vector<int> sym_row_c(sym_row_0);
-
-        // Remark: values, rowindex and colums are unlinked after used in
-        // SetData therefore, we need one of each for each global matrix.
-        Newmark_matrix_0_.SetData(Ndof_, Ndof_, sym_values_0,
-                                  sym_row_0, sym_col_0);
-        Newmark_matrix_1_.SetData(Ndof_, Ndof_, sym_values_1,
-                                  sym_row_1, sym_col_1);
-        mass_matrix_.SetData(Ndof_, Ndof_, sym_values_m,
-                             sym_row_m, sym_col_m);
-        damp_matrix_.SetData(Ndof_, Ndof_, sym_values_c,
-                             sym_row_c, sym_col_c);
     }
 
 
