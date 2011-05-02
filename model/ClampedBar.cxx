@@ -295,16 +295,6 @@ namespace Verdandi
         AssembleNewMarkMatrix0();
         AssembleNewMarkMatrix1();
 
-#if defined(VERDANDI_WITH_DIRECT_SOLVER)
-#if defined(SELDON_WITH_UMFPACK)
-        MatrixUmfPack<T> mat_lu;
-#elif defined(SELDON_WITH_SUPERLU)
-        MatrixSuperLU<T> mat_lu;
-#elif defined(SELDON_WITH_MUMPS)
-        MatrixMumps<T> mat_lu;
-#endif
-        GetLU(Newmark_matrix_1_, mat_lu, true);
-#endif
 
         state disp_1(Ndof_);
         state velo_1(Ndof_);
@@ -319,7 +309,9 @@ namespace Verdandi
 #ifdef VERDANDI_WITH_DIRECT_SOLVER
         Vector<T> tmp(Ndof_);
         tmp = force_;
-        SolveLU(mat_lu, tmp);
+        Matrix<T, Symmetric, RowSymSparse> temporary_matrix;
+        Copy(Newmark_matrix_1_, temporary_matrix);
+        SparseSolve(temporary_matrix, tmp);
         disp_1 = tmp;
 #else
         // Initialization of the Gmres parameters.
@@ -479,18 +471,6 @@ namespace Verdandi
         AssembleNewMarkMatrix0();
         AssembleNewMarkMatrix1();
 
-#if defined(VERDANDI_WITH_DIRECT_SOLVER)
-#if defined(SELDON_WITH_UMFPACK)
-        MatrixUmfPack<T> N1_lu, K_lu;
-#elif defined(SELDON_WITH_SUPERLU)
-        MatrixSuperLU<T> N1_lu, K_lu;
-#elif defined(SELDON_WITH_MUMPS)
-        MatrixMumps<T> N1_lu, K_lu;
-#endif
-        GetLU(Newmark_matrix_1_, N1_lu, true);
-        GetLU(stiffness_matrix_, K_lu, true);
-#endif
-
         /*** Computes K_inv * source_term ***/
 
         state K_inv_Sd(Ndof_), K_inv_Sd_active;
@@ -498,7 +478,9 @@ namespace Verdandi
         K_inv_Sd_active.SetData(Ndof_ - 1, K_inv_Sd.GetData() + 1);
         Copy(source_term.GetVector("displacement"), K_inv_Sd_active);
 #ifdef VERDANDI_WITH_DIRECT_SOLVER
-        SolveLU(K_lu, K_inv_Sd);
+        Matrix<T, Symmetric, RowSymSparse> temporary_matrix;
+        Copy(stiffness_matrix_, temporary_matrix);
+        SparseSolve(temporary_matrix, K_inv_Sd);
 #else
         state b(K_inv_Sd);
         int nb_max_iter = 1000;
@@ -536,8 +518,9 @@ namespace Verdandi
         q_disp(0) = T(0);
         q_disp_active.SetData(Ndof_ - 1, q_disp.GetData() + 1);
 #ifdef VERDANDI_WITH_DIRECT_SOLVER
-        Copy(rhs_active, q_disp_active);
-        SolveLU(N1_lu, q_disp);
+		Copy(rhs_active, q_disp_active);
+		Copy(Newmark_matrix_1_, temporary_matrix);
+        GetAndSolveLU(temporary_matrix, q_disp);
 #else
         Iteration<double> iter2(nb_max_iter, tolerance);
         Preconditioner_Base precond2;
