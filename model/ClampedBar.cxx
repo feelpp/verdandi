@@ -1123,19 +1123,19 @@ namespace Verdandi
                 2. * mass_FEM_matrix_(0, 0) / (Delta_t_ * Delta_t_) +
                 theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 0)
                 / Delta_t_ - 0.5 * stiffness_FEM_matrix_(0, 0)
-                * theta_stiffness_(theta_stiffness_index_(i));
+				* pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
             Newmark_matrix_0_.Val(i + 1, i + 1) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(1, 1) / (Delta_t_ * Delta_t_) +
                 theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(1, 1)
                 / Delta_t_ - 0.5 * stiffness_FEM_matrix_(1, 1)
-                * theta_stiffness_(theta_stiffness_index_(i));
+               * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
             Newmark_matrix_0_.Val(i, i + 1) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(0, 1) / (Delta_t_ * Delta_t_) +
                 theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 1)
                 / Delta_t_ -0.5 * stiffness_FEM_matrix_(0, 1)
-                * theta_stiffness_(theta_stiffness_index_(i));
+                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
         }
     }
 
@@ -1154,19 +1154,19 @@ namespace Verdandi
                 2. * mass_FEM_matrix_(0, 0) / (Delta_t_ * Delta_t_) +
                 theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 0)
                 / Delta_t_ + 0.5 * stiffness_FEM_matrix_(0, 0)
-                * theta_stiffness_(theta_stiffness_index_(i));
+                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
             Newmark_matrix_1_.Val(i + 1, i + 1) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(1, 1) / (Delta_t_ * Delta_t_) +
                 theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(1, 1)
                 / Delta_t_ + 0.5 * stiffness_FEM_matrix_(1, 1)
-                * theta_stiffness_(theta_stiffness_index_(i));
+                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
             Newmark_matrix_1_.Val(i, i + 1) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(0, 1) / (Delta_t_ * Delta_t_) +
                 theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 1)
                 / Delta_t_ + 0.5 * stiffness_FEM_matrix_(0, 1)
-                * theta_stiffness_(theta_stiffness_index_(i));
+                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
         }
 
         // Boundary condition by pseudo-elimination.
