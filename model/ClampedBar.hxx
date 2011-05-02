@@ -254,7 +254,7 @@ namespace Verdandi
         void AssembleMassMatrix(Vector<T>& theta, Vector<int>& theta_index);
         void AssembleNewMarkMatrix0();
         void AssembleNewMarkMatrix1();
-        void AssembleDampMatrix();
+        void AssembleDampMatrix(Vector<T>& theta, Vector<int>& theta_index);
 
         void AssembleStiffnessMatrix(Vector<T>& theta,
                                      Vector<int>& theta_index);

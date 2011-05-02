@@ -112,6 +112,12 @@ namespace Verdandi
     template <class T>
     void Fill(T value, Matrix<T, Symmetric, RowSymSparse>& M);
 
+    template <class T0,
+              class T1, class Storage1, class Prop1, class Allocator1,
+              class T2, class Storage2, class Prop2, class Allocator2>
+    void AddMatrixPosition(T0 c, int pi, int pj,
+                           const Matrix<T1, Storage1, Prop1, Allocator1>& B,
+                           Matrix<T2, Storage2, Prop2, Allocator2>& A);
 #ifndef SWIG
     template <class T, template <class U> class Allocator>
     void GetRowPointer(const Matrix<T, General, RowMajor, Allocator<T> >& M,

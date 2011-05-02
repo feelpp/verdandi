@@ -300,8 +300,6 @@ namespace Verdandi
 
         AssembleMassMatrix(theta_mass_, theta_mass_index_);
 
-        AssembleDampMatrix();
-
         AssembleNewMarkMatrix0();
         AssembleNewMarkMatrix1();
 
@@ -646,21 +644,13 @@ namespace Verdandi
             if (stiffness_matrix_.GetM() == 0)
                 Copy(mass_matrix_, stiffness_matrix_);
             Fill(T(0), stiffness_matrix_);
+
             for (int i = 0; i < Nx_; i++)
-            {
-                stiffness_matrix_.Val(i, i) += stiffness_FEM_matrix_(0, 0)
-                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)))
-                * increment.GetVector("theta_stiffness")
-                    (theta_stiffness_index_(i));
-                stiffness_matrix_.Val(i + 1, i + 1) += stiffness_FEM_matrix_(1, 1)
-                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)))
-                * increment.GetVector("theta_stiffness")
-                    (theta_stiffness_index_(i));
-                stiffness_matrix_.Val(i, i + 1) += stiffness_FEM_matrix_(0, 1)
-                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)))
-                * increment.GetVector("theta_stiffness")
-                    (theta_stiffness_index_(i));
-            }
+                AddMatrixPosition(pow(T(2), theta_stiffness_(
+                                          theta_stiffness_index_(i)))
+                                  * increment.GetVector("theta_stiffness")
+                                  (theta_stiffness_index_(i)), i, i,
+                                  stiffness_FEM_matrix_, stiffness_matrix_);
 
             // Boundary condition by pseudo-elimination.
             stiffness_matrix_.Val(0, 0) = 1;
@@ -849,7 +839,7 @@ namespace Verdandi
         SetShape(state_adjoint, p);
 
         AssembleMassMatrix(theta_mass_, theta_mass_index_);
-        AssembleDampMatrix();
+        AssembleDampMatrix(theta_damp_, theta_damp_index_);
         AssembleStiffnessMatrix(theta_stiffness_, theta_stiffness_index_);
 
         state_collection p_disp, p_velo;
@@ -1080,35 +1070,6 @@ namespace Verdandi
     }
 
 
-    //! Assembles the Mass matrix.
-    /*
-      \param[in] theta vector of 'theta' value.
-      \param[in] theta_index vector that indicates for each element
-      the 'theta' value index of the element.
-    */
-    template <class T>
-    void ClampedBar<T>
-    ::AssembleMassMatrix(Vector<T>& theta, Vector<int>& theta_index)
-    {
-        Fill(T(0), mass_matrix_);
-        for (int i = 0; i < Nx_; i++)
-        {
-            // Mass Matrix.
-            mass_matrix_.Val(i, i) += theta(theta_index(i))
-                * mass_FEM_matrix_(0, 0);
-            mass_matrix_.Val(i + 1, i + 1) += theta(theta_index(i))
-                * mass_FEM_matrix_(1, 1);
-            mass_matrix_.Val(i, i + 1) += theta(theta_index(i))
-                * mass_FEM_matrix_(0, 1);
-        }
-
-        // Boundary condition by pseudo-elimination.
-        mass_matrix_.Val(0, 0) = 1;
-        mass_matrix_.Val(0, 1) = 0;
-        mass_matrix_.Val(1, 0) = 0;
-    }
-
-
     //! Assembles the NewMark matrices.
     template <class T>
     void ClampedBar<T>
@@ -1118,24 +1079,17 @@ namespace Verdandi
         for (int i = 0; i < Nx_; i++)
         {
             // Newmark's matrix at time n.
-            Newmark_matrix_0_.Val(i, i) +=
-                theta_mass_(theta_mass_index_(i)) *
-                2. * mass_FEM_matrix_(0, 0) / (Delta_t_ * Delta_t_) +
-                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 0)
-                / Delta_t_ - 0.5 * stiffness_FEM_matrix_(0, 0)
-				* pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
-            Newmark_matrix_0_.Val(i + 1, i + 1) +=
-                theta_mass_(theta_mass_index_(i)) *
-                2. * mass_FEM_matrix_(1, 1) / (Delta_t_ * Delta_t_) +
-                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(1, 1)
-                / Delta_t_ - 0.5 * stiffness_FEM_matrix_(1, 1)
-               * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
-            Newmark_matrix_0_.Val(i, i + 1) +=
-                theta_mass_(theta_mass_index_(i)) *
-                2. * mass_FEM_matrix_(0, 1) / (Delta_t_ * Delta_t_) +
-                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 1)
-                / Delta_t_ -0.5 * stiffness_FEM_matrix_(0, 1)
-                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
+            AddMatrixPosition(theta_mass_(theta_mass_index_(i)) * 2. /
+                              (Delta_t_ * Delta_t_), i, i, mass_FEM_matrix_,
+                              Newmark_matrix_0_);
+
+            AddMatrixPosition(theta_damp_(theta_damp_index_(i)) /
+                              Delta_t_, i, i, damp_FEM_matrix_,
+                              Newmark_matrix_0_);
+
+            AddMatrixPosition(-.5 * pow(T(2.), theta_stiffness_(
+							theta_stiffness_index_(i))), i, i,
+							  stiffness_FEM_matrix_, Newmark_matrix_0_);
         }
     }
 
@@ -1149,24 +1103,17 @@ namespace Verdandi
         for (int i = 0; i < Nx_; i++)
         {
             // Newmark's matrix at time n+1.
-            Newmark_matrix_1_.Val(i, i) +=
-                theta_mass_(theta_mass_index_(i)) *
-                2. * mass_FEM_matrix_(0, 0) / (Delta_t_ * Delta_t_) +
-                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 0)
-                / Delta_t_ + 0.5 * stiffness_FEM_matrix_(0, 0)
-                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
-            Newmark_matrix_1_.Val(i + 1, i + 1) +=
-                theta_mass_(theta_mass_index_(i)) *
-                2. * mass_FEM_matrix_(1, 1) / (Delta_t_ * Delta_t_) +
-                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(1, 1)
-                / Delta_t_ + 0.5 * stiffness_FEM_matrix_(1, 1)
-                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
-            Newmark_matrix_1_.Val(i, i + 1) +=
-                theta_mass_(theta_mass_index_(i)) *
-                2. * mass_FEM_matrix_(0, 1) / (Delta_t_ * Delta_t_) +
-                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 1)
-                / Delta_t_ + 0.5 * stiffness_FEM_matrix_(0, 1)
-                * pow(T(2), theta_stiffness_(theta_stiffness_index_(i)));
+            AddMatrixPosition(theta_mass_(theta_mass_index_(i)) * 2. /
+                              (Delta_t_ * Delta_t_), i, i, mass_FEM_matrix_,
+                              Newmark_matrix_1_);
+
+            AddMatrixPosition(theta_damp_(theta_damp_index_(i)) /
+                              Delta_t_, i, i, damp_FEM_matrix_,
+                              Newmark_matrix_1_);
+
+            AddMatrixPosition(.5 * pow(T(2.), theta_stiffness_(
+							theta_stiffness_index_(i))), i, i,
+							  stiffness_FEM_matrix_, Newmark_matrix_1_);
         }
 
         // Boundary condition by pseudo-elimination.
@@ -1176,31 +1123,41 @@ namespace Verdandi
 
     }
 
-
-    //! Assembles damp matrix.
+    //! Assembles the Mass matrix.
+    /*
+      \param[in] theta vector of 'theta' value.
+      \param[in] theta_index vector that indicates for each element
+      the 'theta' value index of the element.
+    */
     template <class T>
     void ClampedBar<T>
-    ::AssembleDampMatrix()
+    ::AssembleMassMatrix(Vector<T>& theta, Vector<int>& theta_index)
+    {
+        Fill(T(0), mass_matrix_);
+        for (int i = 0; i < Nx_; i++)
+            AddMatrixPosition(theta(theta_index(i)) , i, i,
+                              mass_FEM_matrix_, mass_matrix_);
+
+        // Boundary condition by pseudo-elimination.
+        mass_matrix_.Val(0, 0) = 1;
+        mass_matrix_.Val(0, 1) = 0;
+        mass_matrix_.Val(1, 0) = 0;
+    }
+
+    //! Assembles damp matrix.
+    /*
+      \param[in] theta vector of 'theta' value.
+      \param[in] theta_index vector that indicates for each element
+      the 'theta' value index of the element.
+    */
+    template <class T>
+    void ClampedBar<T>
+    ::AssembleDampMatrix(Vector<T>& theta, Vector<int>& theta_index)
     {
         Fill(T(0), damp_matrix_);
         for (int i = 0; i < Nx_; i++)
-        {
-            damp_matrix_.Val(i, i) +=
-                theta_damp_(theta_damp_index_(i)) *
-                alpha_ * mass_FEM_matrix_(0, 0) +
-                beta_ * stiffness_FEM_matrix_(0, 0)
-                * theta_damp_(theta_damp_index_(i));
-            damp_matrix_.Val(i + 1, i + 1) +=
-                theta_damp_(theta_damp_index_(i)) *
-                alpha_ * mass_FEM_matrix_(1, 1) +
-                beta_ * stiffness_FEM_matrix_(1, 1)
-                * theta_damp_(theta_damp_index_(i));
-            damp_matrix_.Val(i, i + 1) +=
-                theta_damp_(theta_damp_index_(i)) *
-                alpha_ * mass_FEM_matrix_(0, 1) +
-                beta_ * stiffness_FEM_matrix_(0, 1)
-                * theta_damp_(theta_damp_index_(i));
-        }
+            AddMatrixPosition(theta(theta_index(i)) , i, i,
+                              damp_FEM_matrix_, damp_matrix_);
 
         // Boundary condition by pseudo-elimination.
         damp_matrix_.Val(0, 0) = 1;
@@ -1224,14 +1181,8 @@ namespace Verdandi
 
         Fill(T(0), stiffness_matrix_);
         for (int i = 0; i < Nx_; i++)
-        {
-            stiffness_matrix_.Val(i, i) += stiffness_FEM_matrix_(0, 0)
-                * pow(T(2), theta(theta_index(i)));
-            stiffness_matrix_.Val(i + 1, i + 1) += stiffness_FEM_matrix_(1, 1)
-                * pow(T(2), theta(theta_index(i)));
-            stiffness_matrix_.Val(i, i + 1) += stiffness_FEM_matrix_(0, 1)
-                * pow(T(2), theta(theta_index(i)));
-        }
+            AddMatrixPosition(pow(T(2), theta(theta_index(i))), i, i,
+                              stiffness_FEM_matrix_, stiffness_matrix_);
 
         // Boundary condition by pseudo-elimination.
         stiffness_matrix_.Val(0, 0) = 1;
