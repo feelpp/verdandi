@@ -3,7 +3,7 @@ body {
 }
 
 /* title styles */
-h1 {
+h1, div.title {
 	text-align: center;
 	font: normal 2em arial;
 	color: #1B6FC0;
