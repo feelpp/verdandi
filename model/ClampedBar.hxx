@@ -149,6 +149,8 @@ namespace Verdandi
         Matrix<T, General, RowMajor> mass_FEM_matrix_;
         // Stiffness FEM matrix.
         Matrix<T, General, RowMajor> stiffness_FEM_matrix_;
+        // Damp FEM matrix.
+        Matrix<T, General, RowMajor> damp_FEM_matrix_;
 
         //! Newmark Global FEM matrix (mass matrix).
         Matrix<T, Symmetric, RowSymSparse> mass_matrix_;

@@ -167,6 +167,16 @@ namespace Verdandi
         stiffness_FEM_matrix_(1, 1) = stiff_lin;
         stiffness_FEM_matrix_(0, 1) = -stiff_lin;
 
+        /*** Elementary damping matrix construction ***/
+
+        damp_FEM_matrix_.Reallocate(2, 2);
+        damp_FEM_matrix_(0, 0) = alpha_ * mass_FEM_matrix_(0, 0) +
+            beta_ * stiffness_FEM_matrix_(0, 0);
+        damp_FEM_matrix_(1, 1) = alpha_ * mass_FEM_matrix_(1, 1) +
+            beta_ * stiffness_FEM_matrix_(1, 1);
+        damp_FEM_matrix_(0, 1) = alpha_ * mass_FEM_matrix_(0, 1) +
+            beta_ * stiffness_FEM_matrix_(0, 1);
+
         /*** State initialization ***/
 
         disp_0_.Reallocate(Ndof_);
@@ -466,7 +476,7 @@ namespace Verdandi
         /*** Assembling process ***/
 
         AssembleMassMatrix(theta_mass_, theta_mass_index_);
-        AssembleDampMatrix();
+        AssembleDampMatrix(theta_damp_, theta_damp_index_);
         AssembleStiffnessMatrix(theta_stiffness_, theta_stiffness_index_);
         AssembleNewMarkMatrix0();
         AssembleNewMarkMatrix1();
@@ -1111,20 +1121,20 @@ namespace Verdandi
             Newmark_matrix_0_.Val(i, i) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(0, 0) / (Delta_t_ * Delta_t_) +
-                damp_matrix_.Val(i, i) / Delta_t_ +
-                -0.5 * stiffness_FEM_matrix_(0, 0)
+                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 0)
+                / Delta_t_ - 0.5 * stiffness_FEM_matrix_(0, 0)
                 * theta_stiffness_(theta_stiffness_index_(i));
             Newmark_matrix_0_.Val(i + 1, i + 1) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(1, 1) / (Delta_t_ * Delta_t_) +
-                damp_matrix_.Val(i + 1, i + 1) / Delta_t_ +
-                -0.5 * stiffness_FEM_matrix_(1, 1)
+                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(1, 1)
+                / Delta_t_ - 0.5 * stiffness_FEM_matrix_(1, 1)
                 * theta_stiffness_(theta_stiffness_index_(i));
             Newmark_matrix_0_.Val(i, i + 1) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(0, 1) / (Delta_t_ * Delta_t_) +
-                damp_matrix_.Val(i, i + 1) / Delta_t_ +
-                -0.5 * stiffness_FEM_matrix_(0, 1)
+                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 1)
+                / Delta_t_ -0.5 * stiffness_FEM_matrix_(0, 1)
                 * theta_stiffness_(theta_stiffness_index_(i));
         }
     }
@@ -1142,20 +1152,20 @@ namespace Verdandi
             Newmark_matrix_1_.Val(i, i) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(0, 0) / (Delta_t_ * Delta_t_) +
-                damp_matrix_.Val(i, i) / Delta_t_ +
-                0.5 * stiffness_FEM_matrix_(0, 0)
+                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 0)
+                / Delta_t_ + 0.5 * stiffness_FEM_matrix_(0, 0)
                 * theta_stiffness_(theta_stiffness_index_(i));
             Newmark_matrix_1_.Val(i + 1, i + 1) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(1, 1) / (Delta_t_ * Delta_t_) +
-                damp_matrix_.Val(i + 1, i + 1) / Delta_t_ +
-                0.5 * stiffness_FEM_matrix_(1, 1)
+                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(1, 1)
+                / Delta_t_ + 0.5 * stiffness_FEM_matrix_(1, 1)
                 * theta_stiffness_(theta_stiffness_index_(i));
             Newmark_matrix_1_.Val(i, i + 1) +=
                 theta_mass_(theta_mass_index_(i)) *
                 2. * mass_FEM_matrix_(0, 1) / (Delta_t_ * Delta_t_) +
-                damp_matrix_.Val(i, i + 1) / Delta_t_ +
-                0.5 * stiffness_FEM_matrix_(0, 1)
+                theta_damp_(theta_damp_index_(i)) * damp_FEM_matrix_(0, 1)
+                / Delta_t_ + 0.5 * stiffness_FEM_matrix_(0, 1)
                 * theta_stiffness_(theta_stiffness_index_(i));
         }
 
