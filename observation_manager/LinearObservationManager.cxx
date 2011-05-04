@@ -412,12 +412,19 @@ namespace Verdandi
         // are requested.
         if (selection_policy == 2)
         {
-            double t1 = initial_time_
-                + floor((time - initial_time_) / period) * period;
-            double t2 = t1 + period;
-            if (t1 > time_inf)
+            double t1, t2;
+
+            if (is_multiple(time - initial_time_, period))
+                t1 = time;
+            else
+                t1 = initial_time_
+                    + floor((time - initial_time_) / period) * period;
+
+            t2 = t1 + period;
+
+            if (t1 <= final_time_)
                 available_time.PushBack(t1);
-            if (t2 < time_sup)
+            if (t2 <= final_time_)
                 available_time.PushBack(t2);
             observation_aggregator_.Contribution(time_, available_time_,
                                                  contribution_);

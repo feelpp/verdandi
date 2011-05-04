@@ -85,18 +85,15 @@ namespace Verdandi
         configuration.Set("width_property", width_property_str);
         if (width_property_str == "constant")
             width_property_ = width_constant_;
-        else if (width_property_str == "per-observation")
-        {
+        else
             width_property_ = width_per_observation_;
-            configuration.Set("width_left_upper_bound",
-                              width_left_upper_bound_);
-            configuration.Set("width_right_upper_bound",
-                              width_right_upper_bound_);
-        }
+        configuration.Set("width_left_upper_bound",
+                          width_left_upper_bound_);
+        configuration.Set("width_right_upper_bound",
+                          width_right_upper_bound_);
 
         configuration.Set("width_left", "", 0., width_left_);
         configuration.Set("width_right", "", 0., width_right_);
-
         configuration.Set("discard_observation", discard_observation_);
 
         active_track_index_ = CreateTrack();
@@ -625,7 +622,7 @@ namespace Verdandi
                 width_left_ = observation_time(1) - observation_time(0);
                 width_right_ = observation_time(1) - observation_time(0);
                 contribution(0) = Contribution(time - observation_time(0));
-                contribution(1) = Contribution(time - observation_time(1));
+                contribution(1) = Contribution(observation_time(1) - time);
             }
 
             return;
