@@ -42,7 +42,7 @@ namespace Verdandi
 
     //! Default constructor.
     /*! The seed is initialized from the system clock.
-    */
+     */
     TRNGPerturbationManager
     ::TRNGPerturbationManager():
         BasePerturbationManager<TRNGPerturbationManager>(), nrng_(NULL)
@@ -166,7 +166,6 @@ namespace Verdandi
 
     //! Generates a vector of random numbers with a normal distribution.
     /*! Each component of the random vector is generated independently.
-      \param[in] mean mean of the normal distribution.
       \param[in] variance variance of the random variable.
       \param[in] parameter vector of parameters. The vector may either be
       empty or contain two clipping parameters \f$ (a, b) \f$. With the
@@ -176,10 +175,9 @@ namespace Verdandi
       \param[out] output the generated random vector.
     */
     template <class T0, class T1,
-                  class Prop0, class Allocator0>
+              class Prop0, class Allocator0>
     void TRNGPerturbationManager
-    ::Normal(double mean,
-             Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
+    ::Normal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
              Vector<double, VectFull>& parameter,
              Vector<T1, VectFull, Allocator0>& output)
     {
@@ -235,7 +233,6 @@ namespace Verdandi
 
     //! Generate a random vector with a log-normal distribution.
     /*
-      \param[in] mean mean of the normal distribution.
       \param[in] variance variance of the log-normal distribution.
       \param[in] parameter vector of parameters. The vector may either be
       empty or contain two clipping parameters \f$ (a, b) \f$. With the
@@ -248,15 +245,14 @@ namespace Verdandi
     template <class T0, class Prop0, class Allocator0,
               class T1, class Allocator1>
     void TRNGPerturbationManager
-    ::LogNormal(double mean,
-                Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
+    ::LogNormal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
                 Vector<double, VectFull>& parameter,
                 Vector<T1, VectFull, Allocator1>& output)
     {
         int m = variance.GetM();
         for (int i = 0; i < m; i++)
             output(i) = log(output(i));
-        Normal(mean, variance, parameter, output);
+        Normal(variance, parameter, output);
         for (int i = 0; i < m; i++)
             output(i) = exp(output(i));
     }

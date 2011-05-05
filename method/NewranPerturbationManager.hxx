@@ -36,7 +36,7 @@ namespace Verdandi
 
     //! This class generates random samples using Newran.
     class NewranPerturbationManager:
-    public BasePerturbationManager<NewranPerturbationManager>
+        public BasePerturbationManager<NewranPerturbationManager>
     {
     protected:
         //! Uniform random number generator.
@@ -60,21 +60,19 @@ namespace Verdandi
         void Finalize();
 
         double Normal(double mean, double variance,
-                              Vector<double, VectFull>& parameter);
+                      Vector<double, VectFull>& parameter);
         double LogNormal(double mean, double variance,
-                              Vector<double, VectFull>& parameter);
+                         Vector<double, VectFull>& parameter);
 
         template <class T0, class T1,
                   class Prop0, class Allocator0>
-        void Normal(double mean,
-                    Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
+        void Normal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
                     Vector<double, VectFull>& parameter,
                     Vector<T1, VectFull, Allocator0>& sample);
 
         template <class T0, class Prop0, class Allocator0,
                   class T1, class Allocator1>
-        void LogNormal(double mean,
-                       Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
+        void LogNormal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
                        Vector<double, VectFull>& parameter,
                        Vector<T1, VectFull, Allocator1>& output);
 

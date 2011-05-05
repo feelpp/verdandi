@@ -38,10 +38,10 @@ namespace Verdandi
 
     //! Default constructor.
     /*! The seed is initialized from the system clock.
-    */
+     */
     NewranPerturbationManager
     ::NewranPerturbationManager():
-      BasePerturbationManager<NewranPerturbationManager>(), urng_(NULL)
+        BasePerturbationManager<NewranPerturbationManager>(), urng_(NULL)
     {
         srand(time(NULL));
         double seed = rand()/(double(RAND_MAX) + 1);
@@ -172,7 +172,7 @@ namespace Verdandi
     */
     double NewranPerturbationManager
     ::LogNormal(double mean, double variance,
-             Vector<double, VectFull>& parameter)
+                Vector<double, VectFull>& parameter)
     {
         if (parameter.GetLength() != 0 && parameter.GetLength() != 2)
             throw ErrorArgument("NewranPerturbationManager"
@@ -187,7 +187,6 @@ namespace Verdandi
 
     //! Generates a vector of random numbers with normal distribution.
     /*! Each component of the random vector is generated independently.
-      \param[in] mean mean of the normal distribution.
       \param[in] variance variance of the random variable.
       \param[in] parameter vector of parameters. The vector may either be
       empty or contain two clipping parameters \f$ (a, b) \f$. With the
@@ -199,8 +198,7 @@ namespace Verdandi
     template <class T0, class T1,
               class Prop0, class Allocator0>
     void NewranPerturbationManager
-    ::Normal(double mean,
-             Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
+    ::Normal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
              Vector<double, VectFull>& parameter,
              Vector<T1, VectFull, Allocator0>& output)
     {
@@ -264,30 +262,29 @@ namespace Verdandi
     template <class T0, class Prop0, class Allocator0,
               class T1, class Allocator1>
     void NewranPerturbationManager
-    ::LogNormal(double mean,
-                Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
+    ::LogNormal(Matrix<T0, Prop0, RowSymPacked, Allocator0> variance,
                 Vector<double, VectFull>& parameter,
                 Vector<T1, VectFull, Allocator1>& output)
     {
         int m = variance.GetM();
         for (int i = 0; i < m; i++)
             output(i) = log(output(i));
-        Normal(mean, variance, parameter, output);
+        Normal(variance, parameter, output);
         for (int i = 0; i < m; i++)
             output(i) = exp(output(i));
     }
 
 
-   //! Generate a random vector with a homogeneous normal distribution.
-   /*
-     \param[in] variance variance of the normal distribution.
-     \param[in] parameter vector of parameters. The vector may either be
-     empty or contain two clipping parameters \f$ (a, b) \f$. With the
-     clipping parameters, for a normal distribution, any random value lies in
-     \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ \mu \f$ is the mean
-     of the random variable and \f$ \sigma \f$ is its standard deviation.
-     \param[in,out] output output on entry, the mean vector; on exit,
-     the sample.
+    //! Generate a random vector with a homogeneous normal distribution.
+    /*
+      \param[in] variance variance of the normal distribution.
+      \param[in] parameter vector of parameters. The vector may either be
+      empty or contain two clipping parameters \f$ (a, b) \f$. With the
+      clipping parameters, for a normal distribution, any random value lies in
+      \f$ [\mu - a \sigma, \mu + b \sigma] \f$ where \f$ \mu \f$ is the mean
+      of the random variable and \f$ \sigma \f$ is its standard deviation.
+      \param[in,out] output output on entry, the mean vector; on exit,
+      the sample.
     */
     template <class T0,
               class T1, class Allocator1>

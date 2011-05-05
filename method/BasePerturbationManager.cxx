@@ -156,7 +156,7 @@ namespace Verdandi
                                 + pdf + "\" is not supported.");
 
         if (Nvector == 1 && pdf == "Normal")
-            static_cast<Derived*>(this)->Normal(T1(0), variance,
+            static_cast<Derived*>(this)->Normal(variance,
                                                 parameter, output);
 
         else if (pdf == "Normal")
@@ -167,7 +167,7 @@ namespace Verdandi
             Vector<T1, VectFull, Allocator1> first_vector;
             first_vector.SetData(N, &perturbation(0));
 
-            static_cast<Derived*>(this)->Normal(T1(0), variance,
+            static_cast<Derived*>(this)->Normal(variance,
                                                 parameter, first_vector);
 
             for (int i = 1; i < Nvector; i++)
@@ -179,8 +179,7 @@ namespace Verdandi
                     Copy(first_vector, vector_i);
                 else
                 {
-                    static_cast<Derived*>(this)->Normal(T1(0),
-                                                        variance, parameter,
+                    static_cast<Derived*>(this)->Normal(variance, parameter,
                                                         vector_i);
                     if (correlation.GetLength() != 0)
                     {
@@ -198,8 +197,8 @@ namespace Verdandi
         }
 
         else if (Nvector == 1 && pdf == "LogNormal")
-           static_cast<Derived*>(this)->LogNormal(T1(0), variance,
-                                                  parameter, output);
+            static_cast<Derived*>(this)->LogNormal(variance,
+                                                   parameter, output);
 
         else if (pdf == "LogNormal")
         {
@@ -209,7 +208,7 @@ namespace Verdandi
             Vector<T1, VectFull, Allocator1> first_vector;
             first_vector.SetData(N, &perturbation(0));
 
-            static_cast<Derived*>(this)->LogNormal(T1(0), variance,
+            static_cast<Derived*>(this)->LogNormal(variance,
                                                    parameter, first_vector);
 
             for (int i = 1; i < Nvector; i++)
@@ -221,8 +220,7 @@ namespace Verdandi
                     Copy(first_vector, vector_i);
                 else
                 {
-                    static_cast<Derived*>(this)->LogNormal(T1(0),
-                                                           variance, parameter,
+                    static_cast<Derived*>(this)->LogNormal(variance, parameter,
                                                            vector_i);
 
                     if (correlation.GetLength() != 0)
@@ -312,8 +310,8 @@ namespace Verdandi
                                 + pdf + "\" is not supported.");
 
         if (Nvector == 1 && pdf == "Normal")
-           static_cast<Derived*>(this)-> Normal(variance, parameter,
-                                                output.GetVector(0));
+            static_cast<Derived*>(this)-> Normal(variance, parameter,
+                                                 output.GetVector(0));
 
         else if (pdf == "Normal")
         {
@@ -360,9 +358,9 @@ namespace Verdandi
         }
 
         else if (Nvector == 1 && pdf == "LogNormal")
-        static_cast<Derived*>(this)->
-            LogNormal(variance, parameter,
-                      output.GetVector(0));
+            static_cast<Derived*>(this)->
+                LogNormal(variance, parameter,
+                          output.GetVector(0));
 
 
         else if (pdf == "LogNormal")
