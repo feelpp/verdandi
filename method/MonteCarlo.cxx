@@ -218,7 +218,7 @@ namespace Verdandi
 
         output_saver_.Initialize(configuration);
         output_saver_.Empty("perturbation");
-        output_saver_.Empty("state");
+        output_saver_.Empty("state_forecast");
 
         /*** Logger and read configuration ***/
 
