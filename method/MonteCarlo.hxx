@@ -67,6 +67,8 @@ namespace Verdandi
         string configuration_file_;
         //! Path to the model configuration file.
         string model_configuration_file_;
+        //! Path to the configuration file for the perturbation manager.
+        string perturbation_manager_configuration_file_;
 
         //! Should the iterations be displayed?
         bool show_iteration_;

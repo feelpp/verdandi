@@ -199,6 +199,12 @@ namespace Verdandi
                           configuration_file_,
                           model_configuration_file_);
 
+        /*** Perturbation managager ***/
+
+        configuration.Set("perturbation_manager.configuration_file", "",
+                          configuration_file_,
+                          perturbation_manager_configuration_file_);
+
         /*** Display options ***/
 
         // Should the iteration be displayed on screen?
@@ -241,7 +247,8 @@ namespace Verdandi
 
         model_.Initialize(model_configuration_file_);
 
-        perturbation_manager_.Initialize(model_configuration_file_);
+        perturbation_manager_
+            .Initialize(perturbation_manager_configuration_file_);
 
         iteration_ = 0;
 
