@@ -610,6 +610,9 @@ namespace Verdandi
         {
             for (int i = 0; i< Ntime; i++)
                 contribution(i) = Contribution(time - observation_time(i));
+
+            Logger::Log<3>(*this, "Contribution: {" +
+                            to_str(contribution) + "}\n");
             return;
         }
 
@@ -625,6 +628,8 @@ namespace Verdandi
                 contribution(1) = Contribution(observation_time(1) - time);
             }
 
+            Logger::Log<3>(*this, "Contribution: {" +
+                            to_str(contribution) + "}\n");
             return;
         }
 
@@ -715,6 +720,18 @@ namespace Verdandi
                 return;
             }
     }
+
+
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    template <class T>
+    string ObservationAggregator<T>::GetName() const
+    {
+        return "ObservationAggregator";
+    }
+
 
 }
 

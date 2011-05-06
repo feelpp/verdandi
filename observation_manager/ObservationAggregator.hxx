@@ -143,6 +143,7 @@ namespace Verdandi
         template <class time_vector>
         void GetValueIndex(time_vector& X, double value, int& index_inf,
                            int& index_sup) const;
+        string GetName() const;
     };
 
 
