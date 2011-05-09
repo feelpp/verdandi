@@ -58,7 +58,7 @@ namespace Verdandi
     */
     template <class T>
     ClampedBar<T>::ClampedBar(string configuration_file):
-        time_(0.)
+    time_(0.)
     {
     }
 
@@ -527,8 +527,8 @@ namespace Verdandi
         q_disp(0) = T(0);
         q_disp_active.SetData(Ndof_ - 1, q_disp.GetData() + 1);
 #ifdef VERDANDI_WITH_DIRECT_SOLVER
-		Copy(rhs_active, q_disp_active);
-		Copy(Newmark_matrix_1_, temporary_matrix);
+        Copy(rhs_active, q_disp_active);
+        Copy(Newmark_matrix_1_, temporary_matrix);
         GetAndSolveLU(temporary_matrix, q_disp);
 #else
         Iteration<double> iter2(nb_max_iter, tolerance);
@@ -1089,8 +1089,8 @@ namespace Verdandi
                               Newmark_matrix_0_);
 
             AddMatrixPosition(-.5 * pow(T(2.), theta_stiffness_(
-							theta_stiffness_index_(i))), i, i,
-							  stiffness_FEM_matrix_, Newmark_matrix_0_);
+                                            theta_stiffness_index_(i))), i, i,
+                              stiffness_FEM_matrix_, Newmark_matrix_0_);
         }
     }
 
@@ -1113,8 +1113,8 @@ namespace Verdandi
                               Newmark_matrix_1_);
 
             AddMatrixPosition(.5 * pow(T(2.), theta_stiffness_(
-							theta_stiffness_index_(i))), i, i,
-							  stiffness_FEM_matrix_, Newmark_matrix_1_);
+                                           theta_stiffness_index_(i))), i, i,
+                              stiffness_FEM_matrix_, Newmark_matrix_1_);
         }
 
         // Boundary condition by pseudo-elimination.
