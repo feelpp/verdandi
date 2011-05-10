@@ -84,7 +84,8 @@ namespace Verdandi
                  bool initialize_model, bool initialize_observation_manager)
     {
         Ops configuration(configuration_file);
-        Initialize(configuration);
+        Initialize(configuration, initialize_model,
+                        initialize_observation_manager);
     }
 
 
