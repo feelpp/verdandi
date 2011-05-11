@@ -189,7 +189,7 @@ namespace Verdandi
                         bool initialize_model = true,
                         bool initialize_observation_manager = true);
 
-        void Initialize(Ops& configuration,
+        void Initialize(VerdandiOps& configuration,
                         bool initialize_model = true,
                         bool initialize_observation_manager = true);
 

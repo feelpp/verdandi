@@ -81,7 +81,7 @@ namespace Verdandi
     */
     void NewranPerturbationManager::Initialize(string configuration_file)
     {
-        Ops configuration_stream(configuration_file);
+        VerdandiOps configuration_stream(configuration_file);
 
         configuration_stream.SetPrefix("perturbation_manager.newran.");
 

@@ -66,7 +66,7 @@ namespace Verdandi
     template <class T>
     void ObservationAggregator<T>::Initialize(string configuration_file)
     {
-        Ops configuration(configuration_file);
+        VerdandiOps configuration(configuration_file);
 
         configuration.SetPrefix("observation.aggregator.");
 

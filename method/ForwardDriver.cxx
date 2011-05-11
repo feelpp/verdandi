@@ -73,7 +73,7 @@ namespace Verdandi
     void ForwardDriver<Model>::Initialize(string configuration_file,
                                           bool initialize_model)
     {
-        Ops configuration(configuration_file);
+        VerdandiOps configuration(configuration_file);
         Initialize(configuration, initialize_model);
     }
 
@@ -84,7 +84,7 @@ namespace Verdandi
       model initialization method.
     */
     template <class Model>
-    void ForwardDriver<Model>::Initialize(Ops& configuration,
+    void ForwardDriver<Model>::Initialize(VerdandiOps& configuration,
                                           bool initialize_model)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");

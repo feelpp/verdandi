@@ -20,7 +20,7 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#ifndef VERDANDI_FILE_SHARE_OPS_CXX
+#ifndef VERDANDI_FILE_SHARE_VERDANDIOPS_CXX
 
 #include "ops/Ops.hxx"
 
@@ -37,7 +37,7 @@ namespace Verdandi
     //! Default constructor.
     /*! Nothing is performed. The Lua state is set to NULL.
      */
-    Ops::Ops(): ::Ops::Ops()
+    VerdandiOps::VerdandiOps(): Ops::Ops()
     {
     }
 
@@ -47,7 +47,7 @@ namespace Verdandi
       raised during this evaluation.
       \param[in] file_path path to the configuration file.
     */
-    Ops::Ops(string file_path): ::Ops::Ops(file_path)
+    VerdandiOps::VerdandiOps(string file_path): Ops::Ops(file_path)
     {
     }
 
@@ -55,7 +55,7 @@ namespace Verdandi
     //! Destructor.
     /*! Destroys the Lua state object.
      */
-    Ops::~Ops()
+    VerdandiOps::~VerdandiOps()
     {
     }
 
@@ -75,7 +75,7 @@ namespace Verdandi
     */
     template<class TD, class T>
     void
-    Ops::Set(string name, string constraint,
+    VerdandiOps::Set(string name, string constraint,
              const TD& default_value, T& value)
     {
         SetValue(name, constraint, default_value, true, value);
@@ -89,7 +89,7 @@ namespace Verdandi
       \param[out] value value of the entry.
     */
     template<class T>
-    void Ops::Set(string name, string constraint, T& value)
+    void VerdandiOps::Set(string name, string constraint, T& value)
     {
         SetValue(name, constraint, value, false, value);
     }
@@ -101,7 +101,7 @@ namespace Verdandi
       \param[out] value value of the entry.
     */
     template <class T>
-    void Ops::Set(string name, T& value)
+    void VerdandiOps::Set(string name, T& value)
     {
         SetValue(name, "", value, false, value);
     }
@@ -116,7 +116,7 @@ namespace Verdandi
       \return The value of the entry.
     */
     template<class T>
-    T Ops::Get(string name, string constraint, const T& default_value)
+    T VerdandiOps::Get(string name, string constraint, const T& default_value)
     {
         T value;
         SetValue(name, constraint, default_value, true, value);
@@ -131,7 +131,7 @@ namespace Verdandi
       \return The value of the entry.
     */
     template<class T>
-    T Ops::Get(string name, string constraint)
+    T VerdandiOps::Get(string name, string constraint)
     {
         T value;
         SetValue(name, constraint, value, false, value);
@@ -145,7 +145,7 @@ namespace Verdandi
       \return The value of the entry.
     */
     template <class T>
-    T Ops::Get(string name)
+    T VerdandiOps::Get(string name)
     {
         T value;
         SetValue(name, "", value, false, value);
@@ -161,7 +161,7 @@ namespace Verdandi
       exception is raised.
     */
     template<class T>
-    bool Ops::Is(string name)
+    bool VerdandiOps::Is(string name)
     {
         T value;
         return IsParam(name, value);
@@ -181,7 +181,7 @@ namespace Verdandi
       \note The default value may not satisfy the constraint.
     */
     template<class T, class Allocator>
-    void Ops::SetValue(string name, string constraint,
+    void VerdandiOps::SetValue(string name, string constraint,
                        const Seldon::Vector<T, VectFull, Allocator>&
                        default_value,
                        bool with_default,
@@ -242,7 +242,7 @@ namespace Verdandi
       \note The default value may not satisfy the constraint.
     */
     template<class T, class Allocator>
-    void Ops::SetValue(string name, string constraint,
+    void VerdandiOps::SetValue(string name, string constraint,
                        const vector<Seldon::Vector<T, VectFull, Allocator> >&
                        default_value,
                        bool with_default,
@@ -334,7 +334,7 @@ namespace Verdandi
       \note The default value may not satisfy the constraint.
     */
     template<class T, class Prop, class Storage, class Allocator>
-    void Ops::SetValue(string name, string constraint,
+    void VerdandiOps::SetValue(string name, string constraint,
                        const Seldon::Matrix<T, Prop, Storage, Allocator>&
                        default_value,
                        bool with_default,
@@ -424,7 +424,7 @@ namespace Verdandi
       \note The default value may not satisfy the constraint.
     */
     template<class T, class Prop, class Storage, class Allocator>
-    void Ops::SetValue(string name, string constraint,
+    void VerdandiOps::SetValue(string name, string constraint,
                        const
                        vector<Seldon::Matrix<T, Prop, Storage, Allocator> >&
                        default_value,
@@ -515,7 +515,7 @@ namespace Verdandi
       exception is raised.
     */
     template<class T, class Allocator>
-    bool Ops::IsParam(string name,
+    bool VerdandiOps::IsParam(string name,
                       Seldon::Vector<T, VectFull, Allocator>& value)
     {
         string str_value;
@@ -534,7 +534,7 @@ namespace Verdandi
       exception is raised.
     */
     template<class T, class Prop, class Storage, class Allocator>
-    bool Ops::IsParam(string name,
+    bool VerdandiOps::IsParam(string name,
                       Seldon::Matrix<T, Prop, Storage, Allocator>& value)
     {
         string str_value;
@@ -547,6 +547,6 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_SHARE_OPS_CXX
+#define VERDANDI_FILE_SHARE_VERDANDIOPS_CXX
 #endif
 

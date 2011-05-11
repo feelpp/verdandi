@@ -237,7 +237,7 @@ namespace Verdandi
         // Configuration.
         void
         ReadConfigurationBoundaryCondition(string side,
-                                           Ops& configuration,
+                                           VerdandiOps& configuration,
                                            int& type, T& value,
                                            T& amplitude, T& frequency);
 

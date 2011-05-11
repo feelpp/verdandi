@@ -85,7 +85,7 @@ namespace Verdandi
     ::Initialize(string configuration_file,
                  bool initialize_model, bool initialize_observation_manager)
     {
-        Ops configuration(configuration_file);
+        VerdandiOps configuration(configuration_file);
         Initialize(configuration,
                    initialize_model, initialize_observation_manager);
     }
@@ -98,7 +98,7 @@ namespace Verdandi
               class Optimization>
     void FourDimensionalVariational<T,
                                     Model, ObservationManager, Optimization>
-    ::Initialize(Ops& configuration,
+    ::Initialize(VerdandiOps& configuration,
                  bool initialize_model, bool initialize_observation_manager)
     {
 

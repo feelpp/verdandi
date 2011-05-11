@@ -83,7 +83,7 @@ namespace Verdandi
     {
 
         /*** Configuration ***/
-        Ops configuration(configuration_file);
+        VerdandiOps configuration(configuration_file);
 
         configuration.SetPrefix("shallow_water.domain.");
 
@@ -763,7 +763,7 @@ namespace Verdandi
       for Dirichlet conditions on the height.
       \param[in] side side for the boundary condition (left, right, bottom or
       top).
-      \param[in] configuration Ops instance.
+      \param[in] configuration VerdandiOps instance.
       \param[out] type type of the boundary condition (0, 1, 2 or 3).
       \param[out] inflow in-flow rate.
       \param[out] amplitude amplitude of the variations.
@@ -772,7 +772,7 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>
     ::ReadConfigurationBoundaryCondition(string side,
-                                         Ops& configuration,
+                                         VerdandiOps& configuration,
                                          int& type, T& value,
                                          T& amplitude, T& frequency)
     {

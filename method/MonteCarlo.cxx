@@ -172,7 +172,7 @@ namespace Verdandi
     template <class T, class ClassModel>
     void MonteCarlo<T, ClassModel>::Initialize(string configuration_file)
     {
-        Ops configuration(configuration_file);
+        VerdandiOps configuration(configuration_file);
         Initialize(configuration);
     }
 
@@ -180,7 +180,7 @@ namespace Verdandi
     //! Initializes the simulation.
     /*! Initializes the model and the perturbation manager. */
     template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::Initialize(Ops& configuration)
+    void MonteCarlo<T, ClassModel>::Initialize(VerdandiOps& configuration)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 

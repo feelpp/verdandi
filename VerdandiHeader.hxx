@@ -111,7 +111,7 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#include "share/Ops.hxx"
+#include "share/VerdandiOps.hxx"
 #include "share/Logger.hxx"
 #include "share/Error.hxx"
 #include "share/UsefulFunction.hxx"

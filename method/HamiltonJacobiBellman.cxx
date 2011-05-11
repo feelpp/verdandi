@@ -79,7 +79,7 @@ namespace Verdandi
     void HamiltonJacobiBellman<T, Model, ObservationManager>
     ::Initialize(string configuration_file)
     {
-      Ops configuration(configuration_file);
+      VerdandiOps configuration(configuration_file);
       Initialize(configuration);
     }
 
@@ -91,7 +91,7 @@ namespace Verdandi
     */
     template <class T, class Model, class ObservationManager>
     void HamiltonJacobiBellman<T, Model, ObservationManager>
-    ::Initialize(Ops& configuration)
+    ::Initialize(VerdandiOps& configuration)
     {
         string configuration_file = configuration.GetFilePath();
         configuration.SetPrefix("hjb.");

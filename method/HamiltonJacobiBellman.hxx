@@ -151,7 +151,7 @@ namespace Verdandi
         /*** Methods ***/
 
         void Initialize(string configuration_file);
-        void Initialize(Ops& configuration);
+        void Initialize(VerdandiOps& configuration);
 
         void InitializeStep();
 

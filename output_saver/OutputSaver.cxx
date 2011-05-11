@@ -65,7 +65,7 @@ namespace Verdandi
     void OutputSaver::Initialize(string configuration_file,
                                  string section_name)
     {
-        Ops configuration(configuration_file);
+        VerdandiOps configuration(configuration_file);
         configuration.SetPrefix(section_name);
         Initialize(configuration);
     }
@@ -73,11 +73,11 @@ namespace Verdandi
 
     //! Initializes the output saver with a configuration.
     /*! Reads the configuration.
-      \param[in] configuration Ops instance with the configuration. The
+      \param[in] configuration VerdandiOps instance with the configuration. The
       prefix of \a configuration should already be set so that all entries are
       accessible ("mode", "variable_list", "file", ...).
     */
-    void OutputSaver::Initialize(Ops& configuration)
+    void OutputSaver::Initialize(VerdandiOps& configuration)
     {
 
 
@@ -419,12 +419,12 @@ namespace Verdandi
 
     //! Reads the parameters of the variable in a configuration file.
     /*!
-      \param[in] configuration Ops instance.
+      \param[in] configuration VerdandiOps instance.
       \param[in] generic_path default output file for all variables.
       \param[in] default_mode default saving format.
       \param[in] variable_name variable name.
     */
-    void OutputSaver::SetVariable(Ops& configuration,
+    void OutputSaver::SetVariable(VerdandiOps& configuration,
                                   string generic_path,
                                   string default_mode,
                                   string variable_name)

@@ -106,7 +106,7 @@ namespace Verdandi
         void Fill(Vector<T0, Storage0, Allocator0>& in, string pdf);
 
         void Initialize(string configuration_file);
-        void Initialize(Ops& configuration);
+        void Initialize(VerdandiOps& configuration);
         void InitializeStep();
         void Forward();
 

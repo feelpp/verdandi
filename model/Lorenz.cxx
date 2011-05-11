@@ -75,7 +75,7 @@ namespace Verdandi
 
         /*** Configuration ***/
 
-        Ops configuration(configuration_file);
+        VerdandiOps configuration(configuration_file);
 
         configuration.SetPrefix("lorenz.parameter.");
 

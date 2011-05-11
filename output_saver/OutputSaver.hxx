@@ -67,7 +67,7 @@ namespace Verdandi
         OutputSaver();
         OutputSaver(string configuration_file, string method_name);
         void Initialize(string configuration_file, string method_name);
-        void Initialize(Ops& configuration);
+        void Initialize(VerdandiOps& configuration);
 
         ~OutputSaver();
 
@@ -105,7 +105,7 @@ namespace Verdandi
 
     private:
 
-        void SetVariable(Ops& configuration,
+        void SetVariable(VerdandiOps& configuration,
                          string generic_path,
                          string default_mode,
                          string variable_name);

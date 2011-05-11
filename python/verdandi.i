@@ -49,6 +49,7 @@ using namespace std;
 %rename(OpsError) Ops::Error;
 
 %include "share/Error.hxx"
+%include "share/VerdandiOps.hxx"
 %include "seldon/share/Errors.hxx"
 %include "ops/Error.hxx"
 
