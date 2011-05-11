@@ -153,7 +153,10 @@ namespace Verdandi
         bool HasFinished() const;
 
         // Access methods.
+#ifndef SWIG
         const Model& GetModel() const;
+#endif
+        Model& GetModel();
 
         string GetName() const;
         void Message(string message);

@@ -313,6 +313,20 @@ namespace Verdandi
     }
 
 
+    //! Returns the model.
+    /*!
+      \return The model.
+    */
+    template <class T, class Model, class ObservationManager,
+              class Optimization>
+    Model&
+    FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    ::GetModel()
+    {
+        return model_;
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.

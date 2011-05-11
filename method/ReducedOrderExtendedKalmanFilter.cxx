@@ -662,6 +662,19 @@ namespace Verdandi
     }
 
 
+    //! Returns the model.
+    /*!
+      \return The model.
+    */
+    template <class T, class Model, class ObservationManager>
+    Model&
+    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    ::GetModel()
+    {
+        return model_;
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.
