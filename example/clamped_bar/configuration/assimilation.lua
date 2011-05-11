@@ -254,9 +254,9 @@ four_dimensional_variational = {
       -- If you do not want to use a particular tolerance termination, you can
       -- just set that tolerance to zero and it will be ignored.
       -- Relative tolerance on the optimization parameters.
-      parameter_tolerance = 1.e-6,
+      parameter_tolerance = 1.e-4,
       -- Relative tolerance on the cost function.
-      cost_function_tolerance = 1.e-6,
+      cost_function_tolerance = 1.e-4,
       -- Maximum number of function evaluations. Criterion is disabled
       -- if the value is non-positive.
       Niteration_max = -1

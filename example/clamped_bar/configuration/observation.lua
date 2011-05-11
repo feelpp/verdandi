@@ -45,7 +45,7 @@ observation = {
    error = {
 
       -- Variance of observational errors.
-      variance = 100.
+      variance = 1.e-2
 
    },
 

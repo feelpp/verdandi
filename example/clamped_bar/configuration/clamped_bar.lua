@@ -28,8 +28,8 @@ clamped_bar = {
         theta_stiffness = {1., 1.},
         theta_mass = {1., 1., 1.},
         theta_damp = {1.},
-        alpha = 1.,
-        beta = 1.
+        alpha = 0.001,
+        beta = 0.001
     },
 
     error_statistics = {
