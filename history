@@ -1,3 +1,83 @@
+Version 0.9 (2011-05-12)
+-----------
+
+* Methods
+
+- Added an implementation of the 4D-Var method ('FourDimensionalVariational').
+- Redesigned the perturbation manager so that adding new generators and new
+  distributions is easier, and added support for the TRNG library.
+- Initial import of sequential aggregation (for ensemble forecasting) with
+  discounted ridge regression.
+- Improved the implementation of 'ExtendedKalmanFilter' and
+  'ReducedOrderExtendedKalmanFilter'.
+- Improved the consistency of 'MonteCarlo' with Verdandi.
+- Initial import of the function 'ComputeBLUE_vector'.
+- Added options to 'Method::Initialize' to indicate if the model or
+  observation manager have to be initialized or not.
+- Improved the snapshot recording so that $H^T y$ and $H^T H x$ can be
+  recorded in 'ReducedMinimaxFilter'.
+- Added support for a model error variance provided as a scaled identity
+  matrix in 'ReducedMinimaxFilter'.
+- Added the ability to save the square root of the model error variance
+  in 'ReducedMinimaxFilter'.
+- Changed the initialization of the assimilation methods: the constructor now
+  takes no argument and the configuration file (as string or 'Ops' instance)
+  is the argument of the method 'Initialize'.
+
+* Observations
+
+- Added the ability to define a sparse observation operator with a Lua table.
+
+* Example models
+
+- Added the uncertainty description for the constant term in 'QuadraticModel'.
+- Removed 'ClampedBar' model, and renamed 'ParametricClampedBar' to
+  'ClampedBar'.
+
+* Documentation
+
+- Largely improved the installation description.
+- Initial import of the documentation for the example programs associated
+  with the shallow-water model and the clamped-bar model.
+- Added documentation on Lua configuration files.
+- Added documentation for the Monte Carlo method.
+- Made algorithms notation uniform in documentation.
+
+* Miscellaneous
+
+- Largely improved the compatibility with Visual C++.
+- Added support for a user-defined dependency list in the "SConstruct".
+- Extended the SWIG interface to the methods 'ForwardDriver' and
+  'ReducedOrderExtendedKalmanFilter', and to the 'ClampedBar' model.
+- Uniformized 'ClampedBar' example programs.
+
+* Bug fixes
+
+- In 'ReducedOrderExtendedKalmanFilter::Analyze()', the computation of the
+  matrix 'U' was erroneous.
+- The correlations between normal variables were properly handled only if they
+  were equal to 0 or 1 in 'BasePerturbationManager'.
+- The interpolation in 'ObservationAggregator' was erroneous.
+- The tangent linear model was applied at time "h + 1"  in the method
+  'PropagateCovianceMatrix()' of 'ExtendedKalmanFilter'.
+- In 'ReducedOrderExtendedKalmanFilter::PropagateCovianceMatrix()', the model
+  was applied at time "h + 1", but it was the tangent linear model that had
+  to be applied at time "h".
+- 'MessageHandler::RemoveRecipient' did not properly erase elements
+  from the recipients map.
+- The reduction failed when the number of snapshots was greater than
+  the size of the state in 'ReducedMinimaxFilter'.
+- An exception was raised when the size of the reduced state changed
+  in 'ReducedMinimaxFilter'.
+- In SWIG interface: the preprocessing directive 'VERDANDI_SPARSE' was defined
+  in "verdandi.i" while the directive 'VERDANDI_DENSE' was defined
+  in "verdandi.cpp".
+- In the methods 'BasePerturbationManager::Sample' for vector collections,
+  the perturbation were not deallocated.
+- The time was not initialized in the constructors of 'ClampedBar'.
+- Assembling Newmark matrices was erroneous in 'ClampedBar'.
+
+
 Version 0.8 (2010-12-07)
 -----------
 
