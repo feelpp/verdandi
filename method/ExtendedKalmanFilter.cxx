@@ -69,7 +69,7 @@ namespace Verdandi
 
 
 
-    //! Initializes the optimal interpolation driver.
+    //! Initializes the extended Kalman filter driver.
     /*! Initializes the model and the observation manager. */
     template <class T, class Model, class ObservationManager>
     void ExtendedKalmanFilter<T, Model, ObservationManager>
@@ -83,7 +83,7 @@ namespace Verdandi
     }
 
 
-    //! Initializes the optimal interpolation driver.
+    //! Initializes the extended Kalman filter driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
     template <class T, class Model, class ObservationManager>
@@ -182,9 +182,7 @@ namespace Verdandi
     }
 
 
-    //! Initializes a step for the optimal interpolation.
-    /*! Initializes a step for the model.
-     */
+    //! Initializes a step for the model.
     template <class T, class Model, class ObservationManager>
     void ExtendedKalmanFilter<T, Model, ObservationManager>::InitializeStep()
     {
