@@ -38,7 +38,7 @@ namespace Verdandi
 
     //! Main constructor.
     /*! Builds the driver.
-    */
+     */
     template <class T, class Model, class ObservationManager>
     ExtendedKalmanFilter<T, Model, ObservationManager>
     ::ExtendedKalmanFilter()

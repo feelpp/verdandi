@@ -374,9 +374,9 @@ namespace Verdandi
         model_.GetFullState(full_state);
 
         // Observation operator and data.
-	observation_tangent_linear_operator H_tilde;
-	observation_tangent_linear_operator H;
-	Vector<T> y;
+        observation_tangent_linear_operator H_tilde;
+        observation_tangent_linear_operator H;
+        Vector<T> y;
 
         observation_manager_.SetTime(model_, model_.GetTime());
 
@@ -409,13 +409,13 @@ namespace Verdandi
         }
 
         // Temporary variables.
-	Matrix<T, General, RowMajor> mtmp, mtmp_1;
+        Matrix<T, General, RowMajor> mtmp, mtmp_1;
         Vector<T> vtmp;
 
         /*** Computes the minimax gain 'G_' ***/
 
         // Computes $\widecheck F_0$.
-	Matrix<T, General, RowMajor> F_check(Nstate_, Nprojection_);
+        Matrix<T, General, RowMajor> F_check(Nstate_, Nprojection_);
         vtmp.Reallocate(Nprojection_);
         for (int i = 0; i < Nstate_; i++)
         {
@@ -425,7 +425,7 @@ namespace Verdandi
         }
 
         // Computes $\widecheck Q^{\frac 12}$.
-	model_state_error_variance Q_sqrt_check;
+        model_state_error_variance Q_sqrt_check;
         if (is_model_error_variance_diagonal_)
         {
             Q_sqrt_check.Reallocate(Nstate_, 1);
@@ -450,7 +450,7 @@ namespace Verdandi
 
         // Computes $(I_{q\times q} + \widecheck Q^{\frac T2} \widecheck
         // Q^{\frac 12})^{-1}$.
-	Matrix<T, General, RowMajor> IQtQinv(Nmode_Q_, Nmode_Q_);
+        Matrix<T, General, RowMajor> IQtQinv(Nmode_Q_, Nmode_Q_);
         IQtQinv.SetIdentity();
         MltAdd(T(1), SeldonTrans, Q_sqrt_check,
                SeldonNoTrans, Q_sqrt_check, T(1), IQtQinv);
@@ -521,17 +521,17 @@ namespace Verdandi
         model_.GetFullState(full_state);
 
         // Tangent linear model.
-	Matrix<T, General, RowMajor> M(Nstate_, Nprevious_projection_);
-	ComputeTangentLinearModel(M);
+        Matrix<T, General, RowMajor> M(Nstate_, Nprevious_projection_);
+        ComputeTangentLinearModel(M);
 
         // Temporary variables.
         Vector<T> vtmp, vtmp_1;
-	Matrix<T, General, RowMajor> mtmp, mtmp_1;
+        Matrix<T, General, RowMajor> mtmp, mtmp_1;
 
         /*** Model-related variables ***/
 
         // Computes $\widecheck M_t$.
-	Matrix<T, General, RowMajor> M_check = M;
+        Matrix<T, General, RowMajor> M_check = M;
         for (int i = 0; i < Nstate_; i++)
             for (int j = 0; j < Nprevious_projection_; j++)
                 M_check(i, j) *= D_tilde_inv_(i);
@@ -559,7 +559,7 @@ namespace Verdandi
         MessageHandler::Send(*this, "driver", "state_forecast");
 
         // Computes $\widecheck Q_t^{\frac 12}$.
-	Matrix<T, General, RowMajor> Q_sqrt_check = Q_sqrt;
+        Matrix<T, General, RowMajor> Q_sqrt_check = Q_sqrt;
         for (int i = 0; i < Nstate_; i++)
             for (int j = 0; j < Nmode_Q_; j++)
                 Q_sqrt_check(i, j) *= bound_over_standard_deviation_
@@ -567,7 +567,7 @@ namespace Verdandi
         Q_sqrt.Clear();
 
         // Computes $\widecheck F_{t+1}$.
-	Matrix<T, General, RowMajor> F_check(Nstate_, Nprojection_);
+        Matrix<T, General, RowMajor> F_check(Nstate_, Nprojection_);
         vtmp.Reallocate(Nprojection_);
         for (int i = 0; i < Nstate_; i++)
         {
@@ -577,19 +577,19 @@ namespace Verdandi
         }
 
         // Computes $\widecheck F_{t+1}^T \widecheck Q_t^{\frac 12}$.
-	Matrix<T, General, RowMajor> FtQ(Nprojection_, Nmode_Q_);
+        Matrix<T, General, RowMajor> FtQ(Nprojection_, Nmode_Q_);
         MltAdd(T(1), SeldonTrans, F_check,
                SeldonNoTrans, Q_sqrt_check, T(0), FtQ);
 
         // Computes $G_t + \widecheck M_t^T \widecheck M_t$.
-	Matrix<T, General, RowMajor> G_MtM(Nprevious_projection_,
+        Matrix<T, General, RowMajor> G_MtM(Nprevious_projection_,
                                            Nprevious_projection_);
         MltAdd(T(1), SeldonTrans, M_check,
                SeldonNoTrans, M_check, T(0), G_MtM);
         Add(T(1), G_, G_MtM);
 
         // Computes $\widecheck U_t$.
-	Matrix<T, General, RowMajor> U_check(Nstate_, Nprevious_projection_);
+        Matrix<T, General, RowMajor> U_check(Nstate_, Nprevious_projection_);
         mtmp = G_MtM;
         GetInverse(mtmp);
         GetCholesky(mtmp);
@@ -601,8 +601,8 @@ namespace Verdandi
                SeldonNoTrans, Q_sqrt_check, T(0), UtQ);
 
         // Computes $V_t$.
-	Matrix<T, General, RowMajor> IQtQinv;
-	Matrix<T, General, RowMajor> Vinv(Nmode_Q_, Nmode_Q_);
+        Matrix<T, General, RowMajor> IQtQinv;
+        Matrix<T, General, RowMajor> Vinv(Nmode_Q_, Nmode_Q_);
         Vinv.SetIdentity();
         MltAdd(T(1), SeldonTrans, Q_sqrt_check,
                SeldonNoTrans, Q_sqrt_check, T(1), Vinv);
@@ -619,9 +619,9 @@ namespace Verdandi
         /*** Observation-related variables ***/
 
         // Observation operator and data.
-	observation_tangent_linear_operator H_tilde;
-	observation_tangent_linear_operator H;
-	Vector<T> y;
+        observation_tangent_linear_operator H_tilde;
+        observation_tangent_linear_operator H;
+        Vector<T> y;
 
         observation_manager_.SetTime(model_, time);
 
@@ -663,7 +663,7 @@ namespace Verdandi
         G_.Reallocate(Nprojection_, Nprojection_);
         MltAdd(T(1), SeldonTrans, F_check, SeldonNoTrans, F_check, T(0), G_);
 
-	Matrix<T, General, RowMajor> FtU(Nprojection_, Nprevious_projection_);
+        Matrix<T, General, RowMajor> FtU(Nprojection_, Nprevious_projection_);
         MltAdd(T(1), SeldonTrans, F_check, SeldonNoTrans, U_check, T(0), FtU);
         MltAdd(T(-1), SeldonNoTrans, FtU, SeldonTrans, FtU, T(1), G_);
 
@@ -741,23 +741,23 @@ namespace Verdandi
     void ReducedMinimax<T, Model, ObservationManager>
     ::ComputeTangentLinearModel(Matrix<T, General, RowMajor>& M)
     {
-	Matrix<T, General, RowMajor> I(Nprevious_projection_,
+        Matrix<T, General, RowMajor> I(Nprevious_projection_,
                                        Nprevious_projection_);
-	Vector<T> pi(Nstate_);
-	Vector<T> Ei(Nprevious_projection_);
+        Vector<T> pi(Nstate_);
+        Vector<T> Ei(Nprevious_projection_);
 
-	for (int i = 0; i < Nprevious_projection_; i++)
-	{
+        for (int i = 0; i < Nprevious_projection_; i++)
+        {
             Ei.Zero();
             Ei(i) = T(1);
-	    // Takes the i-th vector from the basis, forming the projected
-	    // subspace these vectors are stored as rows of the matrix
-	    // 'projection_'.
-	    MltAdd(T(1), SeldonTrans, previous_projection_, Ei, T(0), pi);
-	    // Applies tangent linear model to the i-th vector from the basis.
+            // Takes the i-th vector from the basis, forming the projected
+            // subspace these vectors are stored as rows of the matrix
+            // 'projection_'.
+            MltAdd(T(1), SeldonTrans, previous_projection_, Ei, T(0), pi);
+            // Applies tangent linear model to the i-th vector from the basis.
             model_.ApplyTangentLinearOperator(pi);
-	    SetCol(pi, i, M);
-	}
+            SetCol(pi, i, M);
+        }
     }
 
 
@@ -773,8 +773,8 @@ namespace Verdandi
         model_.GetState(state);
 
         // Observation operator and data.
-	observation_tangent_linear_operator H_tilde;
-	Vector<T> y;
+        observation_tangent_linear_operator H_tilde;
+        Vector<T> y;
 
         observation_manager_.SetTime(model_, model_.GetTime());
 

@@ -467,8 +467,8 @@ namespace Verdandi
                                        displacement_gather_1_, MPI::DOUBLE);
 
             MltAdd(T(1), SeldonNoTrans,
-                   observation_manager_.GetErrorVarianceInverse(), SeldonTrans,
-                   HL_local_trans, T(0), working_matrix_or);
+                   observation_manager_.GetErrorVarianceInverse(),
+                   SeldonTrans, HL_local_trans, T(0), working_matrix_or);
             MltAdd(T(1), HL_global_trans, working_matrix_or, T(1), U_);
 
             Transpose(U_);

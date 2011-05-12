@@ -79,7 +79,8 @@ namespace Verdandi
 
         void Initialize(string configuration_file,
                         bool initialize_model = true);
-        void Initialize(VerdandiOps& configuration, bool initialize_model = true);
+        void Initialize(VerdandiOps& configuration,
+                        bool initialize_model = true);
         void InitializeStep();
         void Forward();
 

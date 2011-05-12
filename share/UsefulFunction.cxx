@@ -700,9 +700,9 @@ namespace Verdandi
     //! Adds a small matrix to a bigger one at a given position.
     /*!
       \param[in] c the value to multiply the matrix to insert with.
-	  \param[in] pi the row to place the matrix in.
-	  \param[in] pj the column to place the matrix in.
-	  \param[in] B the matrix to be inserted.
+      \param[in] pi the row to place the matrix in.
+      \param[in] pj the column to place the matrix in.
+      \param[in] B the matrix to be inserted.
       \param[out] A the matrix to be filled.
     */
     template <class T0,
@@ -725,23 +725,23 @@ namespace Verdandi
                                 to_str(A.GetN()) + " in matrix A is not"
                                 " enough to copy another "
                                 + to_str(B.GetN()) + " columns.");
-		for (int i = 0; i < B.GetM(); i++)
-			for (int j = i; j < B.GetN(); j++)
-				A.Val(pi + i, pj + j) += c * B.Val(i, j);
+        for (int i = 0; i < B.GetM(); i++)
+            for (int j = i; j < B.GetN(); j++)
+                A.Val(pi + i, pj + j) += c * B.Val(i, j);
     }
 
 
     //! Adds a small matrix to a bigger one at a given position.
     /*!
-	 \param[in] c the value to multiply the matrix to insert with.
-	 \param[in] pi the row to place the matrix in.
-	 \param[in] pj the column to place the matrix in.
-	 \param[in] B the matrix to be inserted.
-	 \param[out] A the matrix to be filled.
-	 */
+      \param[in] c the value to multiply the matrix to insert with.
+      \param[in] pi the row to place the matrix in.
+      \param[in] pj the column to place the matrix in.
+      \param[in] B the matrix to be inserted.
+      \param[out] A the matrix to be filled.
+    */
     template <class T0,
-	class T1, class Prop1, class Storage1, class Allocator1,
-	class T2, class Prop2, class Storage2, class Allocator2>
+              class T1, class Prop1, class Storage1, class Allocator1,
+              class T2, class Prop2, class Storage2, class Allocator2>
     void AddMatrixPosition(T0 c, int pi, int pj,
                            const Matrix<T1, Prop1, Storage1, Allocator1>& B,
                            Matrix<T2, Prop2, Storage2, Allocator2>& A)
@@ -760,9 +760,9 @@ namespace Verdandi
                                 " enough to copy another "
                                 + to_str(B.GetN()) + " columns.");
 
-		for (int i = 0; i < B.GetM(); i++)
-			for (int j = 0; j < B.GetN(); j++)
-				A.Val(pi + i, pj + j) += c * B.Val(i, j);
+        for (int i = 0; i < B.GetM(); i++)
+            for (int j = 0; j < B.GetN(); j++)
+                A.Val(pi + i, pj + j) += c * B.Val(i, j);
     }
 
 

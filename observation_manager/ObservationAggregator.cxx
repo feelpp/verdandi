@@ -612,7 +612,7 @@ namespace Verdandi
                 contribution(i) = Contribution(time - observation_time(i));
 
             Logger::Log<3>(*this, "Contribution: {" +
-                            to_str(contribution) + "}\n");
+                           to_str(contribution) + "}\n");
             return;
         }
 
@@ -629,7 +629,7 @@ namespace Verdandi
             }
 
             Logger::Log<3>(*this, "Contribution: {" +
-                            to_str(contribution) + "}\n");
+                           to_str(contribution) + "}\n");
             return;
         }
 

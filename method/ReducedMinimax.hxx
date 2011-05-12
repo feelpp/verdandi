@@ -150,9 +150,9 @@ namespace Verdandi
         //! Is the model error variance composed of its diagonal part only?
         bool is_model_error_variance_diagonal_;
         //! Diagonal part of the model error.
-	Vector<T> D_tilde_inv_;
+        Vector<T> D_tilde_inv_;
         //! Number of modes in the square root $\widetilde Q^{\frac 12}$.
-	int Nmode_Q_;
+        int Nmode_Q_;
         /*! \brief Form of the model error matrix Q: 0 = no model error, 1 =
           identity times a scalar. */
         int model_error_description_;
@@ -162,14 +162,14 @@ namespace Verdandi
         T bound_over_standard_deviation_;
 
         //! Systematic error in the initial condition.
-	Vector<T> e0_;
+        Vector<T> e0_;
         //! Systematic error.
-	Vector<T> e_;
+        Vector<T> e_;
 
         //! Observation error.
         Matrix<T, General, RowMajor> R_inv_;
         //! Systematic error in the observations.
-	T eta_;
+        T eta_;
 
         /*** Output saver ***/
 

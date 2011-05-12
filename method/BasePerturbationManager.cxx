@@ -78,7 +78,8 @@ namespace Verdandi
       \param[in] configuration_file configuration file.
     */
     template <class Derived>
-    void BasePerturbationManager<Derived>::Initialize(string configuration_file)
+    void BasePerturbationManager<Derived>
+    ::Initialize(string configuration_file)
     {
     }
 
@@ -183,8 +184,8 @@ namespace Verdandi
                                                         vector_i);
                     if (correlation.GetLength() != 0)
                     {
-                        Mlt(T1(sqrt(1. - correlation(i-1) * correlation(i-1))),
-                            vector_i);
+                        Mlt(T1(sqrt(1. - correlation(i-1)
+                                    * correlation(i-1))), vector_i);
                         Add(T1(correlation(i - 1)), first_vector, vector_i);
                     }
                 }
@@ -220,7 +221,8 @@ namespace Verdandi
                     Copy(first_vector, vector_i);
                 else
                 {
-                    static_cast<Derived*>(this)->LogNormal(variance, parameter,
+                    static_cast<Derived*>(this)->LogNormal(variance,
+                                                           parameter,
                                                            vector_i);
 
                     if (correlation.GetLength() != 0)

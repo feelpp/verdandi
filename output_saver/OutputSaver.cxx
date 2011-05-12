@@ -73,9 +73,9 @@ namespace Verdandi
 
     //! Initializes the output saver with a configuration.
     /*! Reads the configuration.
-      \param[in] configuration VerdandiOps instance with the configuration. The
-      prefix of \a configuration should already be set so that all entries are
-      accessible ("mode", "variable_list", "file", ...).
+      \param[in] configuration VerdandiOps instance with the configuration.
+      The prefix of \a configuration should already be set so that all entries
+      are accessible ("mode", "variable_list", "file", ...).
     */
     void OutputSaver::Initialize(VerdandiOps& configuration)
     {

@@ -44,7 +44,7 @@ namespace Verdandi
     ::HamiltonJacobiBellman():
         time_step_(0)
     {
-       
+
         /*** Initializations ***/
 
         MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
@@ -79,8 +79,8 @@ namespace Verdandi
     void HamiltonJacobiBellman<T, Model, ObservationManager>
     ::Initialize(string configuration_file)
     {
-      VerdandiOps configuration(configuration_file);
-      Initialize(configuration);
+        VerdandiOps configuration(configuration_file);
+        Initialize(configuration);
     }
 
 

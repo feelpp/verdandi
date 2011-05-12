@@ -76,7 +76,7 @@ namespace Verdandi
     template<class TD, class T>
     void
     VerdandiOps::Set(string name, string constraint,
-             const TD& default_value, T& value)
+                     const TD& default_value, T& value)
     {
         SetValue(name, constraint, default_value, true, value);
     }
@@ -182,10 +182,10 @@ namespace Verdandi
     */
     template<class T, class Allocator>
     void VerdandiOps::SetValue(string name, string constraint,
-                       const Seldon::Vector<T, VectFull, Allocator>&
-                       default_value,
-                       bool with_default,
-                       Seldon::Vector<T, VectFull, Allocator>& value)
+                               const Seldon::Vector<T, VectFull, Allocator>&
+                               default_value,
+                               bool with_default,
+                               Seldon::Vector<T, VectFull, Allocator>& value)
     {
         if (!this->Exists(name))
         {
@@ -242,11 +242,12 @@ namespace Verdandi
       \note The default value may not satisfy the constraint.
     */
     template<class T, class Allocator>
-    void VerdandiOps::SetValue(string name, string constraint,
-                       const vector<Seldon::Vector<T, VectFull, Allocator> >&
-                       default_value,
-                       bool with_default,
-                       vector<Seldon::Vector<T, VectFull, Allocator> >& value)
+    void VerdandiOps
+    ::SetValue(string name, string constraint,
+               const vector<Seldon::Vector<T, VectFull, Allocator> >&
+               default_value,
+               bool with_default,
+               vector<Seldon::Vector<T, VectFull, Allocator> >& value)
     {
         if (!this->Exists(name))
         {
@@ -334,11 +335,12 @@ namespace Verdandi
       \note The default value may not satisfy the constraint.
     */
     template<class T, class Prop, class Storage, class Allocator>
-    void VerdandiOps::SetValue(string name, string constraint,
-                       const Seldon::Matrix<T, Prop, Storage, Allocator>&
-                       default_value,
-                       bool with_default,
-                       Seldon::Matrix<T, Prop, Storage, Allocator>& value)
+    void VerdandiOps
+    ::SetValue(string name, string constraint,
+               const Seldon::Matrix<T, Prop, Storage, Allocator>&
+               default_value,
+               bool with_default,
+               Seldon::Matrix<T, Prop, Storage, Allocator>& value)
     {
         if (!this->Exists(name))
         {
@@ -424,13 +426,14 @@ namespace Verdandi
       \note The default value may not satisfy the constraint.
     */
     template<class T, class Prop, class Storage, class Allocator>
-    void VerdandiOps::SetValue(string name, string constraint,
-                       const
-                       vector<Seldon::Matrix<T, Prop, Storage, Allocator> >&
-                       default_value,
-                       bool with_default,
-                       vector<Seldon::Matrix<T, Prop, Storage, Allocator> >&
-                       value)
+    void VerdandiOps
+    ::SetValue(string name, string constraint,
+               const
+               vector<Seldon::Matrix<T, Prop, Storage, Allocator> >&
+               default_value,
+               bool with_default,
+               vector<Seldon::Matrix<T, Prop, Storage, Allocator> >&
+               value)
     {
         if (!this->Exists(name))
         {
@@ -516,7 +519,7 @@ namespace Verdandi
     */
     template<class T, class Allocator>
     bool VerdandiOps::IsParam(string name,
-                      Seldon::Vector<T, VectFull, Allocator>& value)
+                              Seldon::Vector<T, VectFull, Allocator>& value)
     {
         string str_value;
         std::vector<T> vect_value;
@@ -534,8 +537,9 @@ namespace Verdandi
       exception is raised.
     */
     template<class T, class Prop, class Storage, class Allocator>
-    bool VerdandiOps::IsParam(string name,
-                      Seldon::Matrix<T, Prop, Storage, Allocator>& value)
+    bool VerdandiOps
+    ::IsParam(string name,
+              Seldon::Matrix<T, Prop, Storage, Allocator>& value)
     {
         string str_value;
         std::vector<T> vect_value;

@@ -58,7 +58,7 @@ namespace Verdandi
     */
     template <class T>
     ClampedBar<T>::ClampedBar(string configuration_file):
-    time_(0.)
+        time_(0.)
     {
     }
 
