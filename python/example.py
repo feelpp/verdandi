@@ -37,9 +37,9 @@ configuration_file = "configuration/truth.lua"
 
 print "Configuration file:", configuration_file
 
-forward_driver = verdandi.Method(configuration_file)
+forward_driver = verdandi.Method()
 
-forward_driver.Initialize()
+forward_driver.Initialize(configuration_file)
 forward_driver.InitializeStep()
 
 model = forward_driver.GetModel()
@@ -75,10 +75,10 @@ configuration_file = "configuration/assimilation.lua"
 
 print "Configuration file", configuration_file
 
-oi = verdandi.Method1(configuration_file)
+oi = verdandi.Method1()
 model = oi.GetModel()
 
-oi.Initialize()
+oi.Initialize(configuration_file)
 
 # One step forward.
 oi.InitializeStep()
