@@ -205,6 +205,7 @@ namespace Verdandi
                                         ensemble, observation,
                                         weight, aggregated);
         }
+
         // After these steps.
         for (int t = Nspinup_; t < observation.GetLength(); t++)
         {
@@ -379,7 +380,7 @@ namespace Verdandi
                                     ensemble, observation, base_weight,
                                     aggregated);
 
-        int Ns = ensemble.GetLength(0);
+        int Ns = ensemble.GetLength();
 
         Vector<T> weight_vector(Ns);
         GetRow(base_weight, t, weight_vector);
@@ -462,8 +463,8 @@ namespace Verdandi
         this->Init(ensemble, observation);
         Vector2<T> aggregated = observation;
 
-        int Ns = ensemble.GetLength(0);
-        int Nt = ensemble.GetLength(1);
+        int Ns = ensemble.GetLength();
+        int Nt = ensemble.GetLength(0);
 
         Matrix<T> simulation_data;
         Vector<T> observation_data;

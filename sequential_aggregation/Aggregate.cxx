@@ -51,18 +51,24 @@ namespace Verdandi
                                 + " member(s) while there are "
                                 + to_str(weight.GetLength()) + " weight(s).");
 
-        aggregated.Reallocate(ensemble.GetShape(0));
+        int Nt = ensemble.GetLength(0);
+        aggregated.Reallocate(Nt);
 
+        int Nl;
         int t, l, s;
         T aggregated_value;
-        for (t = 0; t < aggregated.GetLength(); t++)
-            for (l = 0; l < aggregated.GetLength(t); l++)
+        for (t = 0; t < Nt; t++)
+        {
+            Nl = ensemble.GetLength(0, t);
+            aggregated(t).Reallocate(Nl);
+            for (l = 0; l < Nl; l++)
             {
                 aggregated_value = T(0);
                 for (s = 0; s < Ns; s++)
                     aggregated_value += ensemble(s, t, l) * weight(s);
                 aggregated(t, l) = aggregated_value;
             }
+        }
     }
 
 
@@ -107,19 +113,21 @@ namespace Verdandi
                                 + to_str(end) + "[ was provided.");
 
         Vector<int> shape(end - begin);
+
         for (int i = begin; i < end; i++)
-            shape(i) = ensemble.GetShape(0, i);
+            shape(i - begin) = ensemble(0, i).GetLength();
         aggregated.Reallocate(shape);
 
+        int Nl;
         int t, l, s;
         T aggregated_value;
         for (t = begin; t < end; t++)
-            for (l = 0; l < aggregated.GetLength(t); l++)
+            for (l = 0; l < aggregated.GetLength(t - begin); l++)
             {
                 aggregated_value = T(0);
                 for (s = 0; s < Ns; s++)
                     aggregated_value += ensemble(s, t, l) * weight(s);
-                aggregated(t, l) = aggregated_value;
+                aggregated(t - begin, l) = aggregated_value;
             }
     }
 
@@ -139,6 +147,8 @@ namespace Verdandi
     {
         int Ns = ensemble.GetLength();
 
+        int Nt = ensemble.GetLength(0);
+
         if (Ns == 0)
             throw ErrorArgument("Aggregate(const Vector3& ensemble, "
                                 "const Matrix<T>& weight, "
@@ -150,29 +160,34 @@ namespace Verdandi
                                 "Vector2& aggregated)",
                                 "The ensemble contains " + to_str(Ns)
                                 + " member(s) while there are "
-                                + to_str(weight.GetLength())
+                                + to_str(weight.GetN())
                                 + " weight(s) per time step.");
-        if (ensemble.GetLength(0) != weight.GetM())
+        if (Nt != weight.GetM())
             throw ErrorArgument("Aggregate(const Vector3& ensemble, "
                                 "const Matrix<T>& weight, "
                                 "Vector2& aggregated)",
                                 "The ensemble contains data for "
-                                + to_str(ensemble.GetLength(0))
+                                + to_str(Nt)
                                 + " time step(s) while there are weights for "
                                 + to_str(weight.GetM()) + " time step(s).");
 
-        aggregated.Reallocate(ensemble.GetShape(0));
+        aggregated.Reallocate(Nt);
 
+        int Nl;
         int t, l, s;
         T aggregated_value;
-        for (t = 0; t < aggregated.GetLength(); t++)
-            for (l = 0; l < aggregated.GetLength(t); l++)
+        for (t = 0; t < Nt; t++)
+        {
+            Nl = ensemble.GetLength(0, t);
+            aggregated(t).Reallocate(Nl);
+            for (l = 0; l < Nl; l++)
             {
                 aggregated_value = T(0);
-                for (s = 0; s < ensemble.GetNs(); s++)
+                for (s = 0; s < Ns; s++)
                     aggregated_value += ensemble(s, t, l) * weight(t, s);
                 aggregated(t, l) = aggregated_value;
             }
+        }
     }
 
 
