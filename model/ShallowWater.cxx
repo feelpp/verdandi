@@ -588,6 +588,7 @@ namespace Verdandi
     void ShallowWater<T>
     ::GetFullState(typename ShallowWater<T>::state& state) const
     {
+        state.Reallocate(2 * Nx_ * Ny_ + 2 * Nx_ + Ny_);
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
             {
