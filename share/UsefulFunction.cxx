@@ -479,22 +479,33 @@ namespace Verdandi
     template <class T, class Allocator>
     void GetCholesky(Matrix<T, General, RowSparse, Allocator>& A)
     {
-        Matrix<T, General, RowSymPacked, Allocator>
-            A_sympacked(A.GetM(), A.GetN());
-        for (int i = 0; i < A.GetM(); i++)
-            for (int j = i; j < A.GetN(); j++)
-                A_sympacked(i, j) = A(i, j);
+        int m = A.GetM();
+        int n = A.GetN();
 
-        GetCholesky(A_sympacked);
+        Matrix<T, General, ArrayRowSymSparse, Allocator> A_array_sym(m, n);
 
-        Matrix<T, General, ArrayRowSparse> A_array(A.GetM(), A.GetN());
-        for (int i = 0; i < A.GetM(); i++)
+        T* data = A.GetData();
+        int* ptr = A.GetPtr();
+        int* column = A.GetInd();
+
+        for (int i = 0; i < m; i++)
+            for (int j = ptr[i]; j < ptr[i + 1]; j++)
+                if (column[j] >= i)
+                    A_array_sym.AddInteraction(i, column[j], data[j]);
+
+        GetCholesky(A_array_sym);
+
+        Matrix<T, General, ArrayRowSparse> A_array(m, n);
+        for (int i = 0; i < m; i++)
             for (int j = 0; j <= i; j++)
-                A_array.AddInteraction(i, j, A_sympacked(i, j));
+                A_array.AddInteraction(i, j, A_array_sym(i, j));
 
+        for (int i = 0; i < n; i++)
+            A_array(i, i) = T(1) / A_array(i, i);
+
+        A.Clear();
         Copy(A_array, A);
     }
-
 
 
     //! Solves a sparse linear system using LU factorization.
