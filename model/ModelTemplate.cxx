@@ -189,6 +189,16 @@ namespace Verdandi
     }
 
 
+    //! Returns the size of the full state vector.
+    /*!
+      \return The size of the full state vector.
+    */
+    int ModelTemplate::GetNfull_state() const
+    {
+        throw ErrorUndefined("ModelTemplate::GetNfull_state()");
+    }
+
+
     //! Provides the state vector.
     /*!
       \param[out] state the reduced state vector.

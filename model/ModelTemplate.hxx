@@ -85,6 +85,7 @@ namespace Verdandi
         double GetTime() const;
         void SetTime(double time);
         int GetNstate() const;
+        int GetNfull_state() const;
         void GetState(state& state);
         void SetState(state& state);
         void GetStateLowerBound(state& lower_bound) const;

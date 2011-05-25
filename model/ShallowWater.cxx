@@ -542,6 +542,17 @@ namespace Verdandi
     }
 
 
+    //! Returns the size of the full state vector.
+    /*!
+      \return The size of the full state vector.
+    */
+    template <class T>
+    int ShallowWater<T>::GetNfull_state() const
+    {
+        return 2 * Nx_ * Ny_ + 2 * Nx_ + Ny_;
+    }
+
+
     //! Provides the reduced state vector.
     /*!
       \param[out] state the reduced state vector.

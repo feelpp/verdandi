@@ -219,6 +219,7 @@ namespace Verdandi
         int GetDeltaX() const;
         int GetDeltaY() const;
         int GetNstate() const;
+        int GetNfull_state() const;
         void GetState(state& state) const;
         void SetState(state& state);
         void GetFullState(state& state) const;
