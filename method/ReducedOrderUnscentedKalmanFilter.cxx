@@ -145,8 +145,8 @@ namespace Verdandi
         configuration.Set("data_assimilation.with_resampling",
                           with_resampling_);
         configuration.Set("data_assimilation.observation_error_variance",
-                          "ops_in(v, {'matrix', 'matrix_inverse', 'vector',"
-                          "'vector_inverse'})", observation_error_variance_);
+                          "ops_in(v, {'matrix', 'matrix_inverse'})",
+                          observation_error_variance_);
 
         /*** Sigma-points ***/
 
@@ -795,7 +795,7 @@ namespace Verdandi
                         Mlt(HL_trans,
                             observation_manager_.GetErrorVarianceInverse(),
                             working_matrix_po);
-                    else if (observation_error_variance_ == "matrix")
+                    else
                     {
                         observation_error_variance R_inv;
                         Copy(observation_manager_.GetErrorVariance(),
@@ -803,13 +803,6 @@ namespace Verdandi
                         GetInverse(R_inv);
                         Mlt(HL_trans, R_inv, working_matrix_po);
                     }
-                    else
-                        throw ErrorUndefined(
-                            "ReducedOrderUnscentedKalmanFilter::Analyse()",
-                            "The parameter observation_error_variance = "
-                            + observation_error_variance_ +
-                            " is not implemented yet. Only 'matrix' and "
-                            "'matrix_inverse' are implemented.");
 
                     U_inv_.SetIdentity();
                     MltAdd(T(1), SeldonNoTrans, working_matrix_po,
@@ -887,7 +880,7 @@ namespace Verdandi
                         Mlt(HL_trans,
                             observation_manager_.GetErrorVarianceInverse(),
                             working_matrix_po);
-                    else if (observation_error_variance_ == "matrix")
+                    else
                     {
                         observation_error_variance R_inv;
                         Copy(observation_manager_.GetErrorVariance(),
@@ -895,9 +888,7 @@ namespace Verdandi
                         GetInverse(R_inv);
                         Mlt(HL_trans, R_inv, working_matrix_po);
                     }
-                    else
-                        throw ErrorConfiguration(
-                            "ReducedOrderUnscentedKalmanFilter::Analyze()");
+
                     U_inv_.SetIdentity();
                     MltAdd(T(1), SeldonNoTrans, working_matrix_po,
                            SeldonTrans, HL_trans, T(1), U_inv_);
@@ -928,7 +919,7 @@ namespace Verdandi
                         Mlt(HL_local_trans,
                             observation_manager_.GetErrorVarianceInverse(),
                             working_matrix_po_local);
-                    else if (observation_error_variance_ == "matrix")
+                    else
                     {
                         observation_error_variance R_inv;
                         Copy(observation_manager_.GetErrorVariance(),
@@ -936,9 +927,6 @@ namespace Verdandi
                         GetInverse(R_inv);
                         Mlt(HL_local_trans, R_inv, working_matrix_po_local);
                     }
-                    else
-                        throw ErrorConfiguration(
-                            "ReducedOrderUnscentedKalmanFilter::Analyze()");
 
                     U_local.Fill(T(0));
                     for (int i = 0; i < Nlocal_filtered_column_; i++)
@@ -1044,20 +1032,13 @@ namespace Verdandi
             if (observation_error_variance_ == "matrix_inverse")
                 Mlt(HL_trans, observation_manager_.GetErrorVarianceInverse(),
                     working_matrix_po);
-            else if (observation_error_variance_ == "matrix")
+            else
             {
                 observation_error_variance R_inv;
                 Copy(observation_manager_.GetErrorVariance(), R_inv);
                 GetInverse(R_inv);
                 Mlt(HL_trans, R_inv, working_matrix_po);
             }
-            else
-                throw ErrorUndefined(
-                    "ReducedOrderUnscentedKalmanFilter::Analyse()",
-                    "The parameter observation_error_variance = "
-                    + observation_error_variance_ +
-                    " is not implemented yet. Only 'matrix' and "
-                    "'matrix_inverse' are implemented.");
 
             U_inv_.SetIdentity();
             MltAdd(T(1), SeldonNoTrans, working_matrix_po,
@@ -1133,19 +1114,12 @@ namespace Verdandi
             if (observation_error_variance_ == "matrix_inverse")
                 Mlt(Z_i_trans, observation_manager_.GetErrorVarianceInverse(),
                     working_matrix_ro);
-            else if (observation_error_variance_ == "matrix")
+            else
             {
                 Copy(observation_manager_.GetErrorVariance(), R_inv);
                 GetInverse(R_inv);
                 Mlt(Z_i_trans, R_inv, working_matrix_ro);
             }
-            else
-                throw ErrorUndefined(
-                    "ReducedOrderUnscentedKalmanFilter::Analyse()",
-                    "The parameter observation_error_variance = "
-                    + observation_error_variance_ +
-                    " is not implemented yet. Only 'matrix' and "
-                    "'matrix_inverse' are implemented.");
 
             // Computes D_m.
             MltAdd(T(1), SeldonNoTrans, working_matrix_ro, SeldonTrans,
@@ -1212,7 +1186,7 @@ namespace Verdandi
             if (observation_error_variance_ == "matrix_inverse")
                 Mlt(HL_trans, observation_manager_.GetErrorVarianceInverse(),
                     working_matrix_po);
-            else if (observation_error_variance_ == "matrix")
+            else
                 Mlt(HL_trans, R_inv, working_matrix_po);
             Mlt(U_inv_, working_matrix_po, working_matrix_po2);
             Mlt(L_, working_matrix_po2, K);

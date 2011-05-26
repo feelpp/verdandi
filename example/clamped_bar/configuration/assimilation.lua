@@ -160,8 +160,7 @@ reduced_order_unscented_kalman_filter = {
 
       analyze_first_step = false,
       with_resampling = false,
-      -- Indicates how R is stored: "matrix", "matrix_inverse", "vector",
-      -- "vector_inverse".
+      -- Indicates how R is stored: "matrix", "matrix_inverse".
       observation_error_variance = "matrix_inverse"
 
    },
