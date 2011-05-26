@@ -49,7 +49,7 @@ observation = {
    operator = {
 
       -- Is the operator a scaled identity matrix?
-      scaled_identity = true,
+      scaled_identity = false,
       -- If so, put the diagonal value:
       diagonal_value = 1.,
       -- Otherwise, the operator value (file name or table):
@@ -66,3 +66,14 @@ observation = {
    }
 
 }
+
+for i = 1, 100 do
+   for j = 1, 3 do
+     observation.operator.value[(i-1)*3 + j] = 0.
+   end
+end
+
+observation.operator.value[80] = 1.
+observation.operator.value[100 + 81] = 1.
+observation.operator.value[200 + 82] = 1.
+
