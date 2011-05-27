@@ -211,21 +211,12 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
-#ifdef VERDANDI_DENSE
-        model_.GetStateErrorVarianceSqrt(L_, U_);
+        model_state_error_variance L, U;
+        model_.GetStateErrorVarianceSqrt(L, U);
+        Copy(L, L_);
+        Copy(U, U_);
         Copy(U_, U_inv_);
         GetInverse(U_inv_);
-#else
-        model_state_error_variance L_sparse, U_sparse;
-        model_.GetStateErrorVarianceSqrt(L_sparse, U_sparse);
-        Matrix<T, General, ArrayRowSparse> L_array, U_array;
-        ConvertRowSparseToArrayRowSparse(L_sparse, L_array);
-        ConvertRowSparseToArrayRowSparse(U_sparse, U_array);
-        ConvertArrayRowSparseToDense(L_array, L_);
-        ConvertArrayRowSparseToDense(U_array, U_);
-        Copy(U_, U_inv_);
-        GetInverse(U_inv_);
-#endif
 
         Nreduced_ = U_.GetN();
 
@@ -794,21 +785,23 @@ namespace Verdandi
                 model_.GetState(x);
                 if (rank_ == 0)
                 {
-                    sigma_point_matrix HL(Nobservation_, Nreduced_);
-                    MltAdd(T(alpha_), SeldonTrans, Z_i_trans, SeldonNoTrans,
-                           I_trans_global_, T(0), HL);
-                    observation_error_variance R_inv;
+                    sigma_point_matrix HL_trans(Nreduced_, Nobservation_);
+                    MltAdd(T(alpha_), SeldonTrans, I_trans_global_,
+                           SeldonNoTrans, Z_i_trans, T(0), HL_trans);
                     sigma_point_matrix
                         working_matrix_po(Nreduced_, Nobservation_), tmp;
 
                     if (observation_error_variance_ == "matrix_inverse")
-                        Copy(observation_manager_.GetErrorVarianceInverse(),
-                             R_inv);
+                        Mlt(HL_trans,
+                            observation_manager_.GetErrorVarianceInverse(),
+                            working_matrix_po);
                     else if (observation_error_variance_ == "matrix")
                     {
+                        observation_error_variance R_inv;
                         Copy(observation_manager_.GetErrorVariance(),
                              R_inv);
                         GetInverse(R_inv);
+                        Mlt(HL_trans, R_inv, working_matrix_po);
                     }
                     else
                         throw ErrorUndefined(
@@ -817,17 +810,10 @@ namespace Verdandi
                             + observation_error_variance_ +
                             " is not implemented yet. Only 'matrix' and "
                             "'matrix_inverse' are implemented.");
-#ifdef VERDANDI_DENSE
-                    MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv,
-                           T(0), working_matrix_po);
-#else
-                    sigma_point_matrix R_inv_dense;
-                    ConvertRowSparseToDense(R_inv, R_inv_dense);
-                    MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv_dense,
-                           T(0), working_matrix_po);
-#endif
+
                     U_inv_.SetIdentity();
-                    MltAdd(T(1), working_matrix_po, HL, T(1), U_inv_);
+                    MltAdd(T(1), SeldonNoTrans, working_matrix_po,
+                           SeldonTrans, HL_trans, T(1), U_inv_);
                     GetInverse(U_inv_);
 
                     // Computes K;
@@ -882,49 +868,39 @@ namespace Verdandi
                     z_col.Nullify();
                 }
 
-                sigma_point_matrix HL_local(Nobservation_, Nreduced_),
-                    HL(Nobservation_, Nreduced_);
-                MltAdd(T(alpha_), SeldonTrans, Z_i_trans, SeldonNoTrans,
-                       I_trans_, T(0), HL_local);
+                sigma_point_matrix HL_local_trans(Nreduced_, Nobservation_),
+                    HL_trans(Nreduced_, Nobservation_);
+                MltAdd(T(alpha_), SeldonTrans, I_trans_, SeldonNoTrans,
+                       Z_i_trans, T(0), HL_local_trans);
 
-                MPI::COMM_WORLD.Allreduce(HL_local.GetData(), HL.GetData(),
-                                          HL.GetSize(), MPI::DOUBLE,
+                MPI::COMM_WORLD.Allreduce(HL_local_trans.GetData(),
+                                          HL_trans.GetData(),
+                                          HL_trans.GetSize(), MPI::DOUBLE,
                                           MPI::SUM);
 
-                observation_error_variance R_inv;
                 sigma_point_matrix
                     working_matrix_po(Nreduced_, Nobservation_), tmp;
-
-                if (observation_error_variance_ == "matrix_inverse")
-                    Copy(observation_manager_.GetErrorVarianceInverse(),
-                         R_inv);
-                else if (observation_error_variance_ == "matrix")
-                {
-                    Copy(observation_manager_.GetErrorVariance(), R_inv);
-                    GetInverse(R_inv);
-                }
-                else
-                    throw ErrorUndefined(
-                        "ReducedOrderUnscentedKalmanFilter::Analyse()",
-                        "The parameter observation_error_variance = "
-                        + observation_error_variance_ +
-                        " is not implemented yet. Only 'matrix' and "
-                        "'matrix_inverse' are implemented.");
-
                 sigma_point_matrix K;
                 if (algorithm_ == 1)
                 {
-#ifdef VERDANDI_DENSE
-                    MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv,
-                           T(0), working_matrix_po);
-#else
-                    sigma_point_matrix R_inv_dense;
-                    ConvertRowSparseToDense(R_inv, R_inv_dense);
-                    MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv_dense,
-                           T(0), working_matrix_po);
-#endif
+                    if (observation_error_variance_ == "matrix_inverse")
+                        Mlt(HL_trans,
+                            observation_manager_.GetErrorVarianceInverse(),
+                            working_matrix_po);
+                    else if (observation_error_variance_ == "matrix")
+                    {
+                        observation_error_variance R_inv;
+                        Copy(observation_manager_.GetErrorVariance(),
+                             R_inv);
+                        GetInverse(R_inv);
+                        Mlt(HL_trans, R_inv, working_matrix_po);
+                    }
+                    else
+                        throw ErrorConfiguration(
+                            "ReducedOrderUnscentedKalmanFilter::Analyze()");
                     U_inv_.SetIdentity();
-                    MltAdd(T(1), working_matrix_po, HL, T(1), U_inv_);
+                    MltAdd(T(1), SeldonNoTrans, working_matrix_po,
+                           SeldonTrans, HL_trans, T(1), U_inv_);
                     GetInverse(U_inv_);
 
                     // Computes K;
@@ -940,27 +916,36 @@ namespace Verdandi
                     sigma_point_matrix
                         U_local(Nlocal_filtered_column_, Nreduced_);
 
-                    HL_local.
-                        Reallocate(Nobservation_, Nlocal_filtered_column_);
+                    HL_local_trans.
+                        Reallocate(Nlocal_filtered_column_, Nobservation_);
                     for (int i = 0; i < Nlocal_filtered_column_; i++)
                     {
-                        GetCol(HL, local_filtered_column_(i), z_col);
-                        SetCol(z_col, i, HL_local);
+                        GetRow(HL_trans, local_filtered_column_(i), z_col);
+                        SetRow(z_col, i, HL_local_trans);
                     }
-#ifdef VERDANDI_DENSE
-                    MltAdd(T(1), SeldonTrans, HL_local, SeldonNoTrans, R_inv,
-                           T(0), working_matrix_po_local);
-#else
-                    sigma_point_matrix R_inv_dense;
-                    ConvertRowSparseToDense(R_inv, R_inv_dense);
-                    MltAdd(T(1), SeldonTrans, HL_local, SeldonNoTrans,
-                           R_inv_dense, T(0), working_matrix_po_local);
-#endif
+
+                    if (observation_error_variance_ == "matrix_inverse")
+                        Mlt(HL_local_trans,
+                            observation_manager_.GetErrorVarianceInverse(),
+                            working_matrix_po_local);
+                    else if (observation_error_variance_ == "matrix")
+                    {
+                        observation_error_variance R_inv;
+                        Copy(observation_manager_.GetErrorVariance(),
+                             R_inv);
+                        GetInverse(R_inv);
+                        Mlt(HL_local_trans, R_inv, working_matrix_po_local);
+                    }
+                    else
+                        throw ErrorConfiguration(
+                            "ReducedOrderUnscentedKalmanFilter::Analyze()");
+
                     U_local.Fill(T(0));
                     for (int i = 0; i < Nlocal_filtered_column_; i++)
                         U_local(i, local_filtered_column_(i)) = T(1);
 
-                    MltAdd(T(1), working_matrix_po_local, HL, T(1), U_local);
+                    MltAdd(T(1), SeldonNoTrans, working_matrix_po_local,
+                           SeldonTrans, HL_trans, T(1), U_local);
 
                     int displacement[Nprocess_],  recvcount[Nprocess_];
                     for (int i = 0; i < Nprocess_; i++)
@@ -1048,20 +1033,23 @@ namespace Verdandi
                 x_col.Nullify();
                 z_col.Nullify();
             }
-            sigma_point_matrix HL(Nobservation_, Nreduced_);
-            MltAdd(T(alpha_), SeldonTrans, Z_i_trans, SeldonNoTrans, I_trans_,
-                   T(0), HL);
+            sigma_point_matrix HL_trans(Nreduced_, Nobservation_);
+            MltAdd(T(alpha_), SeldonTrans, I_trans_, SeldonNoTrans, Z_i_trans,
+                   T(0), HL_trans);
 
             observation_error_variance R_inv;
             sigma_point_matrix working_matrix_po(Nreduced_, Nobservation_),
                 tmp;
 
             if (observation_error_variance_ == "matrix_inverse")
-                Copy(observation_manager_.GetErrorVarianceInverse(), R_inv);
+                Mlt(HL_trans, observation_manager_.GetErrorVarianceInverse(),
+                    working_matrix_po);
             else if (observation_error_variance_ == "matrix")
             {
+                observation_error_variance R_inv;
                 Copy(observation_manager_.GetErrorVariance(), R_inv);
                 GetInverse(R_inv);
+                Mlt(HL_trans, R_inv, working_matrix_po);
             }
             else
                 throw ErrorUndefined(
@@ -1070,17 +1058,10 @@ namespace Verdandi
                     + observation_error_variance_ +
                     " is not implemented yet. Only 'matrix' and "
                     "'matrix_inverse' are implemented.");
-#ifdef VERDANDI_DENSE
-            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv,
-                   T(0), working_matrix_po);
-#else
-            sigma_point_matrix R_inv_dense;
-            ConvertRowSparseToDense(R_inv, R_inv_dense);
-            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv_dense,
-                   T(0), working_matrix_po);
-#endif
+
             U_inv_.SetIdentity();
-            MltAdd(T(1), working_matrix_po, HL, T(1), U_inv_);
+            MltAdd(T(1), SeldonNoTrans, working_matrix_po,
+                   SeldonTrans, HL_trans, T(1), U_inv_);
             GetInverse(U_inv_);
 
             // Computes K;
@@ -1143,18 +1124,20 @@ namespace Verdandi
                 z_col.Nullify();
             }
 
-            observation_error_variance R_inv;
             sigma_point_matrix
                 working_matrix_ro(Nsigma_point_, Nobservation_),
                 D_m(Nsigma_point_, Nsigma_point_);
-            sigma_point_matrix HL;
+            sigma_point_matrix HL_trans;
 
+            observation_error_variance R_inv;
             if (observation_error_variance_ == "matrix_inverse")
-                Copy(observation_manager_.GetErrorVarianceInverse(), R_inv);
+                Mlt(Z_i_trans, observation_manager_.GetErrorVarianceInverse(),
+                    working_matrix_ro);
             else if (observation_error_variance_ == "matrix")
             {
                 Copy(observation_manager_.GetErrorVariance(), R_inv);
                 GetInverse(R_inv);
+                Mlt(Z_i_trans, R_inv, working_matrix_ro);
             }
             else
                 throw ErrorUndefined(
@@ -1165,7 +1148,6 @@ namespace Verdandi
                     "'matrix_inverse' are implemented.");
 
             // Computes D_m.
-            MltAdd(T(1), Z_i_trans, R_inv, T(0), working_matrix_ro);
             MltAdd(T(1), SeldonNoTrans, working_matrix_ro, SeldonTrans,
                    Z_i_trans, T(0), D_m);
 
@@ -1199,7 +1181,7 @@ namespace Verdandi
                 GetInverse(U_inv_);
 
                 // Computes {HL}_{n+1}.
-                HL.Reallocate(Nobservation_, Nreduced_);
+                HL_trans.Reallocate(Nreduced_, Nobservation_);
                 working_matrix_rr2.SetIdentity();
                 MltAdd(T(1), D_v_, working_matrix_rr, T(1),
                        working_matrix_rr2);
@@ -1208,14 +1190,14 @@ namespace Verdandi
                 Add(T(alpha_), D_m, working_matrix_rr);
                 GetInverse(working_matrix_rr);
 
-                MltAdd(T(1), working_matrix_rr, working_matrix_rr2, T(0),
-                       working_matrix_rr3);
+                Mlt(working_matrix_rr, working_matrix_rr2,
+                    working_matrix_rr3);
 
                 MltAdd(T(alpha_), working_matrix_rr3, I_trans_, T(0),
                        working_matrix_rp);
 
-                MltAdd(T(1), SeldonTrans, Z_i_trans, SeldonNoTrans,
-                       working_matrix_rp, T(0), HL);
+                MltAdd(T(1), SeldonTrans, working_matrix_rp, SeldonNoTrans,
+                       Z_i_trans, T(0), HL_trans);
             }
             else
                 throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
@@ -1228,19 +1210,13 @@ namespace Verdandi
                 working_matrix_po(Nreduced_, Nobservation_),
                 working_matrix_po2(Nreduced_, Nobservation_);
 
-#ifdef VERDANDI_DENSE
-            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv, T(0),
-                   working_matrix_po);
-            MltAdd(T(1), U_inv_, working_matrix_po, T(0), working_matrix_po2);
-            MltAdd(T(1), L_, working_matrix_po2, T(0), K);
-#else
-            sigma_point_matrix R_inv_dense;
-            ConvertRowSparseToDense(R_inv, R_inv_dense);
-            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv_dense, T(0),
-                   working_matrix_po);
-            MltAdd(T(1), U_inv_, working_matrix_po, T(0), working_matrix_po2);
-            MltAdd(T(1), L_, working_matrix_po2, T(0), K);
-#endif
+            if (observation_error_variance_ == "matrix_inverse")
+                Mlt(HL_trans, observation_manager_.GetErrorVarianceInverse(),
+                    working_matrix_po);
+            else if (observation_error_variance_ == "matrix")
+                Mlt(HL_trans, R_inv, working_matrix_po);
+            Mlt(U_inv_, working_matrix_po, working_matrix_po2);
+            Mlt(L_, working_matrix_po2, K);
 
             // Computes innovation.
             observation innovation;

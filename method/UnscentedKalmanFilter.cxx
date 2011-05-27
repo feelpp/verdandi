@@ -171,8 +171,7 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
-        background_error_variance_.
-            Copy(model_.GetStateErrorVariance());
+        Copy(model_.GetStateErrorVariance(), background_error_variance_);
 
         /*** Sigma-points ***/
 
@@ -228,17 +227,8 @@ namespace Verdandi
 
         // Computes of background error variance Cholesky factorization.
         model_state_error_variance background_error_variance_sqrt;
-#ifdef VERDANDI_DENSE
         Copy(background_error_variance_, background_error_variance_sqrt);
         GetCholesky(background_error_variance_sqrt);
-#else
-        Matrix<T> tmp_sqrt;
-        ConvertRowSparseToDense(background_error_variance_, tmp_sqrt);
-        GetCholesky(tmp_sqrt);
-        Matrix<T, General, ArrayRowSparse> tmp_sqrt_array;
-        ConvertDenseToArrayRowSparse(tmp_sqrt, tmp_sqrt_array);
-        Copy(tmp_sqrt_array, background_error_variance_sqrt);
-#endif
 
         // Computes X_n^{(i)+}.
         model_state x;
@@ -269,28 +259,15 @@ namespace Verdandi
             model_.SetState(x);
 
             // Computes P_{n + 1}^-.
-#ifdef VERDANDI_DENSE
-            background_error_variance_.Reallocate(Nstate_, Nstate_);
-            background_error_variance_.Fill(T(0));
-#else
-            Matrix<T, General, ArrayRowSparse> tmp_array(Nstate_, Nstate_);
-            Copy(tmp_array, background_error_variance_);
-#endif
             model_state_error_variance working_matrix(Nstate_, 1);
+            T alpha(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 Add(T(-1), x, x_i.GetVector(i));
-#ifdef VERDANDI_DENSE
                 SetCol(x_i.GetVector(i), 0, working_matrix);
-#else
-                model_state_error_variance_row
-                    error_covariance_column(Nstate_);
-                ConvertDenseToSparse(x_i.GetVector(i),
-                                     error_covariance_column);
-                SetCol(error_covariance_column, 0, working_matrix);
-#endif
                 MltAdd(T(1), SeldonNoTrans, working_matrix, SeldonTrans,
-                       working_matrix, T(1), background_error_variance_);
+                       working_matrix, alpha, background_error_variance_);
+                alpha = T(1);
             }
             Mlt(alpha_, background_error_variance_);
         }
@@ -308,29 +285,16 @@ namespace Verdandi
             model_.SetState(x);
 
             // Computes P_{n + 1}^-.
-#ifdef VERDANDI_DENSE
-            background_error_variance_.Reallocate(Nstate_, Nstate_);
-            background_error_variance_.Fill(T(0));
-#else
-            Matrix<T, General, ArrayRowSparse> tmp_array(Nstate_, Nstate_);
-            Copy(tmp_array, background_error_variance_);
-#endif
             model_state_error_variance working_matrix(Nstate_, 1);
+            T alpha(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 Add(T(-1), x, x_i.GetVector(i));
-#ifdef VERDANDI_DENSE
                 SetCol(x_i.GetVector(i), 0, working_matrix);
-#else
-                model_state_error_variance_row
-                    error_covariance_column(Nstate_);
-                ConvertDenseToSparse(x_i.GetVector(i),
-                                     error_covariance_column);
-                SetCol(error_covariance_column, 0, working_matrix);
-#endif
                 MltAdd(alpha_i_(i), SeldonNoTrans, working_matrix,
-                       SeldonTrans, working_matrix, T(1),
+                       SeldonTrans, working_matrix, alpha,
                        background_error_variance_);
+                alpha = T(1);
             }
         }
 
@@ -366,17 +330,8 @@ namespace Verdandi
 
         // Computes background error variance Cholesky factorization.
         model_state_error_variance background_error_variance_sqrt;
-#ifdef VERDANDI_DENSE
         Copy(background_error_variance_, background_error_variance_sqrt);
         GetCholesky(background_error_variance_sqrt);
-#else
-        Matrix<T> tmp_sqrt;
-        ConvertRowSparseToDense(background_error_variance_, tmp_sqrt);
-        GetCholesky(tmp_sqrt);
-        Matrix<T, General, ArrayRowSparse> tmp_sqrt_array;
-        ConvertDenseToArrayRowSparse(tmp_sqrt, tmp_sqrt_array);
-        Copy(tmp_sqrt_array, background_error_variance_sqrt);
-#endif
 
         // Computes X_{n + 1}^{(i)-}.
         model_state x;
@@ -422,62 +377,35 @@ namespace Verdandi
             Mlt(alpha_, x);
 
             // Computes P_XZ = cov(X_{n + 1}^*, Z_{n + 1}^*).
-            model_state_error_variance P_xz(Nstate_, Nobservation_);
-#ifdef VERDANDI_DENSE
-            P_xz.Fill(T(0));
-#else
-            Matrix<T, General, ArrayRowSparse> tmp_array(Nstate_, Nstate_);
-            Copy(tmp_array, P_xz);
-#endif
-            model_state_error_variance working_matrix_state(Nstate_, 1),
+            model_state_error_variance P_xz(Nstate_, Nobservation_),
+                working_matrix_state(Nstate_, 1),
                 working_matrix_observation(Nobservation_, 1);
+            T alpha(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 Add(T(-1), x, x_i.GetVector(i));
-#ifdef VERDANDI_DENSE
                 SetCol(x_i.GetVector(i), 0, working_matrix_state);
-#else
-                model_state_error_variance_row
-                    error_covariance_column(Nstate_);
-                ConvertDenseToSparse(x_i.GetVector(i),
-                                     error_covariance_column);
-                SetCol(error_covariance_column, 0, working_matrix_state);
-#endif
+
                 Add(T(-1), z, z_i.GetVector(i));
-#ifdef VERDANDI_DENSE
                 SetCol(z_i.GetVector(i), 0, working_matrix_observation);
-#else
-                model_state_error_variance_row
-                    error_covariance_column2(Nstate_);
-                ConvertDenseToSparse(z_i.GetVector(i),
-                                     error_covariance_column2);
-                SetCol(error_covariance_column2, 0,
-                       working_matrix_observation);
-#endif
+
                 MltAdd(T(1), SeldonNoTrans, working_matrix_state,
                        SeldonTrans, working_matrix_observation,
-                       T(1), P_xz);
+                       alpha, P_xz);
+                alpha = T(1);
             }
             Mlt(alpha_, P_xz);
 
             // Computes P_Z = cov(Z_{n + 1}^*, Z_{n + 1}^*).
             model_state_error_variance P_z(Nobservation_, Nobservation_);
-            P_z.Fill(T(0));
+            alpha = T(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-#ifdef VERDANDI_DENSE
                 SetCol(z_i.GetVector(i), 0, working_matrix_observation);
-#else
-                model_state_error_variance_row
-                    error_covariance_column(Nstate_);
-                ConvertDenseToSparse(z_i.GetVector(i),
-                                     error_covariance_column);
-                SetCol(error_covariance_column, 0,
-                       working_matrix_observation);
-#endif
                 MltAdd(T(1), SeldonNoTrans,
                        working_matrix_observation, SeldonTrans,
-                       working_matrix_observation, T(1), P_z);
+                       working_matrix_observation, alpha, P_z);
+                alpha = T(1);
             }
             Mlt(alpha_, P_z);
             Add(T(1), observation_manager_.GetErrorVariance(), P_z);
@@ -517,59 +445,32 @@ namespace Verdandi
 
             // Computes P_XZ = cov(X_{n + 1}^*, Z_{n + 1}^*).
             model_state_error_variance P_xz(Nstate_, Nobservation_);
-#ifdef VERDANDI_DENSE
-            P_xz.Fill(T(0));
-#else
-            Matrix<T, General, ArrayRowSparse> tmp_array(Nstate_, Nstate_);
-            Copy(tmp_array, P_xz);
-#endif
             model_state_error_variance working_matrix_state(Nstate_, 1),
                 working_matrix_observation(Nobservation_, 1);
+            T alpha(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 Add(T(-1), x, x_i.GetVector(i));
-#ifdef VERDANDI_DENSE
                 SetCol(x_i.GetVector(i), 0, working_matrix_state);
-#else
-                model_state_error_variance_row
-                    error_covariance_column(Nstate_);
-                ConvertDenseToSparse(x_i.GetVector(i),
-                                     error_covariance_column);
-                SetCol(error_covariance_column, 0, working_matrix_state);
-#endif
+
                 Add(T(-1), z, z_i.GetVector(i));
-#ifdef VERDANDI_DENSE
                 SetCol(z_i.GetVector(i), 0, working_matrix_observation);
-#else
-                model_state_error_variance_row
-                    error_covariance_column2(Nstate_);
-                ConvertDenseToSparse(z_i.GetVector(i),
-                                     error_covariance_column2);
-                SetCol(error_covariance_column2, 0,
-                       working_matrix_observation);
-#endif
+
                 MltAdd(alpha_i_(i), SeldonNoTrans, working_matrix_state,
-                       SeldonTrans, working_matrix_observation, T(1), P_xz);
+                       SeldonTrans, working_matrix_observation, alpha, P_xz);
+                alpha = T(1);
             }
 
             // Computes P_Z = cov(Z_{n + 1}^*, Z_{n + 1}^*).
             model_state_error_variance P_z(Nobservation_, Nobservation_);
-            P_z.Fill(T(0));
+            alpha = T(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-#ifdef VERDANDI_DENSE
                 SetCol(z_i.GetVector(i), 0, working_matrix_observation);
-#else
-                model_state_error_variance_row
-                    error_covariance_column(Nstate_);
-                ConvertDenseToSparse(z_i.GetVector(i),
-                                     error_covariance_column);
-                SetCol(error_covariance_column, 0,
-                       working_matrix_observation);
-#endif
                 MltAdd(alpha_i_(i), SeldonNoTrans,
                        working_matrix_observation, SeldonTrans,
-                       working_matrix_observation, T(1), P_z);
+                       working_matrix_observation, alpha, P_z);
+                alpha = T(1);
             }
             Add(T(1), observation_manager_.GetErrorVariance(), P_z);
 

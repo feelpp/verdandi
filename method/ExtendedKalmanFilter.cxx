@@ -118,7 +118,7 @@ namespace Verdandi
 
         Nobservation_  = observation_manager_.GetNobservation();
 
-        state_error_variance_.Copy(model_.GetStateErrorVariance());
+        Copy(model_.GetStateErrorVariance(), state_error_variance_);
 
 
         /***************************
@@ -264,20 +264,13 @@ namespace Verdandi
         model_.SetTime(time_);
 
         // One column of covariance matrix P.
-        model_state_error_variance_row error_covariance_column(Nstate_);
+        model_state error_covariance_column(Nstate_);
 
         for (int j = 0; j < Nstate_; j++)
         {
             GetCol(state_error_variance_, j,
                    error_covariance_column);
-#ifdef VERDANDI_DENSE
             model_.ApplyTangentLinearOperator(error_covariance_column);
-#else
-            model_state working_vector(Nstate_);
-            ConvertSparseToDense(error_covariance_column, working_vector);
-            model_.ApplyTangentLinearOperator(working_vector);
-            ConvertDenseToSparse(working_vector, error_covariance_column);
-#endif
             SetCol(error_covariance_column, j, state_error_variance_);
         }
 
@@ -286,14 +279,7 @@ namespace Verdandi
         for (int j = 0; j < Nstate_; j++)
         {
             GetCol(state_error_variance_, j, error_covariance_column);
-#ifdef VERDANDI_DENSE
             model_.ApplyTangentLinearOperator(error_covariance_column);
-#else
-            model_state working_vector(Nstate_);
-            ConvertSparseToDense(error_covariance_column, working_vector);
-            model_.ApplyTangentLinearOperator(working_vector);
-            ConvertDenseToSparse(working_vector, error_covariance_column);
-#endif
             SetCol(error_covariance_column, j, state_error_variance_);
         }
 

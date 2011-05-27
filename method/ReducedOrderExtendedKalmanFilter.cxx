@@ -181,18 +181,10 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
-        dense_matrix L, U;
-#ifdef VERDANDI_DENSE
+        model_state_error_variance L, U;
         model_.GetStateErrorVarianceSqrt(L, U);
-#else
-        model_state_error_variance L_sparse, U_sparse;
-        model_.GetStateErrorVarianceSqrt(L_sparse, U_sparse);
-        Matrix<T, General, ArrayRowSparse> L_array, U_array;
-        ConvertRowSparseToArrayRowSparse(L_sparse, L_array);
-        ConvertRowSparseToArrayRowSparse(U_sparse, U_array);
-        ConvertArrayRowSparseToDense(L_array, L);
-        ConvertArrayRowSparseToDense(U_array, U);
-#endif
+        Copy(L, L_);
+        Copy(U, U_);
         Nreduced_ = U.GetN();
 
         if (Nprocess_ > Nreduced_)
@@ -355,17 +347,10 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
-#ifdef VERDANDI_DENSE
-        model_.GetStateErrorVarianceSqrt(L_, U_);
-#else
-        model_state_error_variance L_sparse, U_sparse;
-        model_.GetStateErrorVarianceSqrt(L_sparse, U_sparse);
-        Matrix<T, General, ArrayRowSparse> L_array, U_array;
-        ConvertRowSparseToArrayRowSparse(L_sparse, L_array);
-        ConvertRowSparseToArrayRowSparse(U_sparse, U_array);
-        ConvertArrayRowSparseToDense(L_array, L_);
-        ConvertArrayRowSparseToDense(U_array, U_);
-#endif
+        model_state_error_variance L, U;
+        model_.GetStateErrorVarianceSqrt(L, U);
+        Copy(L, L_);
+        Copy(U, U_);
         Nreduced_ = U_.GetN();
 
         /*** Assimilation ***/
@@ -452,23 +437,23 @@ namespace Verdandi
 
             /*** Updated matrix U ***/
 
-            dense_matrix HL_local_trans(Nlocal_reduced_, Nobservation_),
+            dense_matrix HL_local_trans(Nobservation_, Nlocal_reduced_),
                 working_matrix_or(Nobservation_, Nlocal_reduced_),
                 HL_global_trans(Nreduced_, Nobservation_),
                 U_global(Nreduced_, Nreduced_);
-            MltAdd(T(1), SeldonTrans, L_, SeldonTrans,
-                   observation_manager_.GetTangentLinearOperator(),
-                   T(0), HL_local_trans);
 
+
+            Mlt(observation_manager_.GetTangentLinearOperator(), L_,
+                HL_local_trans);
+            Transpose(HL_local_trans);
             MPI::COMM_WORLD.Allgatherv(HL_local_trans.GetData(),
                                        Nlocal_reduced_ * Nobservation_,
                                        MPI::DOUBLE, HL_global_trans.GetData(),
                                        recvcount_gather_1_,
                                        displacement_gather_1_, MPI::DOUBLE);
-
-            MltAdd(T(1), SeldonNoTrans,
-                   observation_manager_.GetErrorVarianceInverse(),
-                   SeldonTrans, HL_local_trans, T(0), working_matrix_or);
+            Transpose(HL_local_trans);
+            Mlt(observation_manager_.GetErrorVarianceInverse(),
+                HL_local_trans, working_matrix_or);
             MltAdd(T(1), HL_global_trans, working_matrix_or, T(1), U_);
 
             Transpose(U_);
@@ -550,33 +535,22 @@ namespace Verdandi
 
             dense_matrix HL(Nobservation_, Nreduced_),
                 working_matrix_or(Nobservation_, Nreduced_);
-            MltAdd(T(1), observation_manager_.GetTangentLinearOperator(),
-                   L_, T(0), HL);
-            MltAdd(T(1), observation_manager_.GetErrorVarianceInverse(), HL,
-                   T(0), working_matrix_or);
-            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, working_matrix_or,
-                   T(1), U_);
+            Mlt(observation_manager_.GetTangentLinearOperator(), L_, HL);
+            Mlt(observation_manager_.GetErrorVarianceInverse(), HL,
+                working_matrix_or);
+            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans,
+                   working_matrix_or, T(1), U_);
 
             /*** Updated K ***/
 
             dense_matrix U_inv(U_),
-                working_matrix_ro(Nreduced_, Nobservation_),
                 working_matrix_ro2(Nreduced_, Nobservation_);
 
-#ifdef VERDANDI_DENSE
-            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans,
-                   observation_manager_.GetErrorVarianceInverse(),
-                   T(0), working_matrix_ro);
-#else
-            dense_matrix R_inv_dense;
-            ConvertRowSparseToDense(
-                observation_manager_.GetErrorVarianceInverse(), R_inv_dense);
-            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans, R_inv_dense,
-                   T(0), working_matrix_ro);
-#endif
-
+            Mlt(observation_manager_.GetErrorVarianceInverse(), HL,
+                working_matrix_or);
             model_state state_innovation(Nreduced_);
-            MltAdd(T(1), working_matrix_ro, y, T(0), state_innovation);
+            MltAdd(T(1), SeldonTrans, working_matrix_or, y, T(0),
+                   state_innovation);
 
             Vector<T> correction(Nreduced_);
             GetInverse(U_inv);

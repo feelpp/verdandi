@@ -83,10 +83,14 @@ namespace Verdandi
     void GetAndSolveLU(Matrix<T, Prop0, RowSparse, Allocator0>& M,
                        Vector<T, VectFull, Allocator1>& Y);
 
+    template <class T0, class Allocator0,
+              class T1, class Allocator1>
+    void Copy(const Matrix<T0, General, RowMajor, Allocator0>& A,
+        Matrix<T1, General, RowSymPacked, Allocator1>& B);
     template <class T, class Allocator>
-    void ConvertRowSparseToDense(
-        const Matrix<T, General, RowSparse, Allocator>& A,
-        Matrix<T, General, RowMajor, Allocator>& A_dense);
+    void Copy(const Matrix<T, General, RowSparse, Allocator>& A,
+              Matrix<T, General, RowMajor, Allocator>& A_dense);
+
     template <class T, class Allocator>
     void ConvertDenseToArrayRowSparse(
         const Matrix<T, General, RowMajor, Allocator>& A_dense,

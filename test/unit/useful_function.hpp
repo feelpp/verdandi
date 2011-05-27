@@ -87,7 +87,7 @@ public:
 
             Copy(A_array, A);
 
-            ConvertRowSparseToDense(A, A_dense);
+            Copy(A, A_dense);
 
             Vector<real> wr, wi;
             working_matrice.Copy(A_dense);

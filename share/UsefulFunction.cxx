@@ -487,11 +487,10 @@ namespace Verdandi
 
         GetCholesky(A_sympacked);
 
-        A.Clear();
         Matrix<T, General, ArrayRowSparse> A_array(A.GetM(), A.GetN());
         for (int i = 0; i < A.GetM(); i++)
             for (int j = 0; j <= i; j++)
-                A_array(i, j) = A_sympacked(i, j);
+                A_array.AddInteraction(i, j, A_sympacked(i, j));
 
         Copy(A_array, A);
     }
@@ -538,7 +537,7 @@ namespace Verdandi
     void GetInverse(Matrix<T, General, RowSparse, Allocator>& A)
     {
         Matrix<T, General, RowMajor, Allocator> A_dense;
-        ConvertRowSparseToDense(A, A_dense);
+        Copy(A, A_dense);
 
         GetInverse(A_dense);
 
@@ -549,15 +548,35 @@ namespace Verdandi
     }
 
 
+    //! Conversion from 'RowMajor' to 'RowSymPacked' format.
+    /*!
+      \param[in] A the 'RowMajor' matrix to be converted.
+      \param[out] B the matrix \a A  stored in the 'RowSymPacked' format.
+    */
+    template <class T0, class Allocator0,
+              class T1, class Allocator1>
+    void Copy(const Matrix<T0, General, RowMajor, Allocator0>& A,
+              Matrix<T1, General, RowSymPacked, Allocator1>& B)
+    {
+        int m = A.GetM();
+        int n = A.GetN();
+
+        B.Reallocate(m, n);
+
+        for (int i = 0; i < A.GetM(); i++)
+            for (int j = i; j < A.GetN(); j++)
+                B(i, j) = A(i, j);
+    }
+
+
     //! Conversion from 'RowSparse' to 'RowMajor' format.
     /*!
       \param[in] A the 'RowSparse' matrix to be converted.
       \param[out] A_dense the matrix \a A  stored in the 'RowMajor' format.
     */
     template <class T, class Allocator>
-    void ConvertRowSparseToDense(
-        const Matrix<T, General, RowSparse, Allocator>& A,
-        Matrix<T, General, RowMajor, Allocator>& A_dense)
+    void Copy(const Matrix<T, General, RowSparse, Allocator>& A,
+              Matrix<T, General, RowMajor, Allocator>& A_dense)
     {
         int m = A.GetM();
         int n = A.GetN();
