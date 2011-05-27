@@ -816,7 +816,7 @@ namespace Verdandi
                            SeldonTrans, HL_trans, T(1), U_inv_);
                     GetInverse(U_inv_);
 
-                    // Computes K;
+                    // Computes K.
                     sigma_point_matrix K(Nstate_, Nobservation_);
                     Copy(working_matrix_po, tmp);
                     MltAdd(T(1), U_inv_, working_matrix_po, T(0), tmp);
@@ -903,7 +903,7 @@ namespace Verdandi
                            SeldonTrans, HL_trans, T(1), U_inv_);
                     GetInverse(U_inv_);
 
-                    // Computes K;
+                    // Computes K.
                     K.Reallocate(Nstate_, Nobservation_);
                     Copy(working_matrix_po, tmp);
                     MltAdd(T(1), U_inv_, working_matrix_po, T(0), tmp);
@@ -1064,7 +1064,7 @@ namespace Verdandi
                    SeldonTrans, HL_trans, T(1), U_inv_);
             GetInverse(U_inv_);
 
-            // Computes K;
+            // Computes K.
             sigma_point_matrix K(Nstate_, Nobservation_);
 
             tmp.Reallocate(Nreduced_, Nobservation_);
@@ -1204,8 +1204,7 @@ namespace Verdandi
                                      "Analyse()", "Calculation not "
                                      "implemented for no constant alpha_i.");
 
-
-            // Computes K;
+            // Computes K.
             sigma_point_matrix K(Nstate_, Nobservation_),
                 working_matrix_po(Nreduced_, Nobservation_),
                 working_matrix_po2(Nreduced_, Nobservation_);
@@ -1226,7 +1225,6 @@ namespace Verdandi
             // Updates.
             MltAdd(T(1), K, innovation, T(1), x);
             model_.SetState(x);
-
 #endif
         }
 
