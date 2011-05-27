@@ -1,3 +1,33 @@
+Version 1.0 (2011-05-27)
+-----------
+
+* Methods
+
+- Improved the handling of the sparse and dense options in the methods:
+  EKF, UKF, ROEKF and ROUKF.
+
+* Observations
+
+* Example models
+
+- Added a new method 'Model::GetNfull_state()'.
+- Changed the default configuration for the shallow-water model example: the
+  observations are now localized at specific points instead of all grid
+  points.
+
+* Documentation
+
+- Initial import of the documentation for the perturbation manager.
+
+* Miscellaneous
+
+- Improved 'GetCholesky' in the sparse case: the 'RowSparse' matrix is no
+  longer converted to a dense matrix but to an 'ArrayRowSymSparse' matrix
+  before the decomposition.
+
+* Bug fixes
+
+
 Version 0.9 (2011-05-12)
 -----------
 
