@@ -129,6 +129,7 @@ namespace Verdandi
         configuration.SetPrefix("forward.output_saver.");
         output_saver_.Initialize(configuration);
         output_saver_.Empty("state_forecast");
+        configuration.SetPrefix("forward.");
 
         /*** Logger and read configuration ***/
 
