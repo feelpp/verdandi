@@ -87,7 +87,8 @@ namespace Verdandi
 
         configuration_stream.Set("seed_path", seed_path_);
         NEWRAN::Random::SetDirectory(seed_path_.c_str());
-        urng_ = new NEWRAN::LGM_mixed;
+        if(urng_ == NULL)
+            urng_ = new NEWRAN::LGM_mixed;
         NEWRAN::Random::Set(*urng_);
         if (!Lock(seed_path_ + "lock"))
             throw ErrorIO("NewranPerturbationManager::Initialize(string)",
