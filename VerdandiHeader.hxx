@@ -38,6 +38,62 @@ namespace Verdandi
 #include <cmath>
 
 
+//////////////////
+// DEBUG LEVELS //
+//////////////////
+
+
+#ifdef VERDANDI_DEBUG_LEVEL_4
+#ifndef VERDANDI_DEBUG_LEVEL_3
+#define VERDANDI_DEBUG_LEVEL_3
+#endif
+#define SELDON_DEBUG_LEVEL_4
+#endif
+
+#ifdef VERDANDI_DEBUG_LEVEL_3
+#ifndef VERDANDI_DEBUG_LEVEL_2
+#define VERDANDI_DEBUG_LEVEL_2
+#endif
+#define SELDON_DEBUG_LEVEL_3
+#endif
+
+#ifdef VERDANDI_DEBUG_LEVEL_2
+#ifndef VERDANDI_DEBUG_LEVEL_1
+#define VERDANDI_DEBUG_LEVEL_1
+#endif
+#ifndef VERDANDI_CHECK_DIMENSIONS
+#define VERDANDI_CHECK_DIMENSIONS
+#endif
+#define SELDON_DEBUG_LEVEL_2
+#endif
+
+#ifdef VERDANDI_DEBUG_LEVEL_1
+#ifndef VERDANDI_DEBUG_LEVEL_0
+#define VERDANDI_DEBUG_LEVEL_0
+#endif
+#define SELDON_DEBUG_LEVEL_1
+#ifndef VERDANDI_CHECK_IO
+#define VERDANDI_CHECK_IO
+#endif
+#endif
+
+#ifdef VERDANDI_DEBUG_LEVEL_0
+#define SELDON_DEBUG_LEVEL_0
+#ifndef VERDANDI_DEBUG_LEVEL_2
+#define VERDANDI_IS_ACTIVE false
+#endif
+#endif
+
+
+#ifdef VERDANDI_WITH_ABORT
+#define SELDON_WITH_ABORT
+#endif
+
+#ifndef VERDANDI_WITH_ABORT
+#define OPS_WITH_EXCEPTION
+#endif
+
+
 // Convenient macros to catch exceptions.
 #ifndef TRY
 #define TRY try {
@@ -83,13 +139,6 @@ namespace Verdandi
       }
 #endif
 
-#ifdef VERDANDI_WITH_ABORT
-#define SELDON_WITH_ABORT
-#endif
-
-#ifndef VERDANDI_WITH_ABORT
-#define OPS_WITH_EXCEPTION
-#endif
 
 #include "seldon/SeldonHeader.hxx"
 #include "seldon/vector/Vector2.hxx"

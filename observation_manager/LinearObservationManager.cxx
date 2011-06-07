@@ -229,10 +229,10 @@ namespace Verdandi
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
 
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
-            throw IOError("LinearObservationManager"
+            throw ErrorIO("LinearObservationManager"
                           "::Initialize(model, configuration_file)",
                           "Unable to open file \""
                           + observation_file_ + "\".");
@@ -1319,10 +1319,10 @@ namespace Verdandi
     {
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
-            throw IOError("LinearObservationManager"
+            throw ErrorIO("LinearObservationManager"
                           "::LoadObservation(model)",
                           "Unable to open file \""
                           + observation_file_ + "\".");
@@ -1359,10 +1359,10 @@ namespace Verdandi
     {
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
-            throw IOError("LinearObservationManager"
+            throw ErrorIO("LinearObservationManager"
                           "::LoadObservation(model)",
                           "Unable to open file \""
                           + observation_file_ + "\".");
@@ -1488,10 +1488,10 @@ namespace Verdandi
         ifstream file_stream;
         file_stream.open(width_file_.c_str());
         streampos position;
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
-            throw IOError("LinearObservationManager"
+            throw ErrorIO("LinearObservationManager"
                           "::ReadObservationTriangleWidth()",
                           "Unable to open file \""
                           + width_file_ + "\".");

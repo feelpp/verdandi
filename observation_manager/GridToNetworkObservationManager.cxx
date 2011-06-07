@@ -184,10 +184,10 @@ namespace Verdandi
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
 
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
-            throw IOError("GridToNetworkObservationManager"
+            throw ErrorIO("GridToNetworkObservationManager"
                           "::Initialize(model, configuration_file)",
                           "Unable to open file \""
                           + observation_file_ + "\".");
@@ -1185,10 +1185,10 @@ namespace Verdandi
         ifstream file_stream;
         file_stream.open(observation_file_.c_str());
 
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
-            throw IOError("GridToNetworkObservationManager" \
+            throw ErrorIO("GridToNetworkObservationManager" \
                           "::LoadObservation(model)",
                           string("Unable to open file \"")
                           + observation_file_ + "\".");

@@ -41,7 +41,7 @@ env_swig.Replace(SWIGFLAGS = ["-Wall", "-c++", "-python"])
 env_swig.Append(SWIGPATH = env_swig["CPPPATH"])
 env_swig.Replace(CCFLAGS = debug_flag("debug_cpp"))
 env_swig.Append(CPPFLAGS = ["-DSELDON_EXCLUDE_FROM_EXPLICIT_INSTANTIATION",
-                            "-DSELDON_DEBUG_LEVEL_4"])
+                            "-DVERDANDI_DEBUG_LEVEL_4"])
 env_swig.Append(CPPPATH = distutils.sysconfig.get_python_inc())
 env_swig.Replace(SHLIBPREFIX = "")
 

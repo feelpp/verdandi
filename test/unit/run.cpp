@@ -20,7 +20,7 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#define SELDON_DEBUG_LEVEL_4
+#define VERDANDI_DEBUG_LEVEL_4
 #define VERDANDI_WITH_ABORT
 
 #include "blue.hpp"

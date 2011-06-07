@@ -112,10 +112,10 @@ namespace Verdandi
             {
                 fstream file_stream;
                 file_stream.open(checkpoint_recording_file_.c_str());
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
                 // Checks if the file was opened.
                 if (!file_stream.is_open())
-                    throw IOError("TrajectoryManager<T, Model>"
+                    throw ErrorIO("TrajectoryManager<T, Model>"
                                   "::Save", "Unable to open file \""
                                   + checkpoint_recording_file_ + "\".");
 #endif
@@ -220,10 +220,10 @@ namespace Verdandi
         {
             ifstream file_stream;
             file_stream.open(checkpoint_recording_file_.c_str());
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
             // Checks if the file was opened.
             if (!file_stream.is_open())
-                throw IOError("TrajectoryManager<T, Model>"
+                throw ErrorIO("TrajectoryManager<T, Model>"
                               "::SetTime", "Unable to open file \""
                               + checkpoint_recording_file_ + "\".");
 #endif
@@ -258,10 +258,10 @@ namespace Verdandi
         {
             fstream file_stream;
             file_stream.open(loaded_trajectory_recording_file_.c_str());
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
             // Checks if the file was opened.
             if (!file_stream.is_open())
-                throw IOError("TrajectoryManager<T, Model>"
+                throw ErrorIO("TrajectoryManager<T, Model>"
                               "::SetTime", "Unable to open file \""
                               + loaded_trajectory_recording_file_ + "\".");
 #endif
@@ -303,10 +303,10 @@ namespace Verdandi
                                   "Nstate = 0");
         ifstream file_stream;
         file_stream.open(loaded_trajectory_recording_file_.c_str());
-#ifdef SELDON_CHECK_IO
+#ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
-            throw IOError("TrajectoryManager<T, Model>"
+            throw ErrorIO("TrajectoryManager<T, Model>"
                           "::GetState", "Unable to open file \""
                           + loaded_trajectory_recording_file_ + "\".");
 #endif
