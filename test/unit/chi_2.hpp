@@ -20,7 +20,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
-#define SELDON_WITH_CBLAS
+#define SELDON_WITH_BLAS
 #define SELDON_WITH_LAPACK
 #define SELDON_WITH_SUPERLU
 #include "Verdandi.hxx"
