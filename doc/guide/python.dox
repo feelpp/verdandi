@@ -59,11 +59,11 @@ $ ipython -pylab
 In  [1]: import seldon
 In  [2]: import verdandi
 
-In  [3]: method = verdandi.AssimilationMethod("configuration_file.cfg")
-In  [4]: method.Initialize("configuration_file.cfg")
+In  [3]: method = verdandi.Method()
+In  [4]: method.Initialize("configuration_file.lua")
 
 In  [5]: model = method.GetModel()
-In  [6]: model.GetDate()
+In  [6]: model.GetTime()
 Out [6]: 0
 \endprecode
 
@@ -71,16 +71,16 @@ Out [6]: 0
 
 \precode
 In  [7]: method.Forward()
-In  [8]: model.GetDate()
-Out [9]: 1
+In  [8]: model.GetTime()
+Out [9]: 0.0015
 In [10]: model.Forward()
-In [11]: model.GetDate()
-Out[12]: 2
+In [11]: model.GetTime()
+Out[12]: 0.0030
   
 In [13]: for i in range(1008):
    ....:      model.Forward()
-In [14]: model.GetDate()
-Out[14]: 1010
+In [14]: model.GetTime()
+Out[14]: 1.515
 \endprecode
 
 Here is an example of the computation of an analysis. You may want to check its effect by printing the state vector before and after the analysis:
@@ -90,12 +90,12 @@ In [15]: state_vector = seldon.VectorDouble()
 
 In [16]: model.GetState(state_vector)
 In [17]: state_vector.Print()
-1.0167881998005845468   1.0150381428637218484 ...
+0   0
 
 In [18]: method.Analyze()
 In [19]: model.GetState(state_vector)
 In [20]: state_vector.Print()
-1.0167882075200211922   1.0150381458769643928  ...
+0.0272727   0.0272727
 \endprecode
 
 Here is an example of the interactivity of the high-level interface: the first element of the state vector is set to an arbitrary value:
@@ -104,7 +104,7 @@ In [21]: state_vector[0] = 0
 In [22]: model.SetState(state_vector)
 In [23]: model.GetState(state_vector)
 In [24]: state_vector.Print()
-0  1.0150381458769643928  ...
+0  0.0272727
 \endprecode
 
 */
