@@ -45,6 +45,9 @@ namespace Verdandi
         //! Path to the Newran seed directory.
         string seed_path_;
 
+        //! Newran seed value.
+        double seed_value_;
+
     public:
 
         /*** Constructors and destructor ***/
