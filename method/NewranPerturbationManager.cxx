@@ -74,17 +74,26 @@ namespace Verdandi
     // METHODS //
     /////////////
 
-
     //! Initializes the manager.
     /*!
       \param[in] configuration_file configuration file.
     */
     void NewranPerturbationManager::Initialize(string configuration_file)
     {
+        VerdandiOps configuration(configuration_file);
+        Initialize(configuration);
+    }
+
+
+    //! Initializes the manager.
+    /*!
+      \param[in] configuration_stream configuration stream.
+    */
+    void NewranPerturbationManager::Initialize(VerdandiOps&
+                                               configuration_stream)
+    {
         if (urng_ == NULL)
             urng_ = new NEWRAN::LGM_mixed;
-
-        VerdandiOps configuration_stream(configuration_file);
 
         configuration_stream.SetPrefix("perturbation_manager.newran.");
 

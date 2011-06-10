@@ -83,6 +83,17 @@ namespace Verdandi
     void TRNGPerturbationManager::Initialize(string configuration_file)
     {
         VerdandiOps configuration_stream(configuration_file);
+        Initialize(configuration_stream);
+    }
+
+
+    //! Initializes the manager.
+    /*!
+      \param[in] configuration_stream configuration stream.
+    */
+    void TRNGPerturbationManager::Initialize(VerdandiOps&
+                                             configuration_stream)
+    {
         if(nrng_ == NULL)
             nrng_ = new trng::yarn5(time(NULL));
     }

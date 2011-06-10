@@ -56,6 +56,7 @@ namespace Verdandi
         /*** Methods ***/
 
         void Initialize(string configuration_file);
+        void Initialize(VerdandiOps& configuration_stream);
         void Finalize();
 
         double Normal(double mean, double variance,
