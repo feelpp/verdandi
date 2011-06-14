@@ -31,7 +31,7 @@ namespace Verdandi
 
 
     //! This class extends the Ops::Ops class with Verdandi-related features.
-    class VerdandiOps: public Ops::Ops
+    class VerdandiOps: public ::Ops::Ops
     {
     public:
         // Constructor and destructor.
@@ -59,7 +59,7 @@ namespace Verdandi
         bool Is(string name);
 
     protected:
-        using Ops::Ops::SetValue;
+        using ::Ops::Ops::SetValue;
         template<class T, class Allocator>
         void SetValue(string name, string constraint,
                       const Seldon::Vector<T, VectFull, Allocator>&
@@ -87,7 +87,7 @@ namespace Verdandi
                       vector<Seldon::Matrix<T, Prop, Storage, Allocator> >&
                       value);
 
-        using Ops::Ops::IsParam;
+        using ::Ops::Ops::IsParam;
         template<class T, class Allocator>
         bool IsParam(string name,
                      Seldon::Vector<T, VectFull, Allocator>& value);
@@ -95,7 +95,7 @@ namespace Verdandi
         bool IsParam(string name,
                      Seldon::Matrix<T, Prop, Storage, Allocator>& value);
 
-        using Ops::Ops::CheckConstraint;
+        using ::Ops::Ops::CheckConstraint;
         bool CheckConstraint(string expression);
     };
 
