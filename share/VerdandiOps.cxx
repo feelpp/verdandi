@@ -37,7 +37,7 @@ namespace Verdandi
     //! Default constructor.
     /*! Nothing is performed. The Lua state is set to NULL.
      */
-    VerdandiOps::VerdandiOps(): Ops::Ops()
+    VerdandiOps::VerdandiOps(): ::Ops::Ops()
     {
     }
 
@@ -47,7 +47,7 @@ namespace Verdandi
       raised during this evaluation.
       \param[in] file_path path to the configuration file.
     */
-    VerdandiOps::VerdandiOps(string file_path): Ops::Ops(file_path)
+    VerdandiOps::VerdandiOps(string file_path): ::Ops::Ops(file_path)
     {
     }
 
