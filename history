@@ -1,3 +1,22 @@
+Version 1.0.1 (2011-06-16)
+-------------
+
+* Documentation
+
+- Added a section in the documentation about the compilation of Verdandi for a
+  64-bit architecture under Windows.
+
+* Bug fixes
+
+- Fixed compilation problems with Visual C++ compiler related to 'Ops::Ops'.
+- 'ForwardDriver' ignored the configuration variables 'forward.output.log' and
+  'forward.output.configuration'.
+- Added "python" in the library list so that it may be linked when the SWIG
+  interface is built. This is necessary under MacOS.
+- The random number generators were allocated twice, which led to minor memory
+  leaks.
+
+
 Version 1.0 (2011-05-27)
 -----------
 
