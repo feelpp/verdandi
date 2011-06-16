@@ -1,7 +1,7 @@
-Verdandi 1.0+
+Verdandi 1.0.1
 
 Required dependencies:
-    - Seldon 5.1.1-verdandi
+    - Seldon 5.1.2-verdandi
     - Ops 1.0
     - Lua 5.1
 
