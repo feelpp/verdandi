@@ -209,8 +209,8 @@ namespace Verdandi
             Vector<T1, VectFull, Allocator1> first_vector;
             first_vector.SetData(N, &perturbation(0));
 
-            static_cast<Derived*>(this)->LogNormal(variance,
-                                                   parameter, first_vector);
+            static_cast<Derived*>(this)->Normal(variance,
+                                                parameter, first_vector);
 
             for (int i = 1; i < Nvector; i++)
             {
@@ -221,9 +221,9 @@ namespace Verdandi
                     Copy(first_vector, vector_i);
                 else
                 {
-                    static_cast<Derived*>(this)->LogNormal(variance,
-                                                           parameter,
-                                                           vector_i);
+                    static_cast<Derived*>(this)->Normal(variance,
+                                                        parameter,
+                                                        vector_i);
 
                     if (correlation.GetLength() != 0)
                     {
@@ -379,9 +379,9 @@ namespace Verdandi
             }
 
             static_cast<Derived*>(this)->
-                LogNormal(variance,
-                          parameter,
-                          perturbation.GetVector(0));
+                Normal(variance,
+                       parameter,
+                       perturbation.GetVector(0));
 
             for (int i = 1; i < Nvector; i++)
             {
