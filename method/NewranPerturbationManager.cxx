@@ -239,6 +239,18 @@ namespace Verdandi
 
         Vector<T1, VectFull, Allocator0> sample(output.GetSize());
 
+        int m = variance.GetM();
+        Vector<T0, VectFull> diagonal(m);
+        for (int i = 0; i < m; i++)
+            diagonal(i) = sqrt(variance(i, i));
+
+        GetCholesky(variance);
+        Matrix<T1, General, RowMajor> standard_deviation(m, m);
+        standard_deviation.Zero();
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j <= i; j++)
+                standard_deviation(i, j) = variance(i, j);
+
         bool satisfy_constraint = false;
         while(!satisfy_constraint)
         {
@@ -253,18 +265,6 @@ namespace Verdandi
                         value = N.Next();
                 sample(i) = value;
             }
-
-            int m = variance.GetM();
-            Vector<T0, VectFull> diagonal(m);
-            for (int i = 0; i < m; i++)
-                diagonal(i) = sqrt(variance(i, i));
-
-            GetCholesky(variance);
-            Matrix<T1, General, RowMajor> standard_deviation(m, m);
-            standard_deviation.Zero();
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j <= i; j++)
-                    standard_deviation(i, j) = variance(i, j);
 
             MltAdd(T0(1), standard_deviation, sample, T1(1), output);
 
