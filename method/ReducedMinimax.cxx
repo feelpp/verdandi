@@ -262,12 +262,6 @@ namespace Verdandi
 
         if (mode_ == 1 && inner_iteration_ == 0)
         {
-            if (reduction_method_ != "none")
-            {
-                model_.SetFullState(full_state_);
-                model_.SetTime(starting_time_);
-            }
-
             if (show_time_ || show_iteration_)
                 Logger::StdOut(*this, "Starting filtering sequence");
             else
@@ -927,6 +921,12 @@ namespace Verdandi
             inner_iteration_ = 0;
             mode_ = 1;
             iteration_ -= Nstep_snapshot_ - 1;
+
+            if (reduction_method_ != "none")
+            {
+                model_.SetFullState(full_state_);
+                model_.SetTime(starting_time_);
+            }
         }
     }
 
