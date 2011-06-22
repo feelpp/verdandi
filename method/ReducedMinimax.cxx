@@ -952,6 +952,18 @@ namespace Verdandi
     ////////////////////
 
 
+    //! Returns the current mode (snapshot recording or minimax calculations).
+    /*!
+      \return The mode: 0 for snapshot recording and 1 for minimax
+      calculations.
+    */
+    template <class T, class Model, class ObservationManager>
+    int ReducedMinimax<T, Model, ObservationManager>::GetMode() const
+    {
+        return mode_;
+    }
+
+
     //! Returns the current projection matrix.
     /*!
       \return The current projection matrix.

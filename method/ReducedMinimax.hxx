@@ -208,6 +208,7 @@ namespace Verdandi
         bool HasFinished() const;
 
         // Access methods.
+        int GetMode() const;
         Matrix<T, General, RowMajor>& GetProjection();
         Matrix<T, General, RowMajor>& GetPreviousProjection();
         const Model& GetModel() const;
