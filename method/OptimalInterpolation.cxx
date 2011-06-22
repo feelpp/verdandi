@@ -429,6 +429,18 @@ namespace Verdandi
     }
 
 
+    //! Returns the output saver.
+    /*!
+      \return The output saver.
+    */
+    template <class T, class Model, class ObservationManager>
+    OutputSaver&
+    OptimalInterpolation<T, Model, ObservationManager>::GetOutputSaver()
+    {
+        return output_saver_;
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.

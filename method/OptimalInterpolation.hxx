@@ -126,6 +126,7 @@ namespace Verdandi
 
         // Access methods.
         const Model& GetModel() const;
+        OutputSaver& GetOutputSaver();
 
         string GetName() const;
         void Message(string message);

@@ -91,6 +91,7 @@ namespace Verdandi
         const Model& GetModel() const;
 #endif
         Model& GetModel();
+        OutputSaver& GetOutputSaver();
         string GetName() const;
         void Message(string message);
     };

@@ -212,6 +212,7 @@ namespace Verdandi
         Matrix<T, General, RowMajor>& GetPreviousProjection();
         const Model& GetModel() const;
         const ObservationManager& GetObservationManager() const;
+        OutputSaver& GetOutputSaver();
 
         string GetName() const;
         void Message(string message);

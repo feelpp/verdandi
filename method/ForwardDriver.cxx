@@ -228,6 +228,18 @@ namespace Verdandi
     }
 
 
+    //! Returns the output saver.
+    /*!
+      \return The output saver.
+    */
+    template <class Model>
+    OutputSaver&
+    ForwardDriver<Model>::GetOutputSaver()
+    {
+        return output_saver_;
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.
