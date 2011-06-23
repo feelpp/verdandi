@@ -195,11 +195,14 @@ namespace Verdandi
         output_saver_.Empty("projected_state");
         output_saver_.Empty("projection");
         output_saver_.Empty("minimax_gain");
+        output_saver_.Empty("minimax_gain_model_part");
         output_saver_.Empty("snapshot");
         output_saver_.Empty("singular_value");
         output_saver_.Empty("left_singular_vector");
         output_saver_.Empty("right_singular_vector");
         output_saver_.Empty("model_error_variance_sqrt");
+        output_saver_.Empty("reduced_tangent_linear_model");
+        output_saver_.Empty("reduced_tangent_linear_observation_operator");
 
         /*** Logger and read configuration ***/
 
@@ -376,7 +379,7 @@ namespace Verdandi
                    T(0), state);
             model_.SetState(state);
 
-            output_saver_.Save(projection_, "projection");
+            output_saver_.Save(projection_,  model_.GetTime(), "projection");
 
             MessageHandler::Send(*this, "model", "state_forecast");
             MessageHandler::Send(*this, "driver", "state_forecast");
@@ -407,6 +410,8 @@ namespace Verdandi
             H.Reallocate(Nobservation_, Nprojection_);
             MltAdd(T(1), SeldonNoTrans, H_tilde, SeldonTrans, projection_,
                    T(0), H);
+            output_saver_.Save(H, model_.GetTime(),
+                               "reduced_tangent_linear_observation_operator");
             R_inv_ = observation_manager_.GetErrorVariance();
             GetInverse(R_inv_);
             Mlt(1. / (bound_over_standard_deviation_
@@ -421,6 +426,8 @@ namespace Verdandi
             Nobservation_ = 1;
             H.Reallocate(1, Nprojection_);
             H.Zero();
+            output_saver_.Save(H, model_.GetTime(),
+                               "reduced_tangent_linear_observation_operator");
             R_inv_.Reallocate(1, 1);
             R_inv_(0, 0) = T(1);
         }
@@ -484,6 +491,7 @@ namespace Verdandi
         // Adds $H_0^T R_0^{-1} H_0$ to 'G_'.
         Matrix<T, General, RowMajor> Ht_Rinv(Nprojection_, Nobservation_);
         MltAdd(T(1), SeldonTrans, H, SeldonNoTrans, R_inv_, T(0), Ht_Rinv);
+        output_saver_.Save(G_, model_.GetTime(), "minimax_gain_model_part");
         MltAdd(T(1), Ht_Rinv, H, T(1), G_);
 
         /*** Computes the minimax estimator ***/
@@ -520,7 +528,7 @@ namespace Verdandi
         model_.SetState(vtmp);
 
         output_saver_.Save(G_, model_.GetTime(), "minimax_gain");
-        output_saver_.Save(projection_, "projection");
+        output_saver_.Save(projection_,  model_.GetTime(), "projection");
 
         MessageHandler::Send(*this, "all", "::FilterInitialization end");
     }
@@ -546,7 +554,7 @@ namespace Verdandi
                    T(0), state);
             model_.SetState(state);
 
-            output_saver_.Save(projection_, "projection");
+            output_saver_.Save(projection_, model_.GetTime(), "projection");
 
             inner_iteration_++;
             if (reduction_method_ != "none"
@@ -571,6 +579,8 @@ namespace Verdandi
         // Tangent linear model.
         Matrix<T, General, RowMajor> M(Nstate_, Nprevious_projection_);
         ComputeTangentLinearModel(M);
+
+        output_saver_.Save(M, time, "reduced_tangent_linear_model");
 
         // Temporary variables.
         Vector<T> vtmp, vtmp_1;
@@ -683,6 +693,8 @@ namespace Verdandi
             H.Reallocate(Nobservation_, Nprojection_);
             MltAdd(T(1), SeldonNoTrans, H_tilde, SeldonTrans, projection_,
                    T(0), H);
+            output_saver_.Save(H, model_.GetTime(),
+                               "reduced_tangent_linear_observation_operator");
             R_inv_ = observation_manager_.GetErrorVariance();
             GetInverse(R_inv_);
             Mlt(1. / (bound_over_standard_deviation_
@@ -697,6 +709,8 @@ namespace Verdandi
             Nobservation_ = 1;
             H.Reallocate(1, Nprojection_);
             H.Zero();
+            output_saver_.Save(H, model_.GetTime(),
+                               "reduced_tangent_linear_observation_operator");
             R_inv_.Reallocate(1, 1);
             R_inv_(0, 0) = T(1);
         }
@@ -722,6 +736,7 @@ namespace Verdandi
         MltAdd(T(-1), SeldonNoTrans, FtQ_FtUUtQ_Vinv, SeldonTrans, mtmp_1,
                T(1), G_);
 
+        output_saver_.Save(G_, model_.GetTime(), "minimax_gain_model_part");
         MltAdd(T(1), Ht_Rinv, H, T(1), G_);
 
         /*** Computes minimax state estimation ***/
@@ -775,7 +790,7 @@ namespace Verdandi
         }
 
         output_saver_.Save(G_, model_.GetTime(), "minimax_gain");
-        output_saver_.Save(projection_, "projection");
+        output_saver_.Save(projection_, model_.GetTime(), "projection");
 
         MessageHandler::Send(*this, "all", "::Propagation end");
     }
