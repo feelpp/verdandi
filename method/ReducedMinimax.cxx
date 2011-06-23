@@ -671,7 +671,7 @@ namespace Verdandi
         observation_tangent_linear_operator H;
         Vector<T> y;
 
-        observation_manager_.SetTime(model_, time);
+        observation_manager_.SetTime(model_, model_.GetTime());
 
         if (observation_manager_.HasObservation())
         {
