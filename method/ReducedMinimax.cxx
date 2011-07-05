@@ -202,6 +202,7 @@ namespace Verdandi
         output_saver_.Empty("right_singular_vector");
         output_saver_.Empty("model_error_variance_sqrt");
         output_saver_.Empty("reduced_tangent_linear_model");
+        output_saver_.Empty("observation");
         output_saver_.Empty("reduced_tangent_linear_observation_operator");
 
         /*** Logger and read configuration ***/
@@ -410,8 +411,6 @@ namespace Verdandi
             H.Reallocate(Nobservation_, Nprojection_);
             MltAdd(T(1), SeldonNoTrans, H_tilde, SeldonTrans, projection_,
                    T(0), H);
-            output_saver_.Save(H, model_.GetTime(),
-                               "reduced_tangent_linear_observation_operator");
             R_inv_ = observation_manager_.GetErrorVariance();
             GetInverse(R_inv_);
             Mlt(1. / (bound_over_standard_deviation_
@@ -426,11 +425,13 @@ namespace Verdandi
             Nobservation_ = 1;
             H.Reallocate(1, Nprojection_);
             H.Zero();
-            output_saver_.Save(H, model_.GetTime(),
-                               "reduced_tangent_linear_observation_operator");
             R_inv_.Reallocate(1, 1);
             R_inv_(0, 0) = T(1);
         }
+
+        output_saver_.Save(y, model_.GetTime(), "observation");
+        output_saver_.Save(H, model_.GetTime(),
+                           "reduced_tangent_linear_observation_operator");
 
         // Temporary variables.
         Matrix<T, General, RowMajor> mtmp, mtmp_1;
@@ -693,8 +694,6 @@ namespace Verdandi
             H.Reallocate(Nobservation_, Nprojection_);
             MltAdd(T(1), SeldonNoTrans, H_tilde, SeldonTrans, projection_,
                    T(0), H);
-            output_saver_.Save(H, model_.GetTime(),
-                               "reduced_tangent_linear_observation_operator");
             R_inv_ = observation_manager_.GetErrorVariance();
             GetInverse(R_inv_);
             Mlt(1. / (bound_over_standard_deviation_
@@ -709,11 +708,13 @@ namespace Verdandi
             Nobservation_ = 1;
             H.Reallocate(1, Nprojection_);
             H.Zero();
-            output_saver_.Save(H, model_.GetTime(),
-                               "reduced_tangent_linear_observation_operator");
             R_inv_.Reallocate(1, 1);
             R_inv_(0, 0) = T(1);
         }
+
+        output_saver_.Save(y, model_.GetTime(), "observation");
+        output_saver_.Save(H, model_.GetTime(),
+                           "reduced_tangent_linear_observation_operator");
 
         // Computes $H_{t+1}^T R_{t+1}^{-1} H_{t+1}$.
         Matrix<T, General, RowMajor> Ht_Rinv(Nprojection_, Nobservation_);
