@@ -355,7 +355,7 @@ namespace Verdandi
         T1 value;
         value = LogNormal(T0(0), variance, parameter);
         for (int i = 0; i < output.GetLength(); i++)
-            output(i) += value;
+            output(i) *= value;
     }
 
 
