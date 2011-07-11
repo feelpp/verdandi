@@ -162,11 +162,8 @@ namespace Verdandi
 
         else if (pdf == "Normal")
         {
-            Vector<T1, VectFull, Allocator1> perturbation(output.GetLength());
-            perturbation.Fill(T1(0));
-
             Vector<T1, VectFull, Allocator1> first_vector;
-            first_vector.SetData(N, &perturbation(0));
+            first_vector.SetData(N, &output(0));
 
             static_cast<Derived*>(this)->Normal(variance,
                                                 parameter, first_vector);
@@ -174,7 +171,7 @@ namespace Verdandi
             for (int i = 1; i < Nvector; i++)
             {
                 Vector<T1, VectFull, Allocator1> vector_i;
-                vector_i.SetData(N, &perturbation(i * N));
+                vector_i.SetData(N, &output(i * N));
 
                 if (correlation.GetLength() != 0 && correlation(i - 1) == 1.)
                     Copy(first_vector, vector_i);
@@ -189,12 +186,9 @@ namespace Verdandi
                         Add(T1(correlation(i - 1)), first_vector, vector_i);
                     }
                 }
-
                 vector_i.Nullify();
             }
             first_vector.Nullify();
-
-            Add(T1(1), perturbation, output);
         }
 
         else if (Nvector == 1 && pdf == "LogNormal")
@@ -232,7 +226,6 @@ namespace Verdandi
                         Add(T1(correlation(i - 1)), first_vector, vector_i);
                     }
                 }
-
                 vector_i.Nullify();
             }
             first_vector.Nullify();
@@ -317,46 +310,33 @@ namespace Verdandi
 
         else if (pdf == "Normal")
         {
-            Vector<T1, Collection, Allocator1> perturbation(Nvector);
-            T1* tmp;
-            for (int i = 0; i < Nvector; i++)
-            {
-                tmp = new T1(N);
-                tmp->Fill(typename T1::value_type(0));
-                perturbation.SetVector(i, *tmp);
-                tmp->Nullify();
-                delete tmp;
-            }
 
             static_cast<Derived*>(this)->Normal(variance, parameter,
-                                                perturbation.GetVector(0));
+                                                output.GetVector(0));
 
             for (int i = 1; i < Nvector; i++)
             {
                 if (correlation.GetLength() != 0 && correlation(i - 1) == 1.)
-                    perturbation.GetVector(i) = perturbation.GetVector(0);
+                    output.GetVector(i) = output.GetVector(0);
                 else
                 {
                     static_cast<Derived*>(this)->
                         Normal(variance,
                                parameter,
-                               perturbation.GetVector(i));
+                               output.GetVector(i));
 
                     if (correlation.GetLength() != 0)
                     {
                         Mlt(typename T1::value_type(
                                 sqrt(1. -
                                      correlation(i-1) * correlation(i-1))),
-                            perturbation.GetVector(i));
+                            output.GetVector(i));
                         Add(typename T1::value_type(correlation(i - 1)),
-                            perturbation.GetVector(0),
-                            perturbation.GetVector(i));
+                            output.GetVector(0),
+                            output.GetVector(i));
                     }
                 }
             }
-
-            Add(typename T1::value_type(1), perturbation, output);
-            perturbation.Deallocate();
         }
 
         else if (Nvector == 1 && pdf == "LogNormal")
@@ -477,11 +457,9 @@ namespace Verdandi
 
         else if (pdf == "NormalHomogeneous")
         {
-            Vector<T1, VectFull, Allocator1> perturbation(output.GetLength());
-            perturbation.Fill(T1(0));
 
             Vector<T1, VectFull, Allocator1> first_vector(N), vector_i(N);
-            first_vector.SetData(N, &perturbation(0));
+            first_vector.SetData(N, &output(0));
 
             static_cast<Derived*>(this)->NormalHomogeneous(variance,
                                                            parameter,
@@ -489,7 +467,7 @@ namespace Verdandi
 
             for (int i = 1; i < Nvector; i++)
             {
-                vector_i.SetData(N, &perturbation(i * N));
+                vector_i.SetData(N, &output(i * N));
                 static_cast<Derived*>(this)->NormalHomogeneous(variance,
                                                                parameter,
                                                                vector_i);
@@ -498,8 +476,6 @@ namespace Verdandi
                 vector_i.Nullify();
             }
             first_vector.Nullify();
-
-            Add(T1(1), perturbation, output);
         }
 
         else if (Nvector == 1 && pdf == "LogNormalHomogeneous")
@@ -611,42 +587,28 @@ namespace Verdandi
 
         else if (pdf == "NormalHomogeneous")
         {
-            Vector<T1, Collection, Allocator1> perturbation(Nvector);
-            T1* tmp;
-            for (int i = 0; i < Nvector; i++)
-            {
-                tmp = new T1(N);
-                tmp->Fill(typename T1::value_type(0));
-                perturbation.SetVector(i, *tmp);
-                tmp->Nullify();
-                delete tmp;
-            }
-
             static_cast<Derived*>(this)->
                 NormalHomogeneous(variance,
                                   parameter,
-                                  perturbation.GetVector(0));
+                                  output.GetVector(0));
 
             for (int i = 1; i < Nvector; i++)
             {
                 static_cast<Derived*>(this)->
                     NormalHomogeneous(variance,
                                       parameter,
-                                      perturbation.GetVector(i));
+                                      output.GetVector(i));
 
                 if (correlation.GetLength() != 0)
                 {
                     Mlt(typename T1::value_type(
                             sqrt(1. - correlation(i-1) * correlation(i-1))),
-                        perturbation.GetVector(i));
+                        output.GetVector(i));
                     Add(typename T1::value_type(correlation(i - 1)),
-                        perturbation.GetVector(0),
-                        perturbation.GetVector(i));
+                        output.GetVector(0),
+                        output.GetVector(i));
                 }
             }
-
-            Add(1., perturbation, output);
-            perturbation.Deallocate();
         }
 
         else if (Nvector == 1 && pdf == "LogNormalHomogeneous")
