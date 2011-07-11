@@ -258,9 +258,15 @@ namespace Verdandi
                 standard_deviation(i, j) = variance(i, j);
 
         bool satisfy_constraint = false;
-        while(!satisfy_constraint)
+
+        NEWRAN::Normal N;
+
+        Vector<T1, VectFull, Allocator0>
+                perturbation(output.GetSize());
+
+        while (!satisfy_constraint)
         {
-            NEWRAN::Normal N;
+            perturbation.Zero();
             double value;
             int size = sample.GetSize();
             for (int i = 0; i < size; i++)
@@ -272,12 +278,13 @@ namespace Verdandi
                 sample(i) = value;
             }
 
-            MltAdd(T0(1), standard_deviation, sample, T1(1), output);
+            MltAdd(T0(1), standard_deviation, sample,
+                   T1(0), perturbation);
 
-            satisfy_constraint = NormalClipping(diagonal,
-                                                parameter, output);
+            satisfy_constraint = NormalClipping(diagonal, parameter,
+                                                perturbation);
         }
-
+        Add(T1(1), perturbation, output);
     }
 
 
