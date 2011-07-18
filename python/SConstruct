@@ -46,7 +46,9 @@ env_swig.Append(CPPPATH = distutils.sysconfig.get_python_inc())
 env_swig.Replace(SHLIBPREFIX = "")
 
 if env_swig['PLATFORM'] == 'win32':
-    env_swig.SharedLibrary("_verdandi.so", ["verdandi.cpp", "verdandi.i"])
+    env_swig.Replace(SHLIBSUFFIX = ".pyd")
+    env_swig.Replace(LINK = "LINK")
+    env_swig.SharedLibrary("_verdandi", ["verdandi.cpp", "verdandi.i"])
 else:
     env_swig['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
     env_swig.SharedLibrary("_verdandi.so",
