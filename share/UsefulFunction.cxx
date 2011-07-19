@@ -600,6 +600,47 @@ namespace Verdandi
     }
 
 
+    //! Adds a 'vector collection' to a 'full vector'.
+    /*!
+      \param[in] alpha a given scalar.
+      \param[in] X a given collection vector.
+      \param[out] Y the result \f$ Y = Y + \alpha X\f$.
+    */
+    template <class T0,
+              class T1, class Allocator1,
+              class T2, class Allocator2>
+    void Add(const T0 alpha, const Vector<T1, Collection, Allocator1>& X,
+             Vector<T2, VectFull, Allocator2>& Y)
+    {
+        if (alpha != T0(0))
+        {
+            T0 alpha_ = alpha;
+            int ma = X.GetM();
+#ifdef VERDANDI_CHECK_DIMENSIONS
+            CheckDim(X, Y, "Add(alpha, X, Y)");
+#endif
+            for (int i = 0; i < ma; i++)
+                Y(i) += alpha_ * X(i);
+        }
+    }
+
+
+    //! Sets the column of a given matrix.
+    /*!
+      \param[in] X a given column vector.
+      \param[in] i a given index.
+      \param[out] M a given matrix.
+    */
+    template <class T0, class Allocator0, class T1, class Allocator1>
+    void SetCol(const Vector<T1, VectFull, Allocator1>& X,
+                int i, Matrix<T0, General, RowSparse, Allocator0>& M)
+    {
+        Vector<T1, VectSparse, Allocator1> X_sparse;
+        ConvertDenseToSparse(X, X_sparse);
+        SetCol(X_sparse, i, M);
+    }
+
+
     //! Conversion from 'RowMajor' to 'ArrayRowSparse' format.
     /*!
       \param[in] A_dense the 'RowMajor' matrix to be converted.

@@ -232,73 +232,82 @@ namespace Verdandi
 
         // Computes X_n^{(i)+}.
         model_state x;
-        state_collection x_i;
+        model_.GetState(x);
+        X_i_trans_.Reallocate(Nsigma_point_, Nstate_);
+        sigma_point x_col;
         for (int i = 0; i < Nsigma_point_; i++)
         {
-            model_.GetState(x);
-            x_i.AddVector(x);
-            x.Nullify();
+            SetRow(x, i, X_i_trans_);
+            GetRowPointer(X_i_trans_, i, x_col);
             MltAdd(T(1), background_error_variance_sqrt,
-                   sigma_point_collection_.GetVector(i), T(1),
-                   x_i.GetVector(i));
+                   sigma_point_collection_.GetVector(i), T(1), x_col);
+            x_col.Nullify();
         }
-
 
         if (alpha_constant_)
         {
             // Computes X_{n + 1}^-.
             model_.GetState(x);
             x.Fill(T(0));
+            x_col.Reallocate(Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                model_.ApplyOperator(x_i.GetVector(i), i + 1 == Nsigma_point_,
-                                     true);
-                Add(T(1), x_i.GetVector(i), x);
+                GetRow(X_i_trans_, i, x_col);
+                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, true);
+                Add(T(1), x_col, x);
             }
             Mlt(alpha_, x);
-            model_.SetState(x);
 
             // Computes P_{n + 1}^-.
-            model_state_error_variance working_matrix(Nstate_, 1);
             T alpha(0);
+            model_state_error_variance working_matrix(Nstate_, 1);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                Add(T(-1), x, x_i.GetVector(i));
-                SetCol(x_i.GetVector(i), 0, working_matrix);
+                GetRowPointer(X_i_trans_, i, x_col);
+                Add(T(-1), x, x_col);
+                SetCol(x_col, 0, working_matrix);
                 MltAdd(T(1), SeldonNoTrans, working_matrix, SeldonTrans,
                        working_matrix, alpha, background_error_variance_);
                 alpha = T(1);
+                x_col.Nullify();
             }
             Mlt(alpha_, background_error_variance_);
+
+            model_.SetState(x);
         }
         else
         {
             // Computes X_{n + 1}^-.
             model_.GetState(x);
             x.Fill(T(0));
+            x_col.Reallocate(Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                model_.ApplyOperator(x_i.GetVector(i), i + 1 == Nsigma_point_,
-                                     true);
-                Add(alpha_i_(i), x_i.GetVector(i), x);
+                GetRow(X_i_trans_, i, x_col);
+                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, true);
+                Add(alpha_i_(i), x_col, x);
             }
-            model_.SetState(x);
 
             // Computes P_{n + 1}^-.
-            model_state_error_variance working_matrix(Nstate_, 1);
             T alpha(0);
+            Vector<int> row_list(1);
+            Vector<int> column_list(Nstate_);
+            column_list.Fill();
+            model_state_error_variance working_matrix(Nstate_, 1);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                Add(T(-1), x, x_i.GetVector(i));
-                SetCol(x_i.GetVector(i), 0, working_matrix);
+                GetRowPointer(X_i_trans_, i, x_col);
+                Add(T(-1), x, x_col);
+                SetCol(x_col, 0, working_matrix);
                 MltAdd(alpha_i_(i), SeldonNoTrans, working_matrix,
                        SeldonTrans, working_matrix, alpha,
                        background_error_variance_);
                 alpha = T(1);
+                x_col.Nullify();
             }
-        }
 
-        x_i.Deallocate();
+            model_.SetState(x);
+        }
 
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
@@ -335,28 +344,28 @@ namespace Verdandi
 
         // Computes X_{n + 1}^{(i)-}.
         model_state x;
-        state_collection x_i;
+        model_.GetState(x);
+        X_i_trans_.Reallocate(Nsigma_point_, Nstate_);
+        sigma_point x_col;
         for (int i = 0; i < Nsigma_point_; i++)
         {
-            model_.GetState(x);
-            x_i.AddVector(x);
-            x.Nullify();
+            SetRow(x, i, X_i_trans_);
+            GetRowPointer(X_i_trans_, i, x_col);
             MltAdd(T(1), background_error_variance_sqrt,
-                   sigma_point_collection_.GetVector(i), T(1),
-                   x_i.GetVector(i));
+                   sigma_point_collection_.GetVector(i), T(1), x_col);
+            x_col.Nullify();
         }
 
         // Computes Z_{n + 1}^(i).
         Nobservation_ = observation_manager_.GetNobservation();
-        observation working_vector;
-        observation_collection z_i;
+        sigma_point_matrix Z_i_trans(Nsigma_point_, Nobservation_);
+        observation z_col(Nobservation_);
         for (int i = 0; i < Nsigma_point_; i++)
         {
-            working_vector.Reallocate(Nobservation_);
-            z_i.AddVector(working_vector);
-            working_vector.Nullify();
-            observation_manager_.ApplyOperator(x_i.GetVector(i),
-                                               z_i.GetVector(i));
+            GetRowPointer(X_i_trans_, i, x_col);
+            observation_manager_.ApplyOperator(x_col, z_col);
+            SetRow(z_col, i, Z_i_trans);
+            x_col.Nullify();
         }
 
         if (alpha_constant_)
@@ -366,14 +375,22 @@ namespace Verdandi
             z.Reallocate(Nobservation_);
             z.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
-                Add(T(1), z_i.GetVector(i), z);
+            {
+                GetRowPointer(Z_i_trans, i, z_col);
+                Add(T(1), z_col, z);
+                z_col.Nullify();
+            }
             Mlt(alpha_, z);
 
             // Computes X_{n+1}-.
             model_.GetState(x);
             x.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
-                Add(T(1), x_i.GetVector(i), x);
+            {
+                GetRowPointer(X_i_trans_, i, x_col);
+                Add(T(1), x_col, x);
+                x_col.Nullify();
+            }
             Mlt(alpha_, x);
 
             // Computes P_XZ = cov(X_{n + 1}^*, Z_{n + 1}^*).
@@ -383,16 +400,19 @@ namespace Verdandi
             T alpha(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                Add(T(-1), x, x_i.GetVector(i));
-                SetCol(x_i.GetVector(i), 0, working_matrix_state);
+                GetRowPointer(X_i_trans_, i, x_col);
+                Add(T(-1), x, x_col);
+                SetCol(x_col, 0, working_matrix_state);
 
-                Add(T(-1), z, z_i.GetVector(i));
-                SetCol(z_i.GetVector(i), 0, working_matrix_observation);
-
+                GetRowPointer(Z_i_trans, i, z_col);
+                Add(T(-1), z, z_col);
+                SetCol(z_col, 0, working_matrix_observation);
                 MltAdd(T(1), SeldonNoTrans, working_matrix_state,
                        SeldonTrans, working_matrix_observation,
                        alpha, P_xz);
                 alpha = T(1);
+                x_col.Nullify();
+                z_col.Nullify();
             }
             Mlt(alpha_, P_xz);
 
@@ -401,11 +421,13 @@ namespace Verdandi
             alpha = T(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                SetCol(z_i.GetVector(i), 0, working_matrix_observation);
+                GetRowPointer(Z_i_trans, i, z_col);
+                SetCol(z_col, 0, working_matrix_observation);
                 MltAdd(T(1), SeldonNoTrans,
                        working_matrix_observation, SeldonTrans,
                        working_matrix_observation, alpha, P_z);
                 alpha = T(1);
+                z_col.Nullify();
             }
             Mlt(alpha_, P_z);
             Add(T(1), observation_manager_.GetErrorVariance(), P_z);
@@ -435,30 +457,42 @@ namespace Verdandi
             z.Reallocate(Nobservation_);
             z.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
-                Add(alpha_i_(i), z_i.GetVector(i), z);
+            {
+                GetRowPointer(Z_i_trans, i, z_col);
+                Add(alpha_i_(i), z_col, z);
+                z_col.Nullify();
+            }
 
             // Computes X_{n+1}-.
             model_.GetState(x);
             x.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
-                Add(alpha_i_(i), x_i.GetVector(i), x);
+            {
+                GetRowPointer(X_i_trans_, i, x_col);
+                Add(alpha_i_(i), x_col, x);
+                x_col.Nullify();
+            }
 
             // Computes P_XZ = cov(X_{n + 1}^*, Z_{n + 1}^*).
-            model_state_error_variance P_xz(Nstate_, Nobservation_);
-            model_state_error_variance working_matrix_state(Nstate_, 1),
+            model_state_error_variance P_xz(Nstate_, Nobservation_),
+                working_matrix_state(Nstate_, 1),
                 working_matrix_observation(Nobservation_, 1);
             T alpha(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                Add(T(-1), x, x_i.GetVector(i));
-                SetCol(x_i.GetVector(i), 0, working_matrix_state);
+                GetRowPointer(X_i_trans_, i, x_col);
+                Add(T(-1), x, x_col);
+                SetCol(x_col, 0, working_matrix_state);
 
-                Add(T(-1), z, z_i.GetVector(i));
-                SetCol(z_i.GetVector(i), 0, working_matrix_observation);
-
+                GetRowPointer(Z_i_trans, i, z_col);
+                Add(T(-1), z, z_col);
+                SetCol(z_col, 0, working_matrix_observation);
                 MltAdd(alpha_i_(i), SeldonNoTrans, working_matrix_state,
-                       SeldonTrans, working_matrix_observation, alpha, P_xz);
+                       SeldonTrans, working_matrix_observation,
+                       alpha, P_xz);
                 alpha = T(1);
+                x_col.Nullify();
+                z_col.Nullify();
             }
 
             // Computes P_Z = cov(Z_{n + 1}^*, Z_{n + 1}^*).
@@ -466,11 +500,13 @@ namespace Verdandi
             alpha = T(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                SetCol(z_i.GetVector(i), 0, working_matrix_observation);
+                GetRowPointer(Z_i_trans, i, z_col);
+                SetCol(z_col, 0, working_matrix_observation);
                 MltAdd(alpha_i_(i), SeldonNoTrans,
                        working_matrix_observation, SeldonTrans,
                        working_matrix_observation, alpha, P_z);
                 alpha = T(1);
+                z_col.Nullify();
             }
             Add(T(1), observation_manager_.GetErrorVariance(), P_z);
 
@@ -492,9 +528,6 @@ namespace Verdandi
             MltAdd(T(-1), SeldonNoTrans, K, SeldonTrans, P_xz, T(1),
                    background_error_variance_);
         }
-
-        x_i.Deallocate();
-        z_i.Deallocate();
 
         if (option_display_["show_time"])
             cout << " done." << endl;
@@ -584,7 +617,6 @@ namespace Verdandi
             output_saver_.Save(state, double(model_.GetTime()),
                                "state_analysis");
         }
-
     }
 
 

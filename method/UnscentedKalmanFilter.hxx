@@ -65,9 +65,12 @@ namespace Verdandi
         typedef typename ObservationManager::observation
         observation;
         //! Type of the sigma point vector.
-        typedef Vector<T, VectFull, NewAlloc<T> > sigma_point;
+        typedef Vector<T, VectFull, MallocAlloc<T> > sigma_point;
         //! Type of the sigma point collection.
         typedef Vector<sigma_point, Collection> sigma_point_collection;
+        //! Type of the sigma point matrix.
+        typedef Matrix<T, General, RowMajor, MallocAlloc<T> >
+        sigma_point_matrix;
         //! Type of the state vector collection.
         typedef Vector<model_state, Collection> state_collection;
         //! Type of the observation vector collection.
@@ -115,6 +118,8 @@ namespace Verdandi
         sigma_point_collection sigma_point_collection_;
         //! Coefficient vector asociated with sigma-points.
         sigma_point alpha_i_;
+        //! Transpose of [X_n^(*)].
+        sigma_point_matrix X_i_trans_;
         //! Boolean to indicate if the coefficients alpha are constants.
         bool alpha_constant_;
         //! alpha.
