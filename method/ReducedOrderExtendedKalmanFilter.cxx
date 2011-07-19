@@ -468,7 +468,7 @@ namespace Verdandi
             observation_manager_.GetInnovation(x, y);
             Nobservation_ = y.GetSize();
 
-            model_state state_innovation(Nreduced_),
+            model_state_error_variance_row state_innovation(Nreduced_),
                 state_innovation_local(Nlocal_reduced_),
                 x_local(Nreduced_);
             MltAdd(T(1), SeldonTrans, working_matrix_or, y,
@@ -484,12 +484,12 @@ namespace Verdandi
             GetInverse(U_global);
             MltAdd(T(1), U_global, state_innovation, T(0), x_local);
 
-            model_state x_local_local(Nlocal_reduced_);
+            model_state_error_variance_row x_local_local(Nlocal_reduced_);
             for (int i = 0; i < Nlocal_reduced_; i++)
                 x_local_local(i) =
                     x_local(Nlocal_reduced_column_sum_(rank_) + i);
 
-            model_state dx_local(Nstate_), dx(Nstate_);
+            model_state_error_variance_row dx_local(Nstate_), dx(Nstate_);
             MltAdd(T(1), L_, x_local_local, T(0), dx_local);
             dx.Fill(T(0));
             MPI::COMM_WORLD.Allreduce(dx_local.GetData(), dx.GetData(),
@@ -548,11 +548,11 @@ namespace Verdandi
 
             Mlt(observation_manager_.GetErrorVarianceInverse(), HL,
                 working_matrix_or);
-            model_state state_innovation(Nreduced_);
+            model_state_error_variance_row state_innovation(Nreduced_);
             MltAdd(T(1), SeldonTrans, working_matrix_or, y, T(0),
                    state_innovation);
 
-            Vector<T> correction(Nreduced_);
+            model_state_error_variance_row correction(Nreduced_);
             GetInverse(U_inv);
             MltAdd(T(1), U_inv, state_innovation, T(0), correction);
             MltAdd(T(1), L_, correction, T(1), x);
@@ -582,7 +582,7 @@ namespace Verdandi
         model_.SetTime(time_);
 
         // One column of L.
-        model_state L_col(Nstate_);
+        model_state_error_variance_row L_col(Nstate_);
         for (int j = 0; j < Nlocal_reduced_; j++)
         {
             GetCol(L_, j, L_col);
@@ -596,7 +596,7 @@ namespace Verdandi
         model_.SetTime(time_);
 
         // One column of L.
-        model_state L_col(Nstate_);
+        model_state_error_variance_row L_col(Nstate_);
         for (int j = 0; j < Nreduced_; j++)
         {
             GetCol(L_, j, L_col);
