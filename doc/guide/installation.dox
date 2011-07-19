@@ -90,7 +90,6 @@ Installation instructions for MacOS and Linux are nearly identical, except for a
 <li> <b>SCons</b> <br>
 First install a 2.x version of <a href="http://www.python.org/download/">Python</a> (preferably the latest 2.x version, but any version from 2.4 should be fine). Then install <a href="http://www.scons.org/">SCons</a>. Add the path of the SCons program to the environment variable <code>PATH</code> (right-click on My Computer -> Properties -> Advanced -> Environment Variables).</li>
 
-
 <li> <b>Download precompiled libraries</b> <br>
 
 Not all the libraries are needed for all the methods, select and install the ones you will want to use in your assimilation.
@@ -123,39 +122,57 @@ Compile the project to produce the library file <code>superlu.lib</code> (Build 
 <ul>
 <li> Download %Verdandi and expand it to the directory of your choice. </li>
 
-<li> Create a %Verdandi project within Microsoft Visual Studio (File -> New -> Project). In Visual C++/General, select Makefile Project. Choose a name and a location (for example <code>Verdandi_solution</code> and <code>C:\\Projects</code>). The generic build command line is <code>scons</code>, the clean command line is <code>scons -c</code> and the rebuild command line is <code>scons -c && scons</code>.</li>
+<li>Create a "New project from existing code file" in Visual. Select Visual C++ for the entry "Type of project". Specify then the location of an example model directory in your version of Verdandi, e.g., <code>Verdandi-[version]\\example\\quadratic_model</code>, and give a name to the project. On the "Project Settings" page, select "Use external build system". Then put <code>scons</code> as the generic build command line and <code>scons -c</code> as the clean command line. Click on OK.
+</li>
 </ul>
 
 \subsection test Run a test
 <ul>
 
-<li> In the directory <code>C:\\Projects\\Verdandi_solution</code> (or in whatever directory you put your Makefile Project): (1) copy the <code>SConstruct</code> file from <code>verdandi-[version]\\src\\example\\quadratic_model\\</code>, (2) copy an example like <code>verdandi-[version]\\src\\example\\quadratic_model\\forward.cpp</code>, and its configuration directory <code>verdandi-[version]\\src\\example\\quadratic_model\\configuration\\</code>, and (3) create an empty directory <code>result\\</code>. Then edit the <code>SConstruct</code> file so that it looks like this : 
+<li> You now have to configure the dependencies to the different libraries. In "Project -> Properties -> Configuration Properties -> VC++ Directories", add in the "Library Directories" the path to the different directories where your ".lib" files are. For example, if your Lua library is stored in the directory <code>C:\\Program Files\\Lua\\5.1\\lib</code>, add a new line with this path.
+
+If you want to run the quadratic model, you have to link to the Lua, Blas, Lapack and Cblas libraries. Other models can require other libraries.
+
+</li>
+
+<li> In "Project -> Properties -> Configuration Properties -> NMake", set the build command line to <code>scons forward.exe</code> and the rebuild command line to <code>scons -c && scons forward.exe</code>. Set the output to <code>forward.exe</code>. </li>
+
+<li> Compile with "Build -> Build solution". Specify the argument for <code>forward.exe</code>; i.e., put <code>configuration\truth.lua</code> in "Configuration Properties -> Debugging -> Command Arguments". To run the example, launch "Debug -> Start Without Debugging". If you are told that the executable is out of date, check the box so that you will not be asked again and click on <code>No</code> (do not rebuild the project). </li>
+</ul>
+
+\subsection alternative Alternative method to run the tests
+
+Note that you can use the command prompt with the Visual command-line tools, in order to obtain the same results with an approach similar to that of Linux.
+<ul>
+<li>
+Open the command prompt, either in Visual (in "Tools -> Command prompt"), or from your computer "Start menu": "All Programs -> Microsoft Visual Studio -> Visual Studio Command Prompt". Then set the current directory to the example directory of Verdandi with the <code>cd</code> command. For instance, <code>cd C:\\Verdandi-[version]\\example\\quadratic_model</code>.
+
+You will then have to edit the <code>SConstruct</code> file to "manually" add the links to the libraries needed to compile. Edit the <code>SConstruct</code> file from the current directory, so that it looks like this:
 
 \precode
 import os
 
 # Put the path to Verdandi.
 # Also editable from command line with option "verdandi".
-verdandi_path = "C:\\verdandi-0.8"
+verdandi_path = "C:\\verdandi-[version]"
 
 flag_cpp = "/nologo /EHsc /MD"
 linker = "LINK"
 # Put here the list of directories containing the library files to be included.
 include_path = [""]
 # Put here the list of directories containing the .lib files.
-library_path = ["C:\\Program Files\\Lua\\5.1\\lib", "C:\\Program Files\\Blas_Lapack",
-                "C:\\Program Files\\WinNT_P4SSE2"]
+library_path = ["C:\\Program Files\\Lua\\5.1\\lib", "C:\\Program Files\\Blas_Lapack","C:\\Program Files\\WinNT_P4SSE2"]
 
 execfile(os.path.join(verdandi_path, "share\\SConstruct"))
 \endprecode
 </li>
 
-The quadratic model has dependencies to the Lua, Blas, Lapack and Cblas libraries, but other models can require to add some more paths to the <code>include_path</code> and <code>library_path</code> variables.
+<li>
+If you want to run the quadratic model, you have to add the Lua, Blas, Lapack and Cblas directories (containing lua.lib, blas.lib, lapack.lib and cblas.lib) in the "library_path" variable. Other models can require other libraries to be added in this variable.
 
-<li> Edit the Project -> Properties. In Configuration Properties -> NMake, set the build command line to <code>scons forward.exe</code> and the rebuild command line to <code>scons -c && scons forward.exe</code>. Set the output to <code>forward.exe</code>. </li>
-
-<li> Compile with Build -> Build solution. Specify the argument for <code>forward.exe</code>; i.e., put <code>configuration\truth.lua</code> in Configuration Properties -> Debugging -> Command Arguments. To run the example, launch Debug -> Start Without Debugging. If you are told that the executable is out of date, check the box so that you will not be asked again and click on <code>No</code> (do not rebuild the project). </li>
-
+Then type <code>scons</code> in the command prompt. It should create all the executables for the quadratic model. To launch them, type the name of the executable followed by the appropriated configuration file. For example, <code>forward.exe configuration\truth.lua</code> will apply the forward method using the configuration file "truth.lua", and generate some result files in the <code>result</code> directory.
+</li>
+</ul>
 
 \section windows64 Windows, 64-bit computer
 
@@ -206,27 +223,27 @@ Specify the <code>SuperLU\\SRC</code> location in <code>Additional Include Direc
 Compile the project to produce the library file <code>superlu.lib</code> (Build -> Build Solution).
 </li>
 
-
 </ul>
 
 \subsection project Create a Verdandi project
 <ul>
 <li> Download %Verdandi and expand it to the directory of your choice. </li>
 
-<li> Create a %Verdandi project within Microsoft Visual Studio (File -> New -> Project). In Visual C++/General, select Makefile Project. Choose a name and a location (for example <code>Verdandi_solution</code> and <code>C:\\Projects</code>). The generic build command line is <code>scons</code>, the clean command line is <code>scons -c</code> and the rebuild command line is <code>scons -c && scons</code>.</li>
+<li>Create a "New project from existing code file" in Visual. Select Visual C++ for the entry "Type of project". Specify then the location of an example model directory in your version of Verdandi, e.g., <code>Verdandi-[version]\\example\\quadratic_model</code>, and give a name to the project. On the "Project Settings" page, select "Use external build system". Then put <code>scons</code> as the generic build command line and <code>scons -c</code> as the clean command line. Click on OK.
+</li>
 </ul>
 
 \subsection test Run a test
 <ul>
 
-<li> In the directory <code>C:\\Projects\\Verdandi_solution</code> (or in whatever directory you put your Makefile Project): (1) copy an example like <code>verdandi-[version]\\src\\example\\quadratic_model\\forward.cpp</code>, and its configuration directory <code>verdandi-[version]\\src\\example\\quadratic_model\\configuration\\</code>, and (2) create an empty directory <code>result\\</code>. Then create a new blank file named <code>SConstruct</code> (without any extension) and fill it so that it looks like this : 
+<li> Edit <code>SConstruct</code> file from the current project directory so that it looks like this:
 
 \precode
 import os
 
 # Put the path to Verdandi.
 # Also editable from command line with option "verdandi".
-verdandi_path = "C:\\verdandi"
+verdandi_path = "C:\\verdandi-[version]"
 
 flag_cpp = "/nologo /EHsc /MD"
 linker = "LINK"
@@ -247,11 +264,55 @@ execfile(os.path.join(verdandi_path, "share\\SConstruct"))
 \endprecode
 </li>
 
-The quadratic model has dependencies to the Lua, Blas, Lapack and Cblas libraries, but other models can require to add some more paths to the <code>include_path</code> and <code>library_path</code> variables.
+The quadratic model has dependencies to the Lua, Blas, Lapack and Cblas libraries, but other models can require to add some more paths to the <code>include_path</code> and <code>library_path</code> variables. As in 32-bit, you can add the library and include paths directly in the Visual configuration instead of adding them to the "include_path" and "library_path" variables in <code>SConstruct</code>. To do this, go to "Project -> Properties -> Configuration Properties -> VC++ Directories", and add your include paths in the "Include Directories" entry, and add your library paths in the "Library Directories" entry.
 
 <li> Edit the Project -> Properties. In Configuration Properties -> NMake, set the build command line to <code>scons forward.exe</code> and the rebuild command line to <code>scons -c && scons forward.exe</code>. Set the output to <code>forward.exe</code>. In Configuration Properties, set "Platform Tools" to the appropriate 64-bit kit ("Windows 7.1 SDK", for example if you are using Visual C++ Express). If "Platform Tools" is not a visible entry, you may need to temporarily set the "Configuration type" to another type than Makefile ("Application (.exe)", for example). Be sure to switch back the "Configuration type" to Makefile, right after selecting the platform tool.</li>
 
 <li> Compile with Build -> Build solution. Specify the argument for <code>forward.exe</code>; i.e., put <code>configuration\truth.lua</code> in Configuration Properties -> Debugging -> Command Arguments. To run the example, launch Debug -> Start Without Debugging. If you are told that the executable is out of date, check the box so that you will not be asked again and click on <code>No</code> (do not rebuild the project). </li>
+
+</ul>
+
+\subsection alternative Alternative method to run the tests
+
+Note that you can use the command prompt with the Visual command-line tools, in order to obtain the same results with an approach similar to that of Linux.
+<ul>
+<li>
+Open the command prompt, either in Visual (in "Tools -> Command prompt"), or from your computer "Start menu": "All Programs -> Microsoft Visual Studio -> Visual Studio Command Prompt". Then set the current directory to the example directory of Verdandi with the <code>cd</code> command. For instance, <code>cd C:\\Verdandi-[version]\\example\\quadratic_model</code>.
+
+You will then have to edit the <code>SConstruct</code> file to "manually" add the links to the libraries needed to compile. Edit the <code>SConstruct</code> file from the current directory, so that it looks like this:
+
+\precode
+import os
+
+# Put the path to Verdandi.
+# Also editable from command line with option "verdandi".
+verdandi_path = "C:\\verdandi-[version]"
+
+flag_cpp = "/nologo /EHsc /MD"
+linker = "LINK"
+# Put here the list of directories containing the GSL headers.
+# One must include the top GSL directory and its subdirectory "gsl".
+include_path = ["C:\\gsl", "C:\\gsl\\gsl"]
+# Put here the list of directories containing lua.lib, blas.lib, lapack.lib and libf2c.lib.
+library_path = ["C:\\Program Files\\lua64", "C:\\Program Files\\Blas_Lapack"]
+
+import glob
+
+# Replace also here "C:\\gsl\\" with the path to your GSL top directory.
+dependency_list = [x for x in glob.glob('C:\\gsl\\gsl\\cblas\\*.c') if "test" not in x];
+
+library_list = ["libf2c.lib"] 
+
+execfile(os.path.join(verdandi_path, "share\\SConstruct"))
+\endprecode
+</li>
+
+<li>
+If you want to run the quadratic model, you have to add the Lua, Blas, Lapack and Cblas directories (containing lua.lib, blas.lib, lapack.lib and cblas.lib) in the "library_path" variable. Other models can require other libraries to be added in this variable.
+
+Then type <code>scons</code> in the command prompt. It should create all the executables for the quadratic model. To launch them, type the name of the executable followed by the appropriated configuration file. For example, <code>forward.exe configuration\truth.lua</code> will apply the forward method using the configuration file "truth.lua", and generate some result files in the <code>result</code> directory.
+</li>
+</ul>
 
 </ul>
 */
