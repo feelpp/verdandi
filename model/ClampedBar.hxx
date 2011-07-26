@@ -245,8 +245,6 @@ namespace Verdandi
                                        state_error_variance& U);
         const state_error_variance& GetStateErrorVarianceInverse() const;
 
-        bool IsErrorSparse() const;
-
         string GetName() const;
         void Message(string message);
 

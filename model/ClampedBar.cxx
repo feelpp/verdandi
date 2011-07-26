@@ -1015,22 +1015,6 @@ namespace Verdandi
     }
 
 
-    //! Checks if the error covariance matrix is sparse.
-    /*!
-      \return True if there is a sparse error matrix, false otherwise.
-    */
-    template <class T>
-    bool ClampedBar<T>::IsErrorSparse() const
-    {
-#ifdef VERDANDI_STATE_ERROR_SPARSE
-        return true;
-#else
-        return false;
-#endif
-
-    }
-
-
     //! Returns the name of the class.
     template <class T>
     string ClampedBar<T>::GetName() const
