@@ -264,7 +264,7 @@ namespace Verdandi
         model_.SetTime(time_);
 
         // One column of covariance matrix P.
-        model_state error_covariance_column(Nstate_);
+        model_state_error_variance_row error_covariance_column(Nstate_);
 
         for (int j = 0; j < Nstate_; j++)
         {
