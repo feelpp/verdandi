@@ -80,9 +80,9 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "overview")
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "assimilation_methods"
 or basename($_SERVER['REQUEST_URI'], ".php") == "optimal_interpolation"
 or basename($_SERVER['REQUEST_URI'], ".php") == "extended_kalman_filter"
+or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_extended_kalman_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "unscented_kalman_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_unscented_kalman_filter"
-or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_extended_kalman_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_minimax_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "monte_carlo"
 or basename($_SERVER['REQUEST_URI'], ".php") == "four_dimensional_variational")
@@ -94,10 +94,10 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "four_dimensional_variational")
   HL($file, "extended_kalman_filter", "Extended Kalman Filter");
   echo '</li>';
   echo '<li class="jelly">';
-  HL($file, "unscented_kalman_filter", "Unscented Kalman Filter");
+  HL($file, "reduced_order_extended_kalman_filter", "Reduced Order Extended Kalman Filter");
   echo '</li>';
   echo '<li class="jelly">';
-  HL($file, "reduced_order_extended_kalman_filter", "Reduced Order Extended Kalman Filter");
+  HL($file, "unscented_kalman_filter", "Unscented Kalman Filter");
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "reduced_order_unscented_kalman_filter", "Reduced Order Unscented Kalman Filter");
