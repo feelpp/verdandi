@@ -127,6 +127,9 @@ namespace Verdandi
         // Should optimization iterations be displayed on screen?
         configuration.Set("display.show_optimization_iteration",
                           option_display_["show_optimization_iteration"]);
+        // Should optimized parameters be displayed on screen?
+        configuration.Set("display.show_optimized_parameter",
+                          option_display_["show_optimized_parameter"]);
         // Should iterations be displayed on screen?
         configuration.Set("display.show_iteration",
                           option_display_["show_iteration"]);
@@ -390,6 +393,9 @@ namespace Verdandi
         if (option_display_["show_optimization_iteration"])
             Logger::StdOut(*this,
                            "Optimization iteration: " + to_str(Ncall_cost_));
+        if (option_display_["show_optimized_parameter"])
+            Logger::StdOut(*this,
+                           "Optimized parameter: " + to_str(x));
         Ncall_cost_++;
         model_state delta(x);
 

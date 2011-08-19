@@ -281,6 +281,7 @@ four_dimensional_variational = {
    display = {
 
       show_optimization_iteration = true,
+      show_optimized_parameter = false,
       show_iteration = false,
       show_time = true
 
