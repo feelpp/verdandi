@@ -8,6 +8,14 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+<meta name="keywords" content="Verdandi, library, C++, Python, data,
+assimilation, data assimilation, estimation, parameter estimation, filter,
+Kalman, sequential, variational, uncertainty, aggregation, implementation,
+open source"/>
+<meta name="description" content="Verdandi is a generic C++ library for data
+assimilation. It aims at providing methods and tools for data assimilation. It
+is designed to be relevant to a large class of problems involving
+high-dimensional numerical models."/>
 <title>Verdandi user's guide</title>
 <link rel="stylesheet" type="text/css" href="<?php echo $root?>/content.css"/>
 <link rel="stylesheet" href="tabs.css" type="text/css"/>
