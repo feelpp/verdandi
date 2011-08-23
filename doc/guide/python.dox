@@ -38,7 +38,7 @@ In addition to a C++ compiler, one needs Swig 1.3.x. Swig 1.1 cannot generate th
 
 In <code>python/</code> directory, you may simply launch <code>scons swig</code> if you have <a href="http://www.scons.org/">SCons</a> installed (version &gt;=1.0).
 
-This should generate the Python module <code>verdandi.py</code> and the shared library <code>_verdandi.so</code>. You may want to place these two files in a directory of your <code>$PYTHONPATH/</code>, where Python searches for modules (in addition to the local directory <code>./</code>).
+This should generate the Python module <code>verdandi.py</code> and the shared library <code>_verdandi.so</code>. You may want to place these two files in a directory of your <code>$PYTHONPATH</code>, where Python searches for modules.
 
 \subsection compilationw Compiling the interface under Windows
 
@@ -56,7 +56,7 @@ To manipulate vectors from the Python interface, you need Seldon module. To buil
 $ scons
 \endprescreen
 
-<code>seldon.py</code> and <code>_seldon.so</code> have been generated. Make sure these files are in a directory of <code>$PYTHONPATH/</code> to be able to launch <code>Seldon</code> Python module.
+<code>seldon.py</code> and <code>_seldon.so</code> have been generated. Make sure these files are in a directory of <code>$PYTHONPATH</code> to be able to launch <code>Seldon</code> Python module.
 
 \subsection seldon2 Seldon module under Windows
 
