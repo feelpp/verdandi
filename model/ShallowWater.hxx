@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2009 INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Author(s): Vivien Mallet, Claire Mouton, Kevin Charpentier
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -61,6 +61,8 @@ namespace Verdandi
         typedef Vector<T> state;
         //! Type of the model/observation crossed matrix.
         typedef Matrix<T, General, RowSparse> matrix_state_observation;
+        //! Type of an uncertain parameter.
+        typedef Vector<T> uncertain_parameter;
 
     protected:
 
@@ -151,6 +153,10 @@ namespace Verdandi
 
         //! Value of the departure in the initial conditions.
         T value_;
+        //! Is there an initial step at the center?
+        bool source_center_;
+        //! Is there an initial step on the left?
+        bool source_left_;
 
         //! Standard deviation of the model error for boundary conditions.
         double model_error_std_bc_;
@@ -189,6 +195,49 @@ namespace Verdandi
         */
         bool with_positivity_requirement_;
 
+        /*** Uncertainty on parameters ***/
+
+        //! Parameters to be perturbed.
+        vector<uncertain_parameter> parameter_;
+
+        //! List of parameters to be perturbed.
+        vector<string> uncertain_parameter_vector_;
+
+        //! Number of parameters to be perturbed.
+        int Nparameter_;
+
+        //! PDF parameters for the step height.
+        Vector<T> step_height_parameter_;
+
+        //! Correlations between the step height and the other parameters.
+        Vector<T> step_height_correlation_;
+
+        //! Name of the probability distribution for the step height.
+        string step_height_pdf_;
+
+        //! Mean of the probability distribution for the step height.
+        T step_height_mean_;
+
+        //! Covariance matrix for the step height.
+        Matrix<T, Symmetric, RowSymPacked> step_height_variance_;
+
+        //! PDF parameters for the boundary condition.
+        Vector<T> bc_parameter_;
+
+        /*! \brief Correlations between the boundary condition and the other
+          parameters. */
+        Vector<T> bc_correlation_;
+
+        //! Name of the probability distribution for the boundary condition.
+        string bc_pdf_;
+
+        //! Mean of the probability distribution for the boundary condition.
+        T bc_mean_;
+
+        //! Covariance matrix for the boundary condition.
+        Matrix<T, Symmetric, RowSymPacked> bc_variance_;
+
+
         /*** Output saver ***/
 
         //! Output saver.
@@ -201,7 +250,6 @@ namespace Verdandi
         ~ShallowWater();
         void Initialize(string configuration_file);
         void InitializeStep();
-
         // Processing.
         void Forward();
         bool HasFinished() const;
@@ -228,6 +276,16 @@ namespace Verdandi
                                       state_error_variance_row);
         const state_error_variance& GetStateErrorVariance() const;
         bool IsErrorSparse() const;
+
+        int GetNparameter();
+        uncertain_parameter& GetParameter(int i);
+        void SetParameter(int i, uncertain_parameter parameter);
+        Vector<T>& GetParameterCorrelation(int i);
+        string GetParameterPDF(int i);
+        Matrix<T, Symmetric, Seldon::RowSymPacked>&
+        GetParameterVariance(int i);
+        Vector<T>& GetParameterParameter(int i);
+        string GetParameterOption(int i);
 
         const ShallowWater<T>& GetModel() const;
 

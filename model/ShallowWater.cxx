@@ -1,5 +1,5 @@
 // Copyright (C) 2008-2009 INRIA
-// Author(s): Vivien Mallet, Claire Mouton
+// Author(s): Vivien Mallet, Claire Mouton, Kevin Charpentier
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -66,6 +66,9 @@ namespace Verdandi
             delete urng_;
             urng_ = 0;
         }
+
+        for (int i = 0; i < Nparameter_; i++)
+            parameter_[i].Nullify();
     }
 
 
@@ -202,9 +205,9 @@ namespace Verdandi
         NEWRAN::Random::Set(*urng_);
         value_ += max(-2., min(2., normal_.Next())) * model_error_std_ic_;
         configuration.SetPrefix("shallow_water.initial_condition.");
-        bool source;
-        configuration.Set("center", source);
-        if (source)
+        configuration.Set("center", source_center_);
+
+        if (source_center_)
         {
             int center_x = (Nx_ - 1) / 2;
             int center_y = (Ny_ - 1) / 2;
@@ -218,8 +221,8 @@ namespace Verdandi
         u_.Fill(0.);
         v_.Fill(0.);
 
-        configuration.Set("left", source);
-        if (source)
+        configuration.Set("left", source_left_);
+        if (source_left_)
         {
             int position_x = Nx_ / 10;
             int center_y = (Ny_ - 1) / 2;
@@ -239,7 +242,76 @@ namespace Verdandi
 
         state_error_variance_row_.Reallocate(Nx_ * Ny_);
 
-        /*** Ouput saver ***/
+        // Perturbations of step height and bc.
+        configuration.ClearPrefix();
+        Nparameter_ = 0;
+
+        if (configuration.Exists("shallow_water.uncertainty"))
+        {
+            configuration.SetPrefix("shallow_water.uncertainty.");
+
+            configuration.Set("uncertain_parameter_list",
+                              "ops_in(v, {'step_height', 'bc'})",
+                              uncertain_parameter_vector_);
+
+            Nparameter_ = int(uncertain_parameter_vector_.size());
+            if (Nparameter_ == 2)
+            {
+                // "step_height" must be before "bc" for later calls.
+                uncertain_parameter_vector_[0] = "step_height";
+                uncertain_parameter_vector_[1] = "bc";
+            }
+            parameter_.resize(Nparameter_);
+
+            if (find(uncertain_parameter_vector_.begin(),
+                     uncertain_parameter_vector_.end(),
+                     "step_height") != uncertain_parameter_vector_.end())
+            {
+                configuration.Set("step_height.mean", step_height_mean_);
+                value_ += step_height_mean_;
+
+                step_height_variance_.Reallocate(1, 1);
+                configuration.Set("step_height.variance",
+                                  step_height_variance_(0, 0));
+
+                configuration.Set("step_height.distribution",
+                                  "ops_in(v, {'Normal', 'LogNormal', "
+                                  "'NormalHomogeneous', "
+                                  "'LogNormalHomogeneous'})",
+                                  step_height_pdf_);
+
+                configuration.Set("step_height.parameter",
+                                  step_height_parameter_);
+
+                parameter_[0].SetData(1, &value_);
+            }
+
+            if (find(uncertain_parameter_vector_.begin(),
+                     uncertain_parameter_vector_.end(),
+                     "bc") != uncertain_parameter_vector_.end())
+            {
+                configuration.Set("bc.mean", bc_mean_);
+                value_left_ += bc_mean_;
+
+                bc_variance_.Reallocate(1, 1);
+                configuration.Set("bc.variance", bc_variance_(0, 0));
+
+                configuration.Set("bc.distribution",
+                                  "ops_in(v, {'Normal', 'LogNormal', "
+                                  "'NormalHomogeneous', "
+                                  "'LogNormalHomogeneous'})",
+                                  bc_pdf_);
+
+                configuration.Set("bc.parameter", bc_parameter_);
+
+                if (Nparameter_ == 1)
+                    parameter_[0].SetData(1, &value_left_);
+                else
+                    parameter_[1].SetData(1, &value_left_);
+            }
+        }
+
+        /*** Output saver ***/
 
         output_saver_.
             Initialize(configuration_file, "shallow_water.output_saver.");
@@ -253,6 +325,7 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>::InitializeStep()
     {
+
     }
 
 
@@ -266,6 +339,28 @@ namespace Verdandi
     void ShallowWater<T>::Forward()
     {
         int i, j;
+
+        if (time_ == 0. && source_center_)
+        {
+            int center_x = (Nx_ - 1) / 2;
+            int center_y = (Ny_ - 1) / 2;
+            h_(center_x, center_y) = value_;
+            for (int i = -5; i < 6; i++)
+                for (int j = -5; j < 6; j++)
+                    if (center_x + i >= 0 && center_x + i < Nx_
+                        && center_y + j >= 0 && center_y + j < Ny_)
+                        h_(center_x + i, center_y + j) = value_;
+        }
+        if (time_ == 0. && source_left_)
+        {
+            int position_x = Nx_ / 10;
+            int center_y = (Ny_ - 1) / 2;
+            for (int i = -2; i < 3; i++)
+                for (int j = -2; j < 3; j++)
+                    if (position_x + i >= 0 && position_x + i < Nx_
+                        && center_y + j >= 0 && center_y + j < Ny_)
+                        h_(position_x + i, center_y + j) = value_;
+        }
 
         // Left and right values around the interface where a flux is
         // computed. Heights.
@@ -284,6 +379,7 @@ namespace Verdandi
             NEWRAN::Random::Set(*urng_);
             model_error
                 = max(-2., min(2., normal_.Next())) * model_error_std_bc_;
+
         }
 
         // Fluxes along x, inside the domain.
@@ -542,9 +638,9 @@ namespace Verdandi
     }
 
 
-    //! Returns the size of the full state vector.
+    //! Returns the full state vector size.
     /*!
-      \return The size of the full state vector.
+      \return The full state vector size.
     */
     template <class T>
     int ShallowWater<T>::GetNfull_state() const
@@ -723,6 +819,126 @@ namespace Verdandi
 #else
         return false;
 #endif
+    }
+
+
+    //! Returns the number of parameters to be perturbed.
+    /*!
+      \return The number of parameters to be perturbed.
+    */
+    template <class T>
+    int ShallowWater<T>::GetNparameter()
+    {
+        return Nparameter_;
+    }
+
+
+    //! Gets the i-th uncertain parameter.
+    /*!
+      \param[in] i index of the parameter.
+      \return The vector associated with the i-th parameter.
+    */
+    template<class T>
+    typename ShallowWater<T>::uncertain_parameter&
+    ShallowWater<T>::GetParameter(int k)
+    {
+        return parameter_[k];
+    }
+
+
+    //! Sets the i-th parameter.
+    /*!
+      \param[in] i index of the parameter.
+      \param[in] parameter the parameter to assign.
+    */
+    template<class T>
+    void ShallowWater<T>::SetParameter(int i, uncertain_parameter parameter)
+    {
+        if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
+            value_ = parameter(0);
+        else
+            value_left_ = parameter(0);
+    }
+
+
+    //! Returns the correlation between the uncertain parameters.
+    /*! Since there is only one parameter, an empty vector is
+      returned.
+      \param[in] i parameter index.
+      \return An empty vector.
+    */
+    template<class T>
+    Vector<T>& ShallowWater<T>::GetParameterCorrelation(int i)
+    {
+        if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
+            return step_height_correlation_;
+        else
+            return bc_correlation_;
+    }
+
+
+    //! Returns the PDF of the i-th parameter.
+    /*!
+      \param[in] i uncertain-variable index.
+      \return The PDF of the i-th parameter.
+    */
+    template<class T>
+    string ShallowWater<T>::GetParameterPDF(int i)
+    {
+        if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
+            return step_height_pdf_;
+        else
+            return bc_pdf_;
+    }
+
+
+    /*! \brief Returns the covariance matrix associated with the i-th
+      parameter. */
+    /*!
+      \param[in] i parameter index.
+      \return The covariance matrix associated with the i-th parameter.
+    */
+    template<class T>
+    Matrix<T, Symmetric, RowSymPacked>&
+    ShallowWater<T>::GetParameterVariance(int i)
+    {
+        if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
+            return step_height_variance_;
+        else
+            return bc_variance_;
+    }
+
+
+
+    //! Returns parameters associated with the PDF of some model parameter.
+    /*! In case of normal or log-normal distribution, the parameters are
+      clipping parameters.
+      \param[in] i model parameter index.
+      \return The parameters associated with the i-th parameter.
+    */
+    template<class T>
+    Vector<T>& ShallowWater<T>::GetParameterParameter(int i)
+    {
+        if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
+            return step_height_parameter_;
+        else
+            return bc_parameter_;
+    }
+
+
+
+    //! Returns the perturbation option of the i-th parameter.
+    /*!
+      \param[in] i parameter index.
+      \return The perturbation option of the i-th parameter.
+    */
+    template<class T>
+    string ShallowWater<T>::GetParameterOption(int i)
+    {
+        if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
+            return "init_step";
+        else
+            return "every_step";
     }
 
 

@@ -32,11 +32,35 @@ shallow_water = {
 
    },
 
+   uncertainty = {
+
+      uncertain_parameter_list = {"step_height", "bc"},
+
+      step_height = {
+
+         distribution = "NormalHomogeneous",
+         mean = 0.,
+         variance = 0.03^2,
+         parameter = {-2., 2.}
+
+      },
+
+      bc = {
+
+         distribution = "NormalHomogeneous",
+         mean = 0.,
+         variance = 0.03^2,
+         parameter = {-2., 2.}
+
+      }
+
+    },
+
    error = {
 
       -- Standard deviation of the white Gaussian noise on *boundary*
       -- conditions.
-      standard_deviation_bc = 0.,
+      standard_deviation_bc = 0.1,
       -- Standard deviation of the white Gaussian noise on *initial*
       -- conditions.
       standard_deviation_ic = 0.,
