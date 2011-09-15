@@ -283,7 +283,7 @@ library_list = to_string_list("library_list")
 for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
                 "newran", "superlu", "cblas", "pthread", "mpiseq",
                 "dmumps", "zmumps", "mumps_common", "pord", "metis", "m",
-                "umfpack", "amd", "cppunit", "nlopt", "trng4", "python"]:
+                "umfpack", "amd", "cppunit", "nlopt", "trng4"]:
 
     if library not in library_list:
         library_list += [library]
@@ -296,6 +296,13 @@ for library in library_list:
     if conf.CheckLib(library):
         if env['PLATFORM'] != 'win32':
             env.Append(LINKFLAGS = "-l" + library)
+
+# Link to the appropriate version of Python.
+for python_version in ["2.7", "2.6", "2.5", ""]:
+    if conf.CheckLib("python" + python_version):
+        env.Append(LINKFLAGS = "-l" + "python" + python_version)
+        env.Append(CXXFLAGS = ["-DVERDANDI_PYTHON_VERSION=" + python_version])
+        break
 
 if ARGUMENTS["line"] == "no":
     env.Replace(CXXCOMSTR = "[C++] $SOURCE")

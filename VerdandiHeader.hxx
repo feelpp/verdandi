@@ -161,6 +161,10 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
+#ifndef VERDANDI_PYTHON_VERSION
+#define VERDANDI_PYTHON_VERSION 2.6
+#endif
+
 #include "share/VerdandiOps.hxx"
 #include "share/Logger.hxx"
 #include "share/Error.hxx"

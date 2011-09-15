@@ -20,6 +20,15 @@ quadratic_model.definition.initial_state = {0., 0.}
 quadratic_model.definition.with_linear_term = false
 
 
+python_model = {
+
+   module = "QuadraticModel",
+   directory = "../../model/",
+   class_name = "QuadraticModel"
+
+}
+
+
 -------------------------------- OBSERVATION ---------------------------------
 
 

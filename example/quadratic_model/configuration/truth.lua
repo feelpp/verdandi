@@ -13,6 +13,15 @@ output_directory = "result/"
 dofile("configuration/quadratic_model.lua")
 
 
+python_model = {
+
+   module = "QuadraticModel",
+   directory = "../../model/",
+   class_name = "QuadraticModel"
+
+}
+
+
 ----------------------------------- METHOD -----------------------------------
 
 
