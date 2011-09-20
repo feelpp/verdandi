@@ -504,7 +504,7 @@ namespace Verdandi
     */
     template <class T>
     void ShallowWater<T>
-    ::StepBack(const typename ShallowWater<T>::state& state)
+    ::StepBack(const state& state)
     {
         time_ -= Delta_t_;
         SetFullState(state);
@@ -669,7 +669,7 @@ namespace Verdandi
     */
     template <class T>
     void ShallowWater<T>
-    ::GetState(typename ShallowWater<T>::state& state) const
+    ::GetState(state& state) const
     {
         int position = 0;
         state.Reallocate(Nx_ * Ny_);
@@ -686,7 +686,7 @@ namespace Verdandi
     */
     template <class T>
     void ShallowWater<T>
-    ::SetState(typename ShallowWater<T>::state& state)
+    ::SetState(state& state)
     {
         // Positivity requirement.
         if (with_positivity_requirement_)
@@ -707,7 +707,7 @@ namespace Verdandi
     */
     template <class T>
     void ShallowWater<T>
-    ::GetFullState(typename ShallowWater<T>::state& state) const
+    ::GetFullState(state& state) const
     {
         state.Reallocate(2 * Nx_ * Ny_ + 2 * Nx_ + Ny_);
         for (int i = 0; i < Nx_; i++)
@@ -726,7 +726,7 @@ namespace Verdandi
     */
     template <class T>
     void ShallowWater<T>
-    ::SetFullState(const typename ShallowWater<T>::state& state)
+    ::SetFullState(const state& state)
     {
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)

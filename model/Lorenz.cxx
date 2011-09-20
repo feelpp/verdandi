@@ -255,7 +255,7 @@ namespace Verdandi
       \param[out] state the controlled state vector.
     */
     template <class T>
-    void Lorenz<T>::GetState(typename Lorenz<T>::state& state) const
+    void Lorenz<T>::GetState(state& state) const
     {
         state.Reallocate(3);
         state(0) = X_;
@@ -269,7 +269,7 @@ namespace Verdandi
       \param[in] state the new controlled state vector.
     */
     template <class T>
-    void Lorenz<T>::SetState(const typename Lorenz<T>::state& state)
+    void Lorenz<T>::SetState(const state& state)
     {
         X_ = state(0);
         Y_ = state(1);
@@ -282,7 +282,7 @@ namespace Verdandi
       \param[out] state the full state vector.
     */
     template <class T>
-    void Lorenz<T>::GetFullState(typename Lorenz<T>::state& state)
+    void Lorenz<T>::GetFullState(state& state)
         const
     {
         GetState(state);
@@ -295,7 +295,7 @@ namespace Verdandi
     */
     template <class T>
     void Lorenz<T>
-    ::SetFullState(const typename Lorenz<T>::state& state)
+    ::SetFullState(const state& state)
     {
         SetState(state);
     }

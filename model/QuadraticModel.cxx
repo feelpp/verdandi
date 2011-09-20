@@ -282,7 +282,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::ApplyOperator(typename QuadraticModel<T>::state& x,
+    ::ApplyOperator(state& x,
                     bool forward, bool preserve_state)
     {
         state current_state;
@@ -305,7 +305,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::ApplyTangentLinearOperator(typename QuadraticModel<T>::state& x)
+    ::ApplyTangentLinearOperator(state& x)
     {
         state input = x;
         if (with_quadratic_term_)
@@ -330,8 +330,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::GetTangentLinearOperator
-    (typename QuadraticModel<T>::tangent_linear_operator& M) const
+    ::GetTangentLinearOperator(tangent_linear_operator& M) const
     {
         M.Reallocate(Nstate_, Nstate_);
         if (with_quadratic_term_)
@@ -450,7 +449,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::GetState(typename QuadraticModel<T>::state& state) const
+    ::GetState(state& state) const
     {
         state = state_;
     }
@@ -462,7 +461,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::SetState(const typename QuadraticModel<T>::state& state)
+    ::SetState(const state& state)
     {
         state_ = state;
     }
@@ -474,7 +473,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::GetFullState(typename QuadraticModel<T>::state& state) const
+    ::GetFullState(state& state) const
     {
         GetState(state);
     }
@@ -486,7 +485,7 @@ namespace Verdandi
     */
     template <class T>
     void QuadraticModel<T>
-    ::SetFullState(const typename QuadraticModel<T>::state& state)
+    ::SetFullState(const state& state)
     {
         SetState(state);
     }
@@ -666,8 +665,7 @@ namespace Verdandi
     void
     QuadraticModel<T>
     ::GetStateErrorVarianceRow
-    (int row,
-     typename QuadraticModel<T>::state_error_variance_row& P_row)
+    (int row, state_error_variance_row& P_row)
     {
         GetRow(P_, row, P_row);
     }

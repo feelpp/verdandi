@@ -1733,8 +1733,7 @@ namespace Verdandi
     template <class T>
     void LinearObservationManager<T>
     ::GetTangentLinearOperatorRow(int row,
-                                  typename LinearObservationManager<T>
-                                  ::tangent_linear_operator_row&
+                                  tangent_linear_operator_row&
                                   tangent_operator_row)
         const
     {
