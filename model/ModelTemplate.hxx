@@ -56,9 +56,14 @@ namespace Verdandi
         typedef Matrix<double> matrix_state_observation;
         //! Type of the tangent linear model.
         typedef Matrix<double> tangent_linear_operator;
+        //! Type of the model error variance.
+        typedef Matrix<double> error_variance;
 #endif
         //! Type of the state vector.
         typedef Vector<double> state;
+        //! Type of an uncertain parameter.
+        typedef Vector<double> uncertain_parameter;
+
 
 
     public:
@@ -97,10 +102,21 @@ namespace Verdandi
         void GetAdjointState(state& state_adjoint);
         void SetAdjointState(const state& state_adjoint);
 
+        // Uncertainty.
+        int GetNparameter();
+        uncertain_parameter& GetParameter(int i);
+        void SetParameter(int i, uncertain_parameter parameter);
+        Vector<double>& GetParameterCorrelation(int i);
+        string GetParameterPDF(int i);
+        Matrix<double, Symmetric, RowSymPacked>& GetParameterVariance(int i);
+        Vector<double>& GetParameterParameter(int i);
+        string GetParameterOption(int i);
+
         // Errors.
         void GetStateErrorVarianceRow(int row,
                                       state_error_variance_row& P_row);
         state_error_variance& GetStateErrorVariance();
+        error_variance& GetErrorVarianceSqrt();
         void GetStateErrorVarianceSqrt(state_error_variance& L,
                                        state_error_variance& U);
         const state_error_variance& GetStateErrorVarianceInverse() const;

@@ -264,7 +264,7 @@ namespace Verdandi
 
     //! Sets the full state vector.
     /*!
-      \param[in] state the full state vector.
+      \param[in] state the new full state vector.
     */
     void ModelTemplate::SetFullState(state& state)
     {
@@ -291,6 +291,96 @@ namespace Verdandi
     {
         throw ErrorUndefined("ModelTemplate::SetAdjointState(const state& "
                              "state_adjoint)");
+    }
+
+
+    //! Returns the number of parameters to be perturbed.
+    /*!
+      \return The number of parameters to be perturbed.
+    */
+    int ModelTemplate::GetNparameter()
+    {
+        throw ErrorUndefined("ModelTemplate::GetNparameter()");
+    }
+
+
+    //! Gets the i-th uncertain parameter.
+    /*!
+      \param[in] i index of the parameter.
+      \return The vector associated with the i-th parameter.
+    */
+    ModelTemplate::uncertain_parameter& ModelTemplate::GetParameter(int i)
+    {
+        throw ErrorUndefined("ModelTemplate::GetParameter(int i)");
+    }
+
+
+    //! Sets the i-th uncertain parameter.
+    /*!
+      \param[in] i index of the parameter.
+      \param[in] parameter the parameter to assign.
+    */
+    void ModelTemplate::SetParameter(int i, uncertain_parameter parameter)
+    {
+        throw ErrorUndefined("ModelTemplate::SetParameter(int i, "
+                             "uncertain_parameter parameter");
+    }
+
+
+    //! Returns the correlation between the uncertain parameters.
+    /*!
+      \param[in] i parameter index.
+      \return The correlation between the uncertain parameters.
+    */
+    Vector<double>& ModelTemplate::GetParameterCorrelation(int i)
+    {
+        throw ErrorUndefined("ModelTemplate::GetParameterCorrelation(int i)");
+    }
+
+
+    //! Returns the PDF of the i-th parameter.
+    /*!
+      \param[in] i uncertain-variable index.
+      \return The PDF of the i-th parameter.
+    */
+    string ModelTemplate::GetParameterPDF(int i)
+    {
+        throw ErrorUndefined("ModelTemplate::GetParameterPDF(int i)");
+    }
+
+
+    //! Returns the covariance matrix associated with the i-th parameter.
+    /*!
+      \param[in] i parameter index.
+      \return The covariance matrix associated with the i-th parameter.
+    */
+    Matrix<double, Symmetric, RowSymPacked>&
+    ModelTemplate::GetParameterVariance(int i)
+    {
+        throw ErrorUndefined("ModelTemplate::GetParameterVariance(int i)");
+    }
+
+
+    //! Returns parameters associated with the PDF of some model parameter.
+    /*! In case of normal or log-normal distribution, the parameters are
+      clipping parameters.
+      \param[in] i model parameter index.
+      \return The parameters associated with the i-th parameter.
+    */
+    Vector<double>& ModelTemplate::GetParameterParameter(int i)
+    {
+        throw ErrorUndefined("ModelTemplate::GetParameterParameter(int i)");
+    }
+
+
+    //! Returns the perturbation option of the i-th parameter.
+    /*!
+      \param[in] i parameter index.
+      \return The perturbation option of the i-th parameter.
+    */
+    string ModelTemplate::GetParameterOption(int i)
+    {
+        throw ErrorUndefined("ModelTemplate::GetParameterOption(int i)");
     }
 
 
@@ -348,6 +438,16 @@ namespace Verdandi
     ModelTemplate::GetStateErrorVarianceInverse() const
     {
         throw ErrorUndefined("ModelTemplate::GetStateErrorVarianceInverse()");
+    }
+
+
+    //! Returns the square root of the model error variance.
+    /*!
+      \return The square root of the model error variance.
+    */
+    ModelTemplate::error_variance& ModelTemplate::GetErrorVarianceSqrt()
+    {
+        throw ErrorUndefined("ModelTemplate::GetErrorVarianceSqrt()");
     }
 
 
