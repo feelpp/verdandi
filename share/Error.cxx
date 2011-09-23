@@ -319,6 +319,80 @@ namespace Verdandi
     }
 
 
+    //////////////////////////
+    // ERRORPYTHONUNDEFINED //
+    //////////////////////////
+
+
+    //! Main constructor.
+    /*! Error associated with both a function and a comment.
+      \param[in] function function in which the error occurred.
+      \param[in] function_name name of the python function called.
+      \param[in] arguments arguments that must be passed to the function.
+      \param[in] python_file python file where the function is searched.
+      \param[in] comment comment associated with the error.
+    */
+    ErrorPythonUndefined::ErrorPythonUndefined(string function = "",
+                                               string function_name = "",
+                                               string arguments = "",
+                                               string python_file = "",
+                                               string comment = "")
+        throw():
+        Error("Call to an undefined Python function", function, comment)
+    {
+        function_name_ = function_name;
+        arguments_ = arguments;
+        python_file_ = python_file;
+
+#ifdef VERDANDI_WITH_ABORT
+        this->CoutWhat();
+        Logger::SetStdout(false);
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
+        abort();
+#else
+        Logger::Log<VERDANDI_EXCEPTION_LOGGING_LEVEL>(*this, this->What());
+#endif
+    }
+
+
+    //! Destructor.
+    /*!
+      \note Empty.
+    */
+    ErrorPythonUndefined::~ErrorPythonUndefined() throw()
+    {
+    }
+
+    //! Delivers information about the error.
+    /*! Displays available information, i.e. the error description, the
+      function and/or the comment.
+    */
+    string ErrorPythonUndefined::What()
+    {
+        string message(description_);
+        if (!function_.empty())
+            message += " in " + function_;
+        message += ".\n";
+        message += "   The Python function '" + function_name_;
+        message += arguments_;
+        message += "' is either not defined in \"" + python_file_;
+        message += "\" or has wrong arguments.";
+        if (!comment_.empty())
+            message += "\n    " + comment_;
+        return message;
+    }
+
+
+    //! Returns the name of the class.
+    /*!
+      \return The name of the class.
+    */
+    string ErrorPythonUndefined::GetName() const
+    {
+        return "ErrorPythonUndefined";
+    }
+
+
 } // namespace Verdandi.
 
 
