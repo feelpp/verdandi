@@ -28,34 +28,6 @@ dofile("configuration/observation.lua")
 ----------------------------------- METHOD -----------------------------------
 
 
--- Forward simulation.
-forward = {
-
-   display = {
-
-      show_iteration = false,
-      show_time = true
-
-   },
-
-   output_saver = {
-
-      variable_list = {"state_forecast"},
-      file = output_directory .. "forward-%{name}.%{extension}",
-      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
-
-   },
-
-   output = {
-
-      configuration = output_directory .. "forward.lua",
-      log = output_directory .. "forward.log"
-
-   }
-
-}
-
-
 -- Simulation with assimilation using optimal interpolation.
 optimal_interpolation = {
 
@@ -168,5 +140,33 @@ unscented_kalman_filter = {
      log = output_directory .. "ukf.log"
 
   }
+
+}
+
+
+-- Forward simulation.
+forward = {
+
+   display = {
+
+      show_iteration = false,
+      show_time = true
+
+   },
+
+   output_saver = {
+
+      variable_list = {"state_forecast"},
+      file = output_directory .. "forward-%{name}.%{extension}",
+      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
+
+   },
+
+   output = {
+
+      configuration = output_directory .. "forward.lua",
+      log = output_directory .. "forward.log"
+
+   }
 
 }
