@@ -77,6 +77,9 @@ namespace Verdandi
       \param[in] initialize_observation_manager should the observation manager
       be initialized with a call to ObservationManager::Initialize(Model&,
       string)?
+      \param[in] initialize_perturbation_manager should the perturbation
+      manager be initialized with a call to
+      PerturbationManager::Initialize(string)?
       \warning If \a initialize_model is set to false, the model should be
       initialized before calling this function.
     */
@@ -85,11 +88,13 @@ namespace Verdandi
     void EnsembleKalmanFilter<T, Model, ObservationManager,
                               PerturbationManager>
     ::Initialize(string configuration_file,
-                 bool initialize_model, bool initialize_observation_manager)
+                 bool initialize_model, bool initialize_observation_manager,
+                 bool initialize_perturbation_manager)
     {
         VerdandiOps configuration(configuration_file);
         Initialize(configuration,
-                   initialize_model, initialize_observation_manager);
+                   initialize_model, initialize_observation_manager,
+                   initialize_perturbation_manager);
 
     }
 
@@ -104,6 +109,9 @@ namespace Verdandi
       \param[in] initialize_observation_manager should the observation manager
       be initialized with a call to ObservationManager::Initialize(Model&,
       string)?
+      \param[in] initialize_perturbation_manager should the perturbation
+      manager be initialized with a call to
+      PerturbationManager::Initialize(string)?
       \warning If \a initialize_model is set to false, the model should be
       initialized before calling this function.
     */
@@ -112,7 +120,8 @@ namespace Verdandi
     void EnsembleKalmanFilter<T, Model, ObservationManager,
                               PerturbationManager>
     ::Initialize(VerdandiOps& configuration,
-                 bool initialize_model, bool initialize_observation_manager)
+                 bool initialize_model, bool initialize_observation_manager,
+                 bool initialize_perturbation_manager)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
@@ -197,8 +206,9 @@ namespace Verdandi
             MessageHandler::Send(*this, "driver", "initial condition");
         }
 
-        perturbation_manager_
-            .Initialize(perturbation_manager_configuration_file_);
+        if (initialize_perturbation_manager)
+            perturbation_manager_
+                .Initialize(perturbation_manager_configuration_file_);
 
         if (initialize_observation_manager)
             observation_manager_.Initialize(model_,

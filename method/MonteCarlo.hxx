@@ -105,8 +105,12 @@ namespace Verdandi
         template <class T0, class Storage0, class Allocator0>
         void Fill(Vector<T0, Storage0, Allocator0>& in, string pdf);
 
-        void Initialize(string configuration_file);
-        void Initialize(VerdandiOps& configuration);
+        void Initialize(string configuration_file,
+                        bool initialize_model = true,
+                        bool initialize_perturbation_manager = true);
+        void Initialize(VerdandiOps& configuration,
+                        bool initialize_model = true,
+                        bool initialize_perturbation_manager = true);
         void InitializeStep();
         void Forward();
 

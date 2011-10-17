@@ -113,10 +113,12 @@ namespace Verdandi
 
         void Initialize(string configuration_file,
                         bool initialize_model = true,
-                        bool initialize_observation_manager = true);
+                        bool initialize_observation_manager = true,
+                        bool initialize_perturbation_manager = true);
         void Initialize(VerdandiOps& configuration,
                         bool initialize_model = true,
-                        bool initialize_observation_manager = true);
+                        bool initialize_observation_manager = true,
+                        bool initialize_perturbation_manager = true);
 
         void InitializeEnsemble();
 

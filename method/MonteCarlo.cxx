@@ -168,9 +168,22 @@ namespace Verdandi
 
 
     //! Initializes the simulation.
-    /*! Initializes the model and the perturbation manager. */
+    /*! It reads the configuration and initializes the model and the
+      perturbation manager.
+      \param[in] configuration_file configuration file for the method.
+      \param[in] initialize_model should the model be initialized with a call
+      to Model::Initialize(string)?
+      \param[in] initialize_perturbation_manager should the perturbation
+      manager be initialized with a call to
+      PerturbationManager::Initialize(string)?
+      \warning If \a initialize_model is set to false, the model should be
+      initialized before calling this function.
+    */
     template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::Initialize(string configuration_file)
+    void MonteCarlo<T, ClassModel>
+    ::Initialize(string configuration_file,
+                 bool initialize_model,
+                 bool initialize_perturbation_manager)
     {
         VerdandiOps configuration(configuration_file);
         Initialize(configuration);
@@ -178,9 +191,22 @@ namespace Verdandi
 
 
     //! Initializes the simulation.
-    /*! Initializes the model and the perturbation manager. */
+    /*! It reads the configuration and initializes the model and the
+      perturbation manager.
+      \param[in] configuration_file configuration file for the method.
+      \param[in] initialize_model should the model be initialized with a call
+      to Model::Initialize(string)?
+      \param[in] initialize_perturbation_manager should the perturbation
+      manager be initialized with a call to
+      PerturbationManager::Initialize(string)?
+      \warning If \a initialize_model is set to false, the model should be
+      initialized before calling this function.
+    */
     template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::Initialize(VerdandiOps& configuration)
+    void MonteCarlo<T, ClassModel>
+    ::Initialize(VerdandiOps& configuration,
+                 bool initialize_model,
+                 bool initialize_perturbation_manager)
     {
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
@@ -244,11 +270,12 @@ namespace Verdandi
         else
             Logger::Log<-3>(*this, "Initialization");
 
+        if (initialize_model)
+            model_.Initialize(model_configuration_file_);
 
-        model_.Initialize(model_configuration_file_);
-
-        perturbation_manager_
-            .Initialize(perturbation_manager_configuration_file_);
+        if (initialize_perturbation_manager)
+            perturbation_manager_
+                .Initialize(perturbation_manager_configuration_file_);
 
         iteration_ = 0;
 
