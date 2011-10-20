@@ -38,6 +38,7 @@
 #include "method/OptimalInterpolation.hxx"
 #include "method/ForwardDriver.hxx"
 #include "method/ReducedOrderExtendedKalmanFilter.hxx"
+#include "output_saver/OutputSaver.hxx"
   %}
 
 %include "std_string.i"
@@ -106,6 +107,7 @@ using namespace std;
 %include "method/OptimalInterpolation.hxx"
 %include "method/ForwardDriver.hxx"
 %include "method/ReducedOrderExtendedKalmanFilter.hxx"
+%include "output_saver/OutputSaver.hxx"
 
 namespace Verdandi
 {
