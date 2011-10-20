@@ -399,6 +399,20 @@ namespace Verdandi
     }
 
 
+    //! Checks if \a variable_name is a listed variable.
+    /*!
+      \param[in] variable_name name of the variable to be searched.
+    */
+    bool OutputSaver::IsVariable(string variable_name) const
+    {
+        map<string, Variable>::const_iterator im;
+
+        im = variable_list_.find(variable_name);
+
+        return im != variable_list_.end();
+    }
+
+
     //! Displays the variables parameters.
     void OutputSaver::DisplayVariableList() const
     {

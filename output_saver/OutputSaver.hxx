@@ -101,6 +101,7 @@ namespace Verdandi
         void Empty(string variable_name);
         void Empty();
 
+        bool IsVariable(string variable_name) const;
         void DisplayVariableList() const;
 
     private:
