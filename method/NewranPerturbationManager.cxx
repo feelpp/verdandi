@@ -97,31 +97,30 @@ namespace Verdandi
 
         configuration_stream.SetPrefix("perturbation_manager.newran.");
 
-        if (configuration_stream.Exists("random_seed"))
-            if (configuration_stream.Is<double>("random_seed"))
-            {
-                configuration_stream.Set("random_seed", seed_value_);
-                delete urng_;
-                urng_ = new NEWRAN::LGM_mixed(seed_value_);
-                NEWRAN::Random::Set(*urng_);
-            }
-            else
-            {
-                configuration_stream.Set("random_seed", "", NULL,
-                                         random_seed_);
-                if (random_seed_.compare("current_time"))
-                {
-                    NEWRAN::Random::SetDirectory(random_seed_.c_str());
-                    NEWRAN::Random::Set(*urng_);
-                    if (!Lock(random_seed_ + "lock"))
-                        throw ErrorIO(
-                            "NewranPerturbationManager::Initialize(string)",
-                            "Unable to create the Newran lock file \""
-                            + random_seed_ + "lock\".");
+        configuration_stream.Set("seed_type",
+                                 "ops_in(v, {'time', 'number', 'directory'})",
+                                 seed_type_);
 
-                    NEWRAN::Random::CopySeedFromDisk();
-                }
-            }
+        if (seed_type_ == "number")
+        {
+            configuration_stream.Set("seed_number", seed_number_);
+            delete urng_;
+            urng_ = new NEWRAN::LGM_mixed(seed_number_);
+            NEWRAN::Random::Set(*urng_);
+        }
+        else if (seed_type_ == "directory")
+        {
+           configuration_stream.Set("seed_directory", seed_directory_);
+           NEWRAN::Random::SetDirectory(seed_directory_.c_str());
+           NEWRAN::Random::Set(*urng_);
+           if (!Lock(seed_directory_ + "lock"))
+               throw ErrorIO(
+                   "NewranPerturbationManager::Initialize(string)",
+                   "Unable to create the Newran lock file \""
+                   + seed_directory_ + "lock\".");
+
+           NEWRAN::Random::CopySeedFromDisk();
+        }
     }
 
 
@@ -131,12 +130,12 @@ namespace Verdandi
     {
         Finalize();
 
-        if (!random_seed_.empty() && random_seed_.compare("current_time"))
+        if (seed_type_ == "directory")
         {
-            if (!Lock(random_seed_ + "lock"))
+            if (!Lock(seed_directory_ + "lock"))
                 throw ErrorIO("NewranPerturbationManager::Reinitialize()",
                               "Unable to create the Newran lock file \""
-                              + random_seed_ + "lock\".");
+                              + seed_directory_ + "lock\".");
 
             NEWRAN::Random::CopySeedFromDisk();
         }
@@ -147,14 +146,14 @@ namespace Verdandi
     /*! Saves and unlocks the seed. */
     void NewranPerturbationManager::Finalize()
     {
-        if (!random_seed_.empty() && random_seed_.compare("current_time"))
+        if (seed_type_ == "directory")
         {
             NEWRAN::Random::CopySeedToDisk();
 
-            if (!Unlock(random_seed_ + "lock"))
+            if (!Unlock(seed_directory_ + "lock"))
                 throw ErrorIO("NewranPerturbationManager::Finalize()",
                               "Unable to remove the Newran lock file \""
-                              + random_seed_ + "lock\".");
+                              + seed_directory_ + "lock\".");
         }
     }
 

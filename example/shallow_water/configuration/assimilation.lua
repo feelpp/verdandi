@@ -32,23 +32,7 @@ dofile("configuration/observation.lua")
 ------------------------------ PERTURBATION-----------------------------------
 
 
-perturbation_manager = {
-
-   newran = {
-
-      seed_path = os.getenv("HOME") .. "/.newran/",
-      seed_value = 0.4
-
-   },
-
-   output = {
-
-      configuration = output_directory .. "perturbation.lua",
-      log = output_directory .. "perturbation.log"
-
-   }
-
-}
+dofile("configuration/perturbation_manager.lua")
 
 
 ----------------------------------- METHOD -----------------------------------

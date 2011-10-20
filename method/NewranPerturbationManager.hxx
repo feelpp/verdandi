@@ -42,12 +42,15 @@ namespace Verdandi
         //! Uniform random number generator.
         NEWRAN::LGM_mixed* urng_;
 
-        //! String that contains either the path to the Newran seed
-        //! or current_time for a seed based on the CPU time.
-        string random_seed_;
+        /*! \brief String that defines how the seed is initialized: "time",
+          "number" or "directory". */
+        string seed_type_;
 
-        //! Newran seed value.
-        double seed_value_;
+        //! Newran seed number.
+        double seed_number_;
+
+        //! Newran seed directory.
+        string seed_directory_;
 
     public:
 
