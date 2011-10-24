@@ -1,3 +1,56 @@
+Version 1.1 (2011-10-25)
+-----------
+
+* Methods
+
+- Added an implementation of the ensemble Kalman filter
+  ('EnsembleKalmanFilter').
+- Modified 'UnscentedKalmanFilter' to support a model state of type
+  'Vector<Collection>'.
+- Improved the saving options in 'ReducedMinimax'.
+- Added in 'MonteCarlo::Initialize' the option to choose to initialize or not
+  the model and the perturbation manager.
+
+* Example models
+
+- Extended the interface of the shallow water model for the ensemble Kalman
+  filter.
+
+* Perturbation managers
+
+- The perturbation manager based on Newran can now accept several types of
+  seed, and it requires to explicitly choose this type in the configuration.
+
+* Bug fixes
+
+- In the reduced minimax filter, the observations were assimilated one model
+  time step earlier than expected.
+
+
+Version 1.0.2 (2011-08-23)
+-------------
+
+* Documentation
+
+- Added documentation about the compilation of the SWIG interface under
+  Windows.
+- Updated the documentation for the Python interface with the current naming
+  conventions.
+
+* Improvements
+
+- Made the SWIG interface compatible with Windows.
+
+* Bug fixes
+
+- In the perturbation managers, the mean and the covariance matrix were
+  erroneously modified when the constraints were not satisfied by the first
+  sampling.
+- The homogeneous log-normal perturbations were erroneous.
+- In the perturbation manager, several log-normal sampling functions did not
+  work properly.
+
+
 Version 1.0.1 (2011-06-16)
 -------------
 
