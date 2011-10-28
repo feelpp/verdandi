@@ -43,7 +43,7 @@ namespace Verdandi
 
     public:
         typedef typename ClassModel::state model_state;
-        typedef typename ClassModel::uncertain_variable uncertain_variable;
+        typedef typename ClassModel::uncertain_parameter uncertain_parameter;
 
     protected:
 
@@ -54,7 +54,7 @@ namespace Verdandi
         NewranPerturbationManager perturbation_manager_;
 
         //! Perturbations vectors.
-        vector<uncertain_variable> perturbation_;
+        vector<uncertain_parameter> perturbation_;
 
         //! Iteration.
         int iteration_;

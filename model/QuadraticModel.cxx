@@ -154,18 +154,6 @@ namespace Verdandi
         {
             configuration.SetPrefix("quadratic_model.uncertainty.");
 
-            b_mean_.Reallocate(Nstate_);
-            configuration.Set("constant.mean", b_mean_);
-            Add(T(1), b_, b_mean_);
-
-            b_variance_.Reallocate(Nstate_, Nstate_);
-            configuration.Set("constant.variance", b_variance_);
-
-            configuration.Set("constant.distribution",
-                              "ops_in(v, {'Normal', 'LogNormal', "
-                              "'NormalHomogeneous', 'LogNormalHomogeneous'})",
-                              b_pdf_);
-
             configuration.Set("uncertain_parameter_list",
                               "ops_in(v, {'quadratic_term', 'linear_term', "
                               "'constant'})",
@@ -617,94 +605,6 @@ namespace Verdandi
     ::SetFullState(const state& state)
     {
         SetState(state);
-    }
-
-
-    //! Returns the number of variables to be perturbed.
-    /*!
-      \return The number of variables to be perturbed.
-    */
-    template <class T>
-    int QuadraticModel<T>::GetNuncertain()
-    {
-        return 1;
-    }
-
-
-    //! Returns the i-th uncertain variable.
-    /*!
-      \param[in] i index of the uncertain variable.
-      \return The vector associated with the i-th uncertain variable.
-    */
-    template<class T>
-    typename QuadraticModel<T>::uncertain_variable&
-    QuadraticModel<T>::GetUncertainVariable(int i)
-    {
-        return b_;
-    }
-
-
-    //! Returns the correlation between the uncertain variables.
-    /*! Since there is only one uncertain variable, an empty vector is
-      returned.
-      \param[in] i uncertain-variable index.
-      \return An empty vector.
-    */
-    template<class T>
-    Vector<T>& QuadraticModel<T>::GetPDFCorrelation(int i)
-    {
-        return correlation_;
-    }
-
-
-    //! Returns the PDF of the i-th uncertain variable.
-    /*!
-      \param[in] i uncertain-variable index.
-      \return The PDF of the i-th uncertain variable.
-    */
-    template<class T>
-    string QuadraticModel<T>::GetPDF(int i)
-    {
-        return b_pdf_;
-    }
-
-
-    /*! \brief Returns the covariance matrix associated with the i-th
-      uncertain variable. */
-    /*!
-      \param[in] i uncertain-variable index.
-      \return The covariance matrix associated with the i-th variable.
-    */
-    template<class T>
-    Matrix<T, Symmetric, RowSymPacked>&
-    QuadraticModel<T>::GetPDFVariance(int i)
-    {
-        return b_variance_;
-    }
-
-
-    //! Returns parameters associated with the PDF of some uncertain variable.
-    /*! In case of normal or log-normal distribution, the parameters are
-      clipping parameters.
-      \param[in] i uncertain-variable index.
-      \return The parameters associated with the i-th variable.
-    */
-    template<class T>
-    Vector<T>& QuadraticModel<T>::GetPDFParameter(int i)
-    {
-        return b_parameter_;
-    }
-
-
-    //! Returns the perturbation option of the i-th uncertain variable.
-    /*!
-      \param[in] i uncertain-variable index.
-      \return The perturbation option of the i-th uncertain variable.
-    */
-    template<class T>
-    string QuadraticModel<T>::GetPerturbationOption(int i)
-    {
-        return "init_step";
     }
 
 

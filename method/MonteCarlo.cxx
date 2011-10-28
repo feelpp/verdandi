@@ -52,7 +52,7 @@ namespace Verdandi
     template <class T, class ClassModel>
     MonteCarlo<T, ClassModel>::~MonteCarlo()
     {
-        typename vector<uncertain_variable>::iterator i;
+        typename vector<uncertain_parameter>::iterator i;
         for (i = perturbation_.begin(); i != perturbation_.end(); i++)
             Clear(*i);
     }
@@ -280,58 +280,60 @@ namespace Verdandi
         iteration_ = 0;
 
         MessageHandler::Send(*this, "model", "initial condition");
-        for (int i = 0; i < model_.GetNuncertain(); i++)
+        for (int i = 0; i < model_.GetNparameter(); i++)
         {
-            uncertain_variable output;
+            uncertain_parameter output;
             bool allocate;
+            uncertain_parameter parameter = model_.GetParameter(i);
 
-            if (model_.GetPDF(i) == "Normal"
-                || model_.GetPDF(i) == "LogNormal"
-                || model_.GetPDF(i) == "BlockNormal"
-                || model_.GetPDF(i) == "BlockLogNormal")
+            if (model_.GetParameterPDF(i) == "Normal"
+                || model_.GetParameterPDF(i) == "LogNormal"
+                || model_.GetParameterPDF(i) == "BlockNormal"
+                || model_.GetParameterPDF(i) == "BlockLogNormal")
             {
-                SetDimension(model_.GetUncertainVariable(i), output);
-                Fill(output, model_.GetPDF(i));
-                perturbation_manager_.Sample(model_.GetPDF(i),
-                                             model_.GetPDFVariance(i),
-                                             model_.GetPDFParameter(i),
-                                             model_.GetPDFCorrelation(i),
+                SetDimension(parameter, output);
+                Fill(output, model_.GetParameterPDF(i));
+                perturbation_manager_.Sample(model_.GetParameterPDF(i),
+                                             model_.GetParameterVariance(i),
+                                             model_.GetParameterParameter(i),
+                                             model_.GetParameterCorrelation(i),
                                              output);
             }
-            else if (model_.GetPDF(i) == "NormalHomogeneous"
-                     || model_.GetPDF(i) == "LogNormalHomogeneous"
-                     || model_.GetPDF(i) == "BlockNormalHomogeneous"
-                     || model_.GetPDF(i) == "BlockLogNormalHomogeneous")
+            else if (model_.GetParameterPDF(i) == "NormalHomogeneous"
+                     || model_.GetParameterPDF(i) == "LogNormalHomogeneous"
+                     || model_.GetParameterPDF(i) == "BlockNormalHomogeneous"
+                     || model_.GetParameterPDF(i) == "BlockLogNormalHomogeneous")
             {
-                SetDimension(model_.GetUncertainVariable(i), output);
-                Fill(output, model_.GetPDF(i));
-                perturbation_manager_.Sample(model_.GetPDF(i),
-                                             model_.GetPDFVariance(i)(0, 0),
-                                             model_.GetPDFParameter(i),
-                                             model_.GetPDFCorrelation(i),
+                SetDimension(parameter, output);
+                Fill(output, model_.GetParameterPDF(i));
+                perturbation_manager_.Sample(model_.GetParameterPDF(i),
+                                             model_.GetParameterVariance(i)(0, 0),
+                                             model_.GetParameterParameter(i),
+                                             model_.GetParameterCorrelation(i),
                                              output);
             }
             else
                 throw ErrorConfiguration("MonteCarlo::Initialize(string)",
                                          "The probability distribution \""
-                                         + model_.GetPDF(i)
+                                         + model_.GetParameterPDF(i)
                                          + "\" is not supported.");
             perturbation_.push_back(output);
 
-            if (model_.GetPerturbationOption(i) == "init_step")
+            if (model_.GetParameterOption(i) == "init_step")
                 // Applies the perturbations.
-                if (model_.GetPDF(i) == "Normal"
-                    || model_.GetPDF(i) == "BlockNormal"
-                    || model_.GetPDF(i) == "NormalHomogeneous"
-                    || model_.GetPDF(i) == "BlockNormalHomogeneous")
-                    Add(1., perturbation_[i], model_.GetUncertainVariable(i));
-                else if (model_.GetPDF(i) == "LogNormal"
-                         || model_.GetPDF(i) == "BlockLogNormal"
-                         || model_.GetPDF(i) == "LogNormalHomogeneous"
-                         || model_.GetPDF(i) == "BlockLogNormalHomogeneous")
+                if (model_.GetParameterPDF(i) == "Normal"
+                    || model_.GetParameterPDF(i) == "BlockNormal"
+                    || model_.GetParameterPDF(i) == "NormalHomogeneous"
+                    || model_.GetParameterPDF(i) == "BlockNormalHomogeneous")
+                    Add(1., perturbation_[i], parameter);
+                else if (model_.GetParameterPDF(i) == "LogNormal"
+                         || model_.GetParameterPDF(i) == "BlockLogNormal"
+                         || model_.GetParameterPDF(i) == "LogNormalHomogeneous"
+                         || model_.GetParameterPDF(i) == "BlockLogNormalHomogeneous")
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
-                        model_.GetUncertainVariable(i)(k)
-                            *= perturbation_[i](k);
+                        parameter(k) *= perturbation_[i](k);
+
+            model_.SetParameter(i, parameter);
 
             output_saver_.Save(perturbation_[i], "perturbation");
         }
@@ -348,20 +350,24 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
         model_.InitializeStep();
-        for (int i = 0; i < model_.GetNuncertain(); i++)
-            if (model_.GetPerturbationOption(i) == "every_step")
-                if (model_.GetPDF(i) == "Normal"
-                    || model_.GetPDF(i) == "BlockNormal"
-                    || model_.GetPDF(i) == "NormalHomogeneous"
-                    || model_.GetPDF(i) == "BlockNormalHomogeneous")
-                    Add(1., perturbation_[i], model_.GetUncertainVariable(i));
-                else if (model_.GetPDF(i) == "LogNormal"
-                         || model_.GetPDF(i) == "BlockLogNormal"
-                         || model_.GetPDF(i) == "LogNormalHomogeneous"
-                         || model_.GetPDF(i) == "BlockLogNormalHomogeneous")
+        for (int i = 0; i < model_.GetNparameter(); i++)
+        {
+            uncertain_parameter parameter = model_.GetParameter(i);
+            if (model_.GetParameterOption(i) == "every_step")
+                if (model_.GetParameterPDF(i) == "Normal"
+                    || model_.GetParameterPDF(i) == "BlockNormal"
+                    || model_.GetParameterPDF(i) == "NormalHomogeneous"
+                    || model_.GetParameterPDF(i) == "BlockNormalHomogeneous")
+                    Add(1., perturbation_[i], parameter);
+                else if (model_.GetParameterPDF(i) == "LogNormal"
+                         || model_.GetParameterPDF(i) == "BlockLogNormal"
+                         || model_.GetParameterPDF(i) == "LogNormalHomogeneous"
+                         || model_.GetParameterPDF(i) == "BlockLogNormalHomogeneous")
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
-                        model_.GetUncertainVariable(i)(k)
-                            *= perturbation_[i](k);
+                        parameter(k) *= perturbation_[i](k);
+
+            model_.SetParameter(i, parameter);
+        }
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
     }
@@ -484,7 +490,7 @@ namespace Verdandi
     }
 
 
-} // namespace Verdandi.
+} // namespace Verdandi
 
 
 #define VERDANDI_FILE_METHOD_MONTECARLO_CXX
