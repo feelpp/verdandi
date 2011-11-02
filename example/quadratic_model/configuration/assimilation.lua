@@ -5,6 +5,7 @@ Delta_t_model = 0.0015
 Nskip_save = 100
 
 output_directory = "result/"
+output_file_string = ""
 observation_file = output_directory .. "truth-state_forecast.bin"
 
 
@@ -146,6 +147,34 @@ unscented_kalman_filter = {
      log = output_directory .. "ukf.log"
 
   }
+
+}
+
+
+-- Monte Carlo simulation.
+monte_carlo = {
+
+   display = {
+
+      show_iteration = false,
+      show_time = false
+
+   },
+
+   output_saver = {
+      file_string = output_file_string,
+      variable_list = {"perturbation", "state"},
+      file = output_directory  .. output_file_string .. "mc-%{name}.%{extension}",
+      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
+
+   },
+
+   output = {
+
+      configuration = output_directory .. "mc.lua",
+      log = output_directory .. "mc.log"
+
+   },
 
 }
 
