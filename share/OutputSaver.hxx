@@ -85,13 +85,16 @@ namespace Verdandi
 
         template <class S>
         void Save(const S& x, string variable_name);
+#ifdef VERDANDI_WITH_PETSC
+        template <class T, class Allocator>
+        void Save(const Vector<T, PETScPar, Allocator>& x,
+                  string variable_name);
+#endif
 
         template <class S>
         void WriteText(const S& x, string file_name) const;
-
         template <class S>
         void WriteBinary(const S& x, string file_name) const;
-
         template <class T, class Prop, class Allocator>
         void WriteBinary(const Matrix<T, Prop, RowSparse, Allocator>& x,
                          string file_name) const;

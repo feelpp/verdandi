@@ -138,6 +138,27 @@ namespace Verdandi
                        int i, Vector<T, VectFull, Allocator<T> >& V);
 #endif
 
+#ifdef VERDANDI_WITH_PETSC
+    template <class T0, class Allocator0, class Model>
+    void Reallocate(Matrix<T0, General, PETScMPIDense, Allocator0>& A, int i,
+                    int j, const Model& model);
+#endif
+
+    template <class T0, class Prop0, class Storage0, class Allocator0,
+              class Model>
+    void Reallocate(Matrix<T0, Prop0, Storage0, Allocator0>& A, int i, int j,
+                    const Model& model);
+
+#ifdef VERDANDI_WITH_PETSC
+    template <class T0, class Allocator0, class Model>
+    void Reallocate(Vector<T0, PETScPar, Allocator0>& V, int i,
+                    const Model& model);
+#endif
+
+    template <class T0, class Storage0, class Allocator0, class Model>
+    void Reallocate(Vector<T0, Storage0, Allocator0>& V, int i,
+                    const Model& model);
+
 
 } // namespace Verdandi.
 

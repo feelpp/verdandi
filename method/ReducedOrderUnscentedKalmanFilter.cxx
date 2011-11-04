@@ -212,11 +212,11 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
-        model_state_error_variance L, U;
-        model_.GetStateErrorVarianceSqrt(L, U);
-        Copy(L, L_);
+        sigma_point_matrix U;
+        model_.GetStateErrorVarianceSqrt(L_, U);
         Copy(U, U_);
-        Copy(U_, U_inv_);
+        U_inv_.Copy(U_);
+
         GetInverse(U_inv_);
 
         Nreduced_ = U_.GetN();
@@ -255,6 +255,12 @@ namespace Verdandi
             throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
                                  "Initialize()", "Calculation not "
                                  "implemented for no constant alpha_i.");
+        I_.Copy(I_trans_);
+        Transpose(I_);
+
+#if defined(VERDANDI_WITH_PETSC)
+        MPI_Comm_rank(PETSC_COMM_WORLD, &rank_);
+#endif
 
         // Initializes D_v.
         D_v_.Reallocate(Nsigma_point_, Nsigma_point_);
@@ -456,7 +462,7 @@ namespace Verdandi
 
                 if (rank_ == 0)
                 {
-                    Copy(x, working_vector);
+                    working_vector.Copy(x);
                     working_vector.Fill(T(0));
                 }
 
@@ -556,63 +562,71 @@ namespace Verdandi
                 model_.StateUpdated();
             }
 #else
-            model_state& x =  model_.GetState();
+            model_state x;
+            x.Copy(model_.GetState());
 
             /*** Sampling ***/
 
-            sigma_point_matrix tmp;
+            model_state_error_variance tmp;
             GetCholesky(U_inv_);
 
             Copy(L_, tmp);
             MltAdd(T(1), tmp, U_inv_, T(0), L_);
 
             // Computes X_n^{(i)+}.
-            X_i_trans_.Reallocate(Nsigma_point_, Nstate_);
-            sigma_point x_col;
+            Reallocate(X_i_, Nstate_, Nsigma_point_, model_);
             for (int i = 0; i < Nsigma_point_; i++)
-                SetRow(x, i, X_i_trans_);
+                SetCol(x, i, X_i_);
 
-            MltAdd(T(1), SeldonNoTrans, I_trans_, SeldonTrans, L_, T(1),
-                   X_i_trans_);
+            MltAdd(T(1), L_, I_, T(1), X_i_);
 
             /*** Prediction ***/
 
             // Computes X_{n + 1}^-.
             x.Fill(T(0));
+            model_state x_col;
+            Reallocate(x_col, x.GetM(), model_);
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                GetRow(X_i_trans_, i, x_col);
-                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, true);
+                GetCol(X_i_, i, x_col);
+                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, false);
                 Add(T(alpha_), x_col, x);
-                SetRow(x_col, i, X_i_trans_);
+                SetCol(x_col, i, X_i_);
             }
-
-            // Computes L_{n + 1}.
-            MltAdd(T(alpha_), SeldonTrans, X_i_trans_, SeldonNoTrans,
-                   I_trans_, T(0), L_);
 
             /*** Resampling ***/
 
             if (with_resampling_)
             {
+#if defined(VERDANDI_WITH_PETSC)
+                throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
+                                     "Forward()", "'resampling 'option "
+                                     "not support yet.");
+#else
+                MltAdd(T(alpha_), X_i_, I_trans_, T(0), L_);
                 for(int i = 0; i < Nsigma_point_; i++)
-                    SetRow(x, i, X_i_trans_);
-                MltAdd(T(1), SeldonNoTrans, I_trans_, SeldonTrans,
-                       L_, T(1), X_i_trans_);
+                    SetCol(x, i, X_i_);
+                MltAdd(T(1), L_, I_, T(1), X_i_);
+#endif
             }
 
+            // Computes L_{n + 1}.
+            MltAdd(T(alpha_), X_i_, I_trans_, T(0), L_);
+
+            model_.GetState().Copy(x);
             model_.StateUpdated();
 #endif
         }
         else
         {
-#if defined(VERDANDI_WITH_MPI)
+#if defined(VERDANDI_WITH_MPI) || defined(VERDANDI_WITH_PETSC)
             throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
                                  "Forward()", "Parallel algorithm not "
                                  "implemented yet for the 'no"
                                  " simplex' cases.");
 #else
-            model_state& x =  model_.GetState();
+            model_state x =  model_.GetState();
+            x.Copy(model_.GetState());
 
             /*** Sampling ***/
 
@@ -637,10 +651,12 @@ namespace Verdandi
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRow(X_i_trans_, i, x_col);
-                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, true);
+                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, false);
                 Add(T(alpha_), x_col, x);
                 SetRow(x_col, i, X_i_trans_);
             }
+
+            model_.GetState().Copy(x);
             model_.StateUpdated();
 
             /*** Resampling with SVD ***/
@@ -1008,18 +1024,21 @@ namespace Verdandi
 #else
             // Computes [HX_{n+1}^{*}].
             sigma_point_matrix Z_i_trans(Nsigma_point_, Nobservation_);
-            sigma_point x_col;
+            model_state x_col;
+            Reallocate(x_col, Nstate_, model_);
+            model_.StateUpdated();
+
             observation z_col, z(Nobservation_);
             z.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
-                GetRowPointer(X_i_trans_, i, x_col);
+                GetCol(X_i_, i, x_col);
                 GetRowPointer(Z_i_trans, i, z_col);
                 observation_manager_.ApplyOperator(x_col, z_col);
                 Add(T(alpha_), z_col, z);
-                x_col.Nullify();
                 z_col.Nullify();
             }
+
             sigma_point_matrix HL_trans(Nreduced_, Nobservation_);
             MltAdd(T(alpha_), SeldonTrans, I_trans_, SeldonNoTrans, Z_i_trans,
                    T(0), HL_trans);
@@ -1044,29 +1063,30 @@ namespace Verdandi
                    SeldonTrans, HL_trans, T(1), U_inv_);
             GetInverse(U_inv_);
 
-            // Computes K.
-            sigma_point_matrix K(Nstate_, Nobservation_);
-
             tmp.Reallocate(Nreduced_, Nobservation_);
             tmp.Fill(T(0));
 
             MltAdd(T(1), U_inv_, working_matrix_po, T(0), tmp);
-            MltAdd(T(1), L_, tmp, T(0), K);
 
             // Computes innovation.
             observation innovation;
             observation_manager_.GetObservation(innovation);
             Add(T(-1), z, innovation);
 
+            MltAdd(T(1), U_inv_, working_matrix_po, T(0), tmp);
+
+            observation reduced_innovation(Nreduced_);
+            MltAdd(T(1), tmp, innovation, T(0), reduced_innovation);
+
             // Updates.
             model_state& x =  model_.GetState();
-            MltAdd(T(1), K, innovation, T(1), x);
+            MltAdd(T(1), L_, reduced_innovation, T(1), x);
             model_.StateUpdated();
 #endif
         }
         else
         {
-#if defined(VERDANDI_WITH_MPI)
+#if defined(VERDANDI_WITH_MPI) || defined(VERDANDI_WITH_PETSC)
             throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
                                  "Analyse()", "Parallel algorithm not"
                                  " implemented yet for the 'no"

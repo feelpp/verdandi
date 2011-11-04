@@ -223,6 +223,51 @@ namespace Verdandi
     }
 
 
+#ifdef VERDANDI_WITH_PETSC
+    //! Writes the variable in the file with the chosen format.
+    /*! The variable \a variable_name is saved in its dedicated file with its
+      saving mode.
+      \param[in] x value of the variable.
+      \param[in] variable_name name of the variable to be saved.
+    */
+    template <class T, class Allocator>
+    void OutputSaver::Save(const Vector<T, PETScPar, Allocator>& x,
+                           string variable_name)
+    {
+        if (!is_active_)
+            return;
+
+        map<string, Variable>::iterator im;
+
+        im = variable_list_.find(variable_name);
+
+        if (im == variable_list_.end())
+            return;
+
+        Variable& variable = im->second;
+
+        // In case the mode has not been set yet.
+        SetVariable<Vector<T, PETScPar, Allocator> >(variable);
+
+        if (variable.HasToEmptyFile())
+        {
+            int rank;
+            int ierr;
+            ierr = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            CHKERRABORT(MPI_COMM_WORLD, ierr);
+            variable.SetFile(variable.GetFile()
+                             + "-processor_" + to_str(rank));
+            Empty(variable_name);
+        }
+
+        if (variable.GetMode() == "text")
+            WriteText(x, variable.GetFile());
+        else if (variable.GetMode() == "binary")
+            WriteBinary(x, variable.GetFile());
+    }
+#endif
+
+
     //! Writes \a x in a text file.
     /*!
       \param[in] x variable to be written.
@@ -237,7 +282,7 @@ namespace Verdandi
             throw ErrorIO("WriteText(const S& x , string file_name)",
                           "Cannot open file \"" + file_name + "\"." );
 #endif
-        file << x << '\n';
+        x.WriteText(file);
         file.close();
     }
 

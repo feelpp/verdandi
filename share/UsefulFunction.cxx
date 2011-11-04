@@ -858,6 +858,74 @@ namespace Verdandi
     }
 
 
+#ifdef VERDANDI_WITH_PETSC
+    //! Reallocates memory of a given matrix.
+    /*!
+      \param[in, out] A a given matrix. On exit, the matrix is a \a i x \a j
+      matrix.
+      \param[in] i new number of rows.
+      \param[in] j new number of columns.
+      \param[in] model the model that gives, if \a A is distributed, the
+      number of local rows.
+    */
+    template <class T0, class Allocator0,
+              class Model>
+    void Reallocate(Matrix<T0, General, PETScMPIDense, Allocator0>& A, int i,
+                    int j, const Model& model)
+    {
+        A.Reallocate(i, j, model.GetLocalNstate());
+    }
+#endif
+
+
+    //! Reallocates memory of a given matrix.
+    /*!
+      \param[in, out] A a given matrix. On exit, the matrix is a \a i x \a j
+      matrix.
+      \param[in] i new number of rows.
+      \param[in] j new number of columns.
+      \param[in] model this argument is not used by this function.
+    */
+    template <class T0, class Prop0, class Storage0, class Allocator0,
+              class Model>
+    void Reallocate(Matrix<T0, Prop0, Storage0, Allocator0>& A, int i, int j,
+                    const Model& model)
+    {
+        A.Reallocate(i, j);
+    }
+
+
+#ifdef VERDANDI_WITH_PETSC
+    //! Reallocates memory of a given vector.
+    /*!
+      \param[in, out] V a given vector. On exit, the vector is of size i.
+      \param[in] i new vector size.
+      \param[in] model the model that gives, if \a V is distributed, the
+      number of local elements.
+    */
+    template <class T0, class Allocator0,
+              class Model>
+    void Reallocate(Vector<T0, PETScPar, Allocator0>& V, int i,
+                    const Model& model)
+    {
+        V.Reallocate(i, model.GetLocalNstate());
+    }
+#endif
+
+
+    //! Reallocates memory of a given vector.
+    /*!
+      \param[in, out] V a given vector. On exit, the vector is of size i.
+      \param[in] i new vector size.
+      \param[in] model this argument is not used by this function.
+    */
+    template <class T0, class Storage0, class Allocator0,
+              class Model>
+    void Reallocate(Vector<T0, Storage0, Allocator0>& V, int i,
+                    const Model& model)
+    {
+        V.Reallocate(i);
+    }
 
 
 } // namespace Verdandi.

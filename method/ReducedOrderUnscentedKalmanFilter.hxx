@@ -87,7 +87,7 @@ namespace Verdandi
         ObservationManager observation_manager_;
 
         //! Matrix L in the P SVD decomposition.
-        sigma_point_matrix L_;
+        model_state_error_variance L_;
         //! Matrix U in the P SVD decomposition.
         sigma_point_matrix U_;
         //! Inverse of matrix U.
@@ -124,9 +124,18 @@ namespace Verdandi
         //! Choice of sigma-points.
         string sigma_point_type_;
         //! Matrix of sigma-points.
+        sigma_point_matrix I_;
+        //! Matrix of sigma-points (transposed).
         sigma_point_matrix I_trans_;
+#if defined(VERDANDI_WITH_MPI)
         //! Transpose of [X_n^(*)].
         sigma_point_matrix X_i_trans_;
+#else
+        //! [X_n^(*)].
+        model_state_error_variance X_i_;
+        //! [X_n^(*)] (transposed).
+        model_state_error_variance X_i_trans_;
+#endif
         //! Coefficient vector associated with sigma-points.
         sigma_point D_alpha_;
         //! P_alpha^{V}.
@@ -138,14 +147,15 @@ namespace Verdandi
         //! Number of sigma-points.
         int Nsigma_point_;
 
+        //! Process rank.
+        int rank_;
+
 #if defined(VERDANDI_WITH_MPI)
 
         /*** Parallel data ***/
 
         //! Process rank.
         int algorithm_;
-        //! Process rank.
-        int rank_;
         //! Number of processes.
         int Nprocess_;
         //! Number of local sigma-points.
