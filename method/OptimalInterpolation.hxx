@@ -113,8 +113,10 @@ namespace Verdandi
         void InitializeStep();
 
         void Forward();
-
         void Analyze();
+
+        void FinalizeStep();
+        void Finalize();
 
         void ComputeBLUE(const observation& innovation, model_state& state);
         void ComputeBLUE_vector(const observation& innovation,

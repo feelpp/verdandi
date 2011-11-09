@@ -199,6 +199,9 @@ namespace Verdandi
         void InitializeStep();
 
         void Forward();
+        void FinalizeStep();
+        void Finalize();
+
         void FilterInitialization();
         void Propagation();
         void ComputeTangentLinearModel(Matrix<T, General, RowMajor>& M);

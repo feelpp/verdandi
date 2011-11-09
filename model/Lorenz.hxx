@@ -99,6 +99,9 @@ namespace Verdandi
         bool HasFinished() const;
         void Save();
 
+        void FinalizeStep();
+        void Finalize();
+
         // Access methods.
         T GetX() const;
         T GetY() const;

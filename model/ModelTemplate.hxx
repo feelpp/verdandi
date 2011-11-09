@@ -75,6 +75,9 @@ namespace Verdandi
         void BackwardAdjoint(state& observation_term);
         bool HasFinished() const;
 
+        void FinalizeStep();
+        void Finalize();
+
         // Operators.
         void ApplyOperator(state& x,
                            bool forward = false, bool preserve_state = true);

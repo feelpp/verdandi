@@ -37,7 +37,10 @@ int main(int argc, char** argv)
     {
         driver.InitializeStep();
         driver.Forward();
+        driver.FinalizeStep();
     }
+
+    driver.Finalize();
 
     END;
 

@@ -110,6 +110,20 @@ namespace Verdandi
     }
 
 
+    //! Finalizes the current time step for the model.
+    void ModelTemplate::FinalizeStep()
+    {
+        throw ErrorUndefined("ModelTemplate::HasFinished() const");
+    }
+
+
+    //! Finalizes the model.
+    void ModelTemplate::Finalize()
+    {
+        throw ErrorUndefined("ModelTemplate::HasFinished() const");
+    }
+
+
     ///////////////
     // OPERATORS //
     ///////////////

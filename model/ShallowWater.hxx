@@ -256,6 +256,9 @@ namespace Verdandi
         void StepBack(const state& state);
         void Save();
 
+        void FinalizeStep();
+        void Finalize();
+
         // Access methods.
         double GetTime() const;
         void SetTime(double time);

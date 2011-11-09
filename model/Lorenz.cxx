@@ -154,6 +154,20 @@ namespace Verdandi
     }
 
 
+     //! Finalizes the current time step for the model.
+    template <class T>
+    void Lorenz<T>::FinalizeStep()
+    {
+    }
+
+
+    //! Finalizes the model.
+    template <class T>
+    void Lorenz<T>::Finalize()
+    {
+    }
+
+
     ///////////////////
     // ACCESS METHOD //
     ///////////////////

@@ -195,6 +195,30 @@ namespace Verdandi
     }
 
 
+    //! Finalizes a step for the model.
+    template <class Model>
+    void ForwardDriver<Model>::FinalizeStep()
+    {
+        MessageHandler::Send(*this, "all", "::FinalizeStep begin");
+
+        model_.FinalizeStep();
+
+        MessageHandler::Send(*this, "all", "::FinalizeStep end");
+    }
+
+
+    //! Finalizes the model.
+    template <class Model>
+    void ForwardDriver<Model>::Finalize()
+    {
+        MessageHandler::Send(*this, "all", "::Finalize begin");
+
+        model_.Finalize();
+
+        MessageHandler::Send(*this, "all", "::Finalize end");
+    }
+
+
     //! Checks whether the model has finished.
     /*!
       \return True if no more data assimilation is required, false otherwise.

@@ -251,6 +251,30 @@ namespace Verdandi
     }
 
 
+    //! Finalizes a step for the model.
+    template <class T, class Model, class ObservationManager>
+    void OptimalInterpolation<T, Model, ObservationManager>::FinalizeStep()
+    {
+        MessageHandler::Send(*this, "all", "::FinalizeStep begin");
+
+        model_.FinalizeStep();
+
+        MessageHandler::Send(*this, "all", "::FinalizeStep end");
+    }
+
+
+    //! Finalizes the model.
+    template <class T, class Model, class ObservationManager>
+    void OptimalInterpolation<T, Model, ObservationManager>::Finalize()
+    {
+        MessageHandler::Send(*this, "all", "::Finalize begin");
+
+        model_.Finalize();
+
+        MessageHandler::Send(*this, "all", "::Finalize end");
+    }
+
+
     //! Computes BLUE for optimal interpolation.
     /*! The state is updated by the combination of background state and
       innovation. It computes the BLUE (best linear unbiased estimator).

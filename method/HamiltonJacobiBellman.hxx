@@ -160,6 +160,9 @@ namespace Verdandi
         void AdvectionBrysonLevyForward();
         void AdvectionGodunov();
 
+        void FinalizeStep();
+        void Finalize();
+
         T GodunovFlux(T q, T M, T v_l, T v, T v_r) const;
 
         bool HasFinished() const;

@@ -152,8 +152,10 @@ namespace Verdandi
         void InitializeStep();
 
         void Forward();
-
         void Analyze();
+
+        void FinalizeStep();
+        void Finalize();
 
         bool HasFinished() const;
 

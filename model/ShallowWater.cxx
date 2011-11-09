@@ -523,6 +523,20 @@ namespace Verdandi
     }
 
 
+    //! Finalizes the current time step for the model.
+    template <class T>
+    void ShallowWater<T>::FinalizeStep()
+    {
+    }
+
+
+    //! Finalizes the model.
+    template <class T>
+    void ShallowWater<T>::Finalize()
+    {
+    }
+
+
     ///////////////////
     // ACCESS METHOD //
     ///////////////////

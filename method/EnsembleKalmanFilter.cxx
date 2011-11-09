@@ -542,6 +542,34 @@ namespace Verdandi
     }
 
 
+    //! Finalizes a step for the model.
+    template <class T, class Model, class ObservationManager,
+              class PerturbationManager>
+    void EnsembleKalmanFilter<T, Model, ObservationManager,
+                              PerturbationManager>::FinalizeStep()
+    {
+        MessageHandler::Send(*this, "all", "::FinalizeStep begin");
+
+        model_.FinalizeStep();
+
+        MessageHandler::Send(*this, "all", "::FinalizeStep end");
+    }
+
+
+    //! Finalizes the model.
+    template <class T, class Model, class ObservationManager,
+              class PerturbationManager>
+    void EnsembleKalmanFilter<T, Model, ObservationManager,
+                              PerturbationManager>::Finalize()
+    {
+        MessageHandler::Send(*this, "all", "::Finalize begin");
+
+        model_.Finalize();
+
+        MessageHandler::Send(*this, "all", "::Finalize end");
+    }
+
+
     //! Checks whether the model has finished.
     /*!
       \return True if no more data assimilation is required, false otherwise.

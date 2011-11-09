@@ -356,6 +356,20 @@ namespace Verdandi
     }
 
 
+    //! Finalizes the current time step for the model.
+    template <class T>
+    void ClampedBar<T>::FinalizeStep()
+    {
+    }
+
+
+    //! Finalizes the model.
+    template <class T>
+    void ClampedBar<T>::Finalize()
+    {
+    }
+
+
     //! Saves the simulated data.
     /*! It saves the displacement 'disp_0_' and  the velocity 'velo_0_'.
      */

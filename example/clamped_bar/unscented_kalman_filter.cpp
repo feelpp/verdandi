@@ -40,11 +40,12 @@ int main(int argc, char** argv)
     while (!driver.HasFinished())
     {
         driver.InitializeStep();
-
         driver.Forward();
-
         driver.Analyze();
+        driver.FinalizeStep();
     }
+
+    driver.Finalize();
 
     END;
 

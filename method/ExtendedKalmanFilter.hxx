@@ -125,8 +125,10 @@ namespace Verdandi
         void InitializeStep();
 
         void Forward();
-
         void Analyze();
+
+        void FinalizeStep();
+        void Finalize();
 
         void PropagateCovarianceMatrix();
         void PropagateCovarianceMatrix_vector();

@@ -148,6 +148,9 @@ namespace Verdandi
         bool HasFinished() const;
         void Save();
 
+        void FinalizeStep();
+        void Finalize();
+
         // Access methods.
         T GetDelta_t() const;
         double GetTime() const;

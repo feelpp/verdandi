@@ -83,6 +83,8 @@ namespace Verdandi
                         bool initialize_model = true);
         void InitializeStep();
         void Forward();
+        void FinalizeStep();
+        void Finalize();
 
         bool HasFinished() const;
 

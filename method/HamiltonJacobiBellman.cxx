@@ -894,6 +894,30 @@ namespace Verdandi
     }
 
 
+    //! Finalizes a step for the model.
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>::FinalizeStep()
+    {
+        MessageHandler::Send(*this, "all", "::FinalizeStep begin");
+
+        model_.FinalizeStep();
+
+        MessageHandler::Send(*this, "all", "::FinalizeStep end");
+    }
+
+
+    //! Finalizes the model.
+    template <class T, class Model, class ObservationManager>
+    void HamiltonJacobiBellman<T, Model, ObservationManager>::Finalize()
+    {
+        MessageHandler::Send(*this, "all", "::Finalize begin");
+
+        model_.Finalize();
+
+        MessageHandler::Send(*this, "all", "::Finalize end");
+    }
+
+
     //! Computes the Godunov flux along a given dimension.
     /*!
       \param[in] q value of Q along the given dimension.

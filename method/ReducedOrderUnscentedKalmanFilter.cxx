@@ -52,6 +52,7 @@ namespace Verdandi
         /*** Initializations ***/
 
 #if defined(VERDANDI_WITH_MPI)
+        MPI::Init();
         rank_ = MPI::COMM_WORLD.Get_rank();
         Nprocess_ = MPI::COMM_WORLD.Get_size();
         if (rank_ == 0)
@@ -1218,6 +1219,47 @@ namespace Verdandi
 
 #if defined(VERDANDI_WITH_MPI)
         }
+#endif
+    }
+
+
+    //! Finalizes a step for the model.
+    template <class T, class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ::FinalizeStep()
+    {
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+#endif
+        MessageHandler::Send(*this, "all", "::FinalizeStep begin");
+
+        model_.FinalizeStep();
+
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+#endif
+        MessageHandler::Send(*this, "all", "::FinalizeStep end");
+    }
+
+
+    //! Finalizes the model.
+    template <class T, class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ::Finalize()
+    {
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+#endif
+        MessageHandler::Send(*this, "all", "::Finalize begin");
+
+        model_.Finalize();
+
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+#endif
+        MessageHandler::Send(*this, "all", "::Finalize end");
+#if defined(VERDANDI_WITH_MPI)
+        MPI::Finalize();
 #endif
     }
 

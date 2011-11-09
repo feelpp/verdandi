@@ -34,10 +34,6 @@ int main(int argc, char** argv)
         return 1;
     }
 
-#if defined(VERDANDI_WITH_MPI)
-    MPI::Init(argc, argv);
-#endif
-
     typedef double real;
 
     Verdandi::ReducedOrderExtendedKalmanFilter<real,
@@ -49,15 +45,12 @@ int main(int argc, char** argv)
     while (!driver.HasFinished())
     {
         driver.InitializeStep();
-
         driver.Forward();
-
         driver.Analyze();
+        driver.FinalizeStep();
     }
 
-#if defined(VERDANDI_WITH_MPI)
-    MPI::Finalize();
-#endif
+    driver.Finalize();
 
     END;
 

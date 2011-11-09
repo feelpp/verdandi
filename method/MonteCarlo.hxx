@@ -113,6 +113,8 @@ namespace Verdandi
                         bool initialize_perturbation_manager = true);
         void InitializeStep();
         void Forward();
+        void FinalizeStep();
+        void Finalize();
 
         bool HasFinished() const;
 

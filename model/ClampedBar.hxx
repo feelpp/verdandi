@@ -212,6 +212,8 @@ namespace Verdandi
         // Processing.
         void Forward(bool update_force = true);
         bool HasFinished() const;
+        void FinalizeStep();
+        void Finalize();
         void Save();
         void BackwardAdjoint(state& state_innovation);
 
