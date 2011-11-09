@@ -1739,20 +1739,9 @@ namespace Verdandi
     {
         if (operator_scaled_identity_)
         {
-            // if (operator_sparse_)
-            // {
-            //     tangent_operator_row.Reallocate(1);
-            //     tangent_operator_row.Index(0) = row;
-            //     tangent_operator_row.Fill(operator_diagonal_value_);
-            // }
-
-            // // Dense operator.
-            // else
-            {
-                tangent_operator_row.Reallocate(Nobservation_);
-                tangent_operator_row.Zero();
-                tangent_operator_row(row) = operator_diagonal_value_;
-            }
+            tangent_operator_row.Reallocate(Nobservation_);
+            tangent_operator_row.Zero();
+            tangent_operator_row(row) = operator_diagonal_value_;
         }
         else
             GetRow(tangent_operator_matrix_, row, tangent_operator_row);
