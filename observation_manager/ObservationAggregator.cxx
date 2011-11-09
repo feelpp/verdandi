@@ -122,7 +122,7 @@ namespace Verdandi
       '-1' indicates that all observations available in the interval
       [\a time_inf ; \a time] have to be considered.
       '1' indicates that all observations available in the interval
-      [\a time ; \a time_sup] have to be considered.
+      [\a time ; \a time_sup[ have to be considered.
       '2' indicates that only the closest left observation of the interval
       from time and the closest right observation are requested.
       '3' indicates that all observation in the given interval have to be
@@ -130,7 +130,7 @@ namespace Verdandi
       widths.
       \param[in] time a given time.
       \param[out] time_inf lower bound of the time interval.
-      \param[out] time_sup upper bound of the time interval.
+      \param[out] time_sup upper bound (excluded) of the time interval.
       \param[out] selection_policy interval selection policy.
     */
     template <class T>

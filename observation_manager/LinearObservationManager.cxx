@@ -350,7 +350,7 @@ namespace Verdandi
     //! Sets available observation times at a given time interval.
     /*!
       \param[in] time_inf lower bound of the given time interval.
-      \param[in] time_sup upper bound of the given time interval.
+      \param[in] time_sup upper bound (excluded) of the given time interval.
       \param[in] selection_policy interval selection policy.
       \param[out] available_time the available observation times.
     */
@@ -376,7 +376,7 @@ namespace Verdandi
     //! Sets available observation times at a given time interval.
     /*!
       \param[in] time_inf lower bound of the given time interval.
-      \param[in] time_sup upper bound of the given time interval.
+      \param[in] time_sup upper bound (excluded) of the given time interval.
       \param[in] selection_policy interval selection policy.
       \param[out] available_time the available observation times.
     */
@@ -529,10 +529,10 @@ namespace Verdandi
 
 
     //! Gets observations flattened over a list of times.
-    /*! The observations in the interval [\a time_inf, \a time_sup]
+    /*! The observations in the interval [\a time_inf, \a time_sup[
       are loaded and concatenated in a vector.
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation the observation to be flattened.
     */
     template <class T>
@@ -600,10 +600,10 @@ namespace Verdandi
 
 
     //! Gets observations flattened over a list of times.
-    /*! The observations in the interval [\a time_inf, \a time_sup]
+    /*! The observations in the interval [\a time_inf, \a time_sup[
       are loaded and concatenated in a vector.
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation the observation to be flattened.
@@ -687,10 +687,10 @@ namespace Verdandi
 
 
     //! Gets observations flattened over a list of times.
-    /*! The observations in the interval [\a time_inf, \a time_sup]
+    /*! The observations in the interval [\a time_inf, \a time_sup[
       are loaded and concatenated in a vector.
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index indexes associated with the observations.
@@ -783,10 +783,10 @@ namespace Verdandi
 
 
     //! Gets observations aggregated over a list of times.
-    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
+    /*! The observations in the interval [\a time_inf, \a time_sup[ are loaded
       and aggregated.
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation the aggregated observations.
     */
     template <class T>
@@ -858,10 +858,10 @@ namespace Verdandi
 
 
     //! Gets observations aggregated over a list of times.
-    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
+    /*! The observations in the interval [\a time_inf, \a time_sup[ are loaded
       and aggregated.
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation2 the aggregated observations.
@@ -953,10 +953,10 @@ namespace Verdandi
 
 
     //! Gets observations aggregated over a list of times.
-    /*! The observations in the interval [\a time_inf, \a time_sup] are loaded
+    /*! The observations in the interval [\a time_inf, \a time_sup[ are loaded
       and aggregated.
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation_variable variables associated with the
       observations.
       \param[out] observation_index2 indexes associated with the observations.
@@ -1058,8 +1058,8 @@ namespace Verdandi
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation2 the observation to be loaded.
     */
     template <class T>
@@ -1127,8 +1127,8 @@ namespace Verdandi
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation3 the observation to be loaded.
@@ -1212,8 +1212,8 @@ namespace Verdandi
 
     //! Gets observations available in a given interval.
     /*!
-      \param[in] time_inf lower_bound of the given interval.
-      \param[in] time_sup upper_bound of the given interval.
+      \param[in] time_inf lower bound of the given interval.
+      \param[in] time_sup upper bound (excluded) of the given interval.
       \param[out] observation_variable2 variables associated with the
       observations.
       \param[out] observation_index3 indexes associated with the observations.
@@ -1471,7 +1471,7 @@ namespace Verdandi
     //! Reads triangle width associated with observations of a given interval.
     /*!
       \param[in] time_inf lower bound of a given interval.
-      \param[in] time_sup upper bound of a given interval.
+      \param[in] time_sup upper bound (excluded) of a given interval.
       \param[out] width_left left widths associated with observations.
       \param[out] width_right right widths associated with observations.
     */

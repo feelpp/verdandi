@@ -25,8 +25,7 @@ that no observation is available at this time.
 
 \section step Step interpolation
 
-In this mode, all observations whose dates belong to a step centered on \f$t_h\f$
-are selected.
+In this mode, any observation is selected if its date belongs to a left-closed and right-open interval centered on \f$t_h\f$.
 
 \precode
 aggregator = {
@@ -57,7 +56,7 @@ aggregator = {
 
 \section triangle Triangle interpolation
 
-In this mode, one should define an observation interval. All observations
+In this mode, one should define an observation interval (left-closed and right-open). All observations
 available in this interval are considered. The observations outside this interval have no contribution.
 They are interpolated by a triangle
 centered on \f$t_h\f$. The widths of the triangles may not be constant.
