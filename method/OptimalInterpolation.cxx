@@ -301,7 +301,6 @@ namespace Verdandi
     void OptimalInterpolation<T, Model, ObservationManager>
     ::ComputeBLUE_vector(const observation& innovation, model_state& state)
     {
-#ifdef VERDANDI_DENSE
         Nobservation_ = observation_manager_.GetNobservation();
 
         int r, c;
@@ -370,9 +369,6 @@ namespace Verdandi
 
             state(r) += DotProd(BHt_row, HBHR_inv_innovation);
         }
-#else
-        throw ErrorUndefined("OptimalInterpolation::ComputeBLUE_vector");
-#endif
     }
 
 
@@ -388,14 +384,15 @@ namespace Verdandi
     void OptimalInterpolation<T, Model, ObservationManager>
     ::ComputeBLUE_matrix(const observation& innovation, model_state& state)
     {
-#if defined(VERDANDI_SPARSE) && defined(VERDANDI_WITH_DIRECT_SOLVER)
+#ifdef VERDANDI_WITH_DIRECT_SOLVER
         Nobservation_ = observation_manager_.GetNobservation();
 
         // Temporary matrix and vector.
         matrix_state_observation working_matrix_so(Nstate_, Nobservation_);
-        observation_tangent_linear_operator working_matrix_oo(Nobservation_,
-                                                              Nobservation_);
+        matrix_state_observation working_matrix_oo(Nobservation_,
+                                                   Nobservation_);
         // Computes BH'.
+
         MltAdd(T(1), SeldonNoTrans,
                model_.GetStateErrorVariance(), SeldonTrans,
                observation_manager_.GetTangentLinearOperator(), T(0),
@@ -411,17 +408,9 @@ namespace Verdandi
 
         // Computes x = (HBH' + R)^{-1} * innovation by solving the linear
         // system (HBH' + R) * x = innovation.
-#if defined(SELDON_WITH_UMFPACK)
-        MatrixUmfPack<T> matrix_super_lu;
-#elif defined(SELDON_WITH_SUPERLU)
-        MatrixSuperLU<T> matrix_super_lu;
-#elif defined(SELDON_WITH_MUMPS)
-        MatrixMumps<T> matrix_super_lu;
-#endif
-        GetLU(working_matrix_oo, matrix_super_lu);
         observation working_vector(Nobservation_);
         working_vector = innovation;
-        SolveLU(matrix_super_lu, working_vector);
+        GetAndSolveLU(working_matrix_oo, working_vector);
         MltAdd(T(1.), working_matrix_so, working_vector, T(1.), state);
 #else
         throw ErrorUndefined("OptimalInterpolation::ComputeBLUE_matrix");
