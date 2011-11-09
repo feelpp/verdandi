@@ -166,8 +166,7 @@ namespace Verdandi
 #include "share/UsefulFunction.hxx"
 #include "share/MessageHandler.hxx"
 #include "share/VerdandiBase.hxx"
-
-#include "output_saver/OutputSaver.hxx"
+#include "share/OutputSaver.hxx"
 
 #ifdef VERDANDI_SPARSE
 #define VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
