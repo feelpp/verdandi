@@ -590,11 +590,53 @@ namespace Verdandi
     */
     template <class T, class Model, class ObservationManager,
               class PerturbationManager>
-    const Model&
+    Model&
     EnsembleKalmanFilter<T, Model, ObservationManager,
-                         PerturbationManager>::GetModel() const
+                         PerturbationManager>::GetModel()
     {
         return model_;
+    }
+
+
+    //! Returns the observation manager.
+    /*!
+      \return The observation manager.
+    */
+    template <class T, class Model, class ObservationManager,
+              class PerturbationManager>
+    ObservationManager&
+    EnsembleKalmanFilter<T, Model, ObservationManager,
+                         PerturbationManager>::GetObservationManager()
+    {
+        return observation_manager_;
+    }
+
+
+    //! Returns the perturbation manager.
+    /*!
+      \return The perturbation manager.
+    */
+    template <class T, class Model, class ObservationManager,
+              class PerturbationManager>
+    PerturbationManager&
+    EnsembleKalmanFilter<T, Model, ObservationManager,
+                         PerturbationManager>::GetPerturbationManager()
+    {
+        return perturbation_manager_;
+    }
+
+
+    //! Returns the output saver.
+    /*!
+      \return The output saver.
+    */
+    template <class T, class Model, class ObservationManager,
+              class PerturbationManager>
+    OutputSaver&
+    EnsembleKalmanFilter<T, Model, ObservationManager,
+                         PerturbationManager>::GetOutputSaver()
+    {
+        return output_saver_;
     }
 
 

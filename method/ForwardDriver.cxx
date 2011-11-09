@@ -235,17 +235,6 @@ namespace Verdandi
       \return The model.
     */
     template <class Model>
-    const Model& ForwardDriver<Model>::GetModel() const
-    {
-        return model_;
-    }
-
-
-    //! Returns the model.
-    /*!
-      \return The model.
-    */
-    template <class Model>
     Model& ForwardDriver<Model>::GetModel()
     {
         return model_;

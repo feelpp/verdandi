@@ -168,7 +168,9 @@ namespace Verdandi
         bool HasFinished() const;
 
         // Access methods.
-        const Model& GetModel() const;
+        Model& GetModel();
+        ObservationManager& GetObservationManager();
+        OutputSaver& GetOutputSaver();
 
         string GetName() const;
         void Message(string message);

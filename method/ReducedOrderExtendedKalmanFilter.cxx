@@ -670,24 +670,37 @@ namespace Verdandi
       \return The model.
     */
     template <class T, class Model, class ObservationManager>
-    const Model&
-    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
-    ::GetModel() const
-    {
-        return model_;
-    }
-
-
-    //! Returns the model.
-    /*!
-      \return The model.
-    */
-    template <class T, class Model, class ObservationManager>
     Model&
     ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
     ::GetModel()
     {
         return model_;
+    }
+
+
+    //! Returns the observation manager.
+    /*!
+      \return The observation manager..
+    */
+    template <class T, class Model, class ObservationManager>
+    ObservationManager&
+    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    ::GetObservationManager()
+    {
+        return observation_manager_;
+    }
+
+
+    //! Returns the output saver.
+    /*!
+      \return The output saver.
+    */
+    template <class T, class Model, class ObservationManager>
+    OutputSaver&
+    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    ::GetOutputSaver()
+    {
+        return output_saver_;
     }
 
 

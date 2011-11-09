@@ -311,10 +311,23 @@ namespace Verdandi
       \return The model.
     */
     template <class T, class Model, class ObservationManager>
-    const Model&
-    OptimalInterpolation<T, Model, ObservationManager>::GetModel() const
+    Model&
+    OptimalInterpolation<T, Model, ObservationManager>::GetModel()
     {
         return model_;
+    }
+
+
+    //! Returns the observation manager.
+    /*!
+      \return The observation manager.
+    */
+    template <class T, class Model, class ObservationManager>
+    ObservationManager&
+    OptimalInterpolation<T, Model, ObservationManager>
+    ::GetObservationManager()
+    {
+        return observation_manager_;
     }
 
 

@@ -971,10 +971,36 @@ namespace Verdandi
       \return The model.
     */
     template <class T, class Model, class ObservationManager>
-    const Model&
-    HamiltonJacobiBellman<T, Model, ObservationManager>::GetModel() const
+    Model&
+    HamiltonJacobiBellman<T, Model, ObservationManager>::GetModel()
     {
         return model_;
+    }
+
+
+    //! Returns the observation manager.
+    /*!
+      \return The observation manager.
+    */
+    template <class T, class Model, class ObservationManager>
+    ObservationManager&
+    HamiltonJacobiBellman<T, Model, ObservationManager>
+    ::GetObservationManager()
+    {
+        return observation_manager_;
+    }
+
+
+    //! Returns the output saver.
+    /*!
+      \return The output saver.
+    */
+    template <class T, class Model, class ObservationManager>
+    OutputSaver&
+    HamiltonJacobiBellman<T, Model, ObservationManager>
+    ::GetOutputSaver()
+    {
+        return output_saver_;
     }
 
 

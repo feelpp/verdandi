@@ -336,25 +336,39 @@ namespace Verdandi
     */
     template <class T, class Model, class ObservationManager,
               class Optimization>
-    const Model&
-    FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
-    ::GetModel() const
-    {
-        return model_;
-    }
-
-
-    //! Returns the model.
-    /*!
-      \return The model.
-    */
-    template <class T, class Model, class ObservationManager,
-              class Optimization>
     Model&
     FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
     ::GetModel()
     {
         return model_;
+    }
+
+
+    //! Returns the observation manager.
+    /*!
+      \return The observation manager.
+    */
+    template <class T, class Model, class ObservationManager,
+              class Optimization>
+    ObservationManager&
+    FourDimensionalVariational<T, Model, ObservationManager, Optimization>
+    ::GetObservationManager()
+    {
+        return observation_manager_;
+    }
+
+
+    //! Returns the output saver.
+    /*!
+      \return The output saver.
+    */
+    template <class T, class Model, class ObservationManager,
+              class Optimization>
+    OutputSaver&
+    FourDimensionalVariational<T, Model, ObservationManager, Optimization>
+    ::GetOutputSaver()
+    {
+        return output_saver_;
     }
 
 

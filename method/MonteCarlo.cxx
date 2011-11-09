@@ -440,20 +440,20 @@ namespace Verdandi
       \return The model.
     */
     template <class T, class ClassModel>
-    const ClassModel& MonteCarlo<T, ClassModel>::GetModel() const
+    ClassModel& MonteCarlo<T, ClassModel>::GetModel()
     {
         return model_;
     }
 
 
-    //! Returns the model.
+    //! Returns the output saver.
     /*!
-      \return The model.
+      \return The output saver.
     */
     template <class T, class ClassModel>
-    ClassModel& MonteCarlo<T, ClassModel>::GetModel()
+    OutputSaver& MonteCarlo<T, ClassModel>::GetOutputSaver()
     {
-        return model_;
+        return output_saver_;
     }
 
 

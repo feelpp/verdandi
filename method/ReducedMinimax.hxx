@@ -214,8 +214,8 @@ namespace Verdandi
         int GetMode() const;
         Matrix<T, General, RowMajor>& GetProjection();
         Matrix<T, General, RowMajor>& GetPreviousProjection();
-        const Model& GetModel() const;
-        const ObservationManager& GetObservationManager() const;
+        Model& GetModel();
+        ObservationManager& GetObservationManager();
         OutputSaver& GetOutputSaver();
 
         string GetName() const;

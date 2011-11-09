@@ -89,9 +89,6 @@ namespace Verdandi
         bool HasFinished() const;
 
         // Access methods.
-#ifndef SWIG
-        const Model& GetModel() const;
-#endif
         Model& GetModel();
         OutputSaver& GetOutputSaver();
         string GetName() const;

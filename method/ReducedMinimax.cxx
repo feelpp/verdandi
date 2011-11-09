@@ -1033,8 +1033,7 @@ namespace Verdandi
       \return The model.
     */
     template <class T, class Model, class ObservationManager>
-    const Model&
-    ReducedMinimax<T, Model, ObservationManager>::GetModel() const
+    Model& ReducedMinimax<T, Model, ObservationManager>::GetModel()
     {
         return model_;
     }
@@ -1045,9 +1044,8 @@ namespace Verdandi
       \return The observation manager.
     */
     template <class T, class Model, class ObservationManager>
-    const ObservationManager&
-    ReducedMinimax<T, Model, ObservationManager>
-    ::GetObservationManager() const
+    ObservationManager&
+    ReducedMinimax<T, Model, ObservationManager>::GetObservationManager()
     {
         return observation_manager_;
     }

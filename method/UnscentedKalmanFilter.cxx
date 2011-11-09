@@ -582,22 +582,35 @@ namespace Verdandi
       \return The model.
     */
     template <class T, class Model, class ObservationManager>
-    const Model&
-    UnscentedKalmanFilter<T, Model, ObservationManager>::GetModel() const
+    Model&
+    UnscentedKalmanFilter<T, Model, ObservationManager>::GetModel()
     {
         return model_;
     }
 
 
-    //! Returns the model.
+    //! Returns the observation manager.
     /*!
-      \return The model.
+      \return The observation manager.
     */
     template <class T, class Model, class ObservationManager>
-    Model&
-    UnscentedKalmanFilter<T, Model, ObservationManager>::GetModel()
+    ObservationManager&
+    UnscentedKalmanFilter<T, Model, ObservationManager>
+    ::GetObservationManager()
     {
-        return model_;
+        return observation_manager_;
+    }
+
+
+    //! Returns the output saver.
+    /*!
+      \return The output saver.
+    */
+    template <class T, class Model, class ObservationManager>
+    OutputSaver&
+    UnscentedKalmanFilter<T, Model, ObservationManager>::GetOutputSaver()
+    {
+        return output_saver_;
     }
 
 
