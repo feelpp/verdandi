@@ -12,7 +12,7 @@
 
 int main(int argc, char** argv)
 {
-    TRY;
+    VERDANDI_TRY;
 
     if (argc != 2)
     {
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
     driver.Finalize();
 
-    END;
+    VERDANDI_END;
 
     return 0;
 }

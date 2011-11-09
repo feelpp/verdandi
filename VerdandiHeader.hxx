@@ -95,11 +95,11 @@ namespace Verdandi
 
 
 // Convenient macros to catch exceptions.
-#ifndef TRY
-#define TRY try {
+#ifndef VERDANDI_TRY
+#define VERDANDI_TRY try {
 #endif
-#ifndef END
-#define END                                                     \
+#ifndef VERDANDI_END
+#define VERDANDI_END                                            \
   }                                                             \
     catch(Verdandi::Error& Err)                                 \
       {                                                         \

@@ -40,7 +40,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(UsefulFunctionTest);
 
 int main()
 {
-  TRY;
+  VERDANDI_TRY;
 
   TextUi::TestRunner runner;
 
@@ -50,5 +50,5 @@ int main()
 
   return runner.run("", false);
 
-  END;
+  VERDANDI_END;
 }
