@@ -60,6 +60,9 @@ namespace Verdandi
         //! Stores the variables properties.
         map<string, Variable> variable_list_;
 
+        //! Boolean to indicate if the output saver is active or not.
+        bool is_active_;
+
     public:
 
         /*** Constructors and destructor ***/
@@ -68,6 +71,8 @@ namespace Verdandi
         OutputSaver(string configuration_file, string method_name);
         void Initialize(string configuration_file, string method_name);
         void Initialize(VerdandiOps& configuration);
+        void Activate();
+        void Deactivate();
 
         ~OutputSaver();
 

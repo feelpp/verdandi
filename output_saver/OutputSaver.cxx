@@ -38,7 +38,7 @@ namespace Verdandi
 
     //! Default constructor.
     OutputSaver::OutputSaver():
-        save_period_(0), time_tolerance_(0)
+        save_period_(0), time_tolerance_(0), is_active_(true)
     {
     }
 
@@ -50,7 +50,7 @@ namespace Verdandi
       configuration is to be read.
     */
     OutputSaver::OutputSaver(string configuration_file, string section_name):
-        save_period_(0), time_tolerance_(0)
+        save_period_(0), time_tolerance_(0), is_active_(true)
     {
         Initialize(configuration_file, section_name);
     }
@@ -138,6 +138,20 @@ namespace Verdandi
     }
 
 
+    //! Activates the Logger.
+    void OutputSaver::Activate()
+    {
+        is_active_ = true;
+    }
+
+
+    //! Deactivates the Logger.
+    void OutputSaver::Deactivate()
+    {
+        is_active_ = false;
+    }
+
+
     //! Destructor.
     OutputSaver::~OutputSaver()
     {
@@ -169,8 +183,8 @@ namespace Verdandi
     template <class S>
     void OutputSaver::Save(const S& x, double time, string variable_name)
     {
-        if (save_period_ == 0.
-            || is_multiple(time, save_period_, time_tolerance_))
+        if (is_active_ && (save_period_ == 0.
+            || is_multiple(time, save_period_, time_tolerance_)))
             Save(x, variable_name);
     }
 
@@ -184,6 +198,9 @@ namespace Verdandi
     template <class S>
     void OutputSaver::Save(const S& x, string variable_name)
     {
+        if (!is_active_)
+            return;
+
         map<string, Variable>::iterator im;
 
         im = variable_list_.find(variable_name);
