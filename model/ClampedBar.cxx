@@ -254,13 +254,6 @@ namespace Verdandi
     }
 
 
-    //! Initializes the first time step for the model.
-    template <class T>
-    void ClampedBar<T>::InitializeFirstStep()
-    {
-    }
-
-
     //! Initializes the current time step for the model.
     template <class T>
     void ClampedBar<T>::InitializeStep()

@@ -205,7 +205,6 @@ namespace Verdandi
         ClampedBar(string configuration_file);
         ~ClampedBar();
         void Initialize(string configuration_file);
-        void InitializeFirstStep();
         void InitializeStep();
         void InitializeAdjoint();
 

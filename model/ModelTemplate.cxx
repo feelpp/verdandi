@@ -63,13 +63,6 @@ namespace Verdandi
     }
 
 
-    //! Initializes the first time step for the model.
-    void ModelTemplate::InitializeFirstStep()
-    {
-        throw ErrorUndefined("ModelTemplate::InitializeFirstStep()");
-    }
-
-
     //! Initializes the current time step for the model.
     void ModelTemplate::InitializeStep()
     {

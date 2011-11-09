@@ -67,7 +67,6 @@ namespace Verdandi
         ModelTemplate();
         ~ModelTemplate();
         void Initialize(string configuration_file);
-        void InitializeFirstStep();
         void InitializeStep();
 
         // Processing.
