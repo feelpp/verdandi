@@ -143,6 +143,7 @@ if flag_cpp != "":
 # Fortran-specific compilation options.
 fortran_compilation_option = debug_flag("debug_fortran")
 
+add_argument("dump_env", ["no", "yes"])
 add_argument("line", ["no", "yes"])
 add_argument("mumps", ["no", "yes"])
 add_argument("umfpack", ["no", "yes"])
@@ -157,6 +158,11 @@ except:
 if not os.path.isdir(verdandi_path):
     raise Exception, "The Verdandi path \"" + verdandi_path \
           + "\" does not appear to be a valid path."
+
+if ARGUMENTS["dump_env"] == "yes":
+    scons_env_file = open("scons_env.log", "w")
+    scons_env_file.write(env.Dump())
+    scons_env_file.close()
 
 
 ###############

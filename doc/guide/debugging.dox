@@ -100,4 +100,13 @@ One option is to place a breakpoint in \link Verdandi::Error::Error(string funct
 
 Another option, more convenient because no breakpoint is to be placed, is to define <code>VERDANDI_WITH_ABORT</code>. With that flag activated, if a %Verdandi exception is raised, the program will simply abort. The call stack is then at hand.
 
+\section dumping_scons_environment Dumping SCons environment
+
+If you need to access the SCons environment variables, you may launch
+\prescreen
+$ scons dump_env=yes
+\endprescreen
+
+This will create a file <code>scons_env.log</code> that describes the entire SCons environment.
+
 */
