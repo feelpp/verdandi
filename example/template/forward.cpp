@@ -22,9 +22,9 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    ForwardDriver<ModelTemplate> driver(argv[1]);
+    ForwardDriver<ModelTemplate> driver;
 
-    driver.Initialize();
+    driver.Initialize(argv[1]);
 
     while (!driver.HasFinished())
     {
