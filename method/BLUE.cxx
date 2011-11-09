@@ -194,6 +194,36 @@ namespace Verdandi
         int Ny = y.GetLength();
         int Nx = x.GetLength();
 
+        if (B.GetM() != Nx || B.GetN() != Nx)
+            throw ErrorArgument("ComputeBLUE_matrix",
+                                "The state error variance has "
+                                "dimensions " + to_str(B.GetM())
+                                + " x " + to_str(B.GetN())
+                                + " while the state vector has "
+                                + to_str(Nx) + " elements.");
+
+        if (H.GetN() != Nx)
+            throw ErrorArgument("ComputeBLUE_matrix",
+                                "The observation operator has "
+                                + to_str(H.GetN()) + " columns "
+                                "while the state vector has "
+                                + to_str(Nx) + " elements.");
+
+        if (H.GetM() != Ny)
+            throw ErrorArgument("ComputeBLUE_matrix",
+                                "The observation operator has "
+                                + to_str(H.GetM()) + " rows "
+                                "while the observation vector has "
+                                + to_str(Ny) + " elements.");
+
+        if (R.GetM() != Ny || R.GetN() != Ny)
+            throw ErrorArgument("ComputeBLUE_matrix",
+                                "The observation error variance has "
+                                "dimensions " + to_str(R.GetM())
+                                + " x " + to_str(R.GetN())
+                                + " while the observation vector has "
+                                + to_str(Ny) + " elements.");
+
         if (Ny == 0) // No observations.
             return;
 
