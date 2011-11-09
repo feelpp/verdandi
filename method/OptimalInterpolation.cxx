@@ -24,6 +24,7 @@
 
 
 #include "OptimalInterpolation.hxx"
+#include "BLUE.cxx"
 
 
 namespace Verdandi
@@ -130,7 +131,11 @@ namespace Verdandi
 
         configuration.SetPrefix("optimal_interpolation.");
         configuration.Set("BLUE_computation",
+#ifdef VERDANDI_WITH_DIRECT_SOLVER
                           "ops_in(v, {'vector', 'matrix'})",
+#else
+                          "ops_in(v, {'vector'})",
+#endif
                           blue_computation_);
 
         /*** Ouput saver ***/
@@ -235,7 +240,21 @@ namespace Verdandi
             observation_manager_.GetInnovation(state, innovation);
             Nobservation_ = innovation.GetSize();
 
-            ComputeBLUE(innovation, state);
+            matrix_state_observation matrix_state_observation_tmp;
+            if (blue_computation_ == "vector")
+                ComputeBLUE_vector(model_, observation_manager_,
+                                   innovation, state);
+#ifdef VERDANDI_WITH_DIRECT_SOLVER
+            else
+                ComputeBLUE_matrix(model_.GetStateErrorVariance(),
+                                   observation_manager_
+                                   .GetTangentLinearOperator(),
+                                   matrix_state_observation_tmp,
+                                   innovation,
+                                   observation_manager_
+                                   .GetErrorVariance(),
+                                   state, true, false);
+#endif
 
             model_.SetState(state);
 
@@ -272,149 +291,6 @@ namespace Verdandi
         model_.Finalize();
 
         MessageHandler::Send(*this, "all", "::Finalize end");
-    }
-
-
-    //! Computes BLUE for optimal interpolation.
-    /*! The state is updated by the combination of background state and
-      innovation. It computes the BLUE (best linear unbiased estimator).
-      \param[in] innovation the innovation vector.
-      \param[in] state the state vector to analyze.
-    */
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>
-    ::ComputeBLUE(const observation& innovation, model_state& state)
-    {
-        if (blue_computation_ == "vector")
-            ComputeBLUE_vector(innovation, state);
-        else
-            ComputeBLUE_matrix(innovation, state);
-    }
-
-
-    //! Computes BLUE for optimal interpolation with dense matrices.
-    /*!
-      \param[in] innovation the innovation vector.
-      \param[in] state the state vector to analyze.
-    */
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>
-    ::ComputeBLUE_vector(const observation& innovation, model_state& state)
-    {
-        Nobservation_ = observation_manager_.GetNobservation();
-
-        int r, c;
-
-        // One row of background matrix B.
-        model_state_error_variance_row error_covariance_row(Nstate_);
-
-        // One row of tangent operator matrix.
-        observation_tangent_linear_operator_row tangent_operator_row(Nstate_);
-
-        // Temporary matrix and vector.
-        // 'HBHR_inv' will eventually contain the matrix (HBH' + R)^(-1).
-        Matrix<T> HBHR_inv(Nobservation_, Nobservation_);
-        HBHR_inv.Fill(T(0));
-
-        Vector<T> row(Nobservation_);
-
-        // Computes HBH'.
-        T H_entry;
-        for (int j = 0; j < Nstate_; j++)
-        {
-            model_.GetStateErrorVarianceRow(j, error_covariance_row);
-            // Computes the j-th row of BH'.
-            for (r = 0; r < Nobservation_; r++)
-            {
-                observation_manager_
-                    .GetTangentLinearOperatorRow(r, tangent_operator_row);
-                row(r) = DotProd(error_covariance_row, tangent_operator_row);
-            }
-
-            // Keeps on building HBH'.
-            for (r = 0; r < Nobservation_; r++)
-            {
-                H_entry = observation_manager_.GetTangentLinearOperator(r, j);
-                for (c = 0; c < Nobservation_; c++)
-                    HBHR_inv(r, c) += H_entry * row(c);
-            }
-        }
-
-        // Computes (HBH' + R).
-        for (r = 0; r < Nobservation_; r++)
-            for (c = 0; c < Nobservation_; c++)
-                HBHR_inv(r, c) += observation_manager_.GetErrorVariance(r, c);
-
-        // Computes (HBH' + R)^{-1}.
-        GetInverse(HBHR_inv);
-
-        // Computes HBHR_inv * innovation.
-        Vector<T> HBHR_inv_innovation(Nobservation_);
-        MltAdd(T(1), HBHR_inv, innovation, T(0), HBHR_inv_innovation);
-
-        // Computes new state.
-        Vector<T> BHt_row(Nobservation_);
-        BHt_row.Fill(T(0));
-        for (r = 0; r < Nstate_; r++)
-        {
-            // Computes the r-th row of BH'.
-            model_.GetStateErrorVarianceRow(r, error_covariance_row);
-            for (c = 0; c < Nobservation_; c++)
-            {
-                observation_manager_
-                    .GetTangentLinearOperatorRow(c, tangent_operator_row);
-                BHt_row(c) = DotProd(error_covariance_row,
-                                     tangent_operator_row);
-            }
-
-            state(r) += DotProd(BHt_row, HBHR_inv_innovation);
-        }
-    }
-
-
-    //! Computes BLUE using operations on matrices.
-    /*! This method is mainly intended for cases where the covariance matrices
-      are sparse matrices. Otherwise, the manipulation of the matrices may
-      lead to unreasonable memory requirements and to high computational
-      costs.
-      \param[in] innovation the innovation vector.
-      \param[in] state the state vector to analyze.
-    */
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>
-    ::ComputeBLUE_matrix(const observation& innovation, model_state& state)
-    {
-#ifdef VERDANDI_WITH_DIRECT_SOLVER
-        Nobservation_ = observation_manager_.GetNobservation();
-
-        // Temporary matrix and vector.
-        matrix_state_observation working_matrix_so(Nstate_, Nobservation_);
-        matrix_state_observation working_matrix_oo(Nobservation_,
-                                                   Nobservation_);
-        // Computes BH'.
-
-        MltAdd(T(1), SeldonNoTrans,
-               model_.GetStateErrorVariance(), SeldonTrans,
-               observation_manager_.GetTangentLinearOperator(), T(0),
-               working_matrix_so);
-
-        // Computes HBH'.
-        Mlt(observation_manager_.GetTangentLinearOperator(),
-            working_matrix_so, working_matrix_oo);
-
-        // Computes (HBH' + R).
-        Add(T(1),
-            observation_manager_.GetErrorVariance(), working_matrix_oo);
-
-        // Computes x = (HBH' + R)^{-1} * innovation by solving the linear
-        // system (HBH' + R) * x = innovation.
-        observation working_vector(Nobservation_);
-        working_vector = innovation;
-        GetAndSolveLU(working_matrix_oo, working_vector);
-        MltAdd(T(1.), working_matrix_so, working_vector, T(1.), state);
-#else
-        throw ErrorUndefined("OptimalInterpolation::ComputeBLUE_matrix");
-#endif
     }
 
 

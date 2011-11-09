@@ -119,10 +119,6 @@ namespace Verdandi
         void Finalize();
 
         void ComputeBLUE(const observation& innovation, model_state& state);
-        void ComputeBLUE_vector(const observation& innovation,
-                                model_state& state);
-        void ComputeBLUE_matrix(const observation& innovation,
-                                model_state& state);
 
         bool HasFinished() const;
 
