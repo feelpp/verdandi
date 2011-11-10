@@ -123,7 +123,8 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "four_dimensional_variational")
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "models"
 or basename($_SERVER['REQUEST_URI'], ".php") == "quadratic_model"
 or basename($_SERVER['REQUEST_URI'], ".php") == "shallow_water_model"
-or basename($_SERVER['REQUEST_URI'], ".php") == "clamped_bar_model")
+or basename($_SERVER['REQUEST_URI'], ".php") == "clamped_bar_model"
+or basename($_SERVER['REQUEST_URI'], ".php") == "lorenz_model")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "quadratic_model", "Quadratic Model");
@@ -131,7 +132,10 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "clamped_bar_model")
   echo '<li class="jelly">';
   HL($file, "shallow_water_model", "Shallow-water");
   echo '</li>';
+  echo '<li class="jelly">';
   HL($file, "clamped_bar_model", "Clamped Bar");
+  echo '</li>';
+  HL($file, "lorenz_model", "Lorenz model");
   echo '</li> </ul>';
 } ?>
 
