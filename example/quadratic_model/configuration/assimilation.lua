@@ -35,6 +35,15 @@ python_model = {
 dofile("configuration/observation.lua")
 
 
+python_observation_manager = {
+
+   module = "LinearObservationManager",
+   directory = "../../observation_manager/",
+   class_name = "LinearObservationManager"
+
+}
+
+
 ------------------------------ PERTURBATION-----------------------------------
 
 
