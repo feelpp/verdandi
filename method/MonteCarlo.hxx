@@ -16,11 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Verdandi. If not, see http://www.gnu.org/licenses/.
 
-
 #ifndef VERDANDI_FILE_METHOD_MONTECARLO_HXX
-
-
-#include "NewranPerturbationManager.hxx"
 
 
 namespace Verdandi
@@ -37,7 +33,7 @@ namespace Verdandi
       to complete a full Monte Carlo simulation, one has to launch several
       simulations using this class.
     */
-    template <class T, class ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
     class MonteCarlo: public VerdandiBase
     {
 
@@ -51,7 +47,7 @@ namespace Verdandi
         ClassModel model_;
 
         //! Pertubation managers.
-        NewranPerturbationManager perturbation_manager_;
+        PerturbationManager perturbation_manager_;
 
         //! Perturbations vectors.
         vector<uncertain_parameter> perturbation_;

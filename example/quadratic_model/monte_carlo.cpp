@@ -10,6 +10,7 @@
 #include "model/QuadraticModel.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
 #include "method/MonteCarlo.cxx"
+#include "method/NewranPerturbationManager.cxx"
 
 int main(int argc, char** argv)
 {
@@ -26,8 +27,8 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::MonteCarlo<real, Verdandi::QuadraticModel<real> >
-        driver;
+    Verdandi::MonteCarlo<real, Verdandi::QuadraticModel<real>,
+        Verdandi::NewranPerturbationManager> driver;
 
     driver.Initialize(argv[1]);
 

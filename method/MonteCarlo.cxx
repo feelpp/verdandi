@@ -21,7 +21,6 @@
 
 
 #include "MonteCarlo.hxx"
-#include "NewranPerturbationManager.cxx"
 
 
 namespace Verdandi
@@ -37,8 +36,8 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class ClassModel>
-    MonteCarlo<T, ClassModel>::MonteCarlo():
+    template <class T, class ClassModel, class PerturbationManager>
+    MonteCarlo<T, ClassModel, PerturbationManager>::MonteCarlo():
         iteration_(-1)
     {
         MessageHandler::AddRecipient("model", model_,
@@ -49,8 +48,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class ClassModel>
-    MonteCarlo<T, ClassModel>::~MonteCarlo()
+    template <class T, class ClassModel, class PerturbationManager>
+    MonteCarlo<T, ClassModel, PerturbationManager>::~MonteCarlo()
     {
         typename vector<uncertain_parameter>::iterator i;
         for (i = perturbation_.begin(); i != perturbation_.end(); i++)
@@ -62,9 +61,9 @@ namespace Verdandi
     /*!
       \param[in,out] V vector to be cleared.
     */
-    template <class T, class ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
     template <class T0, class Storage0, class Allocator0>
-    void MonteCarlo<T, ClassModel>::Clear(Vector<T0, Storage0, Allocator0>& V)
+    void MonteCarlo<T, ClassModel, PerturbationManager>::Clear(Vector<T0, Storage0, Allocator0>& V)
     {
         V.Clear();
     }
@@ -74,10 +73,10 @@ namespace Verdandi
     /*! Each inner vector of the collection is cleared.
       \param[in,out] V vector to be cleared.
     */
-    template <class T, class ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
     template <class T0, class Allocator0>
     void
-    MonteCarlo<T, ClassModel>::Clear(Vector<T0, Collection, Allocator0>& V)
+    MonteCarlo<T, ClassModel, PerturbationManager>::Clear(Vector<T0, Collection, Allocator0>& V)
     {
         for (int i = 0; i < V.GetNvector(); i++)
             V.GetVector(i).Clear();
@@ -94,9 +93,9 @@ namespace Verdandi
       \param[in] in input vector.
       \param[out] out output vector.
     */
-    template <class T, class ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
     template <class T0, class Storage0, class Allocator0>
-    void MonteCarlo<T, ClassModel>
+    void MonteCarlo<T, ClassModel, PerturbationManager>
     ::SetDimension(Vector<T0, Storage0, Allocator0>& in,
                    Vector<T0, Storage0, Allocator0>& out)
     {
@@ -110,9 +109,9 @@ namespace Verdandi
       \param[in] in input collection vector.
       \param[out] out output collection vector.
     */
-    template <class T, class ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
     template <class T0, class Allocator0>
-    void MonteCarlo<T, ClassModel>
+    void MonteCarlo<T, ClassModel, PerturbationManager>
     ::SetDimension(Vector<T0, Collection, Allocator0>& in,
                    Vector<T0, Collection, Allocator0>& out)
     {
@@ -133,9 +132,9 @@ namespace Verdandi
       \param[in] pdf probability density function: Normal, NormalHomogeneous,
       LogNormal or LogNormalHomogeneous.
     */
-    template <class T, class ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
     template <class T0, class Allocator0>
-    void MonteCarlo<T, ClassModel>
+    void MonteCarlo<T, ClassModel, PerturbationManager>
     ::Fill(Vector<T0, Collection, Allocator0>& in,
            string pdf)
     {
@@ -155,9 +154,9 @@ namespace Verdandi
       \param[in] pdf probability density function: Normal, NormalHomogeneous,
       LogNormal or LogNormalHomogeneous.
     */
-    template <class T, class ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
     template <class T0, class Storage0, class Allocator0>
-    void MonteCarlo<T, ClassModel>
+    void MonteCarlo<T, ClassModel, PerturbationManager>
     ::Fill(Vector<T0, Storage0, Allocator0>& in, string pdf)
     {
         if (pdf == "Normal" || pdf == "NormalHomogeneous")
@@ -179,8 +178,8 @@ namespace Verdandi
       \warning If \a initialize_model is set to false, the model should be
       initialized before calling this function.
     */
-    template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
+    void MonteCarlo<T, ClassModel, PerturbationManager>
     ::Initialize(string configuration_file,
                  bool initialize_model,
                  bool initialize_perturbation_manager)
@@ -202,8 +201,8 @@ namespace Verdandi
       \warning If \a initialize_model is set to false, the model should be
       initialized before calling this function.
     */
-    template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>
+    template <class T, class ClassModel, class PerturbationManager>
+    void MonteCarlo<T, ClassModel, PerturbationManager>
     ::Initialize(VerdandiOps& configuration,
                  bool initialize_model,
                  bool initialize_perturbation_manager)
@@ -345,8 +344,8 @@ namespace Verdandi
 
 
     //! Initializes the model before a time step.
-    template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::InitializeStep()
+    template <class T, class ClassModel, class PerturbationManager>
+    void MonteCarlo<T, ClassModel, PerturbationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
         model_.InitializeStep();
@@ -374,8 +373,8 @@ namespace Verdandi
 
 
     //! Performs a step forward without optimal interpolation.
-    template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::Forward()
+    template <class T, class ClassModel, class PerturbationManager>
+    void MonteCarlo<T, ClassModel, PerturbationManager>::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
@@ -402,8 +401,8 @@ namespace Verdandi
 
 
     //! Finalizes a step for the model.
-    template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::FinalizeStep()
+    template <class T, class ClassModel, class PerturbationManager>
+    void MonteCarlo<T, ClassModel, PerturbationManager>::FinalizeStep()
     {
         MessageHandler::Send(*this, "all", "::FinalizeStep begin");
 
@@ -414,8 +413,8 @@ namespace Verdandi
 
 
     //! Finalizes the model.
-    template <class T, class ClassModel>
-    void MonteCarlo<T, ClassModel>::Finalize()
+    template <class T, class ClassModel, class PerturbationManager>
+    void MonteCarlo<T, ClassModel, PerturbationManager>::Finalize()
     {
         MessageHandler::Send(*this, "all", "::Finalize begin");
 
@@ -429,8 +428,8 @@ namespace Verdandi
     /*!
       \return True if the simulation is finished, false otherwise.
     */
-    template <class T, class ClassModel>
-    bool MonteCarlo<T, ClassModel>::HasFinished() const
+    template <class T, class ClassModel, class PerturbationManager>
+    bool MonteCarlo<T, ClassModel, PerturbationManager>::HasFinished() const
     {
         return model_.HasFinished();
     }
@@ -445,8 +444,9 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class ClassModel>
-    ClassModel& MonteCarlo<T, ClassModel>::GetModel()
+    template <class T, class ClassModel, class PerturbationManager>
+    ClassModel& MonteCarlo<T, ClassModel, PerturbationManager>
+    ::GetModel()
     {
         return model_;
     }
@@ -456,8 +456,9 @@ namespace Verdandi
     /*!
       \return The output saver.
     */
-    template <class T, class ClassModel>
-    OutputSaver& MonteCarlo<T, ClassModel>::GetOutputSaver()
+    template <class T, class ClassModel, class PerturbationManager>
+    OutputSaver& MonteCarlo<T, ClassModel, PerturbationManager>
+    ::GetOutputSaver()
     {
         return output_saver_;
     }
@@ -467,8 +468,8 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class ClassModel>
-    string MonteCarlo<T, ClassModel>::GetName() const
+    template <class T, class ClassModel, class PerturbationManager>
+    string MonteCarlo<T, ClassModel, PerturbationManager>::GetName() const
     {
         return "MonteCarlo";
     }
@@ -478,8 +479,9 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class ClassModel>
-    void  MonteCarlo<T, ClassModel>::Message(string message)
+    template <class T, class ClassModel, class PerturbationManager>
+    void  MonteCarlo<T, ClassModel, PerturbationManager>
+    ::Message(string message)
     {
         if (message.find("forecast") != string::npos)
         {
