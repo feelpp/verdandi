@@ -33,8 +33,10 @@
 
 #include "model/QuadraticModel.hxx"
 #include "model/ClampedBar.hxx"
+#include "model/PythonModel.hxx"
 #include "observation_manager/GridToNetworkObservationManager.hxx"
 #include "observation_manager/LinearObservationManager.hxx"
+#include "observation_manager/PythonObservationManager.hxx"
 #include "method/OptimalInterpolation.hxx"
 #include "method/ForwardDriver.hxx"
 #include "method/ReducedOrderExtendedKalmanFilter.hxx"
@@ -42,6 +44,7 @@
   %}
 
 %include "std_string.i"
+%include "std_pair.i"
 using namespace std;
 
 %import "seldon/seldon.i"
@@ -102,8 +105,10 @@ using namespace std;
 
 %include "model/QuadraticModel.hxx"
 %include "model/ClampedBar.hxx"
+%include "model/PythonModel.hxx"
 %include "observation_manager/GridToNetworkObservationManager.hxx"
 %include "observation_manager/LinearObservationManager.hxx"
+%include "observation_manager/PythonObservationManager.hxx"
 %include "method/OptimalInterpolation.hxx"
 %include "method/ForwardDriver.hxx"
 %include "method/ReducedOrderExtendedKalmanFilter.hxx"
@@ -119,6 +124,8 @@ namespace Verdandi
   %template(Method1) VSWIG_METHOD1;
   %template(Method2) VSWIG_METHOD2;
   %template(Method3) VSWIG_METHOD3;
+  %template(Method4) VSWIG_METHOD4;
+  %template(Method5) VSWIG_METHOD5;
 }
 
 

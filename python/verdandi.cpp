@@ -38,8 +38,10 @@
 
 #include "model/QuadraticModel.cxx"
 #include "model/ClampedBar.cxx"
+#include "model/PythonModel.cxx"
 #include "observation_manager/GridToNetworkObservationManager.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
+#include "observation_manager/PythonObservationManager.cxx"
 #include "method/OptimalInterpolation.cxx"
 #include "method/ForwardDriver.cxx"
 #include "method/ReducedOrderExtendedKalmanFilter.cxx"
@@ -51,12 +53,16 @@ namespace Verdandi
 
     template class VSWIG_MODEL;
     template class VSWIG_MODEL1;
+    class VSWIG_MODEL2;
     template class VSWIG_GRID_TO_NETWORK_OBSERVATION;
     template class VSWIG_LINEAR_OBSERVATION;
+    class VSWIG_LINEAR_OBSERVATION2;
     template class VSWIG_METHOD;
     template class VSWIG_METHOD1;
     template class VSWIG_METHOD2;
     template class VSWIG_METHOD3;
+    template class VSWIG_METHOD4;
+    template class VSWIG_METHOD5;
 
 
 }
