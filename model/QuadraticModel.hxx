@@ -204,11 +204,10 @@ namespace Verdandi
         void SetTime(double time);
         int GetNstate() const;
         int GetNfull_state() const;
-        void GetState(state& state) const;
-        void SetState(const state& state);
-        void GetFullState(state& state) const;
-        void SetFullState(const state& state);
-
+        state& GetState();
+        void StateUpdated();
+        state& GetFullState();
+        void FullStateUpdated();
         pair<int, int> GetParameterIndex(int i);
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);

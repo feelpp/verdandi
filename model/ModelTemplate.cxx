@@ -206,25 +206,22 @@ namespace Verdandi
     }
 
 
-    //! Provides the state vector.
+    //! Provides the controlled state vector.
     /*!
-      \param[out] state the reduced state vector.
+      \return state the controlled state vector.
     */
-    void ModelTemplate::GetState(state& state)
+    typename ModelTemplate::state& ModelTemplate::GetState()
     {
-        throw ErrorUndefined("ModelTemplate::GetState(state& state)");
+        throw ErrorUndefined("ModelTemplate::state& "
+                              "ModelTemplate::GetState()");
     }
 
 
-    //! Sets the state vector.
-    /*! Before setting the reduced state vector, special requirements can be
-      enforced; e.g. positivity requirement or inferior and superior limits.
-      \param[in] state the reduced state vector.
-    */
-    void ModelTemplate::SetState(state& state)
+    //! Performs some calculations when the update of the model state is done.
+    void ModelTemplate::StateUpdated()
     {
         throw ErrorUndefined("ModelTemplate"
-                             "::SetState(state& state)");
+                             "::StateUpdated");
     }
 
 
@@ -252,23 +249,22 @@ namespace Verdandi
     }
 
 
-    //! Provides the full state vector.
+     //! Provides the full state vector.
     /*!
-      \param[out] state the full state vector.
+      \return state the controlled state vector.
     */
-    void ModelTemplate::GetFullState(state& state)
+    typename ModelTemplate::state& ModelTemplate::GetFullState()
     {
-        throw ErrorUndefined("ModelTemplate::GetFullState(state& state)");
+        throw ErrorUndefined("ModelTemplate::state& "
+                              "ModelTemplate::GetFullState()");
     }
 
 
-    //! Sets the full state vector.
-    /*!
-      \param[in] state the new full state vector.
-    */
-    void ModelTemplate::SetFullState(state& state)
+    //! Performs some calculations when the update of the model state is done.
+    void ModelTemplate::FullStateUpdated()
     {
-        throw ErrorUndefined("ModelTemplate::SetFullState(state& state)");
+        throw ErrorUndefined("ModelTemplate"
+                             "::StateUpdated");
     }
 
 

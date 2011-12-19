@@ -390,16 +390,22 @@ namespace Verdandi
     ::ApplyOperator(state& x,
                     bool forward, bool preserve_state)
     {
-        state current_state;
+        state saved_state;
         if (preserve_state)
-            GetState(current_state);
-        SetState(x);
+            saved_state.SetData(state_);
+
+        state_.Nullify();
+        state_.SetData(x);
         Forward();
         if (!forward)
             time_ -= Delta_t_;
-        GetState(x);
+        state_.Nullify();
+
         if (preserve_state)
-            SetState(current_state);
+        {
+            state_.SetData(saved_state);
+            saved_state.Nullify();
+        }
     }
 
 
@@ -559,52 +565,42 @@ namespace Verdandi
     }
 
 
-
     //! Provides the controlled state vector.
     /*!
-      \param[out] state the controlled state vector.
+      \return state the controlled state vector.
     */
     template <class T>
-    void QuadraticModel<T>
-    ::GetState(state& state) const
+    typename QuadraticModel<T>::state& QuadraticModel<T>
+    ::GetState()
     {
-        state = state_;
+        return state_;
     }
 
 
-    //! Sets the controlled state vector.
-    /*!
-      \param[in] state the new controlled state vector.
-    */
+    //! Performs some calculations when the update of the model state is done.
     template <class T>
-    void QuadraticModel<T>
-    ::SetState(const state& state)
+    void QuadraticModel<T>::StateUpdated()
     {
-        state_ = state;
     }
 
 
     //! Provides the full state vector.
     /*!
-      \param[out] state the full state vector.
+      \return state the full state vector.
     */
     template <class T>
-    void QuadraticModel<T>
-    ::GetFullState(state& state) const
+    typename QuadraticModel<T>::state& QuadraticModel<T>
+    ::GetFullState()
     {
-        GetState(state);
+        return state_;
     }
 
 
-    //! Sets the full state vector.
-    /*!
-      \param[in] state the full state vector.
-    */
+    /*! \brief Performs some calculations when the update of the full model
+      state is done.*/
     template <class T>
-    void QuadraticModel<T>
-    ::SetFullState(const state& state)
+    void QuadraticModel<T>::FullStateUpdated()
     {
-        SetState(state);
     }
 
 
@@ -761,7 +757,6 @@ namespace Verdandi
     }
 
 
-
     //! Returns parameters associated with the PDF of some model parameter.
     /*! In case of normal or log-normal distribution, the parameters are
       clipping parameters.
@@ -777,7 +772,6 @@ namespace Verdandi
             return linear_parameter_;
         else return quadratic_parameter_;
     }
-
 
 
     //! Returns the perturbation option of the i-th parameter.

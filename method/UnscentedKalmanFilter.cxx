@@ -231,8 +231,7 @@ namespace Verdandi
         GetCholesky(background_error_variance_sqrt);
 
         // Computes X_n^{(i)+}.
-        model_state x;
-        model_.GetState(x);
+        model_state& x = model_.GetState();
         X_i_trans_.Reallocate(Nsigma_point_, Nstate_);
         sigma_point x_col;
         for (int i = 0; i < Nsigma_point_; i++)
@@ -247,7 +246,6 @@ namespace Verdandi
         if (alpha_constant_)
         {
             // Computes X_{n + 1}^-.
-            model_.GetState(x);
             x.Fill(T(0));
             x_col.Reallocate(Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
@@ -257,6 +255,7 @@ namespace Verdandi
                 Add(T(1), x_col, x);
             }
             Mlt(alpha_, x);
+            model_.StateUpdated();
 
             // Computes P_{n + 1}^-.
             T alpha(0);
@@ -273,12 +272,10 @@ namespace Verdandi
             }
             Mlt(alpha_, background_error_variance_);
 
-            model_.SetState(x);
         }
         else
         {
             // Computes X_{n + 1}^-.
-            model_.GetState(x);
             x.Fill(T(0));
             x_col.Reallocate(Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
@@ -287,6 +284,7 @@ namespace Verdandi
                 model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, true);
                 Add(alpha_i_(i), x_col, x);
             }
+            model_.StateUpdated();
 
             // Computes P_{n + 1}^-.
             T alpha(0);
@@ -305,8 +303,6 @@ namespace Verdandi
                 alpha = T(1);
                 x_col.Nullify();
             }
-
-            model_.SetState(x);
         }
 
         MessageHandler::Send(*this, "model", "forecast");
@@ -343,8 +339,7 @@ namespace Verdandi
         GetCholesky(background_error_variance_sqrt);
 
         // Computes X_{n + 1}^{(i)-}.
-        model_state x;
-        model_.GetState(x);
+        model_state& x = model_.GetState();
         X_i_trans_.Reallocate(Nsigma_point_, Nstate_);
         sigma_point x_col;
         for (int i = 0; i < Nsigma_point_; i++)
@@ -383,7 +378,6 @@ namespace Verdandi
             Mlt(alpha_, z);
 
             // Computes X_{n+1}-.
-            model_.GetState(x);
             x.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
@@ -439,12 +433,11 @@ namespace Verdandi
             MltAdd(T(1), P_xz, P_z, T(0), K);
 
             // Computes X_{n + 1}^+.
-            model_state x0;
-            model_.GetState(x0);
             observation innovation;
             observation_manager_.GetInnovation(x, innovation);
-            MltAdd(T(1), K, innovation, T(1), x0);
-            model_.SetState(x0);
+            MltAdd(T(1), K, innovation, T(1), x);
+
+            model_.StateUpdated();
 
             // Computes P_{n + 1}^+.
             MltAdd(T(-1), SeldonNoTrans, K, SeldonTrans, P_xz, T(1),
@@ -464,7 +457,6 @@ namespace Verdandi
             }
 
             // Computes X_{n+1}-.
-            model_.GetState(x);
             x.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
@@ -517,12 +509,11 @@ namespace Verdandi
             MltAdd(T(1), P_xz, P_z, T(0), K);
 
             // Computes X_{n + 1}^+.
-            model_state x0;
-            model_.GetState(x0);
             observation innovation;
             observation_manager_.GetInnovation(x, innovation);
-            MltAdd(T(1), K, innovation, T(1), x0);
-            model_.SetState(x0);
+            MltAdd(T(1), K, innovation, T(1), x);
+
+            model_.StateUpdated();
 
             // Computes P_{n + 1}^+.
             MltAdd(T(-1), SeldonNoTrans, K, SeldonTrans, P_xz, T(1),
@@ -634,27 +625,15 @@ namespace Verdandi
     void UnscentedKalmanFilter<T, Model, ObservationManager>
     ::Message(string message)
     {
-        model_state state;
         if (message.find("initial condition") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
-        }
-
         if (message.find("forecast") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
-        }
-
         if (message.find("analysis") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_analysis");
-        }
     }
 
 

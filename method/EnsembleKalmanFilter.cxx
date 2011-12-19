@@ -226,9 +226,8 @@ namespace Verdandi
         for (int p = 0; p < Nparameter_; p++)
             parameter_[p].resize(Nmember_);
 
-        model_.GetFullState(state);
         for (int m = 0; m < Nmember_; m++)
-            ensemble_[m] = state;
+            ensemble_[m] = model_.GetFullState();
 
         InitializeEnsemble();
 
@@ -409,30 +408,33 @@ namespace Verdandi
         for (int i = 0; i < Nparameter_; i++)
             reference_parameter.push_back(model_.GetParameter(i));
 
-        model_state reference_state;
-        model_.GetFullState(reference_state);
-
         for (int m = 0; m < Nmember_; m++)
         {
             for (int i = 0; i < Nparameter_; i++)
                 model_.SetParameter(i, parameter_[i][m]);
-            model_.SetFullState(ensemble_[m]);
+            model_.GetFullState() = ensemble_[m];
+            model_.FullStateUpdated();
 
             model_.Forward();
 
-            model_.GetFullState(ensemble_[m]);
+            ensemble_[m] = model_.GetFullState();
 
             if (m < Nmember_ - 1)
                 model_.SetTime(time_);
         }
 
-        Vector<T> mean_state_vector(Nfull_state_);
+        model_state mean_state_vector(model_.GetNstate());
         // Sets state to ensemble mean.
         mean_state_vector = 0.;
         for (int m = 0; m < Nmember_; m++)
-            Add(T(1), ensemble_[m], mean_state_vector);
+        {
+            model_.GetFullState() = ensemble_[m];
+            model_.FullStateUpdated();
+            Add(T(1), model_.GetState(), mean_state_vector);
+        }
         Mlt(T(1) / T(Nmember_), mean_state_vector);
-        model_.SetFullState(mean_state_vector);
+        model_.GetState() = mean_state_vector;
+        model_.StateUpdated();
 
         // Puts back the reference parameters.
         for (int i = 0; i < Nparameter_; i++)
@@ -464,9 +466,6 @@ namespace Verdandi
             observation_manager_.GetObservation(obs);
             Nobservation_ = obs.GetLength();
 
-            model_state mean_state_vector;
-            model_.GetState(mean_state_vector);
-
             // Computes the innovation vectors d = y - Hx where H is the
             // observation operator.
             Matrix<T> innovation_matrix(Nobservation_, Nmember_);
@@ -474,9 +473,9 @@ namespace Verdandi
             model_state state(Nstate_);
             for (int m = 0; m < Nmember_; m++)
             {
-                model_.SetFullState(ensemble_[m]);
-                model_.GetState(state);
-                observation_manager_.ApplyOperator(state, Hx);
+                model_.GetFullState() = ensemble_[m];
+                model_.FullStateUpdated();
+                observation_manager_.ApplyOperator(model_.GetState(), Hx);
                 Mlt(T(-1), Hx);
                 Add(T(1), obs, Hx);
                 SetCol(Hx, m, innovation_matrix);
@@ -487,7 +486,7 @@ namespace Verdandi
             for (int l = 0; l < Nmember_; l++)
                 for (int k = 0; k < Nstate_; k++)
                     ensemble_perturbation(k, l) =
-                        ensemble_[l](k) - mean_state_vector(k);
+                        ensemble_[l](k) - model_.GetState()(k);
 
             // Computes H times L.
             Matrix<T> HL(Nobservation_, Nmember_);
@@ -521,17 +520,18 @@ namespace Verdandi
                 for (int l = 0; l < Nstate_; l++)
                     ensemble_[m](l) += Kd(l, m);
 
+            model_state mean_state_vector(model_.GetNstate());
             // Sets state to ensemble mean.
             mean_state_vector = 0.;
-            state = 0;
             for (int m = 0; m < Nmember_; m++)
             {
-                model_.SetFullState(ensemble_[m]);
-                model_.GetState(state);
-                Add(T(1), state, mean_state_vector);
+                model_.GetFullState() = ensemble_[m];
+                model_.FullStateUpdated();
+                Add(T(1), model_.GetState(), mean_state_vector);
             }
             Mlt(T(1) / T(Nmember_), mean_state_vector);
-            model_.SetState(mean_state_vector);
+            model_.GetState() = mean_state_vector;
+            model_.StateUpdated();
 
             MessageHandler::Send(*this, "model", "analysis");
             MessageHandler::Send(*this, "observation_manager", "analysis");
@@ -666,38 +666,37 @@ namespace Verdandi
         model_state state;
         if (message.find("initial condition") != string::npos)
         {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
 
         }
 
         if (message.find("forecast") != string::npos)
         {
-            model_.GetState(state);
-            output_saver_.Save(state, model_.GetTime(), "state_forecast");
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
+                               "state_forecast");
 
             for (int m = 0; m < Nmember_; m++)
                 if (output_saver_.IsVariable("state_forecast-" + to_str(m)))
                 {
-                    model_.SetFullState(ensemble_[m]);
-                    model_.GetState(state);
-                    output_saver_.Save(state, model_.GetTime(),
+                    model_.GetFullState() = ensemble_[m];
+                    model_.FullStateUpdated();
+                    output_saver_.Save(model_.GetState(), model_.GetTime(),
                                        "state_forecast-" + to_str(m));
                 }
         }
 
         if (message.find("analysis") != string::npos)
         {
-            model_.GetState(state);
-            output_saver_.Save(state, model_.GetTime(), "state_analysis");
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
+                               "state_analysis");
 
             for (int m = 0; m < Nmember_; m++)
                 if (output_saver_.IsVariable("state_analysis-" + to_str(m)))
                 {
-                    model_.SetFullState(ensemble_[m]);
-                    model_.GetState(state);
-                    output_saver_.Save(state, model_.GetTime(),
+                    model_.GetFullState() = ensemble_[m];
+                    model_.FullStateUpdated();
+                    output_saver_.Save(model_.GetState(), model_.GetTime(),
                                        "state_analysis-" + to_str(m));
                 }
         }

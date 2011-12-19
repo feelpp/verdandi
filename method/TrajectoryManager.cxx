@@ -104,10 +104,7 @@ namespace Verdandi
         if ((Nsave_call_ % Nskip_checkpoint_) == 0)
         {
             if (checkpoint_recording_mode_ == "memory")
-            {
-                checkpoint_.AddVector(state);
-                state.Nullify();
-            }
+                checkpoint_.push_back(state);
             else
             {
                 fstream file_stream;
@@ -203,19 +200,23 @@ namespace Verdandi
                                       + to_str(time) + ".");
         }
 
-        model_state saved_state;
+        model_state saved_state(model.GetNstate());
         double saved_time;
-        model.GetState(saved_state);
+        model_state& tmp = model.GetState();
+        Copy(tmp, saved_state);
         saved_time = model.GetTime();
 
         if (loaded_trajectory_recording_mode_ == "memory")
-            loaded_trajectory_.Deallocate();
+            loaded_trajectory_.clear();
         else
             EmptyFile(loaded_trajectory_recording_file_);
         loaded_time_.Clear();
         model.SetTime(checkpoint_time_(checkpoint_index_));
         if (checkpoint_recording_mode_ == "memory")
-            model.SetState(checkpoint_.GetVector(checkpoint_index_));
+        {
+            Copy(checkpoint_[checkpoint_index_], tmp);
+            model.StateUpdated();
+        }
         else
         {
             ifstream file_stream;
@@ -234,22 +235,21 @@ namespace Verdandi
             file_stream.seekg(position);
             input_data.Read(file_stream);
             file_stream.close();
-            model.SetState(input_data);
+            Copy(input_data, tmp);
+            model.StateUpdated();
         }
 
         if (loaded_trajectory_recording_mode_ == "memory")
         {
-            model_state state;
             double tmp_time;
             for (int t = 0; t < Nskip_checkpoint_ && !model.HasFinished();
                  t++)
             {
-                model.GetState(state);
+                model_state& state = model.GetState();
                 tmp_time = model.GetTime();
-                loaded_trajectory_.AddVector(state);
+                loaded_trajectory_.push_back(state);
                 loaded_time_.PushBack(tmp_time);
                 model.Forward();
-                state.Nullify();
                 if (tmp_time == time)
                     loaded_trajectory_index_ = t;
             }
@@ -265,12 +265,11 @@ namespace Verdandi
                               "::SetTime", "Unable to open file \""
                               + loaded_trajectory_recording_file_ + "\".");
 #endif
-            model_state state;
             double tmp_time;
             for (int t = 0; t < Nskip_checkpoint_ && !model.HasFinished();
                  t++)
             {
-                model.GetState(state);
+                model_state& state = model.GetState();
                 tmp_time = model.GetTime();
                 state.Write(file_stream, true);
                 loaded_time_.PushBack(tmp_time);
@@ -280,9 +279,8 @@ namespace Verdandi
             }
             file_stream.close();
         }
-
-
-        model.SetState(saved_state);
+        Copy(saved_state, tmp);
+        model.StateUpdated();
         model.SetTime(saved_time);
     }
 
@@ -296,7 +294,7 @@ namespace Verdandi
     TrajectoryManager<T, Model>::GetState()
     {
         if (loaded_trajectory_recording_mode_ == "memory")
-            return loaded_trajectory_.GetVector(loaded_trajectory_index_);
+            return loaded_trajectory_[loaded_trajectory_index_];
 
         if (Nstate_ == 0)
             throw ErrorProcessing("TrajectoryManager<T, Model>::GetState()",
@@ -335,8 +333,8 @@ namespace Verdandi
     template <class T, class Model>
     void TrajectoryManager<T, Model>::Deallocate()
     {
-        checkpoint_.Deallocate();
-        loaded_trajectory_.Deallocate();
+        checkpoint_.clear();
+        loaded_trajectory_.clear();
         checkpoint_time_.Clear();
         loaded_time_.Clear();
         Ncheckpoint_ = 0;

@@ -498,19 +498,6 @@ namespace Verdandi
     }
 
 
-    //! Moves back to the beginning of the previous step.
-    /*!
-      \param[in] state state vector.
-    */
-    template <class T>
-    void ShallowWater<T>
-    ::StepBack(const state& state)
-    {
-        time_ -= Delta_t_;
-        SetFullState(state);
-    }
-
-
     //! Saves the simulated data.
     /*! It saves the velocities 'u' and 'v', and the height 'h'.
      */
@@ -663,41 +650,37 @@ namespace Verdandi
     }
 
 
-    //! Provides the reduced state vector.
+    //! Provides the state vector.
     /*!
-      \param[out] state the reduced state vector.
+      \return A reference to the state vector
     */
     template <class T>
-    void ShallowWater<T>
-    ::GetState(state& state) const
+    typename ShallowWater<T>::state& ShallowWater<T>
+    ::GetState()
     {
+        state_.Reallocate(Nx_ * Ny_);
         int position = 0;
-        state.Reallocate(Nx_ * Ny_);
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
-                state(position++) = h_(i, j);
+                state_(position++) = h_(i, j);
+        return state_;
     }
 
 
-    //! Sets the reduced state vector.
-    /*! Before setting the reduced state vector, special requirements can be
-      enforced; e.g. positivity requirement or inferior and superior limits.
-      \param[in] state the reduced state vector.
-    */
+    //! Performs some calculations when the update of the model state is done.
     template <class T>
-    void ShallowWater<T>
-    ::SetState(state& state)
+    void ShallowWater<T>::StateUpdated()
     {
         // Positivity requirement.
         if (with_positivity_requirement_)
             for (int r = 0; r < Nx_ * Ny_; r++)
-                if (state(r) < T(0))
-                    state(r) = T(0);
+                if (state_(r) < T(0))
+                    state_(r) = T(0);
 
         int position = 0;
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
-                h_(i, j) = state(position++);
+                h_(i, j) = state_(position++);
     }
 
 
@@ -706,34 +689,32 @@ namespace Verdandi
       \param[out] state the full state vector.
     */
     template <class T>
-    void ShallowWater<T>
-    ::GetFullState(state& state) const
+    typename ShallowWater<T>::state& ShallowWater<T>
+    ::GetFullState()
     {
-        state.Reallocate(2 * Nx_ * Ny_ + 2 * Nx_ + Ny_);
+        state_.Reallocate(2 * Nx_ * Ny_ + 2 * Nx_ + Ny_);
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
             {
-                state(i * Ny_ + j) = h_(i, j);
-                state(Nx_ * Ny_ + i * Ny_ + j) = u_(i, j);
-                state(2 * Nx_ * Ny_ + i * Ny_ + j) = v_(i, j);
+                state_(i * Ny_ + j) = h_(i, j);
+                state_(Nx_ * Ny_ + i * Ny_ + j) = u_(i, j);
+                state_(2 * Nx_ * Ny_ + i * Ny_ + j) = v_(i, j);
             }
+        return state_;
     }
 
 
-    //! Sets the full state vector.
-    /*!
-      \param[in] state the full state vector.
-    */
+    //! Performs some calculations when the update of the model state is done.
     template <class T>
     void ShallowWater<T>
-    ::SetFullState(const state& state)
+    ::FullStateUpdated()
     {
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
             {
-                h_(i, j) = state(i * Ny_ + j);
-                u_(i, j) = state(Nx_ * Ny_ + i * Ny_ + j);
-                v_(i, j) = state(2 * Nx_ * Ny_ + i * Ny_ + j);
+                h_(i, j) = state_(i * Ny_ + j);
+                u_(i, j) = state_(Nx_ * Ny_ + i * Ny_ + j);
+                v_(i, j) = state_(2 * Nx_ * Ny_ + i * Ny_ + j);
             }
     }
 

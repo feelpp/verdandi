@@ -231,17 +231,15 @@ namespace Verdandi
                 cout << "Performing EKF at time step ["
                      << model_.GetTime() << "]..." << endl;
 
-            model_state state;
-            model_.GetState(state);
             Nstate_ = model_.GetNstate();
-
+            model_state& x = model_.GetState();
             observation innovation;
-            observation_manager_.GetInnovation(state, innovation);
+            observation_manager_.GetInnovation(x, innovation);
             Nobservation_ = innovation.GetSize();
 
-            ComputeBLUE(innovation, state);
+            ComputeBLUE(innovation, x);
 
-            model_.SetState(state);
+            model_.StateUpdated();
 
             if (option_display_["show_time"])
                 cout << " done." << endl;
@@ -433,27 +431,15 @@ namespace Verdandi
     void ExtendedKalmanFilter<T, Model, ObservationManager>
     ::Message(string message)
     {
-        model_state state;
         if (message.find("initial condition") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
-        }
-
         if (message.find("forecast") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
-        }
-
         if (message.find("analysis") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_analysis");
-        }
     }
 
 

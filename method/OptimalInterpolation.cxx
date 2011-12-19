@@ -232,8 +232,7 @@ namespace Verdandi
                 cout << "Performing optimal interpolation at time step ["
                      << model_.GetTime() << "]..." << endl;
 
-            model_state state;
-            model_.GetState(state);
+            model_state& state = model_.GetState();
             Nstate_ = model_.GetNstate();
 
             observation innovation;
@@ -256,7 +255,7 @@ namespace Verdandi
                                    state, true, false);
 #endif
 
-            model_.SetState(state);
+            model_.StateUpdated();
 
             if (option_display_["show_time"])
                 cout << " done." << endl;
@@ -362,26 +361,15 @@ namespace Verdandi
     void OptimalInterpolation<T, Model, ObservationManager>
     ::Message(string message)
     {
-        model_state state;
         if (message.find("initial condition") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
-        }
-
         if (message.find("forecast") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, model_.GetTime(), "state_forecast");
-        }
-
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
+                               "state_forecast");
         if (message.find("analysis") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, model_.GetTime(), "state_analysis");
-        }
-
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
+                               "state_analysis");
     }
 
 

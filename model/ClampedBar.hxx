@@ -199,6 +199,9 @@ namespace Verdandi
         //! Output saver.
         OutputSaver output_saver_;
 
+        //! Duplicated state.
+        state duplicated_state_;
+
     public:
         // Constructor and destructor.
         ClampedBar();
@@ -227,12 +230,14 @@ namespace Verdandi
         double GetTime() const;
         void SetTime(double time);
         int GetNstate() const;
-        void GetState(state& state) const;
-        void SetState(state& state);
+        void GetStateCopy(state& state);
+        void SetStateCopy(state& state);
+        state& GetState();
+        void StateUpdated();
         void GetStateLowerBound(state& upper_bound) const;
         void GetStateUpperBound(state& upper_bound) const;
-        void GetFullState(state& state) const;
-        void SetFullState(const state& state);
+        state& GetFullState();
+        void FullStateUpdated();
         void GetAdjointState(state& state_adjoint);
         void SetAdjointState(const state& state_adjoint);
 

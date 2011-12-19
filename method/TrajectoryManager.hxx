@@ -57,12 +57,12 @@ namespace Verdandi
         //! Number of recording in first forward loop.
         int Ncheckpoint_;
         //! Trajectory saved in first forward loop.
-        Vector<model_state, Collection> checkpoint_;
+        vector<model_state> checkpoint_;
         //! Times associated with \a checkpoint_ .
         Vector<double> checkpoint_time_;
 
         //! Trajectory saved in backward loop.
-        Vector<model_state, Collection> loaded_trajectory_;
+        vector<model_state> loaded_trajectory_;
         //! Times associated with \a loaded_trajectory_ .
         Vector<double> loaded_time_;
         //! Checkpoint index.

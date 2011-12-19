@@ -95,6 +95,8 @@ namespace Verdandi
         configuration.Set("initial_time", time_);
         configuration.Set("final_time", final_time_);
 
+        state_.Reallocate(3);
+
         /*** Output saver ***/
 
         output_saver_.Initialize(configuration_file, "lorenz.output_saver.");
@@ -252,53 +254,47 @@ namespace Verdandi
 
     //! Provides the controlled state vector.
     /*!
-      \param[out] state the controlled state vector.
+      \return A reference to the state vector.
     */
     template <class T>
-    void Lorenz<T>::GetState(state& state) const
+    typename Lorenz<T>::state& Lorenz<T>::GetState()
     {
-        state.Reallocate(3);
-        state(0) = X_;
-        state(1) = Y_;
-        state(2) = Z_;
+        state_(0) = X_;
+        state_(1) = Y_;
+        state_(2) = Z_;
+        return state_;
     }
 
 
-    //! Sets the controlled state vector.
-    /*!
-      \param[in] state the new controlled state vector.
-    */
+    //! Performs some calculations when the update of the model state is done.
     template <class T>
-    void Lorenz<T>::SetState(const state& state)
+    void Lorenz<T>::StateUpdated()
     {
-        X_ = state(0);
-        Y_ = state(1);
-        Z_ = state(2);
+        X_ = state_(0);
+        Y_ = state_(1);
+        Z_ = state_(2);
     }
 
 
     //! Provides the full state vector.
     /*!
-      \param[out] state the full state vector.
+      \return A reference to the full state vector.
     */
     template <class T>
-    void Lorenz<T>::GetFullState(state& state)
-        const
+    typename Lorenz<T>::state& Lorenz<T>::GetFullState()
     {
-        GetState(state);
+        GetState();
     }
 
 
-    //! Sets the full state vector.
-    /*!
-      \param[in] state the full state vector.
-    */
+    /*! \brief Performs some calculations when the update of the full model
+      state is done.*/
     template <class T>
-    void Lorenz<T>
-    ::SetFullState(const state& state)
+    void Lorenz<T>::FullStateUpdated()
     {
-        SetState(state);
+        StateUpdated();
     }
+
 
 
     //! Computes a row of the background error covariance matrix B.

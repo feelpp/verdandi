@@ -399,12 +399,10 @@ namespace Verdandi
         if (sigma_point_type_ == "simplex")
         {
 #if defined(VERDANDI_WITH_MPI)
+            model_state& x = model_.GetState();
 
             if (algorithm_ == 0)
             {
-                model_state x;
-                model_.GetState(x);
-
                 sigma_point_matrix X_i_trans_global;
                 sigma_point x_col;
                 X_i_trans_.Reallocate(Nlocal_sigma_point_, Nstate_);
@@ -454,14 +452,22 @@ namespace Verdandi
                     SetRow(x_col, i, X_i_trans_);
                 }
 
-                model_state working_vector(model_.GetNstate());
-                working_vector.Fill(T(0));
+                model_state working_vector;
+
+                if (rank_ == 0)
+                {
+                    Copy(x, working_vector);
+                    working_vector.Fill(T(0));
+                }
+
                 MPI::COMM_WORLD.Reduce(x.GetData(), working_vector.GetData(),
                                        x.GetM(), MPI::DOUBLE, MPI::SUM, 0);
 
 
                 if (rank_ == 0)
-                    model_.SetState(working_vector);
+                    Copy(working_vector, x);
+
+                model_.StateUpdated();
 
                 MPI::COMM_WORLD.
                     Gatherv(X_i_trans_.GetData(),
@@ -475,8 +481,6 @@ namespace Verdandi
             }
             else if (algorithm_ == 1 || algorithm_ == 2)
             {
-                model_state x;
-                model_.GetState(x);
 
                 /*** Sampling ***/
 
@@ -506,8 +510,8 @@ namespace Verdandi
                     SetRow(x_col, i, X_i_trans_);
                 }
 
-                model_state working_vector(model_.GetNstate());
-                working_vector.Fill(T(0));
+                model_state working_vector;
+                Copy(x, working_vector);
                 MPI::COMM_WORLD.Allreduce(x.GetData(),
                                           working_vector.GetData(), x.GetM(),
                                           MPI::DOUBLE, MPI::SUM);
@@ -549,11 +553,10 @@ namespace Verdandi
                                   L_.GetSize(), MPI::DOUBLE, MPI::SUM);
                 }
 
-                model_.SetState(working_vector);
+                model_.StateUpdated();
             }
 #else
-            model_state x;
-            model_.GetState(x);
+            model_state& x =  model_.GetState();
 
             /*** Sampling ***/
 
@@ -587,7 +590,6 @@ namespace Verdandi
             // Computes L_{n + 1}.
             MltAdd(T(alpha_), SeldonTrans, X_i_trans_, SeldonNoTrans,
                    I_trans_, T(0), L_);
-            model_.SetState(x);
 
             /*** Resampling ***/
 
@@ -598,6 +600,8 @@ namespace Verdandi
                 MltAdd(T(1), SeldonNoTrans, I_trans_, SeldonTrans,
                        L_, T(1), X_i_trans_);
             }
+
+            model_.StateUpdated();
 #endif
         }
         else
@@ -608,8 +612,7 @@ namespace Verdandi
                                  "implemented yet for the 'no"
                                  " simplex' cases.");
 #else
-            model_state x;
-            model_.GetState(x);
+            model_state& x =  model_.GetState();
 
             /*** Sampling ***/
 
@@ -638,6 +641,7 @@ namespace Verdandi
                 Add(T(alpha_), x_col, x);
                 SetRow(x_col, i, X_i_trans_);
             }
+            model_.StateUpdated();
 
             /*** Resampling with SVD ***/
 
@@ -680,7 +684,6 @@ namespace Verdandi
             // Computes L_{n + 1}.
             MltAdd(T(alpha_), SeldonTrans, X_i_trans_, SeldonNoTrans,
                    I_trans_, T(0), L_);
-            model_.SetState(x);
 #endif
         }
 
@@ -782,8 +785,6 @@ namespace Verdandi
                             Z_i_trans.GetData(),  sendcount, displacement,
                             MPI::DOUBLE, 0);
 
-                model_state x;
-                model_.GetState(x);
                 if (rank_ == 0)
                 {
                     sigma_point_matrix HL_trans(Nreduced_, Nobservation_);
@@ -822,8 +823,9 @@ namespace Verdandi
                     Add(T(-1), z, innovation);
 
                     // Updates.
+                    model_state& x =  model_.GetState();
                     MltAdd(T(1), K, innovation, T(1), x);
-                    model_.SetState(x);
+                    model_.StateUpdated();
                 }
             }
             else if (algorithm_ == 1 || algorithm_ == 2)
@@ -844,8 +846,6 @@ namespace Verdandi
                         MPI::COMM_WORLD.Irecv(innovation.GetData(),
                                               Nobservation_, MPI::DOUBLE, 0,
                                               MPI::ANY_TAG);
-                model_state x;
-                model_.GetState(x);
                 // Computes [HX_{n+1}^{*}].
                 sigma_point_matrix
                     Z_i_trans(Nlocal_sigma_point_, Nobservation_);
@@ -1001,13 +1001,11 @@ namespace Verdandi
                 Add(T(-1), z, innovation);
 
                 // Updates.
+                model_state& x =  model_.GetState();
                 MltAdd(T(1), K, innovation, T(1), x);
-                model_.SetState(x);
+                model_.StateUpdated();
             }
 #else
-            model_state x;
-            model_.GetState(x);
-
             // Computes [HX_{n+1}^{*}].
             sigma_point_matrix Z_i_trans(Nsigma_point_, Nobservation_);
             sigma_point x_col;
@@ -1061,8 +1059,9 @@ namespace Verdandi
             Add(T(-1), z, innovation);
 
             // Updates.
+            model_state& x =  model_.GetState();
             MltAdd(T(1), K, innovation, T(1), x);
-            model_.SetState(x);
+            model_.StateUpdated();
 #endif
         }
         else
@@ -1073,9 +1072,6 @@ namespace Verdandi
                                  " implemented yet for the 'no"
                                  " simplex' cases.");
 #else
-            model_state x;
-            model_.GetState(x);
-
             // Computes [HX_{n+1}^{*}].
             sigma_point_matrix Z_i_trans(Nsigma_point_, Nobservation_);
             sigma_point x_col;
@@ -1198,8 +1194,9 @@ namespace Verdandi
             Add(T(-1), z, innovation);
 
             // Updates.
+            model_state& x =  model_.GetState();
             MltAdd(T(1), K, innovation, T(1), x);
-            model_.SetState(x);
+            model_.StateUpdated();
 #endif
         }
 
@@ -1207,7 +1204,6 @@ namespace Verdandi
         if (rank_ == 0)
         {
 #endif
-
             if (option_display_["show_time"])
                 cout << " done." << endl;
 
@@ -1341,27 +1337,15 @@ namespace Verdandi
         if (rank_ == 0)
         {
 #endif
-            model_state state;
             if (message.find("initial condition") != string::npos)
-            {
-                model_.GetState(state);
-                output_saver_.Save(state, double(model_.GetTime()),
-                                   "state_forecast");
-            }
-
+                output_saver_.Save(model_.GetState(), double(model_.GetTime())
+                                   , "state_forecast");
             if (message.find("forecast") != string::npos)
-            {
-                model_.GetState(state);
-                output_saver_.Save(state, double(model_.GetTime()),
-                                   "state_forecast");
-            }
-
+                output_saver_.Save(model_.GetState(), double(model_.GetTime())
+                                   , "state_forecast");
             if (message.find("analysis") != string::npos)
-            {
-                model_.GetState(state);
-                output_saver_.Save(state, double(model_.GetTime()),
-                                   "state_analysis");
-            }
+                output_saver_.Save(model_.GetState(), double(model_.GetTime())
+                                   , "state_analysis");
 #if defined(VERDANDI_WITH_MPI)
         }
 #endif

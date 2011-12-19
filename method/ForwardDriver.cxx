@@ -271,20 +271,12 @@ namespace Verdandi
     template <class Model>
     void  ForwardDriver<Model>::Message(string message)
     {
-        model_state state;
         if (message.find("initial condition") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
-        }
-
         if (message.find("forecast") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, model_.GetTime(), "state_forecast");
-        }
-
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
+                               "state_forecast");
     }
 
 

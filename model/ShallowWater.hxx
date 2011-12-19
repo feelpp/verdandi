@@ -66,6 +66,9 @@ namespace Verdandi
 
     protected:
 
+        //! State vector.
+        Vector<T> state_;
+
         //! Water height.
         Matrix<T> h_;
         //! Vertical velocity along x.
@@ -253,7 +256,6 @@ namespace Verdandi
         // Processing.
         void Forward();
         bool HasFinished() const;
-        void StepBack(const state& state);
         void Save();
 
         void FinalizeStep();
@@ -271,10 +273,10 @@ namespace Verdandi
         int GetDeltaY() const;
         int GetNstate() const;
         int GetNfull_state() const;
-        void GetState(state& state) const;
-        void SetState(state& state);
-        void GetFullState(state& state) const;
-        void SetFullState(const state& state);
+        state& GetState();
+        void StateUpdated();
+        state& GetFullState();
+        void FullStateUpdated();
         void GetStateErrorVarianceRow(int row, state_error_variance_row&
                                       state_error_variance_row);
         const state_error_variance& GetStateErrorVariance() const;

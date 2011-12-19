@@ -494,9 +494,7 @@ namespace Verdandi
     {
         if (message.find("forecast") != string::npos)
         {
-            model_state state;
-            model_.GetState(state);
-            output_saver_.Save(state, model_.GetTime(), "state_forecast");
+            output_saver_.Save(model_.GetState(), model_.GetTime(), "state_forecast");
         }
     }
 

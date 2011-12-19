@@ -591,17 +591,27 @@ namespace Verdandi
             saved_time = GetTime();
 
         if (preserve_state)
-            GetFullState(saved_state);
+            saved_state.SetData(duplicated_state_);
 
-        SetState(x);
+        duplicated_state_.Nullify();
+        duplicated_state_.SetData(x);
+        StateUpdated();
+
         Forward(update_force);
-        GetState(x);
+
+        GetStateCopy(duplicated_state_);
+
+        duplicated_state_.Nullify();
 
         if (!forward)
             SetTime(saved_time);
 
         if (preserve_state)
-            SetFullState(saved_state);
+        {
+            duplicated_state_.SetData(saved_state);
+            StateUpdated();
+            saved_state.Nullify();
+        }
     }
 
 
@@ -616,7 +626,7 @@ namespace Verdandi
         double saved_time = 0;
         state saved_state;
         saved_time = GetTime();
-        GetFullState(saved_state);
+        saved_state.Copy(GetFullState());
 
         /*** Computes x_{n+1} + x_n and v_{n+1} - v_n ***/
 
@@ -689,7 +699,9 @@ namespace Verdandi
         Copy(x_.GetVector("velocity"), increment.GetVector("velocity"));
 
         SetTime(saved_time);
-        SetFullState(saved_state);
+
+        GetFullState().Copy(saved_state);
+        FullStateUpdated();
     }
 
 
@@ -746,11 +758,12 @@ namespace Verdandi
 
     //! Provides the reduced state vector.
     /*!
+      The state vector is duplicated.
       \param[out] state the reduced state vector.
     */
     template <class T>
     void ClampedBar<T>
-    ::GetState(state& x) const
+    ::GetStateCopy(state& x)
     {
         x.Reallocate(x_.GetM());
         for (int i = 0; i < x_.GetM(); i++)
@@ -759,13 +772,14 @@ namespace Verdandi
 
 
     //! Sets the reduced state vector.
-    /*! Before setting the reduced state vector, special requirements can be
+    /*!
+      Before setting the reduced state vector, special requirements can be
       enforced; e.g. positivity requirement or inferior and superior limits.
       \param[in] state the reduced state vector.
     */
     template <class T>
     void ClampedBar<T>
-    ::SetState(state& x)
+    ::SetStateCopy(state& x)
     {
         if (x_.GetM() != x.GetM())
             throw ErrorProcessing("ClampedBar::SetState()",
@@ -775,6 +789,31 @@ namespace Verdandi
                                   + to_str(x.GetM()) + ".");
         for (int i = 0; i < x_.GetM(); i++)
             x_(i) = x(i);
+    }
+
+
+    //! Provides the reduced state vector.
+    /*!
+      \return state the reduced state vector.
+    */
+    template <class T>
+    typename ClampedBar<T>::state&  ClampedBar<T>
+    ::GetState()
+    {
+        duplicated_state_.Reallocate(x_.GetM());
+        for (int i = 0; i < x_.GetM(); i++)
+            duplicated_state_(i) = x_(i);
+        return duplicated_state_;
+    }
+
+
+    //! Performs some calculations when the update of the model state is done.
+    template <class T>
+    void ClampedBar<T>
+    ::StateUpdated()
+    {
+        for (int i = 0; i < x_.GetM(); i++)
+            x_(i) = duplicated_state_(i);
     }
 
 
@@ -804,32 +843,22 @@ namespace Verdandi
 
     //! Provides the full state vector.
     /*!
-      \param[out] state the full state vector.
+      \return state the full state vector.
     */
     template <class T>
-    void ClampedBar<T>::GetFullState(state& x) const
+    typename ClampedBar<T>::state&
+    ClampedBar<T>::GetFullState()
     {
-        x.Reallocate(x_full_.GetM());
-        for (int i = 0; i < x_full_.GetM(); i++)
-            x(i) = x_full_(i);
+        return GetState();
     }
 
 
-    //! Sets the full state vector.
-    /*!
-      \param[in] state the full state vector.
-    */
+     //! Performs some calculations when the update of the model state is done.
     template <class T>
-    void ClampedBar<T>::SetFullState(const state& x)
+    void ClampedBar<T>
+    ::FullStateUpdated()
     {
-        if (x_full_.GetM() != x.GetM())
-            throw ErrorProcessing("ClampedBar::SetState()",
-                                  "Operation not permitted:\n x_full_ is a "
-                                  "vector of length " + to_str(x_full_.GetM())
-                                  + ";\n x is a vector of length "
-                                  + to_str(x.GetM()) + ".");
-        for (int i = 0; i < x_.GetM(); i++)
-            x_full_(i) = x(i);
+        StateUpdated();
     }
 
 

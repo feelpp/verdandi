@@ -92,14 +92,13 @@ oi.Forward()
 # Computes the analysis and monitors the change in the state vector.
 print "State vector before analysis:"
 state_vector = seldon.VectorDouble()
-model.GetState(state_vector)
+state_vector = model.GetState()
 state_vector.Print()
 
 # The analysis is now performed (if observations are available).
 oi.Analyze()
 
 print "State vector after analysis:"
-model.GetState(state_vector)
 state_vector.Print()
 
 # Time loop (similar to that of the forward driver).
@@ -109,10 +108,8 @@ for i in range(19):
     oi.Analyze()
 
 # Note that the state may be modified directly in Python.
-model.GetState(state_vector)
 state_vector[0] = 0 # just changes the first component.
-model.SetState(state_vector) # The new state is put back into the model.
-model.GetState(state_vector)
+model.StateUpdated() # The state has been updated.
 
 # And the simulation can go on.
 while not oi.HasFinished():

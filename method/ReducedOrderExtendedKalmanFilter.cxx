@@ -432,8 +432,7 @@ namespace Verdandi
                     cout << "Performing Reduced Order EKF at time step ["
                          << model_.GetTime() << "]..." << endl;
 
-            model_state x;
-            model_.GetState(x);
+            model_state& x = model_.GetState();
             Nstate_ = model_.GetNstate();
 
             /*** Updated matrix U ***/
@@ -498,7 +497,8 @@ namespace Verdandi
                                       MPI::SUM);
             Add(T(1), dx, x);
 
-            model_.SetState(x);
+            model_.StateUpdated();
+
 
             if (rank_ == 0)
             {
@@ -524,8 +524,7 @@ namespace Verdandi
                 cout << "Performing Reduced Order EKF at time step ["
                      << model_.GetTime() << "]..." << endl;
 
-            model_state x;
-            model_.GetState(x);
+            model_state& x = model_.GetState();
             Nstate_ = model_.GetNstate();
 
             observation y;
@@ -558,7 +557,7 @@ namespace Verdandi
             MltAdd(T(1), U_inv, state_innovation, T(0), correction);
             MltAdd(T(1), L_, correction, T(1), x);
 
-            model_.SetState(x);
+            model_.StateUpdated();
 
             if (option_display_["show_time"])
                 cout << " done." << endl;
@@ -729,27 +728,15 @@ namespace Verdandi
         if (rank_ == 0)
         {
 #endif
-            model_state state;
             if (message.find("initial condition") != string::npos)
-            {
-                model_.GetState(state);
-                output_saver_.Save(state, double(model_.GetTime()),
-                                   "state_forecast");
-            }
-
+                output_saver_.Save(model_.GetState(), double(model_.GetTime())
+                                   , "state_forecast");
             if (message.find("forecast") != string::npos)
-            {
-                model_.GetState(state);
-                output_saver_.Save(state, double(model_.GetTime()),
-                                   "state_forecast");
-            }
-
+                output_saver_.Save(model_.GetState(), double(model_.GetTime())
+                                   , "state_forecast");
             if (message.find("analysis") != string::npos)
-            {
-                model_.GetState(state);
-                output_saver_.Save(state, double(model_.GetTime()),
-                                   "state_analysis");
-            }
+                output_saver_.Save(model_.GetState(), double(model_.GetTime())
+                                   , "state_analysis");
 #if defined(VERDANDI_WITH_MPI)
         }
 #endif

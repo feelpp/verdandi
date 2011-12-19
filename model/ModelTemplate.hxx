@@ -93,12 +93,12 @@ namespace Verdandi
         void SetTime(double time);
         int GetNstate() const;
         int GetNfull_state() const;
-        void GetState(state& state);
-        void SetState(state& state);
+        state& GetState();
+        void StateUpdated();
+        state& GetFullState();
+        void FullStateUpdated();
         void GetStateLowerBound(state& lower_bound) const;
         void GetStateUpperBound(state& upper_bound) const;
-        void GetFullState(state& state);
-        void SetFullState(state& state);
         void GetAdjointState(state& state_adjoint);
         void SetAdjointState(const state& state_adjoint);
 

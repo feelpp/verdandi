@@ -222,7 +222,8 @@ namespace Verdandi
         optimization_.SetLowerBound(lower_bound);
         optimization_.SetUpperBound(upper_bound);
 
-        model_.GetState(state_first_guess_);
+        state_first_guess_.Reallocate(model_.GetNstate());
+        Copy(model_.GetState(), state_first_guess_);
 
         if (initialize_model)
         {
@@ -270,14 +271,13 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
 
-        model_state x(Nstate_);
-        model_.GetState(x);
+        model_state& x = model_.GetState();;
         optimization_.SetParameter(x);
         Ncall_cost_ = 0;
         optimization_.Optimize(StaticCost,
                                reinterpret_cast<void*>(this));
         optimization_.GetParameter(x);
-        model_.SetState(x);
+        model_.StateUpdated();
         model_.SetTime(initial_time_);
 
         MessageHandler::Send(*this, "model", "analysis");
@@ -395,27 +395,15 @@ namespace Verdandi
     void FourDimensionalVariational<T, Model, ObservationManager,
                                     Optimization>::Message(string message)
     {
-        model_state state;
         if (message.find("initial condition") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
-        }
-
         if (message.find("forecast") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
-        }
-
         if (message.find("analysis") != string::npos)
-        {
-            model_.GetState(state);
-            output_saver_.Save(state, double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_analysis");
-        }
     }
 
 
@@ -459,21 +447,20 @@ namespace Verdandi
 
 #ifndef VERDANDI_WITH_TRAJECTORY_MANAGER
 
-        Vector<model_state, Collection> trajectory;
+        vector<model_state> trajectory;
 
         T cost_observation(0);
-        Copy(x, delta);
-        model_.SetState(delta);
+        Copy(x, model_.GetState());
+        model_.StateUpdated();
         model_.SetTime(initial_time_);
         while (!model_.HasFinished())
         {
-            model_.GetState(delta);
-
+            model_state& state = model_.GetState();
             observation y, Rinv_y;
             observation_manager_.SetTime(model_, model_.GetTime());
             if (observation_manager_.HasObservation())
             {
-                observation_manager_.GetInnovation(delta, y);
+                observation_manager_.GetInnovation(state, y);
                 Nobservation_ = y.GetSize();
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
@@ -483,8 +470,7 @@ namespace Verdandi
             }
 
             time.PushBack(model_.GetTime());
-            trajectory.AddVector(delta);
-            delta.Nullify();
+            trajectory.push_back(state);
 
             model_.InitializeStep();
             model_.Forward();
@@ -503,11 +489,10 @@ namespace Verdandi
             model_.SetTime(time(t));
             observation y, Rinv_y;
             observation_manager_.SetTime(model_, model_.GetTime());
-            model_.SetState(trajectory.GetVector(t));
             if (observation_manager_.HasObservation())
             {
                 observation_manager_.
-                    GetInnovation(trajectory.GetVector(t), y);
+                    GetInnovation(trajectory[t], y);
                 Nobservation_ = y.GetSize();
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
@@ -520,6 +505,9 @@ namespace Verdandi
             else
                 adjoint_source.Fill(T(0));
 
+            Copy(trajectory[t], model_.GetState());
+            model_.StateUpdated();
+
             model_.InitializeStep();
             model_.BackwardAdjoint(adjoint_source);
         }
@@ -527,25 +515,23 @@ namespace Verdandi
         model_.GetAdjointState(gradient);
         Mlt(T(-1), gradient);
         Add(T(1), x_b, gradient);
-        trajectory.Deallocate();
 
         return T(0.5) * (cost_background + cost_observation);
 
 #else
 
         T cost_observation(0);
-        Copy(x, delta);
-        model_.SetState(delta);
+        Copy(x, model_.GetState());
+        model_.StateUpdated();
         model_.SetTime(initial_time_);
         while (!model_.HasFinished())
         {
-            model_.GetState(delta);
-
+            model_state& state = model_.GetState();
             observation y, Rinv_y;
             observation_manager_.SetTime(model_, model_.GetTime());
             if (observation_manager_.HasObservation())
             {
-                observation_manager_.GetInnovation(delta, y);
+                observation_manager_.GetInnovation(state, y);
                 Nobservation_ = y.GetSize();
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
@@ -555,7 +541,7 @@ namespace Verdandi
             }
 
             time.PushBack(model_.GetTime());
-            trajectory_manager_.Save(delta, model_.GetTime());
+            trajectory_manager_.Save(state, model_.GetTime());
 
             model_.InitializeStep();
             model_.Forward();
@@ -573,7 +559,6 @@ namespace Verdandi
         {
             model_.SetTime(time(t));
             trajectory_manager_.SetTime(model_, model_.GetTime());
-            model_.SetState(trajectory_manager_.GetState());
             observation y, Rinv_y;
             observation_manager_.SetTime(model_, model_.GetTime());
             if (observation_manager_.HasObservation())
@@ -591,6 +576,9 @@ namespace Verdandi
             }
             else
                 adjoint_source.Fill(T(0));
+
+            Copy(trajectory_manager_.GetState(), model_.GetState());
+            model_.StateUpdated();
 
             model_.InitializeStep();
             model_.BackwardAdjoint(adjoint_source);

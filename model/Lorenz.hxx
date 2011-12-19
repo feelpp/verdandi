@@ -85,6 +85,9 @@ namespace Verdandi
         //! Output saver.
         OutputSaver output_saver_;
 
+        //! State vector.
+        state state_;
+
     public:
         // Constructor and destructor.
         Lorenz();
@@ -110,10 +113,10 @@ namespace Verdandi
         double GetTime() const;
         void SetTime(double time);
         int GetNstate() const;
-        void GetState(state& state) const;
-        void SetState(const state& state);
-        void GetFullState(state& state) const;
-        void SetFullState(const state& state);
+        state& GetState();
+        void StateUpdated();
+        state& GetFullState();
+        void FullStateUpdated();
         void GetStateErrorVarianceRow(int row, state_error_variance_row&
                                       error_covariance_row);
         const state_error_variance& GetStateErrorVariance() const;
