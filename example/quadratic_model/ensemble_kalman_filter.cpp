@@ -10,7 +10,7 @@
 #include "model/QuadraticModel.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
 #include "method/EnsembleKalmanFilter.cxx"
-#include "method/NewranPerturbationManager.cxx"
+#include "method/TR1PerturbationManager.cxx"
 
 int main(int argc, char** argv)
 {
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
     Verdandi::EnsembleKalmanFilter<real, Verdandi::QuadraticModel<real>,
         Verdandi::LinearObservationManager<real>,
-        Verdandi::NewranPerturbationManager> driver;
+        Verdandi::TR1PerturbationManager> driver;
 
     driver.Initialize(argv[1]);
 
