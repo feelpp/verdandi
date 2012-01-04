@@ -614,7 +614,7 @@ namespace Verdandi
       of the term to perturb.
     */
     template<class T>
-    pair<int, int> QuadraticModel<T>::GetParameterIndex(int i)
+    std::pair<int, int> QuadraticModel<T>::GetParameterIndex(int i)
     {
         if (is_constant_perturbed_ && i == 0) return make_pair(0, i);
 

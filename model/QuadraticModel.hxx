@@ -208,7 +208,7 @@ namespace Verdandi
         void StateUpdated();
         state& GetFullState();
         void FullStateUpdated();
-        pair<int, int> GetParameterIndex(int i);
+        std::pair<int, int> GetParameterIndex(int i);
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);
         void SetParameter(int i, uncertain_parameter& parameter);
