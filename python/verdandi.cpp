@@ -43,7 +43,7 @@
 #include "method/OptimalInterpolation.cxx"
 #include "method/ForwardDriver.cxx"
 #include "method/ReducedOrderExtendedKalmanFilter.cxx"
-#include "output_saver/OutputSaver.cxx"
+#include "share/OutputSaver.cxx"
 
 namespace Verdandi
 {
