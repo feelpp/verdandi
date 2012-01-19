@@ -9,6 +9,11 @@ observation = {
    -- observations are stored in the file. If the type is "state", the whole
    -- model state is stored.
    type = "state",
+   -- Is the period with which observations are available constant?
+   Delta_t_constant = true,
+   -- If the period with which observations are available non constant
+   -- one should define the observation time file.
+   observation_time_file = "result/time.dat",
    -- Period with which observations are available.
    Delta_t = Delta_t_model * Nskip_save,
    -- Period with which available observations are actually assimilated.

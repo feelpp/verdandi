@@ -112,8 +112,17 @@ namespace Verdandi
         int Nobservation_;
         //! Size in bytes of an observation vector.
         size_t Nbyte_observation_;
-        //! Period with which observations are available.
+        //! Is the time interval between two observations constant?
+        bool is_delta_t_constant_;
+        //! Period with which observations are available (if constant).
         double Delta_t_;
+        /*! Times at which observations are available (if the time interval
+            between two observations is not constant). */
+        Vector<double> observation_time_;
+
+        /*! Path to the observation times (needed if the time interval between
+          two observations is not constant). */
+        string observation_time_file_;
         //! Period with which available observations are actually loaded.
         int Nskip_;
         //! First time at which observations are available.

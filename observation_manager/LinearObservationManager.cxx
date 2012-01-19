@@ -96,7 +96,16 @@ namespace Verdandi
         configuration.SetPrefix("observation.");
         configuration.Set("file", observation_file_);
         configuration.Set("type", "", "state", observation_type_);
-        configuration.Set("Delta_t", "v > 0", Delta_t_);
+        configuration.Set("Delta_t_constant", is_delta_t_constant_);
+        if (!is_delta_t_constant_)
+        {
+            configuration.Set("observation_time_file",
+                              observation_time_file_);
+            observation_time_.Read(observation_time_file_);
+        }
+        else
+            configuration.Set("Delta_t", "v > 0", Delta_t_);
+
         configuration.Set("Nskip", "v > 0", Nskip_);
         configuration.Set("initial_time", "", 0., initial_time_);
         configuration.Set("final_time", "", numeric_limits<double>::max(),
@@ -221,33 +230,54 @@ namespace Verdandi
         if (observation_type_ == "observation")
             Nbyte_observation_ = Nobservation_ * sizeof(T) + sizeof(int);
 
-        int expected_file_size;
-        expected_file_size = Nbyte_observation_ *
-            (int((final_time_ - initial_time_) / (Delta_t_ * Nskip_)) + 1);
+        if (is_delta_t_constant_)
+        {
 
-        int file_size;
-        ifstream file_stream;
-        file_stream.open(observation_file_.c_str());
+            int expected_file_size;
+            expected_file_size = Nbyte_observation_
+                * int((final_time_ - initial_time_)
+                      / (Delta_t_ * double(Nskip_)) + 1.);
+
+            int file_size;
+            ifstream file_stream;
+            file_stream.open(observation_file_.c_str());
 
 #ifdef VERDANDI_CHECK_IO
-        // Checks if the file was opened.
-        if (!file_stream.is_open())
-            throw ErrorIO("LinearObservationManager"
-                          "::Initialize(model, configuration_file)",
-                          "Unable to open file \""
-                          + observation_file_ + "\".");
+            // Checks if the file was opened.
+            if (!file_stream.is_open())
+                throw ErrorIO("LinearObservationManager"
+                              "::Initialize(model, configuration_file)",
+                              "Unable to open file \""
+                              + observation_file_ + "\".");
 #endif
 
-        file_stream.seekg(0, ios_base::end);
-        file_size = file_stream.tellg() ;
-        file_stream.close();
+            file_stream.seekg(0, ios_base::end);
+            file_size = file_stream.tellg() ;
+            file_stream.close();
 
-        if (expected_file_size > file_size)
-            throw IOError("LinearObservationManager"
-                          "::Initialize(model, configuration_file)",
-                          "Too few available observations, the size of \""
-                          + observation_file_ + "\" must be greater than "
-                          + to_str(expected_file_size) + "B.");
+            if (expected_file_size > file_size)
+                throw IOError("LinearObservationManager"
+                              "::Initialize(model, configuration_file)",
+                              "Too few available observations, the size of \""
+                              + observation_file_ + "\" must be greater than "
+                              + to_str(expected_file_size) + "B.");
+        }
+        else
+        {
+            int file_size;
+            ifstream file_stream;
+            file_stream.open(observation_file_.c_str());
+
+#ifdef VERDANDI_CHECK_IO
+            // Checks if the file was opened.
+            if (!file_stream.is_open())
+                throw ErrorIO("LinearObservationManager"
+                              "::Initialize(model, configuration_file)",
+                              "Unable to open file \""
+                              + observation_file_ + "\".");
+#endif
+            file_stream.close();
+        }
     }
 
 
@@ -360,15 +390,24 @@ namespace Verdandi
                        time_vector& available_time)
     {
         available_time.Clear();
-        double period = Delta_t_ * Nskip_;
-        double available_time_0
-            = initial_time_
-            + floor((time_inf - initial_time_) / period) * period;
-        if (available_time_0 == time_inf)
-            available_time.PushBack(available_time_0);
-        available_time_0 += period;
-        for (double t = available_time_0; t < time_sup; t += period)
-            available_time.PushBack(t);
+
+        if (is_delta_t_constant_)
+        {
+            double period = Delta_t_ * Nskip_;
+            double available_time_0
+                = initial_time_
+                + floor((time_inf - initial_time_) / period) * period;
+            if (available_time_0 == time_inf)
+                available_time.PushBack(available_time_0);
+            available_time_0 += period;
+            for (double t = available_time_0; t < time_sup; t += period)
+                available_time.PushBack(t);
+        }
+        else
+            for (int i = 0; i < observation_time_.GetM(); i++)
+                if (observation_time_(i) >= time_inf &&
+                    observation_time_(i) <= time_sup)
+                    available_time.PushBack(observation_time_(i));
         return;
     }
 
@@ -390,107 +429,145 @@ namespace Verdandi
         time_inf = time_inf > initial_time_ ? time_inf : initial_time_;
         time_sup = time_sup < final_time_ ? time_sup : final_time_;
 
-        double period = Delta_t_ * Nskip_;
 
-        // All observations available in the given interval are considered.
-        if (selection_policy == 0)
+        if (is_delta_t_constant_)
         {
-            double available_time_0
-                = initial_time_
-                + floor((time_inf - initial_time_) / period) * period;
-            if (available_time_0 == time_inf)
-                available_time.PushBack(available_time_0);
-            available_time_0 += period;
-            for (double t = available_time_0; t < time_sup; t += period)
-                available_time.PushBack(t);
-            observation_aggregator_.Contribution(time_, available_time_,
-                                                 contribution_);
-            return;
-        }
+            double period = Delta_t_ * Nskip_;
 
-        // Only the closest left observation and the closest right observation
-        // are requested.
-        if (selection_policy == 2)
-        {
-            double t1, t2;
-
-            if (is_multiple(time - initial_time_, period))
-                t1 = time;
-            else
-                t1 = initial_time_
-                    + floor((time - initial_time_) / period) * period;
-
-            t2 = t1 + period;
-
-            if (t1 <= final_time_)
-                available_time.PushBack(t1);
-            if (t2 <= final_time_)
-                available_time.PushBack(t2);
-            observation_aggregator_.Contribution(time_, available_time_,
-                                                 contribution_);
-            return;
-        }
-
-        // All observations available in the given interval are considered
-        // taking into account non constant triangle widths associated with
-        // observations.
-        if (selection_policy == 3)
-        {
-            double available_time_0, available_time_1;
-            int Nobservation;
-
-            Vector<double> width_left, width_right, available_width_left,
-                available_width_right;
-            ReadObservationTriangleWidth(time_inf, time_sup, width_left,
-                                         width_right);
-
-            available_time_0 = initial_time_
-                + floor((time_inf - initial_time_) / period) * period;
-            if (!is_equal(available_time_0, time_inf))
-                available_time_0 += period;
-
-            available_time_1 = initial_time_
-                + floor((time_sup - initial_time_) / period) * period;
-            if (is_equal(available_time_1, time_sup))
-                available_time_1 -= period;
-
-            Nobservation = floor((available_time_1 - available_time_0)
-                                 / period) + 1;
-
-            double t = available_time_0;
-            for (int i = 0; i < Nobservation; i++, t += period)
+            // All observations available in the given interval are
+            // considered.
+            if (selection_policy == 0)
             {
-                if (t < time)
-                {
-                    if (t + width_right(i) > time)
-                    {
-                        available_time.PushBack(t);
-                        available_width_left.PushBack(width_left(i));
-                        available_width_right.PushBack(width_right(i));
-                    }
-                }
-                else if (t > time)
-                {
-                    if (t - width_left(i) < time)
-                    {
-                        available_time.PushBack(t);
-                        available_width_left.PushBack(width_left(i));
-                        available_width_right.PushBack(width_right(i));
-                    }
-                }
-                else
-                {
+                double available_time_0
+                    = initial_time_
+                    + floor((time_inf - initial_time_) / period) * period;
+                if (available_time_0 == time_inf)
+                    available_time.PushBack(available_time_0);
+                available_time_0 += period;
+                for (double t = available_time_0; t < time_sup; t += period)
                     available_time.PushBack(t);
-                    available_width_left.PushBack(width_left(i));
-                    available_width_right.PushBack(width_right(i));
-                }
-
+                observation_aggregator_.Contribution(time_, available_time_,
+                                                     contribution_);
+                return;
             }
-            observation_aggregator_.
-                Contribution(time_, available_time_,
-                             available_width_left, available_width_right,
-                             contribution_);
-            return;
+
+            // Only the closest left observation and the closest right
+            // observation are requested.
+            if (selection_policy == 2)
+            {
+                double t1, t2;
+
+                if (is_multiple(time - initial_time_, period))
+                    t1 = time;
+                else
+                    t1 = initial_time_
+                        + floor((time - initial_time_) / period) * period;
+
+                t2 = t1 + period;
+
+                if (t1 <= final_time_)
+                    available_time.PushBack(t1);
+                if (t2 <= final_time_)
+                    available_time.PushBack(t2);
+                observation_aggregator_.Contribution(time_, available_time_,
+                                                     contribution_);
+                return;
+            }
+
+            // All observations available in the given interval are considered
+            // taking into account non constant triangle widths associated
+            // with observations.
+            if (selection_policy == 3)
+            {
+                double available_time_0, available_time_1;
+                int Nobservation;
+
+                Vector<double> width_left, width_right, available_width_left,
+                    available_width_right;
+                ReadObservationTriangleWidth(time_inf, time_sup, width_left,
+                                             width_right);
+
+                available_time_0 = initial_time_
+                    + floor((time_inf - initial_time_) / period) * period;
+                if (!is_equal(available_time_0, time_inf))
+                    available_time_0 += period;
+
+                available_time_1 = initial_time_
+                    + floor((time_sup - initial_time_) / period) * period;
+                if (is_equal(available_time_1, time_sup))
+                    available_time_1 -= period;
+
+                Nobservation = floor((available_time_1 - available_time_0)
+                                     / period) + 1;
+
+                double t = available_time_0;
+                for (int i = 0; i < Nobservation; i++, t += period)
+                {
+                    if (t < time)
+                    {
+                        if (t + width_right(i) > time)
+                        {
+                            available_time.PushBack(t);
+                            available_width_left.PushBack(width_left(i));
+                            available_width_right.PushBack(width_right(i));
+                        }
+                    }
+                    else if (t > time)
+                    {
+                        if (t - width_left(i) < time)
+                        {
+                            available_time.PushBack(t);
+                            available_width_left.PushBack(width_left(i));
+                            available_width_right.PushBack(width_right(i));
+                        }
+                    }
+                    else
+                    {
+                        available_time.PushBack(t);
+                        available_width_left.PushBack(width_left(i));
+                        available_width_right.PushBack(width_right(i));
+                    }
+
+                }
+                observation_aggregator_.
+                    Contribution(time_, available_time_,
+                                 available_width_left, available_width_right,
+                                 contribution_);
+                return;
+            }
+        }
+        else
+        {
+            // All observations available in the given interval are
+            // considered.
+            if (selection_policy == 0)
+            {
+                for (int i = 0; i < observation_time_.GetM(); i++)
+                    if (observation_time_(i) >= time_inf &&
+                        observation_time_(i) <= time_sup)
+                        available_time.PushBack(observation_time_(i));
+                observation_aggregator_.Contribution(time_, available_time_,
+                                                     contribution_);
+                return;
+            }
+            // Only the closest left observation and the closest right
+            // observation are requested.
+            if (selection_policy == 2)
+            {
+                if (observation_time_(0) > time)
+                    return;
+                for (int i = 1; i < observation_time_.GetM(); i++)
+                    if (observation_time_(i) >= time)
+                    {
+                        available_time.PushBack(observation_time_(i - 1));
+                        available_time.PushBack(observation_time_(i));
+                        observation_aggregator_.
+                            Contribution(time_, available_time_,
+                                         contribution_);
+                        return;
+                    }
+                return;
+            }
         }
 
         throw ErrorArgument("void LinearObservationManager<T>"
@@ -1395,8 +1472,30 @@ namespace Verdandi
         observation_vector input_data;
 
         streampos position;
-        position = (floor((time - initial_time_) / (Delta_t_ * Nskip_) + 0.5)
-                    + variable) * Nbyte_observation_;
+
+        if (is_delta_t_constant_)
+            position = (floor((time - initial_time_)
+                              / (Delta_t_ * Nskip_) + 0.5) + variable)
+                * Nbyte_observation_;
+        else
+        {
+            int index;
+            bool observation_available = false;
+            for (index = 0; index < observation_time_.GetM(); index++)
+                if (observation_time_(index) == time)
+                {
+                    observation_available = true;
+                    break;
+                }
+            if (!observation_available)
+                throw ErrorIO("LinearObservationManager::ReadObservation"
+                              "(ifstream& file_stream, double time, "
+                              "int variable, LinearObservationManager"
+                              "::observation_vector& observation) const",
+                              "No observation available at time "
+                              + to_str(time) + ".");
+            position = index * Nbyte_observation_;
+        }
         file_stream.seekg(position);
         input_data.Read(file_stream);
 
