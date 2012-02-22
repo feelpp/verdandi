@@ -49,11 +49,28 @@ namespace Verdandi
         int Nobservation, Nstate;
         Nobservation = observation_manager.GetNobservation();
         Nstate = model.GetNstate();
+        int Nlocal_state = Nstate;
 
         if (Nobservation == 0) // No observations.
             return;
 
         int r, c;
+
+        int global_state_number = 0;
+
+#if defined(VERDANDI_WITH_MPI)
+        int rank = MPI::COMM_WORLD.Get_rank();
+        int Nprocess = MPI::COMM_WORLD.Get_size();
+        Nlocal_state = Nstate / Nprocess;
+        if (rank < Nstate % Nprocess)
+            Nlocal_state ++;
+        int div = Nstate % Nprocess;
+        if (rank < div)
+            global_state_number = rank * Nlocal_state;
+        else
+            global_state_number = div * (Nlocal_state + 1)
+                + (rank - div) * Nlocal_state;
+#endif
 
         // One row of background matrix B.
         typename Model::state_error_variance_row
@@ -72,9 +89,10 @@ namespace Verdandi
 
         // Computes HBH'.
         T H_entry;
-        for (int j = 0; j < Nstate; j++)
+        for (int j = 0; j < Nlocal_state; j++)
         {
-            model.GetStateErrorVarianceRow(j, state_error_variance_row);
+            model.GetStateErrorVarianceRow(j + global_state_number,
+                                           state_error_variance_row);
             // Computes the j-th row of BH'.
             for (r = 0; r < Nobservation; r++)
             {
@@ -87,11 +105,22 @@ namespace Verdandi
             // Keeps on building HBH'.
             for (r = 0; r < Nobservation; r++)
             {
-                H_entry = observation_manager.GetTangentLinearOperator(r, j);
+                H_entry = observation_manager.
+                    GetTangentLinearOperator(r, j + global_state_number);
                 for (c = 0; c < Nobservation; c++)
                     HBHR_inv(r, c) += H_entry * row(c);
             }
         }
+
+#if defined(VERDANDI_WITH_MPI)
+	Matrix<T> HBHR_recv(Nobservation, Nobservation);
+        MPI::COMM_WORLD.Allreduce(HBHR_inv.GetData(),
+                                  HBHR_recv.GetData(),
+                                  Nobservation * Nobservation,
+                                  MPI::DOUBLE,
+                                  MPI::SUM);
+	HBHR_inv = HBHR_recv;
+#endif
 
         // Computes (HBH' + R).
         for (r = 0; r < Nobservation; r++)
@@ -107,11 +136,16 @@ namespace Verdandi
 
         // Computes new state.
         Vector<T> BHt_row(Nobservation);
+#if defined(VERDANDI_WITH_MPI)
+        typename Model::state state_update_send(Nstate);
+        state_update_send.Fill(T(0.));
+#endif
         BHt_row.Fill(T(0));
-        for (r = 0; r < Nstate; r++)
+        for (r = 0; r < Nlocal_state; r++)
         {
             // Computes the r-th row of BH'.
-            model.GetStateErrorVarianceRow(r, state_error_variance_row);
+            model.GetStateErrorVarianceRow(r + global_state_number,
+                                           state_error_variance_row);
             for (c = 0; c < Nobservation; c++)
             {
                 observation_manager
@@ -120,8 +154,22 @@ namespace Verdandi
                                      tangent_operator_row);
             }
 
+#if defined(VERDANDI_WITH_MPI)
+            state_update_send(r + global_state_number)
+                += DotProd(BHt_row, HBHR_inv_innovation);
+#else
             state(r) += DotProd(BHt_row, HBHR_inv_innovation);
+#endif
         }
+
+#if defined(VERDANDI_WITH_MPI)
+        typename Model::state state_update_recv(Nstate);
+        state_update_recv.Fill(T(0.));
+        MPI::COMM_WORLD.Allreduce(state_update_send.GetDataVoid(),
+                                  state_update_recv.GetDataVoid(),
+                                  Nstate, MPI::DOUBLE, MPI::SUM);
+        Add(T(1.), state_update_recv, state);
+#endif
     }
 
 

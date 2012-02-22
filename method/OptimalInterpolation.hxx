@@ -89,6 +89,14 @@ namespace Verdandi
         //! Computation mode for BLUE: "vector" or "matrix".
         string blue_computation_;
 
+#if defined(VERDANDI_WITH_MPI)
+
+        /*** Parallel settings ***/
+
+        //! Process rank.
+        int rank_;
+#endif
+
         /*** Output saver ***/
 
         //! Output saver.

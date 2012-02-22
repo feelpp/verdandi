@@ -47,6 +47,10 @@ namespace Verdandi
 
         /*** Initializations ***/
 
+#if defined(VERDANDI_WITH_MPI)
+        MPI::Init();
+	rank_ = MPI::COMM_WORLD.Get_rank();
+#endif
         MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
         MessageHandler::AddRecipient("observation_manager",
                                      observation_manager_,
@@ -61,6 +65,9 @@ namespace Verdandi
     OptimalInterpolation<T, Model, ObservationManager>
     ::~OptimalInterpolation()
     {
+#if defined(VERDANDI_WITH_MPI)
+        MPI::Finalize();
+#endif
     }
 
 
@@ -141,10 +148,17 @@ namespace Verdandi
         /*** Ouput saver ***/
 
         configuration.SetPrefix("optimal_interpolation.output_saver.");
-        output_saver_.Initialize(configuration);
-        output_saver_.Empty("state_forecast");
-        output_saver_.Empty("state_analysis");
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+	{
+#endif
+            output_saver_.Initialize(configuration);
+            output_saver_.Empty("state_forecast");
+            output_saver_.Empty("state_analysis");
 
+#if defined(VERDANDI_WITH_MPI)
+	}
+#endif
         /*** Logger and read configuration ***/
 
         configuration.SetPrefix("optimal_interpolation.");
@@ -361,15 +375,22 @@ namespace Verdandi
     void OptimalInterpolation<T, Model, ObservationManager>
     ::Message(string message)
     {
-        if (message.find("initial condition") != string::npos)
-            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
-                               "state_forecast");
-        if (message.find("forecast") != string::npos)
-            output_saver_.Save(model_.GetState(), model_.GetTime(),
-                               "state_forecast");
-        if (message.find("analysis") != string::npos)
-            output_saver_.Save(model_.GetState(), model_.GetTime(),
-                               "state_analysis");
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+	{
+#endif
+            if (message.find("initial condition") != string::npos)
+                output_saver_.Save(model_.GetState(), double(model_.GetTime()),
+                                   "state_forecast");
+            if (message.find("forecast") != string::npos)
+                output_saver_.Save(model_.GetState(), model_.GetTime(),
+                                   "state_forecast");
+            if (message.find("analysis") != string::npos)
+                output_saver_.Save(model_.GetState(), model_.GetTime(),
+                                   "state_analysis");
+#if defined(VERDANDI_WITH_MPI)
+	}
+#endif
     }
 
 
