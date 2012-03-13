@@ -438,7 +438,7 @@ namespace Verdandi
       \return True if the simulation is finished, false otherwise.
     */
     template <class T, class ClassModel, class PerturbationManager>
-    bool MonteCarlo<T, ClassModel, PerturbationManager>::HasFinished() const
+    bool MonteCarlo<T, ClassModel, PerturbationManager>::HasFinished()
     {
         return model_.HasFinished();
     }

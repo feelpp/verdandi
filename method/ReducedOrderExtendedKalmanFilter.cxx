@@ -658,7 +658,6 @@ namespace Verdandi
     template <class T, class Model, class ObservationManager>
     bool ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
     ::HasFinished()
-        const
     {
         return model_.HasFinished();
     }

@@ -165,7 +165,7 @@ namespace Verdandi
 
         T GodunovFlux(T q, T M, T v_l, T v, T v_r) const;
 
-        bool HasFinished() const;
+        bool HasFinished();
 
         // Access methods.
         Model& GetModel();

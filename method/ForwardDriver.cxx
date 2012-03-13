@@ -224,7 +224,7 @@ namespace Verdandi
       \return True if no more data assimilation is required, false otherwise.
     */
     template <class Model>
-    bool ForwardDriver<Model>::HasFinished() const
+    bool ForwardDriver<Model>::HasFinished()
     {
         return model_.HasFinished();
     }

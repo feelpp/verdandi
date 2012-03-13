@@ -136,7 +136,7 @@ namespace Verdandi
 
         void ComputeBLUE(const observation& innovation, model_state& state);
 
-        bool HasFinished() const;
+        bool HasFinished();
 
         // Access methods.
         Model& GetModel();

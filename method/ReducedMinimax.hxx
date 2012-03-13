@@ -208,7 +208,7 @@ namespace Verdandi
 
         void SnapshotRecording();
 
-        bool HasFinished() const;
+        bool HasFinished();
 
         // Access methods.
         int GetMode() const;

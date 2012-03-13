@@ -112,7 +112,7 @@ namespace Verdandi
         void FinalizeStep();
         void Finalize();
 
-        bool HasFinished() const;
+        bool HasFinished();
 
         /*** Access methods ***/
 

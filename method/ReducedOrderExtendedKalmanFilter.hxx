@@ -164,7 +164,7 @@ namespace Verdandi
 
         void PropagateCovarianceMatrix();
 
-        bool HasFinished() const;
+        bool HasFinished();
 
         // Access methods.
         Model& GetModel();

@@ -562,7 +562,6 @@ namespace Verdandi
     */
     template <class T, class Model, class ObservationManager>
     bool UnscentedKalmanFilter<T, Model, ObservationManager>::HasFinished()
-        const
     {
         return model_.HasFinished();
     }

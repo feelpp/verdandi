@@ -320,7 +320,6 @@ namespace Verdandi
               class Optimization>
     bool FourDimensionalVariational<T, Model, ObservationManager,
                                     Optimization>::HasFinished()
-        const
     {
         return model_.HasFinished();
     }

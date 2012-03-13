@@ -960,7 +960,6 @@ namespace Verdandi
     */
     template <class T, class Model, class ObservationManager>
     bool HamiltonJacobiBellman<T, Model, ObservationManager>::HasFinished()
-        const
     {
         return time_step_ == Nt_;
     }

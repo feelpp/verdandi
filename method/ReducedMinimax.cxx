@@ -976,7 +976,7 @@ namespace Verdandi
       \return True if no more data assimilation is required, false otherwise.
     */
     template <class T, class Model, class ObservationManager>
-    bool ReducedMinimax<T, Model, ObservationManager>::HasFinished() const
+    bool ReducedMinimax<T, Model, ObservationManager>::HasFinished()
     {
         // The condition 'mode_ == 0 && inner_iteration_ != Nsnapshot_' means
         // that a sequence of error computation has just ended. The simulation
