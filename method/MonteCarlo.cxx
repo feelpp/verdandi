@@ -63,7 +63,8 @@ namespace Verdandi
     */
     template <class T, class ClassModel, class PerturbationManager>
     template <class T0, class Storage0, class Allocator0>
-    void MonteCarlo<T, ClassModel, PerturbationManager>::Clear(Vector<T0, Storage0, Allocator0>& V)
+    void MonteCarlo<T, ClassModel, PerturbationManager>
+    ::Clear(Vector<T0, Storage0, Allocator0>& V)
     {
         V.Clear();
     }
@@ -76,7 +77,8 @@ namespace Verdandi
     template <class T, class ClassModel, class PerturbationManager>
     template <class T0, class Allocator0>
     void
-    MonteCarlo<T, ClassModel, PerturbationManager>::Clear(Vector<T0, Collection, Allocator0>& V)
+    MonteCarlo<T, ClassModel, PerturbationManager>
+    ::Clear(Vector<T0, Collection, Allocator0>& V)
     {
         for (int i = 0; i < V.GetNvector(); i++)
             V.GetVector(i).Clear();
@@ -292,24 +294,27 @@ namespace Verdandi
             {
                 SetDimension(parameter, output);
                 Fill(output, model_.GetParameterPDF(i));
-                perturbation_manager_.Sample(model_.GetParameterPDF(i),
-                                             model_.GetParameterVariance(i),
-                                             model_.GetParameterParameter(i),
-                                             model_.GetParameterCorrelation(i),
-                                             output);
+                perturbation_manager_
+                    .Sample(model_.GetParameterPDF(i),
+                            model_.GetParameterVariance(i),
+                            model_.GetParameterParameter(i),
+                            model_.GetParameterCorrelation(i),
+                            output);
             }
             else if (model_.GetParameterPDF(i) == "NormalHomogeneous"
                      || model_.GetParameterPDF(i) == "LogNormalHomogeneous"
                      || model_.GetParameterPDF(i) == "BlockNormalHomogeneous"
-                     || model_.GetParameterPDF(i) == "BlockLogNormalHomogeneous")
+                     || model_.GetParameterPDF(i)
+                     == "BlockLogNormalHomogeneous")
             {
                 SetDimension(parameter, output);
                 Fill(output, model_.GetParameterPDF(i));
-                perturbation_manager_.Sample(model_.GetParameterPDF(i),
-                                             model_.GetParameterVariance(i)(0, 0),
-                                             model_.GetParameterParameter(i),
-                                             model_.GetParameterCorrelation(i),
-                                             output);
+                perturbation_manager_
+                    .Sample(model_.GetParameterPDF(i),
+                            model_.GetParameterVariance(i)(0, 0),
+                            model_.GetParameterParameter(i),
+                            model_.GetParameterCorrelation(i),
+                            output);
             }
             else
                 throw ErrorConfiguration("MonteCarlo::Initialize(string)",
@@ -327,8 +332,10 @@ namespace Verdandi
                     Add(1., perturbation_[i], parameter);
                 else if (model_.GetParameterPDF(i) == "LogNormal"
                          || model_.GetParameterPDF(i) == "BlockLogNormal"
-                         || model_.GetParameterPDF(i) == "LogNormalHomogeneous"
-                         || model_.GetParameterPDF(i) == "BlockLogNormalHomogeneous")
+                         || model_.GetParameterPDF(i)
+                         == "LogNormalHomogeneous"
+                         || model_.GetParameterPDF(i)
+                         == "BlockLogNormalHomogeneous")
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
 
@@ -360,8 +367,10 @@ namespace Verdandi
                     Add(1., perturbation_[i], parameter);
                 else if (model_.GetParameterPDF(i) == "LogNormal"
                          || model_.GetParameterPDF(i) == "BlockLogNormal"
-                         || model_.GetParameterPDF(i) == "LogNormalHomogeneous"
-                         || model_.GetParameterPDF(i) == "BlockLogNormalHomogeneous")
+                         || model_.GetParameterPDF(i)
+                         == "LogNormalHomogeneous"
+                         || model_.GetParameterPDF(i)
+                         == "BlockLogNormalHomogeneous")
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
 
