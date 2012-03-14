@@ -215,12 +215,8 @@ namespace Verdandi
                                        Nskip_step);
 #endif
 
-        model_state lower_bound, upper_bound;
-        model_.GetStateLowerBound(lower_bound);
-        model_.GetStateUpperBound(upper_bound);
-
-        optimization_.SetLowerBound(lower_bound);
-        optimization_.SetUpperBound(upper_bound);
+        optimization_.SetLowerBound(model_.GetStateLowerBound());
+        optimization_.SetUpperBound(model_.GetStateUpperBound());
 
         state_first_guess_.Reallocate(model_.GetNstate());
         Copy(model_.GetState(), state_first_guess_);

@@ -227,24 +227,24 @@ namespace Verdandi
 
     //! Provides the state lower bound.
     /*!
-      \param[out] lower_bound the state lower bound (componentwise).
+      \return The state lower bound (componentwise).
     */
-    void ModelTemplate
-    ::GetStateLowerBound(state& lower_bound) const
+    typename ModelTemplate::state& ModelTemplate
+    ::GetStateLowerBound()
     {
-        throw ErrorUndefined("ModelTemplate"
+        throw ErrorUndefined("ModelTemplate::state& ModelTemplate"
                              "::GetStateLowerBound(state& lower_bound)");
     }
 
 
     //! Provides the state upper bound.
     /*!
-      \param[out] upper_bound the state upper bound (componentwise).
+      \return The state upper bound (componentwise).
     */
-    void ModelTemplate
-    ::GetStateUpperBound(state& upper_bound) const
+    typename ModelTemplate::state& ModelTemplate
+    ::GetStateUpperBound()
     {
-        throw ErrorUndefined("ModelTemplate"
+        throw ErrorUndefined("ModelTemplate::state& ModelTemplate"
                              "::GetStateUpperBound(state& upper_bound)");
     }
 

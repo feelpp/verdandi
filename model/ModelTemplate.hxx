@@ -97,8 +97,8 @@ namespace Verdandi
         void StateUpdated();
         state& GetFullState();
         void FullStateUpdated();
-        void GetStateLowerBound(state& lower_bound) const;
-        void GetStateUpperBound(state& upper_bound) const;
+        state& GetStateLowerBound();
+        state& GetStateUpperBound();
         void GetAdjointState(state& state_adjoint);
         void SetAdjointState(const state& state_adjoint);
 

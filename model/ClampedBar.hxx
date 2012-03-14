@@ -128,6 +128,11 @@ namespace Verdandi
         //! Full state collection.
         state_collection x_full_;
 
+        //! State lower bound.
+        state lower_bound_;
+        //! State upper bound.
+        state upper_bound_;
+
         //! Mass parameter
         Vector<T> theta_mass_;
         //! Number of mass parameter regions.
@@ -234,8 +239,8 @@ namespace Verdandi
         void SetStateCopy(state& state);
         state& GetState();
         void StateUpdated();
-        void GetStateLowerBound(state& upper_bound) const;
-        void GetStateUpperBound(state& upper_bound) const;
+        state& GetStateLowerBound();
+        state& GetStateUpperBound();
         state& GetFullState();
         void FullStateUpdated();
         void GetAdjointState(state& state_adjoint);

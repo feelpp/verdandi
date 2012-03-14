@@ -819,25 +819,25 @@ namespace Verdandi
 
     //! Provides the state lower bound.
     /*!
-      \param[out] lower_bound the state lower bound (componentwise).
+      \return The state lower bound (componentwise).
     */
     template <class T>
-    void ClampedBar<T>
-    ::GetStateLowerBound(state& lower_bound) const
+    typename ClampedBar<T>::state& ClampedBar<T>
+    ::GetStateLowerBound()
     {
-        lower_bound.Clear();
+        return lower_bound_;
     }
 
 
     //! Provides the state upper bound.
     /*!
-      \param[out] upper_bound the state upper bound (componentwise).
+      \return The state upper bound (componentwise).
     */
     template <class T>
-    void ClampedBar<T>
-    ::GetStateUpperBound(state& upper_bound) const
+    typename ClampedBar<T>::state& ClampedBar<T>
+    ::GetStateUpperBound()
     {
-        upper_bound.Clear();
+        return upper_bound_;
     }
 
 
