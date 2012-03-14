@@ -1193,10 +1193,10 @@ namespace Verdandi
         // Skeleton.
         for (int i = 0; i < Ndof_ - 1; i++)
         {
-            tridiagonal(i, i) = 0;
-            tridiagonal(i, i + 1) = 0;
+            tridiagonal.Get(i, i) = 0;
+            tridiagonal.Get(i, i + 1) = 0;
         }
-        tridiagonal(Ndof_ - 1, Ndof_ - 1) = 0;
+        tridiagonal.Get(Ndof_ - 1, Ndof_ - 1) = 0;
 
         Copy(tridiagonal, Newmark_matrix_0_);
         Copy(Newmark_matrix_0_, Newmark_matrix_1_);

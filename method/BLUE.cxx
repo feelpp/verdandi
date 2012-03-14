@@ -24,7 +24,7 @@
 
 
 #include "BLUE.hxx"
-#include "seldon/computation/interfaces/direct/SparseSolver.cxx"
+#include "seldon/computation/solver/SparseSolver.cxx"
 
 
 namespace Verdandi
