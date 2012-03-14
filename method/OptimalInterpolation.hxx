@@ -118,8 +118,6 @@ namespace Verdandi
         void FinalizeStep();
         void Finalize();
 
-        void ComputeBLUE(const observation& innovation, model_state& state);
-
         bool HasFinished() const;
 
         // Access methods.
