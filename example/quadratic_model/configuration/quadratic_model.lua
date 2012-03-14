@@ -27,6 +27,39 @@ quadratic_model = {
 
    },
 
+   uncertainty = {
+
+      uncertain_parameter_list = {"quadratic_term", "linear_term", "constant"},
+
+      quadratic_term = {
+
+         distribution = "NormalHomogeneous",
+         mean = {0., 0.},
+         variance = {0.1^2, 0.,
+                     0., 0.1^2},
+         parameter = {-1., 1.}
+      },
+
+      linear_term = {
+
+         distribution = "NormalHomogeneous",
+         mean = {0., 0.},
+         variance = {0.1^2, 0.,
+                     0., 0.1^2},
+         parameter = {-1., 1.}
+      },
+
+      constant = {
+
+         distribution = "NormalHomogeneous",
+         mean = {0., 0.},
+         variance = {0.1^2, 0.,
+                     0., 0.1^2},
+         parameter = {-1., 1.}
+      }
+
+    },
+
    error = {
 
       -- Is the model error variance a scaled identity matrix?

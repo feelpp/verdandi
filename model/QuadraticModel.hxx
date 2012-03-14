@@ -54,6 +54,7 @@ namespace Verdandi
         typedef Matrix<T> matrix_state_observation;
         typedef Matrix<T> error_variance;
         typedef Vector<T> uncertain_variable;
+        typedef Vector<T> uncertain_parameter;
 
     protected:
 
@@ -91,7 +92,20 @@ namespace Verdandi
         //! Temporary variable that stores S times the state vector.
         Vector<T> S_state_;
 
-        /*** Uncertainty ***/
+        /*** Uncertainty on parameters ***/
+
+        //! Should the quadratic term be perturbed?
+        bool is_quadratic_perturbed_;
+        //! Should the linear term be perturbed?
+        bool is_linear_perturbed_;
+        //! Should the constant term be perturbed?
+        bool is_constant_perturbed_;
+
+        //! Parameters to be perturbed.
+        uncertain_parameter parameter_;
+
+        //! List of parameters to be perturbed.
+        vector<string> uncertain_parameter_vector_;
 
         //! Correlations between the uncertain variables.
         Vector<T> correlation_;
@@ -110,6 +124,58 @@ namespace Verdandi
 
         //! Perturbation option for 'b_'.
         string b_option_;
+
+        //! Number of "global" parameters to be perturbed.
+        int Nglob_parameter_;
+
+        //! Number of parameters to be perturbed.
+        int Nparameter_;
+
+        //! Correlations between the constant term and the other terms.
+        Vector<T> constant_correlation_;
+
+        //! Name of the probability distribution for the constant term.
+        string constant_pdf_;
+
+        //! Mean of the probability distribution for the constant term.
+        Vector<T> constant_mean_;
+
+        //! Covariance matrix for the constant term.
+        Matrix<T, Symmetric, RowSymPacked> constant_variance_;
+
+        //! PDF parameters for the constant term.
+        Vector<T> constant_parameter_;
+
+        //! Correlations between the parameters for the linear term.
+        Vector<T> linear_correlation_;
+
+        //! Name of the probability distribution for the linear term.
+        string linear_pdf_;
+
+        //! Mean of the probability distribution for the linear term.
+        Vector<T> linear_mean_;
+
+        //! Covariance matrix for the linear term.
+        Matrix<T, Symmetric, RowSymPacked> linear_variance_;
+
+        //! PDF parameters for the linear term.
+        Vector<T> linear_parameter_;
+
+        //! Correlations between the quadratic term and the other terms.
+        Vector<T> quadratic_correlation_;
+
+        //! Name of the probability distribution for the quadratic term
+        string quadratic_pdf_;
+
+        //! Mean of the probability distribution for the quadratic term.
+        Vector<T> quadratic_mean_;
+
+        //! Covariance matrix for the quadratic term
+        Matrix<T, Symmetric, RowSymPacked> quadratic_variance_;
+
+        //! PDF parameters for the quadratic term.
+        Vector<T> quadratic_parameter_;
+
 
         /*** Errors ***/
 
@@ -156,6 +222,7 @@ namespace Verdandi
         double GetTime() const;
         void SetTime(double time);
         int GetNstate() const;
+        int GetNfull_state() const;
         void GetState(state& state) const;
         void SetState(const state& state);
         void GetFullState(state& state) const;
@@ -167,6 +234,17 @@ namespace Verdandi
         Matrix<T, Symmetric, Seldon::RowSymPacked>& GetPDFVariance(int i);
         Vector<T>& GetPDFParameter(int i);
         string GetPerturbationOption(int i);
+
+        pair<int, int> GetParameterIndex(int i);
+        int GetNparameter();
+        uncertain_parameter& GetParameter(int i);
+        void SetParameter(int i, uncertain_parameter& parameter);
+        Vector<T>& GetParameterCorrelation(int i);
+        string GetParameterPDF(int i);
+        Matrix<T, Symmetric, Seldon::RowSymPacked>&
+        GetParameterVariance(int i);
+        Vector<T>& GetParameterParameter(int i);
+        string GetParameterOption(int i);
 
         // Errors.
         error_variance& GetErrorVariance();

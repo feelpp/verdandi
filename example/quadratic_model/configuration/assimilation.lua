@@ -25,6 +25,12 @@ quadratic_model.definition.with_linear_term = false
 dofile("configuration/observation.lua")
 
 
+------------------------------ PERTURBATION-----------------------------------
+
+
+dofile("configuration/perturbation_manager.lua")
+
+
 ----------------------------------- METHOD -----------------------------------
 
 
@@ -142,6 +148,49 @@ unscented_kalman_filter = {
   }
 
 }
+
+
+-- Simulation with assimilation using ensemble Kalman filter.
+ensemble_kalman_filter = {
+
+   Nmember = 100,
+
+   data_assimilation = {
+
+      analyze_first_step = false,
+
+   },
+
+   display = {
+
+      show_iteration = true,
+      show_time = false
+
+   },
+
+   output_saver = {
+
+      variable_list = {"state_forecast", "state_analysis"},
+      file = output_directory .. "enkf-%{name}.%{extension}",
+      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6",
+
+   },
+
+   output = {
+
+     configuration = output_directory .. "enkf.lua",
+     log = output_directory .. "enkf.log"
+
+  }
+
+}
+
+for i = 0, 1 do
+   table.insert(ensemble_kalman_filter.output_saver.variable_list,
+                "state_forecast-" .. i)
+   table.insert(ensemble_kalman_filter.output_saver.variable_list,
+                "state_analysis-" .. i)
+end
 
 
 -- Forward simulation.
