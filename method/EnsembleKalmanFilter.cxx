@@ -44,6 +44,12 @@ namespace Verdandi
 
         /*** Initializations ***/
 
+#if defined(VERDANDI_WITH_MPI)
+        MPI::Init();
+        rank_ = MPI::COMM_WORLD.Get_rank();
+        Nprocess_ = MPI::COMM_WORLD.Get_size();
+#endif
+
         MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
         MessageHandler::AddRecipient("observation_manager",
                                      observation_manager_,
@@ -59,6 +65,9 @@ namespace Verdandi
     EnsembleKalmanFilter<T, Model, ObservationManager, PerturbationManager>
     ::~EnsembleKalmanFilter()
     {
+#if defined(VERDANDI_WITH_MPI)
+        MPI::Finalize();
+#endif
     }
 
 
@@ -167,6 +176,20 @@ namespace Verdandi
         /*** Ensemble data ***/
 
         configuration.Set("Nmember", Nmember_);
+        Nlocal_member_ = Nmember_;
+        int global_member_number = 0;
+
+#if defined(VERDANDI_WITH_MPI)
+        Nlocal_member_ = Nmember_ / Nprocess_;
+        if (rank_ < Nmember_ % Nprocess_)
+            Nlocal_member_++;
+        int div = Nmember_ % Nprocess_;
+        if (rank_ < div)
+            global_member_number = rank_ * Nlocal_member_;
+        else
+            global_member_number = div * (Nlocal_member_ + 1)
+                + (rank_ - div) * Nlocal_member_;
+#endif
 
         /*** Ouput saver ***/
 
@@ -176,10 +199,12 @@ namespace Verdandi
         output_saver_.Empty("state_forecast");
         output_saver_.Empty("state_analysis");
 
-        for (int k = 0; k < Nmember_; k++)
+        for (int k = 0; k < Nlocal_member_; k++)
         {
-            output_saver_.Empty("state_forecast-" + to_str(k));
-            output_saver_.Empty("state_analysis-" + to_str(k));
+            output_saver_.Empty("state_forecast-"
+                                + to_str(k + global_member_number));
+            output_saver_.Empty("state_analysis-"
+                                + to_str(k + global_member_number));
         }
 
         /*** Logger and read configuration ***/
@@ -192,7 +217,8 @@ namespace Verdandi
         if (configuration.Exists("output.configuration"))
         {
             string output_configuration;
-            configuration.Set("output.configuration", output_configuration);
+            configuration.Set("output.configuration",
+                              output_configuration);
             configuration.WriteLuaDefinition(output_configuration);
         }
 
@@ -220,13 +246,13 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nfull_state_ = model_.GetNfull_state();
         Nparameter_ = model_.GetNparameter();
-        ensemble_.resize(Nmember_);
+        ensemble_.resize(Nlocal_member_);
         parameter_.resize(Nparameter_);
 
         for (int p = 0; p < Nparameter_; p++)
-            parameter_[p].resize(Nmember_);
+            parameter_[p].resize(Nlocal_member_);
 
-        for (int m = 0; m < Nmember_; m++)
+        for (int m = 0; m < Nlocal_member_; m++)
             ensemble_[m] = model_.GetFullState();
 
         InitializeEnsemble();
@@ -260,7 +286,7 @@ namespace Verdandi
                 // Parameter to be perturbed.
                 reference_parameter = model_.GetParameter(i);
 
-                for (int m = 0; m < Nmember_ ; m++)
+                for (int m = 0; m < Nlocal_member_ ; m++)
                 {
                     uncertain_parameter sample;
                     SetDimension(model_.GetParameter(i), sample);
@@ -289,6 +315,7 @@ namespace Verdandi
                                     model_.GetParameterParameter(i),
                                     model_.GetParameterCorrelation(i),
                                     sample);
+
                     if (model_.GetParameterPDF(i) == "Normal"
                         || model_.GetParameterPDF(i) == "BlockNormal"
                         || model_.GetParameterPDF(i) == "NormalHomogeneous"
@@ -335,7 +362,7 @@ namespace Verdandi
                 // Parameter to be perturbed.
                 reference_parameter = model_.GetParameter(i);
 
-                for (int m = 0; m < Nmember_ ; m++)
+                for (int m = 0; m < Nlocal_member_ ; m++)
                 {
                     uncertain_parameter sample;
                     SetDimension(model_.GetParameter(i), sample);
@@ -406,7 +433,7 @@ namespace Verdandi
         for (int i = 0; i < Nparameter_; i++)
             reference_parameter.push_back(model_.GetParameter(i));
 
-        for (int m = 0; m < Nmember_; m++)
+        for (int m = 0; m < Nlocal_member_; m++)
         {
             for (int i = 0; i < Nparameter_; i++)
                 model_.SetParameter(i, parameter_[i][m]);
@@ -417,19 +444,30 @@ namespace Verdandi
 
             ensemble_[m] = model_.GetFullState();
 
-            if (m < Nmember_ - 1)
+            if (m < Nlocal_member_ - 1)
                 model_.SetTime(time_);
         }
 
         model_state mean_state_vector(model_.GetNstate());
         // Sets state to ensemble mean.
         mean_state_vector = 0.;
-        for (int m = 0; m < Nmember_; m++)
+        for (int m = 0; m < Nlocal_member_; m++)
         {
             model_.GetFullState() = ensemble_[m];
             model_.FullStateUpdated();
             Add(T(1), model_.GetState(), mean_state_vector);
         }
+
+#if defined(VERDANDI_WITH_MPI)
+        model_state mean_state_global_vector(model_.GetNstate());
+        MPI::COMM_WORLD.Allreduce(mean_state_vector.GetData(),
+                                  mean_state_global_vector.GetData(),
+                                  model_.GetNstate(),
+                                  MPI::DOUBLE,
+                                  MPI::SUM);
+        mean_state_vector = mean_state_global_vector;
+#endif
+
         Mlt(T(1) / T(Nmember_), mean_state_vector);
         model_.GetState() = mean_state_vector;
         model_.StateUpdated();
@@ -464,12 +502,16 @@ namespace Verdandi
             observation_manager_.GetObservation(obs);
             Nobservation_ = obs.GetLength();
 
+            model_state mean_state_vector(model_.GetNstate());
+            // Sets state to ensemble mean.
+            mean_state_vector = model_.GetState();
+
             // Computes the innovation vectors d = y - Hx where H is the
             // observation operator.
-            Matrix<T> innovation_matrix(Nobservation_, Nmember_);
+            Matrix<T> innovation_matrix(Nobservation_, Nlocal_member_);
             observation Hx(Nobservation_);
             model_state state(Nstate_);
-            for (int m = 0; m < Nmember_; m++)
+            for (int m = 0; m < Nlocal_member_; m++)
             {
                 model_.GetFullState() = ensemble_[m];
                 model_.FullStateUpdated();
@@ -480,14 +522,14 @@ namespace Verdandi
             }
 
             // Constructs state ensemble perturbation matrix L.
-            Matrix<T> ensemble_perturbation(Nstate_, Nmember_);
-            for (int l = 0; l < Nmember_; l++)
+            Matrix<T> ensemble_perturbation(Nstate_, Nlocal_member_);
+            for (int l = 0; l < Nlocal_member_; l++)
                 for (int k = 0; k < Nstate_; k++)
                     ensemble_perturbation(k, l) =
-                        ensemble_[l](k) - model_.GetState()(k);
+                        ensemble_[l](k) - mean_state_vector(k);
 
             // Computes H times L.
-            Matrix<T> HL(Nobservation_, Nmember_);
+            Matrix<T> HL(Nobservation_, Nlocal_member_);
             MltAdd(T(1), observation_manager_.GetTangentLinearOperator(),
                    ensemble_perturbation, T(0), HL);
 
@@ -500,7 +542,7 @@ namespace Verdandi
                    T(1), working_matrix);
 
             // Computes (HLL'H' + R)^{-1} d.
-            Matrix<T> correction(Nobservation_, Nmember_);
+            Matrix<T> correction(Nobservation_, Nlocal_member_);
             GetInverse(working_matrix);
             MltAdd(T(1), working_matrix, innovation_matrix, T(0), correction);
 
@@ -510,23 +552,33 @@ namespace Verdandi
                    HL, T(0), LLH);
 
             // Computes LL'H' (HLL'H' + R)^{-1} d.
-            Matrix<T> Kd(Nstate_, Nmember_);
+            Matrix<T> Kd(Nstate_, Nlocal_member_);
             MltAdd(T(1), LLH, correction, T(0), Kd);
 
             // Updates the ensemble A += K * d.
-            for (int m = 0; m < Nmember_; m++)
+            for (int m = 0; m < Nlocal_member_; m++)
                 for (int l = 0; l < Nstate_; l++)
                     ensemble_[m](l) += Kd(l, m);
 
-            model_state mean_state_vector(model_.GetNstate());
             // Sets state to ensemble mean.
             mean_state_vector = 0.;
-            for (int m = 0; m < Nmember_; m++)
+            for (int m = 0; m < Nlocal_member_; m++)
             {
                 model_.GetFullState() = ensemble_[m];
                 model_.FullStateUpdated();
                 Add(T(1), model_.GetState(), mean_state_vector);
             }
+
+#if defined(VERDANDI_WITH_MPI)
+            model_state mean_state_global_vector(model_.GetNstate());
+            MPI::COMM_WORLD.Allreduce(mean_state_vector.GetData(),
+                                      mean_state_global_vector.GetData(),
+                                      model_.GetNstate(),
+                                      MPI::DOUBLE,
+                                      MPI::SUM);
+            mean_state_vector = mean_state_global_vector;
+#endif
+
             Mlt(T(1) / T(Nmember_), mean_state_vector);
             model_.GetState() = mean_state_vector;
             model_.StateUpdated();
@@ -661,42 +713,79 @@ namespace Verdandi
     void EnsembleKalmanFilter<T, Model, ObservationManager,
                               PerturbationManager>::Message(string message)
     {
-        model_state state;
-        if (message.find("initial condition") != string::npos)
-        {
-            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
-                               "state_forecast");
 
-        }
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+#endif
+            if (message.find("initial condition") != string::npos)
+                output_saver_.Save(model_.GetState(),
+                                   double(model_.GetTime()),
+                                   "state_forecast");
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+#endif
+            if (message.find("forecast") != string::npos)
+                output_saver_.Save(model_.GetState(), model_.GetTime(),
+                                   "state_forecast");
+        int global_member_number = 0;
+
+#if defined(VERDANDI_WITH_MPI)
+        int div = Nmember_ % Nprocess_;
+        if (rank_ < div)
+            global_member_number = rank_ * Nlocal_member_;
+        else
+            global_member_number = div * (Nlocal_member_ + 1)
+                + (rank_ - div) * Nlocal_member_;
+#endif
 
         if (message.find("forecast") != string::npos)
         {
-            output_saver_.Save(model_.GetState(), model_.GetTime(),
-                               "state_forecast");
+            model_state mean_state_vector(model_.GetNfull_state());
+            mean_state_vector = model_.GetFullState();
 
-            for (int m = 0; m < Nmember_; m++)
-                if (output_saver_.IsVariable("state_forecast-" + to_str(m)))
+            for (int m = 0; m < Nlocal_member_; m++)
+                if (output_saver_
+                    .IsVariable("state_forecast-"
+                                + to_str(m + global_member_number)))
                 {
                     model_.GetFullState() = ensemble_[m];
                     model_.FullStateUpdated();
-                    output_saver_.Save(model_.GetState(), model_.GetTime(),
-                                       "state_forecast-" + to_str(m));
+                    output_saver_.Save(model_.GetState(),
+                                       model_.GetTime(),
+                                       "state_forecast-"
+                                       + to_str(m + global_member_number));
                 }
+
+            model_.GetFullState() = mean_state_vector;
+            model_.FullStateUpdated();
         }
+
+#if defined(VERDANDI_WITH_MPI)
+        if (rank_ == 0)
+#endif
+            if (message.find("analysis") != string::npos)
+                output_saver_.Save(model_.GetState(), model_.GetTime(),
+                                   "state_analysis");
 
         if (message.find("analysis") != string::npos)
         {
-            output_saver_.Save(model_.GetState(), model_.GetTime(),
-                               "state_analysis");
+            model_state mean_state_vector(model_.GetNfull_state());
+            mean_state_vector = model_.GetFullState();
 
-            for (int m = 0; m < Nmember_; m++)
-                if (output_saver_.IsVariable("state_analysis-" + to_str(m)))
+            for (int m = 0; m < Nlocal_member_; m++)
+                if (output_saver_
+                    .IsVariable("state_analysis-"
+                                + to_str(m + global_member_number)))
                 {
                     model_.GetFullState() = ensemble_[m];
                     model_.FullStateUpdated();
-                    output_saver_.Save(model_.GetState(), model_.GetTime(),
-                                       "state_analysis-" + to_str(m));
+                    output_saver_.Save(model_.GetState(),
+                                       model_.GetTime(),
+                                       "state_analysis-" +
+                                       to_str(m + global_member_number));
                 }
+            model_.GetFullState() = mean_state_vector;
+            model_.FullStateUpdated();
         }
     }
 

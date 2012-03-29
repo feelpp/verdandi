@@ -5,6 +5,12 @@
 #define VERDANDI_DENSE
 #define VERDANDI_WITH_ABORT
 
+//#define VERDANDI_WITH_MPI
+
+#if defined(VERDANDI_WITH_MPI)
+#include <mpi.h>
+#endif
+
 #include "Verdandi.hxx"
 
 #include "model/QuadraticModel.cxx"

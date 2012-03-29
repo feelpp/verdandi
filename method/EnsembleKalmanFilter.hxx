@@ -63,6 +63,9 @@ namespace Verdandi
         //! The number of members in the ensemble.
         int Nmember_;
 
+        //! Local number of ensemble members (for parallel computing).
+        int Nlocal_member_;
+
         //! The ensemble state vectors.
         ensemble ensemble_;
 
@@ -96,6 +99,16 @@ namespace Verdandi
         bool analyze_first_step_;
         //! Current time.
         double time_;
+
+#if defined(VERDANDI_WITH_MPI)
+
+        /*** Parallel settings ***/
+
+        //! Process rank.
+        int rank_;
+        //! Number of processes.
+        int Nprocess_;
+#endif
 
         /*** Output saver ***/
 
