@@ -306,10 +306,9 @@ namespace Verdandi
                             model_.GetParameter(i)(j) *= sample(j);
 
                     parameter_[i][m] = model_.GetParameter(i);
+                    // Puts back the reference parameter into the model.
+                    model_.SetParameter(i, reference_parameter);
                 }
-
-                // Puts back the reference parameter into the model.
-                model_.SetParameter(i, reference_parameter);
 
                 MessageHandler::Send(*this, "model", "perturbation");
             }
@@ -382,10 +381,9 @@ namespace Verdandi
                             model_.GetParameter(i)(j) *= sample(j);
 
                     parameter_[i][m] = model_.GetParameter(i);
+                    // Puts back the reference parameter into the model.
+                    model_.SetParameter(i, reference_parameter);
                 }
-
-                // Puts back the reference parameter into the model.
-                model_.SetParameter(i, reference_parameter);
 
                 MessageHandler::Send(*this, "model", "perturbation");
             }
