@@ -136,7 +136,7 @@ public:
         Matrix<T, Prop, ArrayRowSparse, Allocator> Marray(m, n);
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)
-                Marray(i, j) = T(1);
+                Marray.Get(i, j) = T(1);
         Copy(Marray, M);
     }
 
