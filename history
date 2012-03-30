@@ -1,3 +1,95 @@
+Version 1.2 (2012-03-30)
+-----------
+
+* Methods
+
+- The state vectors are now passed by reference to the assimilation methods.
+  'GetState(state&)', 'SetState(state&)', 'GetFullState(state&)' and
+  'SetFullState(state&)' have been replaced with 'state& GetState()',
+  'StateUpdated()', 'state& GetFullState()' and 'FullStateUpdated()'.
+  Also replaced the model methods 'GetStateLowerBound(state&)' and
+  'GetStateUpperBound(state&)' with 'state& GetStateLowerBound()' and 
+  'state& GetStateUpperBound()'.
+- 'ForwardDriver' and 'ReducedOrderUnscentedKalmanFilter' can now efficiently
+  handle models parallelized by MPI.
+- Initial import of sequential aggregation (for ensemble forecasting) with
+  discounted ridge regression ('DiscountedRidgeRegression').
+- Added support for parallel computations in 'EnsembleKalmanFilter'.
+- Added support for parallel computations in 'ComputeBLUE_vector'.
+- Enforced the rule that the member functions of the data assimilation
+  methods are non const, except 'GetName'.
+- Modified the interface to 'MonteCarlo' so that it is consistent with the 
+  interface to 'EnsembleKalmanFilter'.
+- Made 'MonteCarlo' template of the perturbation manager.
+- Added methods 'GetModel', "GetObservationManager', 'GetPerturbationManager',
+  'GetOuputSaver', 'FinalizeStep' and 'Finalize' in all appropriate
+  assimilation methods.
+- Removed the references to 'VERDANDI_DENSE' and 'VERDANDI_SPARSE' in
+  'OptimalInterpolation".
+- Added consistency checks for the dimensions of the arguments of
+  'ComputeBLUE_matrix'.
+
+* Models
+
+- Added the possibility to use a model written in Python. A generic interface
+  between Python and C++ is implemented in 'PythonModel'.
+
+* Observation managers
+
+- Added the possibility to use an observation manager written in Python.  A
+  generic interface between Python and C++ is implemented in
+  'PythonObservationManager.
+
+* Example models
+
+- Added the new model 'PetscClampedBar', which implements 'ClampedBar' with
+  PETSc.
+- Extended the interface of the quadratic model for the ensemble Kalman
+  filter.
+- Added configuration for the 'MonteCarlo' example with the quadratic model.
+
+* Example observation managers
+
+- Added the new observation manager 'PetscLinearObservationManager', which
+  implements 'LinearObservationManager' with PETSc.
+- Added support for non constant time intervals between observations in
+  'LinearObservationManager'.
+
+* Output saver
+
+- Added 'OutputSaver::Activate' and 'OutputSaver::Deactivate'.
+
+* Perturbation managers
+
+- Added an interface to the random number generator library from C++ TR1.
+- Set TR1 as the default random number generator library.
+
+* Debugging 
+
+- Added the option "dump_env" to dump the SCons environment in the file 
+  "scons_env.log"
+
+* Documentation
+
+- Added the section "Plugging a Model".
+- Added a description of the Lorenz model.
+
+* Bug fixes
+
+- In 'EnsembleKalmanFilter', from one member to another, the
+  parameters were not perturbed around the same reference values.
+- The examples in "example/template" did not compile.
+
+* Miscellaneous
+
+- Updated Seldon version from 5.1 (patched for Verdandi) to 5.2 (release
+  candidate).
+- Renamed 'TRY' to 'VERDANDI_TRY' and 'END' to 'VERDANDI_END'
+- Initial import of "Functions_Vector2.*xx" and "Fuctions_Vector3.*xx".
+- Added the error class 'ErrorPythonUndefined'.
+- Moved "OutputSaver.*xx" and "Variable.*xx" to "share/".
+
+
 Version 1.1 (2011-10-25)
 -----------
 
@@ -108,8 +200,6 @@ Version 0.9 (2011-05-12)
 - Added an implementation of the 4D-Var method ('FourDimensionalVariational').
 - Redesigned the perturbation manager so that adding new generators and new
   distributions is easier, and added support for the TRNG library.
-- Initial import of sequential aggregation (for ensemble forecasting) with
-  discounted ridge regression.
 - Improved the implementation of 'ExtendedKalmanFilter' and
   'ReducedOrderExtendedKalmanFilter'.
 - Improved the consistency of 'MonteCarlo' with Verdandi.
