@@ -118,12 +118,16 @@ fortran_compiler = ARGUMENTS.get("fortran", fortran_compiler)
 linker = ARGUMENTS.get("link", linker)
 
 if ARGUMENTS["mpi"] == "yes":
+    mpi_cxx_compiler = None
     # search for known good MPI C++ compilers
     option_list = ['mpicxx','mpiCC','mpic++']
     for o in option_list:
         if WhereIs(o) != None:
             mpi_cxx_compiler = WhereIs(o)
             break
+    if mpi_cxx_compiler is None:
+        raise Exception, \
+            "Unable to find a MPI compiler (mpicxx, mpiCC or mpic++)."
 
 # Compilation options.
 add_argument("debug", ["0", "-1", "1", "2"])
@@ -244,8 +248,7 @@ if ARGUMENTS["mpi"] == "no":
    if cpp_compiler is not None:
         env.Replace(CXX = cpp_compiler)
 if ARGUMENTS["mpi"] == "yes":
-   if mpi_cxx_compiler is not None:
-        env.Replace(CXX = mpi_cxx_compiler)
+    env.Replace(CXX = mpi_cxx_compiler)
 
 if fortran_compiler is not None:
     env.Replace(F77 = fortran_compiler)
