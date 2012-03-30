@@ -116,18 +116,21 @@ namespace Verdandi
 
 
     /*! \brief This class serves for exceptions raised when an undefined
-      function or method in a python file is called. */
+      function or method in a Python module is called. */
     class ErrorPythonUndefined: public Error
     {
     protected:
+        //! Name of the Python function.
         string function_name_;
+        //! List of arguments of the function.
         string arguments_;
-        string python_file_;
+        //! Name of the Python module.
+        string module_;
     public:
         // Constructor.
         ErrorPythonUndefined(string function, string function_name,
                              string arguments,
-                             string python_file,
+                             string module,
                              string comment) throw();
 
         // Destructor.
