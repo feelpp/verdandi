@@ -5,7 +5,7 @@
 /*!
 \page clamped_bar_model Clamped Bar
 
-Below is the physical description of the clamped bar model. For details about how to apply <b>data assimilation methods</b> on this models see
+Below is the physical description of the clamped bar model. For details about how to apply <b>data assimilation methods</b> on this model see
 \ref clamped_bar.
 
 \section clamped_bar_algo The Clamped Bar model

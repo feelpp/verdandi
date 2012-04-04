@@ -30,4 +30,7 @@ The state contains:
 <li> the horizontal velocity along y (stored in matrix <code>v_</code>). </li>
 </ul>
 
+For details about how to apply <b>data assimilation methods</b> on this model see
+\ref shallow_water.
+
 */

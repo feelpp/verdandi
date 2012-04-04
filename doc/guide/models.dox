@@ -12,7 +12,7 @@ Follow the links below for a description of three available <b>models</b>:
 <ul>
 <li> \ref quadratic_model "Quadratic Model"; </li>
 <li> \ref shallow_water_model "Shallow-water"; </li>
-<li> \ref clamped_bar_model "Clamped Bar". </li>
+<li> \ref clamped_bar_model "Clamped Bar"; </li>
 <li> \ref lorenz_model "Lorenz Model". </li>
 </ul>
 
