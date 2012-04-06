@@ -5,13 +5,15 @@
 /*!
 \page four_dimensional_variational Four Dimensional Variational
 
+Verdandi provides a C++ implementation of the Four Dimensional Variational assimilation method (4DVAR).
+
 The Four Dimensional Variational assimilation method (4DVAR) is implemented in <code>FourDimensionalVariational.hxx</code> and <code>FourDimensionalVariational.cxx</code>. The class
 \link Verdandi::FourDimensionalVariational FourDimensionalVariational\endlink is a template class: <code>FourDimensionalVariational<T, ClassModel,
 ClassObservationManager, ClassOptimization></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>),
 <code>ClassModel</code> is the type of the model (e.g. <code>ClampedBar<double></code>), <code>ClassObservationManager</code> is the
 type of the observation manager (e.g. <code>LinearObservationManager<double></code>), <code>ClassOptimization</code> is the type of the optimization algorithm (e.g. <code>Seldon::NLoptSolver</code>).
 
-Here is how you may use the \link Verdandi::FourDimensionalVariational FourDimensionalVariational\endlink class:
+A simulation with the Four Dimensional Variational assimilation method (4DVAR) may be carried out with the following C++ lines:
 
 \precode
 FourDimensionalVariational<real, ClampedBar<real>,

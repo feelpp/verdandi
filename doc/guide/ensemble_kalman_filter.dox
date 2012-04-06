@@ -5,9 +5,12 @@
 /*!
 \page ensemble_kalman_filter Ensemble Kalman Filter
 
+Verdandi provides a C++ implementation of the Ensemble Kalman Filter (EnKF).
+
 The Ensemble Kalman Filter (EnKF) is implemented in <code>EnsembleKalmanFilter.hxx</code> and <code>EnsembleKalmanFilter.cxx</code>. The class \link Verdandi::EnsembleKalmanFilter EnsembleKalmanFilter\endlink is a template class: <code>EnsembleKalmanFilter<T, ClassModel, ClassObservationManager, ClassPerturbationManager></code>. <code>T</code> is the type of the elements to be stored (e.g., <code>double</code>), <code>ClassModel</code> is the type of the model (e.g., <code>ShallowWater<double></code>), <code>ClassObservationManager</code> is the type of the observation manager (e.g. <code>LinearObservationManager<double></code>), and <code>ClassPerturbationManager</code> is the type of the perturbation manager (e.g. <code>NewranPerturbationManager</code>).
 
-Here is how you may use the \link Verdandi::EnsembleKalmanFilter EnsembleKalmanFilter\endlink class:
+A simulation with Ensemble Kalman filter (EnKF) may be carried
+out with the following C++ lines:
 
 \precode
 EnsembleKalmanFilter<real, ShallowWater<real>,
