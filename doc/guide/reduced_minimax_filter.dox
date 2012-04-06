@@ -5,6 +5,8 @@
 /*!
 \page reduced_minimax_filter Reduced Minimax Filter
 
+Verdandi provides a C++ implementation of the Reduced Minimax Filter (RMF).
+
 The Reduced Minimax Filter (RMF) is implemented in
 <code>ReducedMinimax.hxx</code> and
 <code>ReducedMinimax.cxx</code>. The class \link
@@ -17,8 +19,8 @@ elements to be stored (e.g., <code>double</code>),
 is the type of the observation manager (e.g.
 <code>LinearObservationManager<double></code>).
 
-Here is how you may use the \link Verdandi::ReducedMinimax
-ReducedMinimax\endlink class:
+A simulation with the Reduced Minimax Filter (RMF) may be carried
+out with the following C++ lines:
 
 \precode
 ReducedMinimax<real, ClampedBar<real>,

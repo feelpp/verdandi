@@ -5,9 +5,12 @@
 /*!
 \page unscented_kalman_filter Unscented Kalman Filter
 
+Verdandi provides a C++ implementation of the unscented Kalman filter (UKF). 
+
 The unscented Kalman filter (UKF) is implemented in <code>UnscentedKalmanFilter.hxx</code> and <code>UnscentedKalmanFilter.cxx</code>. The class \link Verdandi::UnscentedKalmanFilter UnscentedKalmanFilter\endlink is a template class: <code>UnscentedKalmanFilter<T, ClassModel, ClassObservationManager></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of the model (e.g. <code>ClampedBar<double></code>), <code>ClassObservationManager</code> is the type of the observation manager (e.g. <code>LinearObservationManager<double></code>).
 
-Here is how you may use the \link Verdandi::UnscentedKalmanFilter UnscentedKalmanFilter\endlink class:
+A simulation with the unscented Kalman filter (UKF) may be carried
+out with the following C++ lines:
 
 \precode
 UnscentedKalmanFilter<real, ClampedBar<real>,

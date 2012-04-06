@@ -5,9 +5,12 @@
 /*!
 \page reduced_order_extended_kalman_filter Reduced Order Extended Kalman Filter
 
+Verdandi provides a C++ implementation of the reduced order extended Kalman filter (ROEKF) also known as singular evolutive extended Kalman filter (SEEK).
+
 The reduced order extended Kalman filter (ROEKF) is implemented in <code>ReducedOrderExtendedKalmanFilter.hxx</code> and <code>ReducedOrderExtendedKalmanFilter.cxx</code>. The class \link Verdandi::ReducedOrderExtendedKalmanFilter ReducedOrderExtendedKalmanFilter\endlink is a template class: <code>ReducedOrderExtendedKalmanFilter<T, ClassModel, ClassObservationManager></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of the model (e.g. <code>ClampedBar<double></code>), <code>ClassObservationManager</code> is the type of the observation manager (e.g. <code>LinearObservationManager<double></code>).
 
-Here is how you may use the \link Verdandi::ReducedOrderExtendedKalmanFilter ReducedOrderExtendedKalmanFilter\endlink class:
+A simulation with the reduced order extended Kalman filter (ROEKF) may be carried
+out with the following C++ lines:
 
 \precode
 ReducedOrderExtendedKalmanFilter<real, ClampedBar<real>,

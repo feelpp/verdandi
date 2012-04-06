@@ -5,9 +5,12 @@
 /*!
 \page extended_kalman_filter Extended Kalman Filter
 
+Verdandi provides a C++ implementation of the extended Kalman filter (EKF).
+
 The extended Kalman filter (EKF) is implemented in <code>ExtendedKalmanFilter.hxx</code> and <code>ExtendedKalmanFilter.cxx</code>. The class \link Verdandi::ExtendedKalmanFilter ExtendedKalmanFilter\endlink is a template class: <code>ExtendedKalmanFilter<T, ClassModel, ClassObservationManager></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of the model (e.g. <code>ClampedBar<double></code>), <code>ClassObservationManager</code> is the type of the observation manager (e.g. <code>LinearObservationManager<double></code>).
 
-Here is how you may use the \link Verdandi::ExtendedKalmanFilter ExtendedKalmanFilter\endlink class:
+A simulation with the Extended Kalman Filter (EKF) may be carried
+out with the following C++ lines:
 
 \precode
 ExtendedKalmanFilter<real, ClampedBar<real>,

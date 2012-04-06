@@ -5,9 +5,12 @@
 /*!
 \page optimal_interpolation Optimal Interpolation
 
+Verdandi provides a C++ implementation of the optimal interpolation.
+
 The optimal interpolation is a sequential data assimilation method. It is implemented in <code>OptimalInterpolation.hxx</code> and <code>OptimalInterpolation.cxx</code>. The class \link Verdandi::OptimalInterpolation OptimalInterpolation\endlink is a template class: <code>OptimalInterpolation<T, ClassModel, ClassObservationManager></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of the model (e.g. <code>ShallowWater<double></code>), <code>ClassObservationManager</code> is the type of the observation manager (e.g. <code>GridToNetworkObservationManager<double></code>).
 
-Here is how you may use the \link Verdandi::OptimalInterpolation OptimalInterpolation\endlink class:
+A simulation with the optimal interpolation may be carried
+out with the following C++ lines:
 
 \precode
 OptimalInterpolation<double,  ShallowWater<double>,

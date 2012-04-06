@@ -5,9 +5,12 @@
 /*!
 \page reduced_order_unscented_kalman_filter Reduced Order Unscented Kalman Filter
 
+Verdandi provides a C++ implementation of the reduced order unscented Kalman filter (ROUKF), which is the generalized formulation of the singular evolutive interpolated Kalman filter (SEIK).
+
 The reduced order unscented Kalman filter (ROUKF) is implemented in <code>ReducedOrderUnscentedKalmanFilter.hxx</code> and <code>ReducedOrderUnscentedKalmanFilter.cxx</code>. The class \link Verdandi::ReducedOrderUnscentedKalmanFilter ReducedOrderUnscentedKalmanFilter\endlink is a template class: <code>ReducedOrderUnscentedKalmanFilter<T, ClassModel, ClassObservationManager></code>. <code>T</code> is the type of the elements to be stored (e.g. <code>double</code>), <code>ClassModel</code> is the type of the model (e.g. <code>ClampedBar<double></code>), <code>ClassObservationManager</code> is the type of the observation manager (e.g. <code>LinearObservationManager<double></code>).
 
-Here is how you may use the \link Verdandi::ReducedOrderUnscentedKalmanFilter ReducedOrderUnscentedKalmanFilter\endlink class:
+A simulation with the reduced order unscented Kalman filter (ROUKF) may be carried
+out with the following C++ lines:
 
 \precode
 ReducedOrderUnscentedKalmanFilter<real, ClampedBar<real>,
@@ -88,6 +91,8 @@ With: <br>
 \f$P^a_h\f$ error covariance matrix of \f$x_h^a\f$; <br>
 \f$R_h\f$ observational error covariance matrix; <br>
 \f$\mathcal{M}_h\f$ model.
+
+It is worthwhile noting that the SEIK filter is equivalent to this reduced UKF algorithm. In fact, the SEIK procedure uses in the resampling and covariance factorization a matrix which is nothing but the transposed of [V ∗] with this particular choice of sigma-points.
 
 
 \section algorithm7 Generalized case

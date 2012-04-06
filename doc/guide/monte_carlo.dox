@@ -5,10 +5,12 @@
 /*!
 \page monte_carlo Monte Carlo
 
+Verdandi provides a C++ implementation of the Monte Carlo method.
+
 The Monte Carlo method is implemented in <code>MonteCarlo.hxx</code> and <code>MonteCarlo.cxx</code>. The class \link Verdandi::MonteCarlo MonteCarlo\endlink is a template class: <code>MonteCarlo<T, ClassModel></code>. <code>T</code> is the type of the elements to be stored (e.g., <code>double</code>), <code>ClassModel</code> is the type of the model (e.g., <code>QuadraticModel<double></code>).
 
-Here is how you may use the \link Verdandi::MonteCarlo MonteCarlo\endlink class:
-
+A simulation with the Monte Carlo method may be carried
+out with the following C++ lines:
 \precode
 MonteCarlo<real,  QuadraticModel<real> > driver; [1]
 
