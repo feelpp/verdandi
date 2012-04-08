@@ -34,6 +34,8 @@
 #include "Verdandi.hxx"
 #include "VerdandiBase.cxx"
 
+#include "share/VerdandiOps.cxx"
+
 #include "seldon/SeldonSolver.hxx"
 
 #include "model/QuadraticModel.cxx"
@@ -66,6 +68,79 @@ namespace Verdandi
 
 
 }
+
+
+/////////////////
+// VERDANDIOPS //
+/////////////////
+
+
+// The following part is for the instantiation of VerdandiOps methods.
+
+#define VERDANDI_OPS_INSTANTIATE_ELEMENT(type)                          \
+    template type Verdandi::VerdandiOps::Get(string);                   \
+    template type Verdandi::VerdandiOps::Get(string, string);           \
+    template type Verdandi::VerdandiOps::Get(string, string, const type&); \
+    template type Ops::Ops::Apply(string name, const type& arg0);       \
+    template type Ops::Ops::Apply(string name, const type& arg0,        \
+                                  const type& arg1);                    \
+    template type Ops::Ops::Apply(string name, const type& arg0,        \
+                                  const type& arg1, const type& arg2);  \
+    template type Ops::Ops::Apply(string name, const type& arg0,        \
+                                  const type& arg1, const type& arg2,   \
+                                  const type& arg3);                    \
+    template type Ops::Ops::Apply(string name, const type& arg0,        \
+                                  const type& arg1, const type& arg2,   \
+                                  const type& arg3, const type& arg4);  \
+    template bool Verdandi::VerdandiOps::Is<type >(string);             \
+
+#define VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(type0, type1)  \
+    template void Ops::Ops::Apply(string name,                  \
+                                  const std::vector<type0>& in, \
+                                  std::vector<type1>& out);     \
+
+#define VERDANDI_OPS_INSTANTIATE_VECTOR(type)                           \
+    template type Verdandi::VerdandiOps::Get(string);                   \
+    template type Verdandi::VerdandiOps::Get(string, string);           \
+    template type Verdandi::VerdandiOps::Get(string, string, const type&); \
+    template bool Verdandi::VerdandiOps::Is<type >(string);             \
+
+VERDANDI_OPS_INSTANTIATE_ELEMENT(bool);
+VERDANDI_OPS_INSTANTIATE_ELEMENT(int);
+VERDANDI_OPS_INSTANTIATE_ELEMENT(float);
+VERDANDI_OPS_INSTANTIATE_ELEMENT(double);
+VERDANDI_OPS_INSTANTIATE_ELEMENT(string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(bool, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(int, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(float, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(double, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(string, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(bool, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(int, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(float, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(double, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(string, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(bool, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(int, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(float, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(double, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(string, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(bool, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(int, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(float, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(double, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(string, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(bool, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(int, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(float, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(double, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(string, string);
+VERDANDI_OPS_INSTANTIATE_VECTOR(std::vector<bool>);
+VERDANDI_OPS_INSTANTIATE_VECTOR(std::vector<int>);
+VERDANDI_OPS_INSTANTIATE_VECTOR(std::vector<float>);
+VERDANDI_OPS_INSTANTIATE_VECTOR(std::vector<double>);
+VERDANDI_OPS_INSTANTIATE_VECTOR(std::vector<string>);
+
 
 #define VERDANDI_FILE_PYTHON_VERDANDI_CPP
 #endif
