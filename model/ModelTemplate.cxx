@@ -210,7 +210,7 @@ namespace Verdandi
     /*!
       \return state the controlled state vector.
     */
-    typename ModelTemplate::state& ModelTemplate::GetState()
+    ModelTemplate::state& ModelTemplate::GetState()
     {
         throw ErrorUndefined("ModelTemplate::state& "
                               "ModelTemplate::GetState()");
@@ -229,7 +229,7 @@ namespace Verdandi
     /*!
       \return The state lower bound (componentwise).
     */
-    typename ModelTemplate::state& ModelTemplate
+    ModelTemplate::state& ModelTemplate
     ::GetStateLowerBound()
     {
         throw ErrorUndefined("ModelTemplate::state& ModelTemplate"
@@ -241,7 +241,7 @@ namespace Verdandi
     /*!
       \return The state upper bound (componentwise).
     */
-    typename ModelTemplate::state& ModelTemplate
+    ModelTemplate::state& ModelTemplate
     ::GetStateUpperBound()
     {
         throw ErrorUndefined("ModelTemplate::state& ModelTemplate"
@@ -253,7 +253,7 @@ namespace Verdandi
     /*!
       \return state the controlled state vector.
     */
-    typename ModelTemplate::state& ModelTemplate::GetFullState()
+    ModelTemplate::state& ModelTemplate::GetFullState()
     {
         throw ErrorUndefined("ModelTemplate::state& "
                               "ModelTemplate::GetFullState()");
