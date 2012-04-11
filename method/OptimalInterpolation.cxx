@@ -145,6 +145,15 @@ namespace Verdandi
 #endif
                           blue_computation_);
 
+        configuration.Set("with_analysis_variance_diagonal",
+                          with_analysis_variance_diagonal_);
+        if (with_analysis_variance_diagonal_ && blue_computation_ == "matrix")
+            throw ErrorConfiguration("OptimalInterpolation"
+                                     "::Initialize(VerdandiOps&, bool, bool)",
+                                     "The analysis variance diagonal cannot "
+                                     "be computed when the analysis is "
+                                     "computed with option \"matrix\".");
+
         /*** Ouput saver ***/
 
         configuration.SetPrefix("optimal_interpolation.output_saver.");
@@ -155,6 +164,7 @@ namespace Verdandi
             output_saver_.Initialize(configuration);
             output_saver_.Empty("state_forecast");
             output_saver_.Empty("state_analysis");
+            output_saver_.Empty("analysis_variance_diagonal");
 
 #if defined(VERDANDI_WITH_MPI)
 	}
@@ -255,8 +265,13 @@ namespace Verdandi
 
             matrix_state_observation matrix_state_observation_tmp;
             if (blue_computation_ == "vector")
-                ComputeBLUE_vector(model_, observation_manager_,
-                                   innovation, state);
+                if (with_analysis_variance_diagonal_)
+                    ComputeBLUE_vector(model_, observation_manager_,
+                                       innovation, state,
+                                       analysis_variance_diagonal_);
+                else
+                    ComputeBLUE_vector(model_, observation_manager_,
+                                       innovation, state);
 #ifdef VERDANDI_WITH_DIRECT_SOLVER
             else
                 ComputeBLUE_matrix(model_.GetStateErrorVariance(),
@@ -277,6 +292,15 @@ namespace Verdandi
             MessageHandler::Send(*this, "model", "analysis");
             MessageHandler::Send(*this, "observation_manager", "analysis");
             MessageHandler::Send(*this, "driver", "analysis");
+            if (with_analysis_variance_diagonal_)
+            {
+                MessageHandler::Send(*this, "model",
+                                     "analysis_variance_diagonal");
+                MessageHandler::Send(*this, "observation_manager",
+                                     "analysis_variance_diagonal");
+                MessageHandler::Send(*this, "driver",
+                                     "analysis_variance_diagonal");
+            }
         }
 
         MessageHandler::Send(*this, "all", "::Analyze end");
@@ -387,6 +411,10 @@ namespace Verdandi
             if (message.find("analysis") != string::npos)
                 output_saver_.Save(model_.GetState(), model_.GetTime(),
                                    "state_analysis");
+            if (message.find("analysis_variance_diagonal") != string::npos)
+                output_saver_.Save(analysis_variance_diagonal_,
+                                   model_.GetTime(),
+                                   "analysis_variance_diagonal");
 #if defined(VERDANDI_WITH_MPI)
 	}
 #endif

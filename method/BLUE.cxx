@@ -173,6 +173,162 @@ namespace Verdandi
     }
 
 
+    //! Computes BLUE and the diagonal of its variance.
+    /*! It computes the BLUE (best linear unbiased estimator) and the diagonal
+      of its variance.
+      \param[in] model the model.
+      \param[in] observation_manager the observation manager.
+      \param[in] innovation the innovation vector.
+      \param[in,out] x on entry, the background vector; on exit, the analysis.
+      \param[out] variance on exit, the diagonal elements of the analysis
+      variance, i.e., the variances of the components of \a x.
+    */
+    template <class Model, class ObservationManager,
+              class Innovation, class State>
+    void ComputeBLUE_vector(Model& model,
+                            ObservationManager& observation_manager,
+                            const Innovation& innovation, State& state,
+                            State& variance)
+    {
+        typedef typename State::value_type T;
+
+        int Nobservation, Nstate;
+        Nobservation = observation_manager.GetNobservation();
+        Nstate = model.GetNstate();
+        int Nlocal_state = Nstate;
+
+        variance.Reallocate(Nstate);
+
+        if (Nobservation == 0) // No observations.
+            return;
+
+        int r, c;
+
+        int global_state_number = 0;
+
+#if defined(VERDANDI_WITH_MPI)
+        int rank = MPI::COMM_WORLD.Get_rank();
+        int Nprocess = MPI::COMM_WORLD.Get_size();
+        Nlocal_state = Nstate / Nprocess;
+        if (rank < Nstate % Nprocess)
+            Nlocal_state ++;
+        int div = Nstate % Nprocess;
+        if (rank < div)
+            global_state_number = rank * Nlocal_state;
+        else
+            global_state_number = div * (Nlocal_state + 1)
+                + (rank - div) * Nlocal_state;
+#endif
+
+        // One row of background matrix B.
+        typename Model::state_error_variance_row
+            state_error_variance_row(Nstate);
+
+        // One row of tangent operator matrix.
+        typename ObservationManager::tangent_linear_operator_row
+            tangent_operator_row(Nstate);
+
+        // Temporary matrix and vector.
+        // 'HBHR_inv' will eventually contain the matrix (HBH' + R)^(-1).
+        Matrix<T> HBHR_inv(Nobservation, Nobservation);
+        HBHR_inv.Fill(T(0));
+
+        Vector<T> row(Nobservation);
+
+        // Computes HBH'.
+        T H_entry;
+        for (int j = 0; j < Nlocal_state; j++)
+        {
+            model.GetStateErrorVarianceRow(j + global_state_number,
+                                           state_error_variance_row);
+            // Computes the j-th row of BH'.
+            for (r = 0; r < Nobservation; r++)
+            {
+                observation_manager
+                    .GetTangentLinearOperatorRow(r, tangent_operator_row);
+                row(r) = DotProd(state_error_variance_row,
+                                 tangent_operator_row);
+            }
+
+            // Keeps on building HBH'.
+            for (r = 0; r < Nobservation; r++)
+            {
+                H_entry = observation_manager.
+                    GetTangentLinearOperator(r, j + global_state_number);
+                for (c = 0; c < Nobservation; c++)
+                    HBHR_inv(r, c) += H_entry * row(c);
+            }
+        }
+
+#if defined(VERDANDI_WITH_MPI)
+	Matrix<T> HBHR_recv(Nobservation, Nobservation);
+        MPI::COMM_WORLD.Allreduce(HBHR_inv.GetData(),
+                                  HBHR_recv.GetData(),
+                                  Nobservation * Nobservation,
+                                  MPI::DOUBLE,
+                                  MPI::SUM);
+	HBHR_inv = HBHR_recv;
+#endif
+
+        // Computes (HBH' + R).
+        for (r = 0; r < Nobservation; r++)
+            for (c = 0; c < Nobservation; c++)
+                HBHR_inv(r, c) += observation_manager.GetErrorVariance(r, c);
+
+        // Computes (HBH' + R)^{-1}.
+        GetInverse(HBHR_inv);
+
+        // Computes HBHR_inv * innovation.
+        Vector<T> HBHR_inv_innovation(Nobservation);
+        MltAdd(T(1), HBHR_inv, innovation, T(0), HBHR_inv_innovation);
+
+        // Intermediate variable to compute the variance diagonal.
+        Vector<T> HBHR_inv_BHt_row(Nobservation);
+
+        // Computes new state.
+        Vector<T> BHt_row(Nobservation);
+#if defined(VERDANDI_WITH_MPI)
+        typename Model::state state_update_send(Nstate);
+        state_update_send.Fill(T(0.));
+#endif
+        BHt_row.Fill(T(0));
+        for (r = 0; r < Nlocal_state; r++)
+        {
+            // Computes the r-th row of BH'.
+            model.GetStateErrorVarianceRow(r + global_state_number,
+                                           state_error_variance_row);
+            variance(r + global_state_number)
+                = state_error_variance_row(r + global_state_number);
+            for (c = 0; c < Nobservation; c++)
+            {
+                observation_manager
+                    .GetTangentLinearOperatorRow(c, tangent_operator_row);
+                BHt_row(c) = DotProd(state_error_variance_row,
+                                     tangent_operator_row);
+            }
+
+#if defined(VERDANDI_WITH_MPI)
+            state_update_send(r + global_state_number)
+                += DotProd(BHt_row, HBHR_inv_innovation);
+#else
+            state(r) += DotProd(BHt_row, HBHR_inv_innovation);
+#endif
+            MltAdd(T(1), HBHR_inv, BHt_row, T(0), HBHR_inv_BHt_row);
+            variance(r + global_state_number)
+                -= DotProd(BHt_row, HBHR_inv_BHt_row);
+        }
+
+#if defined(VERDANDI_WITH_MPI)
+        typename Model::state state_update_recv(Nstate);
+        state_update_recv.Fill(T(0.));
+        MPI::COMM_WORLD.Allreduce(state_update_send.GetDataVoid(),
+                                  state_update_recv.GetDataVoid(),
+                                  Nstate, MPI::DOUBLE, MPI::SUM);
+        Add(T(1.), state_update_recv, state);
+#endif
+    }
+
+
     //! Computes BLUE using operations on matrices.
     /*! This method is mainly intended for cases where the covariance matrices
       are sparse matrices. Otherwise, the manipulation of the matrices may

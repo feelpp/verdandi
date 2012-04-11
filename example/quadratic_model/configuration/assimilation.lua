@@ -58,6 +58,8 @@ optimal_interpolation = {
 
    -- Computation mode for BLUE: "vector" or "matrix".
    BLUE_computation = "vector",
+   -- Should the diagonal of the analysis variance be computed?
+   with_analysis_variance_diagonal = false,
 
    data_assimilation = {
 

@@ -88,6 +88,13 @@ namespace Verdandi
 
         //! Computation mode for BLUE: "vector" or "matrix".
         string blue_computation_;
+        //! Should the diagonal of the analysis variance be computed?
+        bool with_analysis_variance_diagonal_;
+
+        /*** Assimilation variable ***/
+
+        //! Diagonal of the analysis variance.
+        model_state analysis_variance_diagonal_;
 
 #if defined(VERDANDI_WITH_MPI)
 

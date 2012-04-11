@@ -34,6 +34,14 @@ namespace Verdandi
                             const Innovation& innovation, State& state);
 
 
+    template <class Model, class ObservationManager,
+              class Innovation, class State>
+    void ComputeBLUE_vector(Model& model,
+                            ObservationManager& observation_manager,
+                            const Innovation& innovation, State& state,
+                            State& variance);
+
+
     template <class StateErrorVariance, class ObservationOperator,
               class Observation, class ObservationErrorVariance,
               class State>
