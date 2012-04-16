@@ -9,7 +9,7 @@
 \section own_model Create your own model
 
 
-Start from the \link Verdandi::ModelTemplate ModelTemplate\endlink. The complete interface of the model class is described \link Verdandi::ModelTemplate here\endlink. With a complete interface, one can apply any data assimilation method in Verdandi. But for a given data assimilation method, not all methods are required.
+Start from the \link Verdandi::ModelTemplate ModelTemplate\endlink. The complete interface of the model class is described \link Verdandi::ModelTemplate here\endlink. With a complete interface, one can apply any data assimilation method in Verdandi. But for a given data assimilation method, not all methods are required. Use the \link model_requirements Model requirements page\endlink, or the Python script <code>bin/methods_requirement</code> to know precisely which methods you will need to implement in your model.
 
 <ul>
 <li>

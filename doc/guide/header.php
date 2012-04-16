@@ -201,10 +201,18 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "optimization_solver")
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "plugging_in_verdandi"
 or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_model"
+or basename($_SERVER['REQUEST_URI'], ".php") == "model_requirements"
+or basename($_SERVER['REQUEST_URI'], ".php") == "observation_requirements"
 or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_observation")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "plugging_model", "Model");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "model_requirements", "Methods requirements for models");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "observation_requirements", "Methods requirements for observation managers");
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "plugging_observation", "Observations");
