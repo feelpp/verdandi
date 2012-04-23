@@ -252,17 +252,17 @@ four_dimensional_variational = {
    nlopt = {
 
       -- Optimization algorithm (LD_VAR1, LD_LBFGS, LD_SLSQP, LD_MMA,
-      -- LD_TNEWTON ...).
+      -- LD_TNEWTON, ...).
       algorithm = "LD_VAR1",
 
-      -- If you do not want to use a particular tolerance termination, you can
-      -- just set that tolerance to zero and it will be ignored.
-      -- Relative tolerance on the optimization parameters.
+      -- Relative tolerance on the optimization parameters. If you do not want
+      -- to use a particular tolerance termination, you can just set that
+      -- tolerance to zero and it will be ignored.
       parameter_tolerance = 1.e-4,
       -- Relative tolerance on the cost function.
       cost_function_tolerance = 1.e-4,
-      -- Maximum number of function evaluations. Criterion is disabled
-      -- if the value is non-positive.
+      -- Maximum number of function evaluations. Criterion is disabled if the
+      -- value is non-positive.
       Niteration_max = -1
 
    },

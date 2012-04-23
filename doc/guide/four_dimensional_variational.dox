@@ -13,6 +13,8 @@ ClassObservationManager, ClassOptimization></code>. <code>T</code> is the type o
 <code>ClassModel</code> is the type of the model (e.g. <code>ClampedBar<double></code>), <code>ClassObservationManager</code> is the
 type of the observation manager (e.g. <code>LinearObservationManager<double></code>), <code>ClassOptimization</code> is the type of the optimization algorithm (e.g. <code>Seldon::NLoptSolver</code>).
 
+The implementation of the Four Dimensional Variational assimilation method (4DVAR) relies on the <a href="http://www.seldon.sourceforge.net">Seldon</a> \ref optimization_solver to carry out nonlinear optimization. One optimization library is currently interfaced: <a href="http://ab-initio.mit.edu/wiki/index.php/NLopt">NLopt</a>. The installation procedure of the NLopt solver is detailed in the section \ref nlopt_installation.
+
 A simulation with the Four Dimensional Variational assimilation method (4DVAR) may be carried out with the following C++ lines:
 
 \precode

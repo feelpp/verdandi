@@ -164,10 +164,14 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "observation_aggregator")
 <li class="jelly"> <?php HL($file, "tools", "Tools");?>
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "tools"
-or basename($_SERVER['REQUEST_URI'], ".php") == "perturbation_manager")
+or basename($_SERVER['REQUEST_URI'], ".php") == "perturbation_manager"
+or basename($_SERVER['REQUEST_URI'], ".php") == "optimization_solver")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
   HL($file, "perturbation_manager", "Perturbation Manager"); 
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "optimization_solver", "Optimization Solver");
   echo '</li> </ul>';
 } ?>
 
