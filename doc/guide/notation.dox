@@ -5,7 +5,9 @@
 /*!
 \page notation Notation
 
-Unless otherwise specified, the notation used throughout the whole documentation (including the reference documentation) is that detailed below.
+Unless otherwise specified, the notation used throughout the whole documentation (including the reference documentation) is that described below.
+
+For details about the C++ notation of the variables involved in data assimilation algorithms, see section \ref reference_notation "reference notation".
 
 \section model Model and State Vectors
 

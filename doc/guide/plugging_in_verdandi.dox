@@ -13,6 +13,9 @@ This section of the documentation explains how to plug an external model and obs
 
 The tables below list the variables involved in data assimilation. For each variable, the name of the C++ type (a <code>typedef</code>) and the recommended C++ variable name are given.
 
+For details about the mathematical description of these variables
+see section \ref notation "mathematical notation".
+
 \subsection model_table Model
 
 <table>
