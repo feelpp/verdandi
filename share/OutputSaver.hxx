@@ -91,6 +91,7 @@ namespace Verdandi
                   string variable_name);
 #endif
 
+        void WriteText(const double& x, string file_name) const;
         template <class S>
         void WriteText(const S& x, string file_name) const;
         template <class S>

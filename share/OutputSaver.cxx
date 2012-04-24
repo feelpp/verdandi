@@ -268,6 +268,24 @@ namespace Verdandi
 #endif
 
 
+    //! Writes \a x of type double in a text file.
+    /*!
+      \param[in] x double to be written.
+      \param[in] file_name output filename.
+    */
+    void OutputSaver::WriteText(const double& x, string file_name) const
+    {
+        ofstream file(file_name.c_str(), ofstream::app);
+#ifdef VERDANDI_CHECK_IO
+        if (!file)
+            throw ErrorIO("WriteText(const double& x , string file_name)",
+                          "Cannot open file \"" + file_name + "\"." );
+#endif
+        file << x << '\n';
+        file.close();
+    }
+
+
     //! Writes \a x in a text file.
     /*!
       \param[in] x variable to be written.
