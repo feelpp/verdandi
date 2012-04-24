@@ -14,11 +14,90 @@ $ scons dump_env=yes
 
 This will create a file <code>scons_env.log</code> that describes the entire SCons environment.
 
-\section exceptions Exceptions raised
+\section exceptions Exceptions
+
+\subsection exceptions_options Options
+
+%Verdandi is able to check for several mistakes:
+
+<ul>
+
+  <li>VERDANDI_CHECK_CONFIGURATION: checks that there is no error in configurations.</li>
+
+  <li>VERDANDI_CHECK_IO: checks input/output operations on disk.</li>
+
+  <li>VERDANDI_CHECK_PROCESSING: checks some data processing.</li>
+
+  <li>VERDANDI_CHECK_ARGUMENT: checks functions or methods arguments.</li>
+
+  <li>VERDANDI_CHECK_DIMENSIONS: checks that the dimensions of involved structures are compatible. Notice that there are methods in which the compatibility is not checked however.</li>
+
+</ul>
+
+%Seldon is also able to check for several mistakes:
+
+<ul>
+
+  <li>SELDON_CHECK_IO: checks input/output operations on disk.</li>
+
+  <li>SELDON_CHECK_MEMORY: checks memory allocations and deallocations.</li>
+
+  <li>SELDON_CHECK_DIMENSIONS: checks that the dimensions of involved structures are compatible. Notice that there are methods in which the compatibility is not checked however.</li>
+
+  <li>SELDON_CHECK_BOUNDS: checks that indices are not out of range.</li>
+
+</ul>
+
+To enable <code>VERDANDI_CHECK_IO</code>, for example, put (before <code>#include &lt;Verdandi.hxx&gt;</code>):</p>
+
+\precode #define VERDANDI_CHECK_IO\endprecode
+
+<p>Alternatively, there are debug levels:</p>
+
+<ul>
+
+  <li>SELDON_DEBUG_LEVEL_0: nothing is checked.</li>
+
+  <li>SELDON_DEBUG_LEVEL_1: equivalent to SELDON_CHECK_IO plus SELDON_CHECK_MEMORY.</li>
+
+  <li>SELDON_DEBUG_LEVEL_2: equivalent to SELDON_DEBUG_LEVEL_1 plus SELDON_CHECK_DIMENSIONS.</li>
+
+  <li>SELDON_DEBUG_LEVEL_3: equivalent to SELDON_DEBUG_LEVEL_2 plus SELDON_CHECK_BOUNDS.</li>
+
+  <li>SELDON_DEBUG_LEVEL_4: equivalent to SELDON_DEBUG_LEVEL_3.</li>
+
+</ul>
+
+
+<ul>
+
+  <li>VERDANDI_DEBUG_LEVEL_0: equivalent to VERDANDI_CHECK_CONFIGURATION plus VERDANDI_CHECK_ARGUMENT plus VERDANDI_CHECK_PROCESSING plus SELDON_DEBUG_LEVEL_0.</li>
+
+  <li>VERDANDI_DEBUG_LEVEL_1: equivalent to VERDANDI_DEBUG_LEVEL_0 plus SELDON_DEBUG_LEVEL_1 plus VERDANDI_CHECK_IO.</li>
+
+  <li>VERDANDI_DEBUG_LEVEL_2: equivalent to VERDANDI_DEBUG_LEVEL_1 plus SELDON_DEBUG_LEVEL_2 plus VERDANDI_CHECK_DIMENSIONS.</li>
+
+  <li>VERDANDI_DEBUG_LEVEL_3: equivalent to VERDANDI_DEBUG_LEVEL_2 plus SELDON_DEBUG_LEVEL_3.</li>
+
+  <li>VERDANDI_DEBUG_LEVEL_4: equivalent to VERDANDI_DEBUG_LEVEL_3 plus SELDON_DEBUG_LEVEL_4.</li>
+
+</ul>
+
+
+In practice, it is advocated to choose VERDANDI_DEBUG_LEVEL_4 in the development stage and VERDANDI_DEBUG_LEVEL_2 for the stable version. Indeed VERDANDI_DEBUG_LEVEL_4 slows down the program but checks many things and VERDANDI_DEBUG_LEVEL_2 should not slow down the program and ensures that it is reasonably safe.
+
+Development stage:
+\precode #define VERDANDI_DEBUG_LEVEL_4\endprecode
+
+
+Stable version:
+\precode #define VERDANDI_DEBUG_LEVEL_2\endprecode
+
+\subsection exceptions_raised Exceptions raised
 
 The objects that may be launched by %Verdandi are of type: \link Verdandi::ErrorConfiguration ErrorConfiguration\endlink, \link Verdandi::ErrorIO ErrorIO\endlink, \link Verdandi::ErrorProcessing ErrorProcessing\endlink, \link Verdandi::ErrorUndefined ErrorUndefined\endlink, \link Verdandi::ErrorArgument ErrorArgument\endlink. They all derive from \link Verdandi::Error Error\endlink. They provide the method \link Verdandi::Error::What() What()\endlink that returns a string explaining the error, and the method \link Verdandi::Error::CoutWhat() CoutWhat()\endlink that displays on screen this explanation.
 
-\section exceptions_and_debugging Exceptions and debugging
+\subsection exceptions_and_debugging Exceptions and debugging
 
 Suppose your code contains an error and raises an exception. You probably want to identify the function that raised the exception. The error message should contain the name of the function. But you probably want to know the exact line where the error occurred and the sequence of calls. Then, you have two options, using a debugger.
 
