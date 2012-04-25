@@ -268,3 +268,84 @@ forward = {
    }
 
 }
+
+
+-- Hamilton-Jacobi-Bellman.
+hjb = {
+
+   domain = {
+
+      discretization = {-1., 0.01, 201,
+                        -1., 0.01, 201},
+      initial_time = 0.,
+      Delta_t = 0.0003,
+      Nt = math.floor(0.1 / 0.0003)
+
+   },
+
+   equation_coefficient = {
+
+      with_quadratic_term = true,
+      with_advection_term = true,
+      with_source_term = true,
+
+      -- Is the model time-dependent?
+      model_time_dependent = false,
+
+      Q_0 = {1., 0.,
+             0., 1.},
+
+      -- Position of the minimum of the initial parabola.
+      x_0 = {0., 0.},
+
+      Q = {1., 0.,
+           0., 1.},
+
+      R = {10., 0.,
+           0., 10.}
+
+   },
+
+   solver = {
+
+      -- Numerical scheme: LxF (for first-order Lax-Friedrichs), BrysonLevy
+      -- (second-order central scheme) and Godunov.
+      scheme = "Godunov"
+
+   },
+
+   boundary_condition = {
+
+      -- "Dirichlet", "Extrapolation" and "Periodic" are supported.
+      type = "Extrapolation",
+      -- Constant value imposed outside the domain.
+      value = 2.
+
+   },
+
+   lax_friedrichs = {
+
+      -- Is the model time-dependent?
+      model_time_dependent = false,
+      -- Upper bound on the absolute value of the model operator, in every
+      -- direction.
+      Upper_bound_model = {150., 150.}
+
+   },
+
+   display = {
+
+      show_iteration = false,
+      show_time = true
+
+   },
+
+   output_saver = {
+
+      variable_list = {"value_function"},
+      file = output_directory .. "hjb-%{name}.%{extension}",
+      time = "step 50",
+
+   }
+
+}
