@@ -1047,18 +1047,13 @@ namespace Verdandi
                     z_col.Nullify();
                 }
             else
-            {
-                observation d(Nobservation_);
                 for (int i = 0; i < Nsigma_point_; i++)
                 {
                     GetCol(X_i_, i, x_col);
-                    GetRowPointer(Z_i_trans, i, z_col);
-                    observation_manager_.ApplyOperator(x_col, z_col);
-                    z_col.Nullify();
-                    observation_manager_.GetInnovation(x_col, d);
-                    Add(T(alpha_), d, z);
+                    observation_manager_.GetInnovation(x_col, z_col);
+                    Add(T(alpha_), z_col, z);
+                    SetRow(z_col, i, Z_i_trans);
                 }
-            }
 
             sigma_point_matrix HL_trans(Nreduced_, Nobservation_);
             MltAdd(T(alpha_), SeldonTrans, I_trans_, SeldonNoTrans, Z_i_trans,
@@ -1098,7 +1093,7 @@ namespace Verdandi
                 MltAdd(T(1), tmp, innovation, T(0), reduced_innovation);
             }
             else
-                MltAdd(T(1), tmp, z, T(0), reduced_innovation);
+                MltAdd(T(-1), tmp, z, T(0), reduced_innovation);
 
             // Updates.
             model_state& x =  model_.GetState();
@@ -1135,19 +1130,14 @@ namespace Verdandi
                     z_col.Nullify();
                 }
             else
-            {
-                observation d(Nobservation_);
                 for (int i = 0; i < Nsigma_point_; i++)
                 {
                     GetRowPointer(X_i_trans_, i, x_col);
-                    GetRowPointer(Z_i_trans, i, z_col);
-                    observation_manager_.ApplyOperator(x_col, z_col);
-                    z_col.Nullify();
-                    observation_manager_.GetInnovation(x_col, d);
-                    Add(T(alpha_), d, z);
+                    observation_manager_.GetInnovation(x_col, z_col);
+                    Add(T(alpha_), z_col, z);
+                    SetRow(z_col, i, Z_i_trans);
                     x_col.Nullify();
                 }
-            }
 
             // Computes [Z] = [HX_{n+1}^{*} - E(HX_{n+1}^{*})].
             for (int i = 0; i < Nsigma_point_; i++)
@@ -1259,7 +1249,7 @@ namespace Verdandi
             {
                 // Updates.
                 model_state& x =  model_.GetState();
-                MltAdd(T(1), K, z, T(1), x);
+                MltAdd(T(-1), K, z, T(1), x);
                 model_.StateUpdated();
             }
 #endif
