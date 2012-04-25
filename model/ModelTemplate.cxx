@@ -124,14 +124,19 @@ namespace Verdandi
 
     //! Applies the model to a given vector.
     /*! The current state of the model is modified.
-      \param[in] x a vector.
+      \param[in,out] x on entry, the state vector to which the model should be
+      applied; on exit, the result.
       \param[in] forward Boolean to indicate if the model has to go on to the
       next step.
       \param[in] preserve_state Boolean to indicate if the model state has to
       be preserved.
+      \return The time associated with \a x on exit. If \a forward is true,
+      this time should coincide with the model time on exit. If \a forward is
+      false, this time should coincide with the model time on exit plus one
+      time step.
     */
-    void ModelTemplate::ApplyOperator(state& x,
-                                      bool forward, bool preserve_state)
+    double ModelTemplate::ApplyOperator(state& x,
+                                        bool forward, bool preserve_state)
     {
         throw ErrorUndefined("ModelTemplate::ApplyOperator(state& x, "
                              "bool forward, bool preserve_state)");
@@ -140,9 +145,12 @@ namespace Verdandi
 
     //! Applies the tangent linear model to a given vector.
     /*!
-      \param[in] x a vector.
+      \param[in,out] x on entry, the state vector to which the tangent linear
+      model should be applied; on exit, the result.
+      \return The time associated with \a x on exit. This time should be the
+      model time plus one time step.
     */
-    void ModelTemplate::ApplyTangentLinearOperator(state& x)
+    double ModelTemplate::ApplyTangentLinearOperator(state& x)
     {
         throw ErrorUndefined("ModelTemplate"
                              "::ApplyTangentLinearOperator(state& x)");

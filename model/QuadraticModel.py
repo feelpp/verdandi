@@ -128,11 +128,16 @@ class QuadraticModel:
 
     ## Applies the model to a given vector.
     # The current state of the model is modified.
-    # @param[in, out] state a vector.
+    # @param[in,out] state on entry, the state vector to which the model is
+    #  applied; on exit, the state vector after the model is applied.
     # @param[in] forward Boolean to indicate if the model has to go on to the
     #  next step.
     # @param[in] preserve_state Boolean to indicate if the model state has to
     #  be preserved.
+    # @return The time associated with \a state on exit. If \a forward is
+    # true, this time should coincide with the model time on exit. If \a
+    # forward is false, this time should coincide with the model time on exit
+    # plus one time step.
     def ApplyOperator(self, state, forward = False, preserve_state = True):
         if preserve_state:
             current_state = self.state_.copy()
@@ -144,10 +149,17 @@ class QuadraticModel:
         if preserve_state:
             self.state_ = current_state
 
+        if forward:
+            return self.time_
+        else:
+            return self.time_ + self.Delta_t_
+
 
     ## Applies the tangent linear model to a given vector.
     # @param[in,out] x on entry, a vector to which the tangent linear model
     #  should be applied; on exit, the result.
+    # @return The time associated with \a x on exit. This time should be the
+    #  model time plus one time step.
     def ApplyTangentLinearOperator(self, x):
         input = x.copy()
         if self.with_quadratic_term_:
@@ -162,6 +174,8 @@ class QuadraticModel:
 
         elif self.with_linear_term_:
             x += self.Delta_t_ * dot(self.L_, input)
+
+        return self.time_ + self.Delta_t_
 
 
     ## Returns the tangent linear model.

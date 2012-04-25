@@ -378,17 +378,20 @@ namespace Verdandi
 
     //! Applies the model to a given state vector.
     /*!
-      \param[in,out] c on entry, the state vector to which the model is
+      \param[in,out] x on entry, the state vector to which the model is
       applied; on exit, the state vector after the model is applied.
       \param[in] forward Boolean to indicate if the model has to go on to the
       next step.
       \param[in] preserve_state Boolean to indicate if the model state has to
       be preserved.
+      \return The time associated with \a x on exit. If \a forward is true,
+      this time should coincide with the model time on exit. If \a forward is
+      false, this time should coincide with the model time on exit plus one
+      time step.
     */
     template <class T>
-    void QuadraticModel<T>
-    ::ApplyOperator(state& x,
-                    bool forward, bool preserve_state)
+    double QuadraticModel<T>
+    ::ApplyOperator(state& x, bool forward, bool preserve_state)
     {
         state saved_state;
         if (preserve_state)
@@ -406,6 +409,11 @@ namespace Verdandi
             state_.SetData(saved_state);
             saved_state.Nullify();
         }
+
+        if (forward)
+            return time_;
+        else
+            return time_ + Delta_t_;
     }
 
 
@@ -413,9 +421,11 @@ namespace Verdandi
     /*!
       \param[in,out] x on entry, a vector to which the tangent linear model
       should be applied; on exit, the result.
+      \return The time associated with \a x on exit. This time should be the
+      model time plus one time step.
     */
     template <class T>
-    void QuadraticModel<T>
+    double QuadraticModel<T>
     ::ApplyTangentLinearOperator(state& x)
     {
         state input = x;
@@ -432,6 +442,8 @@ namespace Verdandi
         }
         else if (with_linear_term_)
             MltAdd(Delta_t_, L_, input, T(1), x);
+
+        return time_ + Delta_t_;
     }
 
 

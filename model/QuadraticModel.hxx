@@ -188,9 +188,10 @@ namespace Verdandi
 
         // Processing.
         void Forward();
-        void ApplyOperator(state& x,
-                           bool forward = false, bool preserve_state = true);
-        void ApplyTangentLinearOperator(state& x);
+        double ApplyOperator(state& x,
+                             bool forward = false,
+                             bool preserve_state = true);
+        double ApplyTangentLinearOperator(state& x);
         void GetTangentLinearOperator(tangent_linear_operator&) const;
         bool HasFinished() const;
         void Save();

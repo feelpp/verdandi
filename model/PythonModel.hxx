@@ -122,9 +122,9 @@ namespace Verdandi
         void Finalize();
 
         // Operators.
-        void ApplyOperator(state& x,
-                           bool forward = false, bool preserve_state = true);
-        void ApplyTangentLinearOperator(state& x);
+        double ApplyOperator(state& x,
+                             bool forward = false, bool preserve_state = true);
+        double ApplyTangentLinearOperator(state& x);
         void GetTangentLinearOperator(tangent_linear_operator&) const;
 
         // Access methods.

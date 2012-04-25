@@ -348,11 +348,15 @@ namespace Verdandi
       next step.
       \param[in] preserve_state Boolean to indicate if the model state has to
       be preserved.
+      \return The time associated with \a x on exit. If \a forward is true,
+      this time should coincide with the model time on exit. If \a forward is
+      false, this time should coincide with the model time on exit plus one
+      time step.
     */
     template <class T>
-    void PetscClampedBar<T>::ApplyOperator(state& x, bool forward,
-                                           bool preserve_state,
-                                           bool update_force)
+    double PetscClampedBar<T>::ApplyOperator(state& x, bool forward,
+                                             bool preserve_state,
+                                             bool update_force)
     {
         double saved_time = 0;
         state saved_state;
@@ -366,6 +370,7 @@ namespace Verdandi
         StateUpdated();
 
         Forward(update_force);
+        double new_time = GetTime();
 
         x.Copy(GetState());
 
@@ -377,15 +382,19 @@ namespace Verdandi
             state_.Copy(saved_state);
             StateUpdated();
         }
+
+        return new_time;
     }
 
 
     //! Applies the tangent linear model to a given vector.
     /*!
       \param[in,out] increment the increment.
+      \return The time associated with \a x on exit. This time should be the
+      model time plus one time step.
     */
     template <class T>
-    void PetscClampedBar<T>
+    double PetscClampedBar<T>
     ::ApplyTangentLinearOperator(state& increment_state)
     {
         throw
