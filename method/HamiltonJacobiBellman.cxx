@@ -371,17 +371,16 @@ namespace Verdandi
             Mx_.Reallocate(Npoint_, Ndimension_);
         if (with_advection_term_ && !model_time_dependent_)
         {
+            model_.SetTime(initial_time_);
+
             courant_number_ = 0.;
             double time, time_step;
             for (int i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
+                Copy(x, Mx);
 
-                model_.SetTime(initial_time_);
-                model_.SetState(x);
-                model_.Forward();
-                model_.GetState(Mx);
-                time = model_.GetTime();
+                time = model_.ApplyOperator(Mx);
                 time_step = time - initial_time_;
 
                 Add(-1., x, Mx);
@@ -543,6 +542,8 @@ namespace Verdandi
         double initial_time = initial_time_ + T(time_step_) * Delta_t_;
         double time, time_step;
 
+        model_.SetTime(initial_time_);
+
         T time_delta = 0.;
         while (time_delta != Delta_t_)
         {
@@ -552,12 +553,9 @@ namespace Verdandi
                 for (int i_cell = 0; i_cell < Npoint_; i_cell++)
                 {
                     get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
+                    Copy(x, Mx);
 
-                    model_.SetTime(initial_time);
-                    model_.SetState(x);
-                    model_.Forward();
-                    model_.GetState(Mx);
-                    time = model_.GetTime();
+                    time = model_.ApplyOperator(Mx);
                     time_step = time - initial_time;
 
                     Add(-1., x, Mx);
@@ -694,18 +692,17 @@ namespace Verdandi
         double initial_time = initial_time_ + T(time_step_) * Delta_t_;
         double time, time_step;
 
+        model_.SetTime(initial_time);
+
         if (model_time_dependent_)
         {
             courant_number_ = 0.;
             for (int i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
+                Copy(x, Mx);
 
-                model_.SetTime(initial_time);
-                model_.SetState(x);
-                model_.Forward();
-                model_.GetState(Mx);
-                time = model_.GetTime();
+                time = model_.ApplyOperator(Mx);
                 time_step = time - initial_time;
 
                 Add(-1., x, Mx);
@@ -816,6 +813,8 @@ namespace Verdandi
         double initial_time = initial_time_ + T(time_step_) * Delta_t_;
         double time, time_step;
 
+        model_.SetTime(initial_time);
+
         T time_delta = 0.;
         if (with_advection_term_ && model_time_dependent_)
         {
@@ -823,12 +822,9 @@ namespace Verdandi
             for (int i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
+                Copy(x, Mx);
 
-                model_.SetTime(initial_time);
-                model_.SetState(x);
-                model_.Forward();
-                model_.GetState(Mx);
-                time = model_.GetTime();
+                time = model_.ApplyOperator(Mx);
                 time_step = time - initial_time;
 
                 Add(-1., x, Mx);
