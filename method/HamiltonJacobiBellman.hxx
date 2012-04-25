@@ -55,6 +55,13 @@ namespace Verdandi
         //! Display options.
         map<string, bool> option_display_;
 
+        //! Path to the configuration file.
+        string configuration_file_;
+        //! Path to the model configuration file.
+        string model_configuration_file_;
+        //! Path to the configuration file for the observation manager.
+        string observation_configuration_file_;
+
         //! Dimension of the state.
         int Nstate_;
         //! Number of observations.

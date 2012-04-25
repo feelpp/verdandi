@@ -93,9 +93,10 @@ namespace Verdandi
     void HamiltonJacobiBellman<T, Model, ObservationManager>
     ::Initialize(VerdandiOps& configuration)
     {
-        string configuration_file = configuration.GetFilePath();
-        configuration.SetPrefix("hjb.");
         MessageHandler::Send(*this, "all", "::Initialize begin");
+
+        configuration_file_ = configuration.GetFilePath();
+        configuration.SetPrefix("hjb.");
 
         if (option_display_["show_time"])
             Logger::StdOut(*this, "Time: "
@@ -115,6 +116,18 @@ namespace Verdandi
          * Reads the configuration *
          ***************************/
 
+
+        /*** Model ***/
+
+        configuration.Set("model.configuration_file", "",
+                          configuration_file_,
+                          model_configuration_file_);
+
+        /*** Observation manager ***/
+
+        configuration.Set("observation_manager.configuration_file", "",
+                          configuration_file_,
+                          observation_configuration_file_);
 
         /*** Display options ***/
 
@@ -152,16 +165,6 @@ namespace Verdandi
             to_num(discretization_vector[3 * i + 2], Nx_(i));
             Npoint_ *= Nx_(i);
         }
-
-        // Checks consistency of 'Ndimension_' with the model state.
-        if (Ndimension_ != model_.GetNstate())
-            throw ErrorConfiguration("HamiltonJacobiBellman::"
-                                     "HamiltonJacobiBellman",
-                                     "The dimension of the model ("
-                                     + to_str(model_.GetNstate())
-                                     + ") is incompatible with that of "
-                                     " the HJB solver (" + to_str(Ndimension_)
-                                     + ").");
 
         configuration.Set("initial_time", initial_time_);
         configuration.Set("Delta_t", Delta_t_);
@@ -332,9 +335,20 @@ namespace Verdandi
         /*** Initializations ***/
 
         if (with_advection_term_)
-            model_.Initialize(configuration_file);
+            model_.Initialize(model_configuration_file_);
         if (with_source_term_)
-            observation_manager_.Initialize(model_, configuration_file);
+            observation_manager_.Initialize(model_,
+                                            observation_configuration_file_);
+
+        // Checks compatibilities with the model state dimension.
+        if (with_advection_term_ && Ndimension_ != model_.GetNstate())
+            throw ErrorConfiguration("HamiltonJacobiBellman::"
+                                     "HamiltonJacobiBellman",
+                                     "The dimension of the model ("
+                                     + to_str(model_.GetNstate())
+                                     + ") is incompatible with that of "
+                                     "the HJB solver (" + to_str(Ndimension_)
+                                     + ").");
 
         /*** Initial value function ***/
 
