@@ -182,8 +182,10 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
-        model_state_error_variance L, U;
-        model_.GetStateErrorVarianceSqrt(L, U);
+        model_state_error_variance& L =
+            model_.GetStateErrorVarianceProjector();
+        model_state_error_variance_reduced& U =
+            model_.GetStateErrorVarianceReduced();
         Copy(L, L_);
         Copy(U, U_);
         Nreduced_ = U.GetN();
@@ -348,10 +350,8 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_  = observation_manager_.GetNobservation();
 
-        model_state_error_variance L, U;
-        model_.GetStateErrorVarianceSqrt(L, U);
-        Copy(L, L_);
-        Copy(U, U_);
+        Copy(model_.GetStateErrorVarianceProjector(), L_);
+        Copy(model_.GetStateErrorVarianceReduced(), U_);
         Nreduced_ = U_.GetN();
 
         /*** Assimilation ***/

@@ -66,6 +66,10 @@ namespace Verdandi
         observation;
         //! Type of dense matrix.
         typedef Matrix<T, General, RowMajor> dense_matrix;
+        /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
+          decomposition of the background error covariance matrix. */
+        typedef typename Model::state_error_variance_reduced
+        model_state_error_variance_reduced;
 
     protected:
 

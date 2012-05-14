@@ -300,14 +300,13 @@ namespace Verdandi
     //! Computes a row of the background error covariance matrix B.
     /*!
       \param[in] row row index.
-      \param[out] error_covariance_row the value of row number \a row.
+      \return The value of row number \a row.
     */
     template <class T>
-    void Lorenz<T>
-    ::GetStateErrorVarianceRow(int row, state_error_variance_row&
-                               state_error_covariance_row)
+    typename Lorenz<T>::state_error_variance_row& Lorenz<T>
+    ::GetStateErrorVarianceRow(int row)
     {
-        throw ErrorUndefined("Lorenz::GetStateErrorVarianceRow");
+        throw ErrorUndefined("Lorenz::GetStateErrorVarianceRow(int row)");
     }
 
 

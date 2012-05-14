@@ -277,8 +277,7 @@ namespace Verdandi
         void StateUpdated();
         state& GetFullState();
         void FullStateUpdated();
-        void GetStateErrorVarianceRow(int row, state_error_variance_row&
-                                      state_error_variance_row);
+        state_error_variance_row& GetStateErrorVarianceRow(int row);
         const state_error_variance& GetStateErrorVariance() const;
         bool IsErrorSparse() const;
 

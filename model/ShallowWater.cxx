@@ -722,33 +722,32 @@ namespace Verdandi
     //! Computes a row of the background error covariance matrix B.
     /*!
       \param[in] row row index.
-      \param[out] state_error_variance_row the value of row number \a row.
+      \return The value of row number \a row.
     */
     template <class T>
-    void ShallowWater<T>
-    ::GetStateErrorVarianceRow(int row, state_error_variance_row&
-                               state_error_variance_row)
+    typename ShallowWater<T>::state_error_variance_row& ShallowWater<T>
+    ::GetStateErrorVarianceRow(int row)
     {
 #ifdef VERDANDI_STATE_ERROR_SPARSE
         {
-            state_error_variance_row.Reallocate(Nx_ * Ny_);
-            state_error_variance_row.Zero();
-            state_error_variance_row(row) = state_error_variance_value_;
+            state_error_variance_row_.Reallocate(Nx_ * Ny_);
+            state_error_variance_row_.Zero();
+            state_error_variance_row_(row) = state_error_variance_value_;
         }
 # else
         {
 #ifdef VERDANDI_STATE_ERROR_DENSE
             {
-                state_error_variance_row.Reallocate(Nx_ * Ny_);
-                state_error_variance_row.Zero();
-                state_error_variance_row(row)
+                state_error_variance_row_.Reallocate(Nx_ * Ny_);
+                state_error_variance_row_.Zero();
+                state_error_variance_row_(row)
                     = state_error_variance_value_;
             }
 #else
             {
                 // The row has already been computed.
                 if (row == current_row_)
-                    state_error_variance_row = state_error_variance_row_;
+                    return state_error_variance_row_;
                 else
                 {
                     int i, j;
@@ -774,12 +773,12 @@ namespace Verdandi
                                 = state_error_variance_value_
                                 * (1. + distance) * exp(-distance);
                         }
-                    state_error_variance_row = state_error_variance_row_;
                 }
             }
 #endif
         }
 #endif
+        return state_error_variance_row_;
     }
 
 

@@ -53,6 +53,10 @@ namespace Verdandi
 
         //! Type of the background error covariance matrix.
         typedef Matrix<T, General, PETScMPIDense> state_error_variance;
+        /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
+          decomposition of the background error covariance matrix. */
+        typedef Matrix<T, General, RowMajor, MallocAlloc<T> >
+        state_error_variance_reduced;
         //! Type of a row of the background error variance.
         typedef Vector<T, PETScPar> state_error_variance_row;
         //! Type of the model/observation crossed matrix.
@@ -178,6 +182,19 @@ namespace Verdandi
         //! Inverse of the background error covariance matrix (B^-1).
         state_error_variance state_error_variance_inverse_;
 
+        /*! \brief Projector matrix L in the decomposition of the
+          background error covariance matrix (\f$B\f$) as a product LUL^T */
+        state_error_variance state_error_variance_projector_;
+        /*! \brief Reduced matrix U in the decomposition of the
+          background error covariance matrix (\f$B\f$) as a product LUL^T */
+        state_error_variance_reduced state_error_variance_reduced_;
+
+        //! Index of the row of B currently stored.
+        int current_row_;
+        //! Value of the row of B currently stored.
+        state_error_variance_row state_error_variance_row_;
+
+
         static const double Pi_;
 
         /*** Output saver ***/
@@ -207,7 +224,7 @@ namespace Verdandi
                              bool preserve_state = true,
                              bool update_force = true);
         double ApplyTangentLinearOperator(state& x);
-        void GetTangentLinearOperator(tangent_linear_operator&) const;
+        tangent_linear_operator& GetTangentLinearOperator();
 
         // Access methods.
         double GetTime() const;
@@ -222,18 +239,16 @@ namespace Verdandi
         state& GetStateUpperBound();
         state& GetFullState();
         void FullStateUpdated();
-        void GetAdjointState(state& state_adjoint);
-        void SetAdjointState(const state& state_adjoint);
+        state& GetAdjointState();
+        void AdjointStateUpdated();
 
-        void GetStateErrorVarianceRow(int row, state_error_variance_row&
-                                      state_error_variance_row);
+        state_error_variance_row& GetStateErrorVarianceRow(int row);
         state_error_variance& GetStateErrorVariance();
 #ifndef SWIG
         const state_error_variance& GetStateErrorVariance() const;
 #endif
-        template <class L_matrix, class U_matrix>
-        void GetStateErrorVarianceSqrt(L_matrix& L,
-                                       U_matrix& U);
+        state_error_variance& GetStateErrorVarianceProjector();
+        state_error_variance_reduced& GetStateErrorVarianceReduced();
         const state_error_variance& GetStateErrorVarianceInverse() const;
 
         string GetName() const;

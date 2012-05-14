@@ -317,8 +317,7 @@ namespace Verdandi
         double saved_time = model_.GetTime();
         model_.SetTime(time_);
 
-        model_tangent_linear_operator A;
-        model_.GetTangentLinearOperator(A);
+        model_tangent_linear_operator& A = model_.GetTangentLinearOperator();
 
         MltAdd(T(1.), A, state_error_variance_, T(0.), state_error_variance_);
 

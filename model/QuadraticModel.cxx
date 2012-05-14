@@ -37,7 +37,8 @@ namespace Verdandi
 
     //! Constructor.
     template <class T>
-    QuadraticModel<T>::QuadraticModel(): Delta_t_(1.), time_(0.)
+    QuadraticModel<T>::QuadraticModel():
+        Delta_t_(1.), time_(0.), current_row_(-1)
     {
     }
 
@@ -47,7 +48,8 @@ namespace Verdandi
       \param[in] configuration_file path to the configuration file.
     */
     template <class T>
-    QuadraticModel<T>::QuadraticModel(string configuration_file)
+    QuadraticModel<T>::QuadraticModel(string configuration_file):
+        Delta_t_(1.), time_(0.), current_row_(-1)
     {
         Initialize(configuration_file);
     }
@@ -449,13 +451,13 @@ namespace Verdandi
 
     //! Returns the tangent linear model.
     /*!
-      \param[out] M the matrix of the tangent linear model.
+      \return The matrix of the tangent linear model.
     */
     template <class T>
-    void QuadraticModel<T>
-    ::GetTangentLinearOperator(tangent_linear_operator& M) const
+    typename QuadraticModel<T>::tangent_linear_operator& QuadraticModel<T>
+    ::GetTangentLinearOperator()
     {
-        M.Reallocate(Nstate_, Nstate_);
+        tangent_linear_operator_.Reallocate(Nstate_, Nstate_);
         if (with_quadratic_term_)
         {
             Vector<T> M_row(Nstate_);
@@ -464,21 +466,23 @@ namespace Verdandi
                 MltAdd(T(1), S_[i], state_, T(0), M_row);
                 MltAdd(T(Delta_t_), SeldonTrans, S_[i], state_,
                        T(Delta_t_), M_row);
-                SetRow(M_row, i, M);
-                M(i, i) += T(1);
+                SetRow(M_row, i, tangent_linear_operator_);
+                tangent_linear_operator_(i, i) += T(1);
             }
             if (with_linear_term_)
-                Add(T(Delta_t_), L_, M);
+                Add(T(Delta_t_), L_, tangent_linear_operator_);
         }
         else if (with_linear_term_)
         {
-            M.Copy(L_);
-            Mlt(Delta_t_, M);
+            tangent_linear_operator_.Copy(L_);
+            Mlt(Delta_t_, tangent_linear_operator_);
             for (int i = 0; i < Nstate_; i++)
-                M(i, i) += T(1);
+                tangent_linear_operator_(i, i) += T(1);
         }
         else
-            M.SetIdentity();
+            tangent_linear_operator_.SetIdentity();
+
+        return tangent_linear_operator_;
     }
 
 
@@ -882,15 +886,18 @@ namespace Verdandi
     //! Returns a row of the state error variance.
     /*!
       \param[in] row row index.
-      \param[out] P_row the row with index \a row in the state error variance.
+      \return The row with index \a row in the state error variance.
     */
     template <class T>
-    void
-    QuadraticModel<T>
-    ::GetStateErrorVarianceRow
-    (int row, state_error_variance_row& P_row)
+    typename QuadraticModel<T>::state_error_variance_row&
+    QuadraticModel<T>::GetStateErrorVarianceRow(int row)
     {
-        GetRow(P_, row, P_row);
+        if (current_row_ == row)
+            return state_error_variance_row_;
+        else
+            current_row_ = row;
+            GetRow(P_, row, state_error_variance_row_);
+        return state_error_variance_row_;
     }
 
 

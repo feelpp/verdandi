@@ -119,11 +119,9 @@ class PythonModelTemplate:
     def GetState(self):
         return self.state_
 
-
-    ## Sets the controlled state vector.
-    # @param[in] state the new controlled state vector.
-    def SetState(self, state):
-        self.state_ = state
+    ## Performs some calculations when the update of the model state is done.
+    def StateUpdated(self):
+        return
 
 
     ## Provides the state lower bound.
@@ -144,10 +142,9 @@ class PythonModelTemplate:
         return self.full_state_
 
 
-    ## Sets the full state vector.
-    # @param[in] state The new full state vector.
-    def SetFullState(self, full_state):
-        self.full_state_ = full_state
+    ## Performs some calculations when the update of the model state is done.
+    def FullStateUpdated(self, full_state):
+        return
 
 
     ## Provides the adjoint state vector.
@@ -156,10 +153,10 @@ class PythonModelTemplate:
         return self.adjoint_state_
 
 
-    ## Sets the adjoint state vector.
-    # @param[in] adjoint_state The new adjoint state vector.
-    def SetAdjointState(self, adjoint_state):
-        self.adjoint_state_ = adjoint_state
+    ## Performs some calculations when the update of the adjoint state
+    #  is done.
+    def AdjointStateUpdated(self):
+        return
 
 
     ## Returns the number of parameters to be perturbed.
@@ -220,12 +217,6 @@ class PythonModelTemplate:
     ### Errors ###
 
 
-    ## Returns the square root of the model error variance.
-    # @return The square root of the model error variance.
-    def GetErrorVarianceSqrt(self):
-        return self.Q_sqrt_
-
-
     ## Returns the state error variance.
     # @return The state error variance.
     def GetStateErrorVariance(self):
@@ -239,12 +230,18 @@ class PythonModelTemplate:
         return self.P_[row]
 
 
-    ## Returns a decomposition of the state error covariance matrix (\f$B\f$)
-    # as a product \f$LUL^T\f$.
-    # @param[out] L the matrix \f$L\f$.
-    # @param[out] U the matrix \f$U\f$.
-    def GetStateErrorVarianceSqrt(self, L, U):
-        return
+    ## Returns the matrix L in the decomposition of the state error covariance
+    # matrix (\f$B\f$) as a product \f$LUL^T\f$.
+    # @return The matrix \f$L\f$.
+    def GetStateErrorVarianceProjector(self):
+        return self.L_
+
+
+    ## Returns the matrix U in the decomposition of the state error covariance
+    # matrix (\f$B\f$) as a product \f$LUL^T\f$.
+    # @return The matrix \f$U\f$.
+    def GetStateErrorVarianceReduced(self):
+        return self.U_
 
 
     ## Returns the inverse of the background error variance (\f$B^{-1}\f$).

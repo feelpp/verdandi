@@ -46,7 +46,7 @@ namespace Verdandi
 
     //! Constructor.
     template <class T>
-    PetscClampedBar<T>::PetscClampedBar(): time_(0.)
+    PetscClampedBar<T>::PetscClampedBar(): time_(0.), current_row_(-1)
     {
     }
 
@@ -57,7 +57,7 @@ namespace Verdandi
     */
     template <class T>
     PetscClampedBar<T>::PetscClampedBar(string configuration_file):
-    time_(0.)
+        time_(0.), current_row_(-1)
     {
     }
 
@@ -404,14 +404,14 @@ namespace Verdandi
 
     //! Gets the matrix of the tangent linear model.
     /*!
-      \param[out] A the matrix of the tangent linear model.
+      \return The matrix of the tangent linear model.
     */
     template <class T>
-    void PetscClampedBar<T>
-    ::GetTangentLinearOperator(tangent_linear_operator& A) const
+    typename PetscClampedBar<T>::tangent_linear_operator&
+    PetscClampedBar<T>::GetTangentLinearOperator()
     {
-        throw ErrorUndefined("PetscClampedBar<T>::GetTangentLinearOperator"
-                             "(tangent_linear_operator& A) const");
+        throw ErrorUndefined("tangent_linear_operator& PetscClampedBar"
+                             "::GetTangentLinearOperator()");
     }
 
 
@@ -648,37 +648,41 @@ namespace Verdandi
 
     //! Returns the adjoint state vector.
     /*!
-      \param[in] state_adjoint the adjoint state vector.
+      \return The adjoint state vector.
     */
     template <class T>
-    void PetscClampedBar<T>::GetAdjointState(state& state_adjoint)
+    typename PetscClampedBar<T>::state& PetscClampedBar<T>::GetAdjointState()
     {
-        throw ErrorUndefined("PetscClampedBar<T>::GetAdjointState");
+        throw ErrorUndefined("state& PetscClampedBar<T>::GetAdjointState()");
     }
 
 
-    //! Sets the adjoint state vector.
-    /*!
-      \param[out] state_adjoint the adjoint state vector.
+    /*! Performs some calculations when the update of the adjoint state
+      is done.
     */
     template <class T>
-    void PetscClampedBar<T>::SetAdjointState(const state& state_adjoint)
+    void PetscClampedBar<T>::AdjointStateUpdated()
     {
-        throw ErrorUndefined("PetscClampedBar<T>::SetAdjointState");
+        throw ErrorUndefined("PetscClampedBar<T>::AdjointStateUpdated()");
     }
 
 
     //! Computes a row of the background error covariance matrix B.
     /*!
       \param[in] row row index.
-      \param[out] error_covariance_row the value of row number \a row.
+      \return The value of row number \a row.
     */
     template <class T>
-    void PetscClampedBar<T>
-    ::GetStateErrorVarianceRow(int row, state_error_variance_row&
-                               state_error_variance_row)
+    typename PetscClampedBar<T>::state_error_variance_row& PetscClampedBar<T>
+    ::GetStateErrorVarianceRow(int row)
     {
-        GetRow(state_error_variance_, row, state_error_variance_row);
+        if (row == current_row_)
+            return state_error_variance_row_;
+
+        GetRow(state_error_variance_, row, state_error_variance_row_);
+        current_row_ = row;
+
+        return state_error_variance_row_;
     }
 
 
@@ -706,31 +710,52 @@ namespace Verdandi
     }
 
 
-    /*! Returns a decomposition of the state error covariance matrix (\f$B\f$)
-      as a product \f$LUL^T\f$.
+    /*! Returns the matrix L in the decomposition of the
+      state error covariance matrix (\f$B\f$) as a product \f$LUL^T\f$.
     */
     /*!
-      \param[out] L the matrix \f$L\f$.
-      \param[out] U the matrix \f$U\f$.
+      \return The matrix \f$L\f$.
     */
     template <class T>
-    template <class L_matrix, class U_matrix>
-    void PetscClampedBar<T>
-    ::GetStateErrorVarianceSqrt(L_matrix& L, U_matrix& U)
+    typename PetscClampedBar<T>::state_error_variance& PetscClampedBar<T>
+    ::GetStateErrorVarianceProjector()
     {
         int Nreduced = 0;
         for (unsigned int i = 0; i < reduced_.size(); i++)
             Nreduced += parameter_.GetVector(reduced_[i]).GetSize();
-        L.Reallocate(Nstate_, Nreduced_, Nstate_local_);
+        state_error_variance_projector_.Reallocate(Nstate_,
+                                                   Nreduced_, Nstate_local_);
         if (rank_ == Nprocess_ - 1)
             for (int i = 0; i < Nreduced_; i++)
-                L.SetBuffer(Nstate_ - 1 - i, Nreduced_ - 1 - i, T(1));
-        L.Flush();
+                state_error_variance_projector_.SetBuffer(Nstate_ - 1 - i,
+                                                          Nreduced_ - 1 - i,
+                                                          T(1));
+        state_error_variance_projector_.Flush();
+        return state_error_variance_projector_;
+    }
 
-        U.Reallocate(Nreduced_, Nreduced_);
-        U.Fill(T(0));
+
+    /*! Returns the matrix U in the decomposition of the
+      state error covariance matrix (\f$B\f$) as a product \f$LUL^T\f$.
+    */
+    /*!
+      \return The matrix \f$U\f$.
+    */
+    template <class T>
+    typename PetscClampedBar<T>::state_error_variance_reduced&
+    PetscClampedBar<T>::GetStateErrorVarianceReduced()
+    {
+        int Nreduced = 0;
+        for (unsigned int i = 0; i < reduced_.size(); i++)
+            Nreduced += parameter_.GetVector(reduced_[i]).GetSize();
+
+        state_error_variance_reduced_.Reallocate(Nreduced_, Nreduced_);
+        state_error_variance_reduced_.Fill(T(0));
         for (int i = 0; i < Nreduced_; i++)
-            U(i, i) = T(T(1) / state_error_variance_value_);
+            state_error_variance_reduced_(i, i) =
+                T(T(1) / state_error_variance_value_);
+
+        return state_error_variance_reduced_;
     }
 
 

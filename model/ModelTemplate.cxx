@@ -161,11 +161,11 @@ namespace Verdandi
     /*!
       \param[out] A the matrix of the tangent linear model.
     */
-    void ModelTemplate
-    ::GetTangentLinearOperator(tangent_linear_operator& A) const
+    ModelTemplate::tangent_linear_operator& ModelTemplate
+    ::GetTangentLinearOperator()
     {
-        throw ErrorUndefined("ModelTemplate::GetTangentLinearOperator"
-                             "(tangent_linear_operator& A) const");
+        throw ErrorUndefined("ModelTemplate::tangent_linear_operatorx& "
+                             "ModelTemplate::GetTangentLinearOperator()");
     }
 
 
@@ -178,7 +178,7 @@ namespace Verdandi
     /*!
       \return The current time.
     */
-    double ModelTemplate::GetTime() const
+    double ModelTemplate::GetTime()
     {
         throw ErrorUndefined("ModelTemplate::GetTime() const");
     }
@@ -198,7 +198,7 @@ namespace Verdandi
     /*!
       \return The state vector size.
     */
-    int ModelTemplate::GetNstate() const
+    int ModelTemplate::GetNstate()
     {
         throw ErrorUndefined("ModelTemplate::GetNstate()");
     }
@@ -208,7 +208,7 @@ namespace Verdandi
     /*!
       \return The size of the full state vector.
     */
-    int ModelTemplate::GetNfull_state() const
+    int ModelTemplate::GetNfull_state()
     {
         throw ErrorUndefined("ModelTemplate::GetNfull_state()");
     }
@@ -221,11 +221,11 @@ namespace Verdandi
     ModelTemplate::state& ModelTemplate::GetState()
     {
         throw ErrorUndefined("ModelTemplate::state& "
-                              "ModelTemplate::GetState()");
+                             "ModelTemplate::GetState()");
     }
 
 
-    //! Performs some calculations when the update of the model state is done.
+    //! Carries out some calculations when the model state has been updated.
     void ModelTemplate::StateUpdated()
     {
         throw ErrorUndefined("ModelTemplate"
@@ -237,8 +237,7 @@ namespace Verdandi
     /*!
       \return The state lower bound (componentwise).
     */
-    ModelTemplate::state& ModelTemplate
-    ::GetStateLowerBound()
+    ModelTemplate::state& ModelTemplate::GetStateLowerBound()
     {
         throw ErrorUndefined("ModelTemplate::state& ModelTemplate"
                              "::GetStateLowerBound(state& lower_bound)");
@@ -249,26 +248,25 @@ namespace Verdandi
     /*!
       \return The state upper bound (componentwise).
     */
-    ModelTemplate::state& ModelTemplate
-    ::GetStateUpperBound()
+    ModelTemplate::state& ModelTemplate::GetStateUpperBound()
     {
         throw ErrorUndefined("ModelTemplate::state& ModelTemplate"
                              "::GetStateUpperBound(state& upper_bound)");
     }
 
 
-     //! Provides the full state vector.
+    //! Provides the full state vector.
     /*!
       \return state the controlled state vector.
     */
     ModelTemplate::state& ModelTemplate::GetFullState()
     {
         throw ErrorUndefined("ModelTemplate::state& "
-                              "ModelTemplate::GetFullState()");
+                             "ModelTemplate::GetFullState()");
     }
 
 
-    //! Performs some calculations when the update of the model state is done.
+    //! Carries out some calculations when the model state has been updated.
     void ModelTemplate::FullStateUpdated()
     {
         throw ErrorUndefined("ModelTemplate"
@@ -278,20 +276,19 @@ namespace Verdandi
 
     //! Returns the adjoint state vector.
     /*!
-      \param[out] state_adjoint the adjoint state vector.
+      \return The adjoint state vector.
     */
-    void ModelTemplate::GetAdjointState(state& state_adjoint)
+    ModelTemplate::state& ModelTemplate::GetAdjointState()
     {
-        throw ErrorUndefined("ModelTemplate::GetAdjointState(state& "
-                             "state_adjoint)");
+        throw ErrorUndefined("ModelTemplate::state& ModelTemplate"
+                             "::GetAdjointState()");
     }
 
 
-    //! Sets the adjoint state vector.
-    /*!
-      \param[out] state_adjoint the adjoint state vector.
+    /*! Carries out some calculations when the the adjoint state
+      has been updated.
     */
-    void ModelTemplate::SetAdjointState(const state& state_adjoint)
+    void ModelTemplate::AdjointStateUpdated()
     {
         throw ErrorUndefined("ModelTemplate::SetAdjointState(const state& "
                              "state_adjoint)");
@@ -396,14 +393,14 @@ namespace Verdandi
     //! Computes a row of the variance of the state error.
     /*!
       \param[in] row row index.
-      \param[out] P_row the row with index \a row in the state error variance.
+      \return The row with index \a row in the state error variance.
     */
-    void ModelTemplate
-    ::GetStateErrorVarianceRow(int row, state_error_variance_row& P_row)
+    ModelTemplate::state_error_variance_row&
+    ModelTemplate::GetStateErrorVarianceRow(int row)
     {
-        throw ErrorUndefined("ModelTemplate::GetStateErrorVarianceRow(int"
-                             "row, state_error_variance_row&"
-                             "state_error_variance_row)");
+        throw ErrorUndefined("ModelTemplate::state_error_variance_row& "
+                             "ModelTemplate::GetStateErrorVarianceRow"
+                             "(int row)");
     }
 
 
@@ -414,23 +411,38 @@ namespace Verdandi
     ModelTemplate::state_error_variance&
     ModelTemplate::GetStateErrorVariance()
     {
-        throw ErrorUndefined("ModelTemplate::GetStateErrorVariance()");
+        throw ErrorUndefined("ModelTemplate::state_error_variance& "
+                             "ModelTemplate::GetStateErrorVariance()");
     }
 
 
-    /*! Returns a decomposition of the state error covariance matrix (\f$B\f$)
-      as a product \f$LUL^T\f$.
+    /*! Returns the matrix L in the decomposition of the
+      state error covariance matrix (\f$B\f$) as a product \f$LUL^T\f$.
     */
     /*!
-      \param[out] L the matrix \f$L\f$.
-      \param[out] U the matrix \f$U\f$.
+      \return The matrix \f$L\f$.
     */
-    void ModelTemplate::GetStateErrorVarianceSqrt(state_error_variance& L,
-                                                  state_error_variance& U)
+    ModelTemplate::state_error_variance&
+    ModelTemplate::GetStateErrorVarianceProjector()
     {
-        throw ErrorUndefined("ModelTemplate::GetStateErrorVarianceSqrt("
-                             "state_error_variance& L, "
-                             "state_error_variance& U)");
+        throw ErrorUndefined("ModelTemplate::state_error_variance& "
+                             "ModelTemplate::"
+                             "GetStateErrorVarianceProjector()");
+    }
+
+
+    /*! Returns the matrix U in the decomposition of the
+      state error covariance matrix (\f$B\f$) as a product \f$LUL^T\f$.
+    */
+    /*!
+      \return The matrix \f$U\f$.
+    */
+    ModelTemplate::state_error_variance_reduced&
+    ModelTemplate::GetStateErrorVarianceReduced()
+    {
+        throw ErrorUndefined("ModelTemplate::state_error_variance_reduced& "
+                             "ModelTemplate::"
+                             "GetStateErrorVarianceReduced()");
     }
 
 
@@ -441,7 +453,8 @@ namespace Verdandi
     const ModelTemplate::state_error_variance&
     ModelTemplate::GetStateErrorVarianceInverse() const
     {
-        throw ErrorUndefined("ModelTemplate::GetStateErrorVarianceInverse()");
+        throw ErrorUndefined("ModelTemplate::state_error_variance& "
+                             "ModelTemplate::GetStateErrorVarianceInverse()");
     }
 
 

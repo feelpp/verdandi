@@ -59,6 +59,9 @@ namespace Verdandi
 #ifdef VERDANDI_SPARSE
         //! Type of the background error covariance matrix.
         typedef Matrix<T, General, RowSparse> state_error_variance;
+        /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
+          decomposition of the background error covariance matrix. */
+        typedef Matrix<T, General, RowSparse> state_error_variance_reduced;
         //! Type of a row of the background error variance.
         typedef Vector<T> state_error_variance_row;
         //! Type of the model/observation crossed matrix.
@@ -68,6 +71,9 @@ namespace Verdandi
 #else
         //! Type of the background error covariance matrix.
         typedef Matrix<T> state_error_variance;
+        /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
+          decomposition of the background error covariance matrix. */
+        typedef Matrix<T> state_error_variance_reduced;
         //! Type of a row of the background error variance.
         typedef Vector<T> state_error_variance_row;
         //! Type of the model/observation crossed matrix.
@@ -183,9 +189,16 @@ namespace Verdandi
         //! Inverse of the background error covariance matrix (B^-1).
         state_error_variance state_error_variance_inverse_;
 
-        //! Number of the row of B currently stored.
+        /*! \brief Projector matrix L in the decomposition of the
+          background error covariance matrix (\f$B\f$) as a product LUL^T */
+        state_error_variance state_error_variance_projector_;
+        /*! \brief Reduced matrix U in the decomposition of the
+          background error covariance matrix (\f$B\f$) as a product LUL^T */
+        state_error_variance_reduced state_error_variance_reduced_;
+
+        //! Index of the row of B currently stored.
         int current_row_;
-        //! Number of the column of Q currently stored.
+        //! Index of the column of Q currently stored.
         int current_column_;
         //! Value of the row of B currently stored.
         state_error_variance_row state_error_variance_row_;
@@ -206,6 +219,9 @@ namespace Verdandi
 
         //! Duplicated state.
         state duplicated_state_;
+
+        //! Adjoint state.
+        state state_adjoint_;
 
     public:
         // Constructor and destructor.
@@ -229,7 +245,7 @@ namespace Verdandi
                              bool preserve_state = true,
                              bool update_force = true);
         double ApplyTangentLinearOperator(state& x);
-        void GetTangentLinearOperator(tangent_linear_operator&) const;
+        tangent_linear_operator& GetTangentLinearOperator();
 
         // Access methods.
         double GetTime() const;
@@ -243,17 +259,16 @@ namespace Verdandi
         state& GetStateUpperBound();
         state& GetFullState();
         void FullStateUpdated();
-        void GetAdjointState(state& state_adjoint);
-        void SetAdjointState(const state& state_adjoint);
+        state& GetAdjointState();
+        void AdjointStateUpdated();
 
-        void GetStateErrorVarianceRow(int row, state_error_variance_row&
-                                      state_error_variance_row);
+        state_error_variance_row& GetStateErrorVarianceRow(int row);
         state_error_variance& GetStateErrorVariance();
 #ifndef SWIG
         const state_error_variance& GetStateErrorVariance() const;
 #endif
-        void GetStateErrorVarianceSqrt(state_error_variance& L,
-                                       state_error_variance& U);
+        state_error_variance& GetStateErrorVarianceProjector();
+        state_error_variance_reduced& GetStateErrorVarianceReduced();
         const state_error_variance& GetStateErrorVarianceInverse() const;
 
         string GetName() const;

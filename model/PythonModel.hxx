@@ -40,6 +40,9 @@ namespace Verdandi
 
         //! Type of the state error variance.
         typedef Matrix<double> state_error_variance;
+        /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
+          decomposition of the background error covariance matrix. */
+        typedef Matrix<double> state_error_variance_reduced;
         //! Type of a row of the state error variance.
         typedef Vector<double> state_error_variance_row;
         //! Type of the state/observation crossed matrix.
@@ -85,10 +88,28 @@ namespace Verdandi
         //! State lower bound.
         state lower_bound_;
 
+        //! Adjoint state.
+        state state_adjoint_;
+
         //! State error variance.
         state_error_variance state_error_variance_;
         //! State error variance inverse.
         state_error_variance state_error_variance_inverse_;
+
+        //! Number of the row of state_error_variance_ currently stored.
+        int current_row_;
+        //! Value of the row of state_error_variance_ currently stored.
+        state_error_variance_row state_error_variance_row_;
+
+        /*! \brief Projector matrix L in the decomposition of the
+          background error covariance matrix (\f$B\f$) as a product LUL^T */
+        state_error_variance state_error_variance_projector_;
+        /*! \brief Reduced matrix U in the decomposition of the
+          background error covariance matrix (\f$B\f$) as a product LUL^T */
+        state_error_variance_reduced state_error_variance_reduced_;
+
+        //! Tangent linear operator (H).
+        tangent_linear_operator tangent_linear_operator_;
 
         //! Uncertain parameter.
         uncertain_parameter uncertain_parameter_;
@@ -125,7 +146,7 @@ namespace Verdandi
         double ApplyOperator(state& x,
                              bool forward = false, bool preserve_state = true);
         double ApplyTangentLinearOperator(state& x);
-        void GetTangentLinearOperator(tangent_linear_operator&) const;
+        tangent_linear_operator& GetTangentLinearOperator();
 
         // Access methods.
         double GetTime() const;
@@ -138,8 +159,8 @@ namespace Verdandi
         state& GetStateUpperBound();
         state& GetFullState();
         void FullStateUpdated();
-        void GetAdjointState(state& state_adjoint);
-        void SetAdjointState(const state& state_adjoint);
+        state& GetAdjointState();
+        void AdjointStateUpdated();
 
         // Uncertainty.
         int GetNparameter();
@@ -152,11 +173,10 @@ namespace Verdandi
         string GetParameterOption(int i);
 
         // Errors.
-        void GetStateErrorVarianceRow(int row,
-                                      state_error_variance_row& P_row);
+        state_error_variance_row& GetStateErrorVarianceRow(int row);
         state_error_variance& GetStateErrorVariance();
-        void GetStateErrorVarianceSqrt(state_error_variance& L,
-                                       state_error_variance& U);
+        state_error_variance& GetStateErrorVarianceProjector();
+        state_error_variance_reduced& GetStateErrorVarianceReduced();
         const state_error_variance& GetStateErrorVarianceInverse();
 
         string GetName() const;

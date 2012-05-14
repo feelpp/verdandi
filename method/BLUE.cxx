@@ -72,10 +72,6 @@ namespace Verdandi
                 + (rank - div) * Nlocal_state;
 #endif
 
-        // One row of background matrix B.
-        typename Model::state_error_variance_row
-            state_error_variance_row(Nstate);
-
         // One row of tangent operator matrix.
         typename ObservationManager::tangent_linear_operator_row
             tangent_operator_row(Nstate);
@@ -91,8 +87,9 @@ namespace Verdandi
         T H_entry;
         for (int j = 0; j < Nlocal_state; j++)
         {
-            model.GetStateErrorVarianceRow(j + global_state_number,
-                                           state_error_variance_row);
+            typename Model::state_error_variance_row&
+                state_error_variance_row =
+                model.GetStateErrorVarianceRow(j + global_state_number);
             // Computes the j-th row of BH'.
             for (r = 0; r < Nobservation; r++)
             {
@@ -144,8 +141,9 @@ namespace Verdandi
         for (r = 0; r < Nlocal_state; r++)
         {
             // Computes the r-th row of BH'.
-            model.GetStateErrorVarianceRow(r + global_state_number,
-                                           state_error_variance_row);
+            typename Model::state_error_variance_row&
+                state_error_variance_row =
+                model.GetStateErrorVarianceRow(r + global_state_number);
             for (c = 0; c < Nobservation; c++)
             {
                 observation_manager
@@ -220,10 +218,6 @@ namespace Verdandi
                 + (rank - div) * Nlocal_state;
 #endif
 
-        // One row of background matrix B.
-        typename Model::state_error_variance_row
-            state_error_variance_row(Nstate);
-
         // One row of tangent operator matrix.
         typename ObservationManager::tangent_linear_operator_row
             tangent_operator_row(Nstate);
@@ -239,8 +233,9 @@ namespace Verdandi
         T H_entry;
         for (int j = 0; j < Nlocal_state; j++)
         {
-            model.GetStateErrorVarianceRow(j + global_state_number,
-                                           state_error_variance_row);
+            typename Model::state_error_variance_row&
+                state_error_variance_row =
+                model.GetStateErrorVarianceRow(j + global_state_number);
             // Computes the j-th row of BH'.
             for (r = 0; r < Nobservation; r++)
             {
@@ -295,8 +290,9 @@ namespace Verdandi
         for (r = 0; r < Nlocal_state; r++)
         {
             // Computes the r-th row of BH'.
-            model.GetStateErrorVarianceRow(r + global_state_number,
-                                           state_error_variance_row);
+            typename Model::state_error_variance_row&
+                state_error_variance_row =
+                model.GetStateErrorVarianceRow(r + global_state_number);
             variance(r + global_state_number)
                 = state_error_variance_row(r + global_state_number);
             for (c = 0; c < Nobservation; c++)

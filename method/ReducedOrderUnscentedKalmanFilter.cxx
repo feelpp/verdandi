@@ -213,11 +213,10 @@ namespace Verdandi
             observation_manager_.DiscardObservation(false);
         }
         Nstate_ = model_.GetNstate();
-        Nobservation_  = observation_manager_.GetNobservation();
+        Nobservation_ = observation_manager_.GetNobservation();
 
-        sigma_point_matrix U;
-        model_.GetStateErrorVarianceSqrt(L_, U);
-        Copy(U, U_);
+        Copy(model_.GetStateErrorVarianceProjector(), L_);
+        Copy(model_.GetStateErrorVarianceReduced(), U_);
         U_inv_.Copy(U_);
 
         GetInverse(U_inv_);

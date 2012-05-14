@@ -41,6 +41,9 @@ namespace Verdandi
 #ifdef VERDANDI_SPARSE
         //! Type of the state error variance.
         typedef Matrix<double, General, RowSparse> state_error_variance;
+        /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
+          decomposition of the state error variance. */
+        typedef Matrix<T, General, RowSparse> state_error_variance_reduced;
         //! Type of a row of the state error variance.
         typedef Vector<double, VectSparse> state_error_variance_row;
         //! Type of the state/observation crossed matrix.
@@ -50,6 +53,9 @@ namespace Verdandi
 #else
         //! Type of the state error variance.
         typedef Matrix<double> state_error_variance;
+        /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
+          decomposition of the state error variance. */
+        typedef Matrix<T, General, RowSparse> state_error_variance_reduced;
         //! Type of a row of the state error variance.
         typedef Vector<double> state_error_variance_row;
         //! Type of the state/observation crossed matrix.
@@ -83,25 +89,24 @@ namespace Verdandi
         void Finalize();
 
         // Operators.
-        double ApplyOperator(state& x,
-                             bool forward = false,
+        double ApplyOperator(state& x, bool forward = false,
                              bool preserve_state = true);
         double ApplyTangentLinearOperator(state& x);
-        void GetTangentLinearOperator(tangent_linear_operator&) const;
+        tangent_linear_operator& GetTangentLinearOperator();
 
         // Access methods.
-        double GetTime() const;
+        double GetTime();
         void SetTime(double time);
-        int GetNstate() const;
-        int GetNfull_state() const;
+        int GetNstate();
+        int GetNfull_state();
         state& GetState();
         void StateUpdated();
         state& GetFullState();
         void FullStateUpdated();
         state& GetStateLowerBound();
         state& GetStateUpperBound();
-        void GetAdjointState(state& state_adjoint);
-        void SetAdjointState(const state& state_adjoint);
+        state& GetAdjointState();
+        void AdjointStateUpdated();
 
         // Uncertainty.
         int GetNparameter();
@@ -114,12 +119,11 @@ namespace Verdandi
         string GetParameterOption(int i);
 
         // Errors.
-        void GetStateErrorVarianceRow(int row,
-                                      state_error_variance_row& P_row);
+        state_error_variance_row& GetStateErrorVarianceRow(int row);
         state_error_variance& GetStateErrorVariance();
         error_variance& GetErrorVarianceSqrt();
-        void GetStateErrorVarianceSqrt(state_error_variance& L,
-                                       state_error_variance& U);
+        state_error_variance& GetStateErrorVarianceProjector();
+        state_error_variance_reduced& GetStateErrorVarianceReduced();
         const state_error_variance& GetStateErrorVarianceInverse() const;
 
         string GetName() const;

@@ -64,7 +64,12 @@ namespace Verdandi
         Py_Finalize();
 
         state_.Nullify();
+        state_adjoint_.Nullify();
+        tangent_linear_operator_.Nullify();
         uncertain_parameter_.Nullify();
+        state_error_variance_projector_.Nullify();
+        state_error_variance_reduced_.Nullify();
+        state_error_variance_row_.Nullify();
         parameter_correlation_.Nullify();
         parameter_variance_.Nullify();
         parameter_parameter_.Nullify();
@@ -303,11 +308,13 @@ namespace Verdandi
 
     //! Gets the tangent linear model.
     /*!
-      \param[out] A the matrix of the tangent linear model.
+      \return The matrix of the tangent linear model.
     */
-    void PythonModel::
-    GetTangentLinearOperator(tangent_linear_operator& A) const
+    PythonModel::tangent_linear_operator& PythonModel::
+    GetTangentLinearOperator()
     {
+        tangent_linear_operator_.Nullify();
+
         char function_name[] = "GetTangentLinearOperator";
 
         PyObject *pyValue = PyObject_CallMethod(pyModelInstance_,
@@ -322,14 +329,16 @@ namespace Verdandi
             throw ErrorProcessing("PythonModel::GetTangentLinearOperator",
                                   ErrorMessageNotContiguous(function_name));
 
-        PyArrayObject *stateArray =
+        PyArrayObject *tangentArray =
             reinterpret_cast<PyArrayObject*>(pyValue);
 
-        int size_X = (stateArray->dimensions)[0];
-        int size_Y = (stateArray->dimensions)[1];
-        A.Reallocate(size_X, size_Y);
-        memcpy(A.GetDataVoid(), stateArray->data,
-               size_X * size_Y * sizeof(double));
+        int size_X = (tangentArray->dimensions)[0];
+        int size_Y = (tangentArray->dimensions)[1];
+        tangent_linear_operator_.SetData(size_X, size_Y,
+                                         reinterpret_cast<double*>
+                                         (tangentArray->data));
+
+        return tangent_linear_operator_;
     }
 
 
@@ -410,7 +419,7 @@ namespace Verdandi
 
     //! Provides the controlled state vector.
     /*!
-      \return the controlled state vector.
+      \return The controlled state vector.
     */
     PythonModel::state& PythonModel::GetState()
     {
@@ -456,7 +465,7 @@ namespace Verdandi
 
     //! Provides the state lower bound.
     /*!
-      \return the state lower bound (componentwise).
+      \return The state lower bound (componentwise).
     */
     PythonModel::state& PythonModel::GetStateLowerBound()
     {
@@ -488,7 +497,7 @@ namespace Verdandi
 
     //! Provides the state upper bound.
     /*!
-      \return the state upper bound (componentwise).
+      \return The state upper bound (componentwise).
     */
     PythonModel::state& PythonModel::GetStateUpperBound()
     {
@@ -519,7 +528,7 @@ namespace Verdandi
 
     //! Provides the full state vector.
     /*!
-      \param[out] x the full state vector.
+      \return The full state vector.
     */
     PythonModel::state& PythonModel::GetFullState()
     {
@@ -565,10 +574,12 @@ namespace Verdandi
 
     //! Returns the adjoint state vector.
     /*!
-      \param[out] state_adjoint the adjoint state vector.
+      \return The adjoint state vector.
     */
-    void PythonModel::GetAdjointState(state& state_adjoint)
+    PythonModel::state& PythonModel::GetAdjointState()
     {
+        state_adjoint_.Nullify();
+
         char function_name[] = "GetAdjointState";
 
         PyObject *pyValue = PyObject_CallMethod(pyModelInstance_,
@@ -586,32 +597,26 @@ namespace Verdandi
         PyArrayObject *stateArray = reinterpret_cast<PyArrayObject*>(pyValue);
 
         int size = (stateArray->dimensions)[0];
-        state_adjoint.Reallocate(size);
-        memcpy(state_adjoint.GetDataVoid(), stateArray->data,
-               size*sizeof(double));
+
+        state_adjoint_.SetData(size,
+                               reinterpret_cast<double*> (stateArray->data));
+
+        return state_adjoint_;
     }
 
 
-    //! Sets the adjoint state vector.
-    /*!
-      \param[out] state_adjoint the adjoint state vector.
+    /*! Performs some calculations when the update of the adjoint state
+      is done.
     */
-    void PythonModel::SetAdjointState(const state& state_adjoint)
+    void PythonModel::AdjointStateUpdated()
     {
-        char function_name[] = "SetAdjointState";
-        char format_unit[] = "O";
-        npy_intp dim[1];
-        dim[0] = state_adjoint.GetLength();
+        char function_name[] = "AdjointStateUpdated";
 
-        PyObject *pyState =
-            PyArray_SimpleNewFromData(1, dim, NPY_DOUBLE,
-                                      state_adjoint.GetDataVoid());
-
-        if (PyObject_CallMethod(pyModelInstance_, function_name,
-                                format_unit, pyState) != Py_None)
-            throw ErrorPythonUndefined("PythonModel::SetAdjointState",
+        if (PyObject_CallMethod(pyModelInstance_, function_name, NULL)
+            != Py_None)
+            throw ErrorPythonUndefined("PythonModel::AdjointStateUpdated",
                                        string(function_name),
-                                       "(self, state_adjoint)", module_);
+                                       "(self)", module_);
     }
 
 
@@ -863,11 +868,15 @@ namespace Verdandi
     //! Computes a row of the variance of the state error.
     /*!
       \param[in] row row index.
-      \param[out] P_row the row with index \a row in the state error variance.
+      \return The row with index \a row in the state error variance.
     */
-    void PythonModel
-    ::GetStateErrorVarianceRow(int row, state_error_variance_row& P_row)
+    PythonModel::state_error_variance_row& PythonModel
+    ::GetStateErrorVarianceRow(int row)
     {
+        state_error_variance_row_.Nullify();
+
+        if (row == current_row_)
+            return state_error_variance_row_;
         char function_name[] = "GetStateErrorVarianceRow";
         char format_unit[] = "i";
 
@@ -885,12 +894,16 @@ namespace Verdandi
             throw ErrorProcessing("PythonModel::GetStateErrorVarianceRow",
                                   ErrorMessageNotContiguous(function_name));
 
+        current_row_ = row;
+
         PyArrayObject *stateArray = reinterpret_cast<PyArrayObject*>(pyValue);
 
         int size = (stateArray->dimensions)[0];
-        P_row.Reallocate(size);
-        memcpy(P_row.GetDataVoid(), stateArray->data,
-               size*sizeof(double));
+        state_error_variance_row_.SetData(size,
+                                          reinterpret_cast<double*>
+                                          (stateArray->data));
+
+        return state_error_variance_row_;
     }
 
 
@@ -929,52 +942,81 @@ namespace Verdandi
     }
 
 
-    /*! Returns a decomposition of the state error covariance matrix (\f$B\f$)
-      as a product \f$LUL^T\f$.
+    /*! Returns the matrix L in the decomposition of the
+      state error covariance matrix (\f$B\f$) as a product \f$LUL^T\f$.
     */
     /*!
-      \param[out] L the matrix \f$L\f$.
-      \param[out] U the matrix \f$U\f$.
+      \return The matrix \f$L\f$.
     */
-    void PythonModel::GetStateErrorVarianceSqrt(state_error_variance& L,
-                                                state_error_variance& U)
+    PythonModel::state_error_variance&
+    PythonModel::GetStateErrorVarianceProjector()
     {
+        state_error_variance_projector_.Nullify();
 
-        char function_name[] = "GetStateErrorVarianceSqrt";
+        char function_name[] = "GetStateErrorVarianceProjector";
         PyObject *pyValue = PyObject_CallMethod(pyModelInstance_,
                                                 function_name, NULL);
 
         if (pyValue == NULL)
             throw ErrorPythonUndefined("PythonModel"
-                                       "::GetStateErrorVarianceSqrt",
+                                       "::GetStateErrorVarianceProjector",
                                        string(function_name), "(self)",
                                        module_);
 
-        PyObject *py_L = PyTuple_GetItem(pyValue, (Py_ssize_t) 0);
-        PyObject *py_U = PyTuple_GetItem(pyValue, (Py_ssize_t) 1);
+        PyArrayObject *py_L = reinterpret_cast<PyArrayObject*>(pyValue);
 
         if (!PyArray_ISCONTIGUOUS(py_L))
-            throw ErrorProcessing("PythonModel::GetStateErrorVarianceSqrt",
+            throw ErrorProcessing("PythonModel"
+                                  "::GetStateErrorVarianceProjector",
                                   ErrorMessageNotContiguous(function_name));
+
+        int size_x = (py_L->dimensions)[0];
+        int size_y = (py_L->dimensions)[1];
+
+        state_error_variance_projector_.SetData(size_x, size_y,
+                                                reinterpret_cast<double*>
+                                                (py_L->data));
+
+        return state_error_variance_projector_;
+    }
+
+
+    /*! Returns the matrix U in the decomposition of the
+      state error covariance matrix (\f$B\f$) as a product \f$LUL^T\f$.
+    */
+    /*!
+      \return The matrix \f$U\f$.
+    */
+    PythonModel::state_error_variance_reduced&
+    PythonModel::GetStateErrorVarianceReduced()
+    {
+        state_error_variance_reduced_.Nullify();
+
+        char function_name[] = "GetStateErrorVarianceReduced";
+        PyObject *pyValue = PyObject_CallMethod(pyModelInstance_,
+                                                function_name, NULL);
+
+        if (pyValue == NULL)
+            throw ErrorPythonUndefined("PythonModel"
+                                       "::GetStateErrorVarianceReduced",
+                                       string(function_name), "(self)",
+                                       module_);
+
+        PyArrayObject *py_U = reinterpret_cast<PyArrayObject*>(pyValue);
+
         if (!PyArray_ISCONTIGUOUS(py_U))
-            throw ErrorProcessing("PythonModel::GetStateErrorVarianceSqrt",
+            throw ErrorProcessing("PythonModel"
+                                  "::GetStateErrorVarianceReduced",
                                   ErrorMessageNotContiguous(function_name));
 
-        PyArrayObject *L_array = reinterpret_cast<PyArrayObject*>(py_L);
+        int size_x = (py_U->dimensions)[0];
+        int size_y = (py_U->dimensions)[1];
 
-        int size_x = (L_array->dimensions)[0];
-        int size_y = (L_array->dimensions)[1];
-        L.Reallocate(size_x, size_y);
-        memcpy(L.GetDataVoid(), L_array->data,
-               size_x*size_y*sizeof(double));
+        state_error_variance_reduced_.SetData(size_x, size_y,
+                                              reinterpret_cast<double*>
+                                              (py_U->data));
 
-        PyArrayObject *U_array = reinterpret_cast<PyArrayObject*>(py_U);
-
-        size_x = (U_array->dimensions)[0];
-        size_y = (U_array->dimensions)[1];
-        U.Reallocate(size_x, size_y);
-        memcpy(U.GetDataVoid(), U_array->data,
-               size_x*size_y*sizeof(double));
+        return state_error_variance_reduced_;
     }
 
 

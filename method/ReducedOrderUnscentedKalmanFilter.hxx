@@ -76,6 +76,10 @@ namespace Verdandi
         //! Type of the sigma point matrix.
         typedef Matrix<T, General, RowMajor, MallocAlloc<T> >
         sigma_point_matrix;
+        /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
+          decomposition of the background error covariance matrix. */
+        typedef typename Model::state_error_variance_reduced
+        model_state_error_variance_reduced;
 
     protected:
 
@@ -89,7 +93,7 @@ namespace Verdandi
         //! Matrix L in the P SVD decomposition.
         model_state_error_variance L_;
         //! Matrix U in the P SVD decomposition.
-        sigma_point_matrix U_;
+        model_state_error_variance_reduced U_;
         //! Inverse of matrix U.
         sigma_point_matrix U_inv_;
         //! Innovation covariance.

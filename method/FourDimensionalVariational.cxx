@@ -478,7 +478,8 @@ namespace Verdandi
 
         model_state adjoint_source(Nstate_);
         adjoint_source.Fill(T(0));
-        model_.SetAdjointState(adjoint_source);
+        model_.GetAdjointState().Fill(T(0));
+        model_.AdjointStateUpdated();
         for (int t = time.GetM() - 1; t >= 0; t--)
         {
             model_.SetTime(time(t));
@@ -507,7 +508,7 @@ namespace Verdandi
             model_.BackwardAdjoint(adjoint_source);
         }
 
-        model_.GetAdjointState(gradient);
+        Copy(model_.GetAdjointState(), gradient);
         Mlt(T(-1), gradient);
         Add(T(1), x_b, gradient);
 
@@ -549,7 +550,8 @@ namespace Verdandi
 
         model_state adjoint_source(Nstate_);
         adjoint_source.Fill(T(0));
-        model_.SetAdjointState(adjoint_source);
+        model_.GetAdjointState().Fill(T(0));
+        model_.AdjointStateUpdated();
         for (int t = time.GetM() - 1; t >= 0; t--)
         {
             model_.SetTime(time(t));
@@ -579,7 +581,7 @@ namespace Verdandi
             model_.BackwardAdjoint(adjoint_source);
         }
 
-        model_.GetAdjointState(gradient);
+        Copy(model_.GetAdjointState(), gradient);
         Mlt(T(-1), gradient);
         Add(T(1), x_b, gradient);
         trajectory_manager_.Deallocate();

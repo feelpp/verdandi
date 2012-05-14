@@ -47,7 +47,7 @@ namespace Verdandi
 
     //! Constructor.
     template <class T>
-    ClampedBar<T>::ClampedBar(): time_(0.)
+    ClampedBar<T>::ClampedBar(): time_(0.), current_row_(-1)
     {
     }
 
@@ -58,7 +58,7 @@ namespace Verdandi
     */
     template <class T>
     ClampedBar<T>::ClampedBar(string configuration_file):
-        time_(0.)
+        time_(0.), current_row_(-1)
     {
     }
 
@@ -719,14 +719,14 @@ namespace Verdandi
 
     //! Gets the matrix of the tangent linear model.
     /*!
-      \param[out] A the matrix of the tangent linear model.
+      \return The matrix of the tangent linear model.
     */
     template <class T>
-    void ClampedBar<T>
-    ::GetTangentLinearOperator(tangent_linear_operator& A) const
+    typename ClampedBar<T>::tangent_linear_operator& ClampedBar<T>
+    ::GetTangentLinearOperator()
     {
-        throw ErrorUndefined("ClampedBar::GetTangentLinearOperator"
-                             "(tangent_linear_operator& A) const");
+        throw ErrorUndefined("tangent_linear_operator& ClampedBar"
+                             "::GetTangentLinearOperator()");
     }
 
 
@@ -865,7 +865,7 @@ namespace Verdandi
     }
 
 
-     //! Performs some calculations when the update of the model state is done.
+    //! Performs some calculations when the update of the model state is done.
     template <class T>
     void ClampedBar<T>
     ::FullStateUpdated()
@@ -876,16 +876,20 @@ namespace Verdandi
 
     //! Returns the adjoint state vector.
     /*!
-      \param[in] state_adjoint the adjoint state vector.
+      \return The adjoint state vector.
     */
     template <class T>
-    void ClampedBar<T>::GetAdjointState(state& state_adjoint)
+    typename ClampedBar<T>::state& ClampedBar<T>::GetAdjointState()
     {
         if (!is_adjoint_initialized_)
             InitializeAdjoint();
 
         state_collection p;
-        SetShape(state_adjoint, p);
+        state_adjoint_.Reallocate(q_.GetM());
+        for (int i = 0; i < q_.GetM(); i++)
+            state_adjoint_(i) = q_(i);
+
+        SetShape(state_adjoint_, p);
 
         AssembleMassMatrix(theta_mass_, theta_mass_index_);
         AssembleDampMatrix(theta_damp_, theta_damp_index_);
@@ -939,47 +943,53 @@ namespace Verdandi
         p.Nullify();
         q_disp_active.Nullify();
         q_velo_active.Nullify();
+
+        return state_adjoint_;
     }
 
 
-    //! Sets the adjoint state vector.
-    /*!
-      \param[out] state_adjoint the adjoint state vector.
+    /*! Performs some calculations when the update of the adjoint state
+      is done.
     */
     template <class T>
-    void ClampedBar<T>::SetAdjointState(const state& state_adjoint)
+    void ClampedBar<T>::AdjointStateUpdated()
     {
         if (!is_adjoint_initialized_)
             InitializeAdjoint();
 
-        if (q_.GetM() != state_adjoint.GetM())
-            throw ErrorProcessing("ClampedBar::SetStateAdjoint()",
+        if (q_.GetM() != state_adjoint_.GetM())
+            throw ErrorProcessing("ClampedBar::AdjointStateUpdated()",
                                   "Operation not permitted:\n p_ is a vector"
                                   " of length " + to_str(q_.GetM()) +
                                   ";\n  state_adjoint is a vector of length "
-                                  + to_str(state_adjoint.GetM()) + ".");
+                                  + to_str(state_adjoint_.GetM()) + ".");
 
         for (int i = 0; i < q_.GetM(); i++)
-            q_(i) = state_adjoint(i);
+            q_(i) = state_adjoint_(i);
     }
 
 
     //! Computes a row of the background error covariance matrix B.
     /*!
       \param[in] row row index.
-      \param[out] error_covariance_row the value of row number \a row.
+      \return The value of row number \a row.
     */
     template <class T>
-    void ClampedBar<T>
-    ::GetStateErrorVarianceRow(int row, state_error_variance_row&
-                               state_error_variance_row)
+    typename ClampedBar<T>::state_error_variance_row& ClampedBar<T>
+    ::GetStateErrorVarianceRow(int row)
     {
-        GetRow(state_error_variance_, row, state_error_variance_row);
+        if (row == current_row_)
+            return state_error_variance_row_;
+
+        GetRow(state_error_variance_, row, state_error_variance_row_);
+        current_row_ = row;
+
+        return state_error_variance_row_;
     }
 
 
     //! Returns the background error covariance matrix (\f$B\f$).
-    /*! Returns the background error covariance matrix (\f$B\f$).
+    /*!
       \return The matrix of the background error covariance.
     */
     template <class T>
@@ -991,7 +1001,7 @@ namespace Verdandi
 
 
     //! Returns the background error covariance matrix (\f$B\f$).
-    /*! Returns the background error covariance matrix (\f$B\f$).
+    /*!
       \return The matrix of the background error covariance.
     */
     template <class T>
@@ -1002,36 +1012,29 @@ namespace Verdandi
     }
 
 
-    /*! Returns a decomposition of the state error covariance matrix (\f$B\f$)
-      as a product \f$LUL^T\f$.
+    /*! Returns the matrix L in the decomposition of the
+      state error covariance matrix (\f$B\f$) as a product \f$LUL^T\f$.
     */
     /*!
-      \param[out] L the matrix \f$L\f$.
-      \param[out] U the matrix \f$U\f$.
+      \return The matrix \f$L\f$.
     */
     template <class T>
-    void ClampedBar<T>::GetStateErrorVarianceSqrt(
-        state_error_variance& L,
-        state_error_variance& U)
+    typename ClampedBar<T>::state_error_variance&
+    ClampedBar<T>::GetStateErrorVarianceProjector()
     {
         int Nreduced = 0;
         for (unsigned int i = 0; i < reduced_.size(); i++)
             Nreduced += x_.GetVector(reduced_[i]).GetSize();
 #ifndef VERDANDI_STATE_ERROR_SPARSE
         // Initializes L.
-        L.Reallocate(Nstate_, Nreduced);
-        L.Fill(T(0));
+        state_error_variance_projector_.Reallocate(Nstate_, Nreduced);
+        state_error_variance_projector_.Fill(T(0));
         for (unsigned int i = 0, l = 0; i < reduced_.size(); i++)
             for(int k = x_.GetIndex(reduced_[i]);
                 k < x_.GetIndex(reduced_[i]) +
                     x_.GetVector(reduced_[i]).GetSize(); k++)
-                L(k, l++) = 1;
+                state_error_variance_projector_(k, l++) = 1;
 
-        // Initializes U.
-        U.Reallocate(Nreduced,  Nreduced);
-        U.Fill(T(0));
-        for (int i = 0; i < Nreduced; i++)
-            U(i, i) = T(T(1) / state_error_variance_value_);
 #else
         // Initializes L.
         Matrix<T, General, ArrayRowSparse> L_array(Nstate_, Nreduced);
@@ -1040,14 +1043,42 @@ namespace Verdandi
                 k < x_.GetIndex(reduced_[i]) +
                     x_.GetVector(reduced_[i]).GetSize(); k++)
                 L_array(k, l++) = 1;
-        Copy(L_array, L);
+        Copy(L_array, state_error_variance_projector_);
+#endif
+        return state_error_variance_projector_;
+    }
+
+
+    /*! Returns the matrix U in the decomposition of the
+      state error covariance matrix (\f$B\f$) as a product \f$LUL^T\f$.
+    */
+    /*!
+      \return The matrix \f$U\f$.
+    */
+    template <class T>
+    typename ClampedBar<T>::state_error_variance_reduced&
+    ClampedBar<T>::GetStateErrorVarianceReduced()
+    {
+        int Nreduced = 0;
+        for (unsigned int i = 0; i < reduced_.size(); i++)
+            Nreduced += x_.GetVector(reduced_[i]).GetSize();
+#ifndef VERDANDI_STATE_ERROR_SPARSE
+
+        // Initializes U.
+        state_error_variance_reduced_.Reallocate(Nreduced,  Nreduced);
+        state_error_variance_reduced_.Fill(T(0));
+        for (int i = 0; i < Nreduced; i++)
+            state_error_variance_reduced_(i, i) =
+                T(T(1) / state_error_variance_value_);
+#else
 
         // Initializes U.
         Matrix<T, General, ArrayRowSparse> U_array(Nreduced,  Nreduced);
         for (int i = 0; i < Nreduced; i++)
             U_array(i, i) = T(T(1) / state_error_variance_value_);
-        Copy(U_array, U);
+        Copy(U_array, state_error_variance_reduced_);
 #endif
+        return state_error_variance_reduced_;
     }
 
 

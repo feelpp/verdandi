@@ -167,10 +167,18 @@ namespace Verdandi
         error_variance Q_sqrt_;
 
         //! Variance of the state error.
-        error_variance P_;
+        state_error_variance P_;
 
         //! Variance of the state error in square root form.
-        error_variance P_sqrt_;
+        state_error_variance P_sqrt_;
+
+        //! Tangent linear operator (H).
+        tangent_linear_operator tangent_linear_operator_;
+
+        //! Index of the row of P currently stored.
+        int current_row_;
+        //! Value of the row of P currently stored.
+        state_error_variance_row state_error_variance_row_;
 
         /*** Output saver ***/
 
@@ -192,7 +200,8 @@ namespace Verdandi
                              bool forward = false,
                              bool preserve_state = true);
         double ApplyTangentLinearOperator(state& x);
-        void GetTangentLinearOperator(tangent_linear_operator&) const;
+        tangent_linear_operator& GetTangentLinearOperator();
+
         bool HasFinished() const;
         void Save();
 
@@ -233,8 +242,7 @@ namespace Verdandi
 #ifndef SWIG
         const state_error_variance& GetStateErrorVariance() const;
 #endif
-        void GetStateErrorVarianceRow(int row, state_error_variance_row&
-                                      state_error_variance_row);
+        state_error_variance_row& GetStateErrorVarianceRow(int row);
         state_error_variance& GetStateErrorVarianceSqrt();
 #ifndef SWIG
         const state_error_variance& GetStateErrorVarianceSqrt() const;
