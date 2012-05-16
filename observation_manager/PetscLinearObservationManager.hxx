@@ -116,6 +116,11 @@ namespace Verdandi
         //! Final time at which observations are available.
         double final_time_;
 
+        //! Current observation.
+        observation current_observation_;
+        //! Are current observations loaded.
+        bool observation_loaded_;
+
         int rank_;
         int Nprocess_;
         MPI_Comm mpi_communicator_;
@@ -143,8 +148,6 @@ namespace Verdandi
 
         //! Observation error variance.
         T error_variance_value_;
-        //! Observation error covariance matrix (R).
-        error_variance error_variance_;
         //! Inverse of the observation error covariance matrix (R).
         error_variance error_variance_inverse_;
 

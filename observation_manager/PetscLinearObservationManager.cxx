@@ -172,7 +172,8 @@ namespace Verdandi
         configuration.Set("operator.Nobservation", Nobservation_);
         configuration.Set("error.variance", "v > 0", error_variance_value_);
 
-        tangent_operator_matrix_.Reallocate(Nobservation_, Nstate_model_);
+        tangent_operator_matrix_.Reallocate(Nstate_model_, Nobservation_,
+                                            Nlocal_state_model_);
 
         if(rank_ == 0)
             for(int i = 0; i < Nobservation_; i++)
@@ -263,6 +264,12 @@ namespace Verdandi
 
         time_ = time;
         SetAvailableTime(time_, available_time_);
+
+        if (!HasObservation())
+            return;
+
+        observation_loaded_ = false;
+        GetObservation(current_observation_);
     }
 
 
@@ -1335,45 +1342,21 @@ namespace Verdandi
                       observation_vector&
                       observation) const
     {
+        if (observation_type_ == "state")
+            throw ErrorUndefined("Observation type 'state' not yet supported."
+                                 "Observations have to be provided with the"
+                                 " 'observation' type, which means that only "
+                                 "observations are stored in the observation"
+                                 " file.");
         observation.Reallocate(Nobservation_);
-        if (rank_ == 0)
+        if (!rank_)
         {
-            observation_vector input_data;
-
             streampos position;
             position = (floor((time - initial_time_)
                               / (Delta_t_ * Nskip_) + 0.5)
                         + variable) * Nbyte_observation_;
             file_stream.seekg(position);
-
-            input_data.Read(file_stream);
-
-            if (observation_type_ == "state")
-            {
-                input_data.Resize(Nobservation_);
-                Copy(input_data, observation);
-            }
-            else
-            {
-                if (input_data.GetSize() != Nobservation_)
-                    throw ErrorIO("PetscLinearObservationManager"
-                                  "::ReadObservation"
-                                  "(ifstream& file_stream, double time, "
-                                  "int variable,"
-                                  " PetscLinearObservationManager"
-                                  "::observation_vector& observation) const",
-                                  "The observation type is 'observation', so "
-                                  "only observations are stored in the file, "
-                                  "but the size of the observation "
-                                  "read at time "
-                                  + to_str(time_) + " (Nread = "
-                                  + to_str(input_data.GetSize())
-                                  + ") mismatches with the "
-                                  "expected size (Nobservation = "
-                                  + to_str(Nobservation_ ) + ").");
-                Copy(input_data, observation);
-            }
-
+            observation.Read(file_stream);
         }
         MPI_Bcast(observation.GetData(), Nobservation_, MPI_DOUBLE, 0,
                   MPI_COMM_WORLD);
@@ -1483,7 +1466,13 @@ namespace Verdandi
     void PetscLinearObservationManager<T>
     ::GetObservation(observation& observation)
     {
+        if (observation_loaded_)
+        {
+            observation.Copy(current_observation_);
+            return;
+        }
         GetAggregatedObservation(observation);
+        observation_loaded_ = true;
     }
 
 
@@ -1623,7 +1612,8 @@ namespace Verdandi
         state Hx;
         Hx.Reallocate(Nobservation_);
 
-        Mlt(tangent_operator_matrix_, x, Hx);
+        MatMultTranspose(tangent_operator_matrix_.GetPetscMatrix(),
+                         x.GetPetscVector(), Hx.GetPetscVector());
 
         Vec Hx_seq;
         VecScatter ctx;
@@ -1674,13 +1664,8 @@ namespace Verdandi
     T PetscLinearObservationManager<T>
     ::GetTangentLinearOperator(int i, int j) const
     {
-        if (operator_scaled_identity_)
-            if (i == j)
-                return operator_diagonal_value_;
-            else
-                return T(0);
-        else
-            return tangent_operator_matrix_(i, j);
+        throw ErrorUndefined("PetscLinearObservationManager<T>"
+                             "::GetTangentLinearOperator");
     }
 
 
@@ -1698,25 +1683,8 @@ namespace Verdandi
                                   tangent_operator_row)
         const
     {
-        if (operator_scaled_identity_)
-        {
-            // if (operator_sparse_)
-            // {
-            //     tangent_operator_row.Reallocate(1);
-            //     tangent_operator_row.Index(0) = row;
-            //     tangent_operator_row.Fill(operator_diagonal_value_);
-            // }
-
-            // // Dense operator.
-            // else
-            {
-                tangent_operator_row.Reallocate(Nobservation_);
-                tangent_operator_row.Zero();
-                tangent_operator_row(row) = operator_diagonal_value_;
-            }
-        }
-        else
-            GetRow(tangent_operator_matrix_, row, tangent_operator_row);
+        throw ErrorUndefined("PetscLinearObservationManager<T>"
+                             "::GetTangentLinearOperatorRow");
     }
 
 
@@ -1729,7 +1697,8 @@ namespace Verdandi
     ::tangent_linear_operator& PetscLinearObservationManager<T>
     ::GetTangentLinearOperator() const
     {
-        return tangent_operator_matrix_;
+        throw ErrorUndefined("PetscLinearObservationManager<T>"
+                             "::GetTangentLinearOperator");
     }
 
 
@@ -1744,13 +1713,8 @@ namespace Verdandi
     ::ApplyAdjointOperator(const state& x,
                            observation& y) const
     {
-        if (operator_scaled_identity_)
-        {
-            y = x;
-            Mlt(operator_diagonal_value_, y);
-        }
-        else
-            Mlt(1., SeldonTrans, tangent_operator_matrix_, x, 0., y);
+        throw ErrorUndefined("PetscLinearObservationManager<T>"
+                             "::ApplyAdjointOperator");
     }
 
 
@@ -1805,7 +1769,8 @@ namespace Verdandi
     ::error_variance& PetscLinearObservationManager<T>
     ::GetErrorVariance() const
     {
-        return error_variance_;
+        throw ErrorUndefined("error_variance& PetscLinearObservationManager"
+                             "::GetErrorVariance() const");
     }
 
 
