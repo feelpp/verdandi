@@ -90,10 +90,14 @@ namespace Verdandi
         observation_aggregator_.Initialize(configuration_file);
 
         VerdandiOps configuration(configuration_file);
-
-        Nstate_model_ = model.GetNstate();
-
+        InitializeOperator(model, configuration_file);
         configuration.SetPrefix("observation.");
+
+        bool with_observation;
+        configuration.Set("option.with_observation", with_observation);
+        if (!with_observation)
+            return;
+
         configuration.Set("file", observation_file_);
         configuration.Set("type", "", "state", observation_type_);
         configuration.Set("Delta_t_constant", is_delta_t_constant_);
@@ -114,12 +118,85 @@ namespace Verdandi
         time_ = numeric_limits<double>::min();
 
         configuration.Set("width_file", "", "", width_file_);
-        configuration.Set("error.variance", "v > 0", error_variance_value_);
+
+        if (observation_type_ == "state")
+            Nbyte_observation_ = Nstate_model_ * sizeof(T) + sizeof(int);
+
+        if (observation_type_ == "observation")
+            Nbyte_observation_ = Nobservation_ * sizeof(T) + sizeof(int);
+
+        if (is_delta_t_constant_)
+        {
+
+            int expected_file_size;
+            expected_file_size = Nbyte_observation_
+                * int((final_time_ - initial_time_)
+                      / (Delta_t_ * double(Nskip_)) + 1.);
+
+            int file_size;
+            ifstream file_stream;
+            file_stream.open(observation_file_.c_str());
+
+#ifdef VERDANDI_CHECK_IO
+            // Checks if the file was opened.
+            if (!file_stream.is_open())
+                throw ErrorIO("LinearObservationManager"
+                              "::Initialize(model, configuration_file)",
+                              "Unable to open file \""
+                              + observation_file_ + "\".");
+#endif
+
+            file_stream.seekg(0, ios_base::end);
+            file_size = file_stream.tellg() ;
+            file_stream.close();
+
+            if (expected_file_size > file_size)
+                throw IOError("LinearObservationManager"
+                              "::Initialize(model, configuration_file)",
+                              "Too few available observations, the size of \""
+                              + observation_file_ + "\" must be greater than "
+                              + to_str(expected_file_size) + "B.");
+        }
+        else
+        {
+            int file_size;
+            ifstream file_stream;
+            file_stream.open(observation_file_.c_str());
+
+#ifdef VERDANDI_CHECK_IO
+            // Checks if the file was opened.
+            if (!file_stream.is_open())
+                throw ErrorIO("LinearObservationManager"
+                              "::Initialize(model, configuration_file)",
+                              "Unable to open file \""
+                              + observation_file_ + "\".");
+#endif
+            file_stream.close();
+        }
+    }
+
+
+    //! Initializes the observation operator \a H.
+    /*!
+      \param[in] model model.
+      \param[in] configuration_file configuration file.
+      \tparam Model the model type; e.g. ShallowWater<double>
+    */
+    template <class T>
+    template <class Model>
+    void LinearObservationManager<T>
+    ::InitializeOperator(const Model& model, string configuration_file)
+    {
+        VerdandiOps configuration(configuration_file);
+        Nstate_model_ = model.GetNstate();
+        configuration.SetPrefix("observation.");
 
         /*** Building the matrices ***/
 
         configuration.Set("operator.scaled_identity",
                           operator_scaled_identity_);
+        configuration.Set("error.variance", "v > 0",
+                          error_variance_value_);
 
         if (operator_scaled_identity_)
         {
@@ -224,60 +301,6 @@ namespace Verdandi
         Mlt(T(T(1)/ error_variance_value_), error_variance_inverse_);
 #endif
 
-        if (observation_type_ == "state")
-            Nbyte_observation_ = Nstate_model_ * sizeof(T) + sizeof(int);
-
-        if (observation_type_ == "observation")
-            Nbyte_observation_ = Nobservation_ * sizeof(T) + sizeof(int);
-
-        if (is_delta_t_constant_)
-        {
-
-            int expected_file_size;
-            expected_file_size = Nbyte_observation_
-                * int((final_time_ - initial_time_)
-                      / (Delta_t_ * double(Nskip_)) + 1.);
-
-            int file_size;
-            ifstream file_stream;
-            file_stream.open(observation_file_.c_str());
-
-#ifdef VERDANDI_CHECK_IO
-            // Checks if the file was opened.
-            if (!file_stream.is_open())
-                throw ErrorIO("LinearObservationManager"
-                              "::Initialize(model, configuration_file)",
-                              "Unable to open file \""
-                              + observation_file_ + "\".");
-#endif
-
-            file_stream.seekg(0, ios_base::end);
-            file_size = file_stream.tellg() ;
-            file_stream.close();
-
-            if (expected_file_size > file_size)
-                throw IOError("LinearObservationManager"
-                              "::Initialize(model, configuration_file)",
-                              "Too few available observations, the size of \""
-                              + observation_file_ + "\" must be greater than "
-                              + to_str(expected_file_size) + "B.");
-        }
-        else
-        {
-            int file_size;
-            ifstream file_stream;
-            file_stream.open(observation_file_.c_str());
-
-#ifdef VERDANDI_CHECK_IO
-            // Checks if the file was opened.
-            if (!file_stream.is_open())
-                throw ErrorIO("LinearObservationManager"
-                              "::Initialize(model, configuration_file)",
-                              "Unable to open file \""
-                              + observation_file_ + "\".");
-#endif
-            file_stream.close();
-        }
     }
 
 

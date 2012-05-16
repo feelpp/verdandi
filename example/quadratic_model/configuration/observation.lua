@@ -61,4 +61,11 @@ observation = {
 
    },
 
+   option = {
+
+      -- In order to deactivate all observations.
+      with_observation = true
+
+   },
+
 }

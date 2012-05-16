@@ -62,6 +62,13 @@ observation = {
 
    },
 
+   option = {
+
+      -- In order to deactivate all observations.
+      with_observation = true
+
+   },
+
    location = {
 
       observation_location = {80, 0,

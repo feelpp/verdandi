@@ -117,7 +117,7 @@ namespace Verdandi
         //! Period with which observations are available (if constant).
         double Delta_t_;
         /*! Times at which observations are available (if the time interval
-            between two observations is not constant). */
+          between two observations is not constant). */
         Vector<double> observation_time_;
 
         /*! Path to the observation times (needed if the time interval between
@@ -179,6 +179,9 @@ namespace Verdandi
         // Initialization.
         template <class Model>
         void Initialize(const Model& model, string configuration_file);
+        template <class Model>
+        void InitializeOperator(const Model& model,
+                                string configuration_file);
 
         void DiscardObservation(bool discard_observation);
         int CreateTrack();

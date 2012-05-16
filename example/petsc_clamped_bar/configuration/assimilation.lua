@@ -6,7 +6,7 @@ final_time_petsc_clamped_bar = 10
 -- Saving period.
 Nskip_save = 1
 
-observation_file = "result/truth-state_forecast.bin"
+observation_file = "result/truth-observation.bin"
 
 output_mode = "text"
 output_directory = "result/"

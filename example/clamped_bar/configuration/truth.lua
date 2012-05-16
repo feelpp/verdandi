@@ -6,6 +6,8 @@ final_time_clamped_bar = 10.0
 -- Saving period.
 Nskip_save = 1
 
+observation_file = "result/truth-observation.bin"
+
 output_directory = "result/"
 output_mode = "binary"
 output_mode_scalar = "text"
@@ -15,6 +17,14 @@ output_mode_scalar = "text"
 
 
 dofile("configuration/clamped_bar.lua")
+
+
+----------------------------------- OBSERVATION ------------------------------
+
+
+dofile("configuration/observation.lua")
+-- In order to deactivate all observations.
+observation.option.with_observation = false
 
 
 ----------------------------------- METHOD -----------------------------------
@@ -47,3 +57,7 @@ forward = {
    }
 
 }
+
+
+observation_generator = forward
+observation_generator.output_saver.variable_list = {"observation"}

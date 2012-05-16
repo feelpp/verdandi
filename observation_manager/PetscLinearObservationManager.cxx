@@ -87,76 +87,28 @@ namespace Verdandi
     void PetscLinearObservationManager<T>
     ::Initialize(Model& model, string configuration_file)
     {
-
-        mpi_communicator_ = PETSC_COMM_WORLD;
-        int ierr;
-        ierr = MPI_Comm_rank(mpi_communicator_, &rank_);
-        CHKERRABORT(mpi_communicator_, ierr);
-        ierr = MPI_Comm_size(mpi_communicator_, &Nprocess_);
-        CHKERRABORT(mpi_communicator_, ierr);
-
         observation_aggregator_.Initialize(configuration_file);
 
+        InitializeOperator(model, configuration_file);
+
         VerdandiOps configuration(configuration_file);
-
-        Nstate_model_ = model.GetNstate();
-
         configuration.SetPrefix("observation.");
+
+        bool with_observation;
+        configuration.Set("option.with_observation", with_observation);
+        if (!with_observation)
+            return;
+
         configuration.Set("file", observation_file_);
-
-        observation_file_ = observation_file_ + "-processor_" + to_str(rank_);
-
         configuration.Set("type", "", "state", observation_type_);
         configuration.Set("Delta_t", "v > 0", Delta_t_);
         configuration.Set("Nskip", "v > 0", Nskip_);
         configuration.Set("initial_time", "", 0., initial_time_);
         configuration.Set("final_time", "", numeric_limits<double>::max(),
                           final_time_);
-
         time_ = numeric_limits<double>::min();
 
         configuration.Set("width_file", "", "", width_file_);
-        configuration.Set("error.variance", "v > 0", error_variance_value_);
-
-        /***  Building the matrices ***/
-
-        typename Model::state& x = model.GetState();
-        Nlocal_state_model_ = x.GetLocalM();
-
-        configuration.Set("operator.diagonal_value",
-                          operator_diagonal_value_);
-        configuration.Set("operator.Nobservation", Nobservation_);
-
-        tangent_operator_matrix_.Reallocate(Nobservation_, Nstate_model_);
-        int start, end;
-        tangent_operator_matrix_.GetProcessorRowRange(start, end);
-        for(int i = start; i < end; i++)
-            tangent_operator_matrix_.SetBuffer(i, i,
-                                               operator_diagonal_value_);
-        tangent_operator_matrix_.Flush();
-
-#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
-        build_diagonal_sparse_matrix(Nobservation_, error_variance_value_,
-                                     error_variance_);
-        build_diagonal_sparse_matrix(Nobservation_,
-                                     T(T(1) / error_variance_value_),
-                                     error_variance_inverse_);
-#else
-        error_variance_.Reallocate(Nobservation_, Nobservation_);
-        error_variance_.SetIdentity();
-        Mlt(error_variance_value_, error_variance_);
-        error_variance_inverse_.Reallocate(Nobservation_, Nobservation_);
-        error_variance_inverse_.SetIdentity();
-        Mlt(T(T(1)/ error_variance_value_), error_variance_inverse_);
-#endif
-
-        if (rank_ == 0)
-            if (Nobservation_ > Nlocal_state_model_)
-                throw ErrorConfiguration("PetscLinearObservationManager"
-                                         "::Initialize(model, "
-                                         "configuration_file)",
-                                         "Nobservation must be lower than"
-                                         " Nstate / Nprocs.");
 
         if (observation_type_ == "state")
             Nbyte_observation_ = Nlocal_state_model_ * sizeof(T)
@@ -186,6 +138,59 @@ namespace Verdandi
         file_stream.seekg(0, ios_base::end);
         file_size = file_stream.tellg() ;
         file_stream.close();
+    }
+
+
+    //! Initializes the observation manager.
+    /*!
+      \param[in] model model.
+      \param[in] configuration_file configuration file.
+      \tparam Model the model type; e.g. ShallowWater<double>
+    */
+    template <class T>
+    template <class Model>
+    void PetscLinearObservationManager<T>
+    ::InitializeOperator(Model& model, string configuration_file)
+    {
+        mpi_communicator_ = PETSC_COMM_WORLD;
+        int ierr;
+        ierr = MPI_Comm_rank(mpi_communicator_, &rank_);
+        CHKERRABORT(mpi_communicator_, ierr);
+        ierr = MPI_Comm_size(mpi_communicator_, &Nprocess_);
+        CHKERRABORT(mpi_communicator_, ierr);
+
+        /***  Building the matrices ***/
+
+        typename Model::state& x = model.GetState();
+        Nlocal_state_model_ = x.GetLocalM();
+        Nstate_model_ = model.GetNstate();
+
+        VerdandiOps configuration(configuration_file);
+        configuration.SetPrefix("observation.");
+        configuration.Set("operator.diagonal_value",
+                          operator_diagonal_value_);
+        configuration.Set("operator.Nobservation", Nobservation_);
+        configuration.Set("error.variance", "v > 0", error_variance_value_);
+
+        tangent_operator_matrix_.Reallocate(Nobservation_, Nstate_model_);
+
+        if(rank_ == 0)
+            for(int i = 0; i < Nobservation_; i++)
+                tangent_operator_matrix_.SetBuffer(i, i,
+                                                   operator_diagonal_value_);
+        tangent_operator_matrix_.Flush();
+
+
+#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+        build_diagonal_sparse_matrix(Nobservation_,
+                                     T(T(1) / error_variance_value_),
+                                     error_variance_inverse_);
+#else
+        error_variance_inverse_.Reallocate(Nobservation_, Nobservation_);
+        error_variance_inverse_.SetIdentity();
+        Mlt(T(T(1)/ error_variance_value_), error_variance_inverse_);
+#endif
+
     }
 
 

@@ -164,12 +164,14 @@ namespace Verdandi
         PetscLinearObservationManager();
         template <class Model>
         PetscLinearObservationManager(Model& model,
-                                 string configuration_file);
+                                      string configuration_file);
         ~PetscLinearObservationManager();
 
         // Initialization.
         template <class Model>
         void Initialize(Model& model, string configuration_file);
+        template <class Model>
+        void InitializeOperator(Model& model, string configuration_file);
 
         void DiscardObservation(bool discard_observation);
         int CreateTrack();

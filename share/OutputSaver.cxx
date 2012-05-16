@@ -201,6 +201,17 @@ namespace Verdandi
         if (!is_active_)
             return;
 
+#ifdef VERDANDI_WITH_PETSC
+        /* In this case, the simulation is parallel, but x is sequential
+         (duplicated on each processes): only process 0 perform the saving. */
+        int rank;
+        int ierr;
+        ierr = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        CHKERRABORT(MPI_COMM_WORLD, ierr);
+        if (rank != 0)
+            return;
+#endif
+
         map<string, Variable>::iterator im;
 
         im = variable_list_.find(variable_name);
