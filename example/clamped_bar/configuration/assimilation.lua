@@ -164,9 +164,6 @@ reduced_order_unscented_kalman_filter = {
       with_resampling = false,
       -- Indicates how R is stored: "matrix", "matrix_inverse".
       observation_error_variance = "matrix_inverse",
-      -- Should the computations be carried out on observations (false) or
-      -- directly on innovations (true)?
-      with_innovation = true
 
    },
 

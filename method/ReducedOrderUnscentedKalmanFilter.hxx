@@ -118,9 +118,6 @@ namespace Verdandi
         bool with_resampling_;
         //! Indicates how R is stored (matrix, matrix_inverse, vector).
         string observation_error_variance_;
-        /*! \brief Should the computations be carried out on observations
-          (false) or directly on innovations (true)? */
-        bool with_innovation_;
 
         /*** Sigma-points ***/
 
