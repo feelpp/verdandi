@@ -287,10 +287,8 @@ for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
                 "newran", "superlu", "cblas", "pthread", "mpiseq",
                 "dmumps", "zmumps", "mumps_common", "pord", "metis", "m",
                 "umfpack", "amd", "cppunit", "nlopt", "trng4",
-                "scalapack", "blacs", "parmetis", "petsccontrib", "petscsnes",
-                "petscts", "petscksp", "petscdm", "petscmat", "petscvec",
-                "petsc", "mpi", "mpi_cxx", "mesh5", "X11", "superlu_dist",
-                "metis"]:
+                "scalapack", "blacs", "parmetis", "petsc", "mpi", "mpi_cxx",
+                "mesh5", "X11", "superlu_dist", "metis"]:
     if library not in library_list:
         library_list += [library]
 if env['PLATFORM'] in ['win32', 'win64'] and "lua" not in library_list:
