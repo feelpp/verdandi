@@ -89,6 +89,6 @@ for i = 1, 100 do
    end
 end
 
-observation.operator.value[80] = 1.
-observation.operator.value[100 + 81] = 1.
-observation.operator.value[200 + 82] = 1.
+observation.operator.value[80 + 1] = 1.
+observation.operator.value[100 + 81 + 1] = 1.
+observation.operator.value[200 + 82 + 1] = 1.
