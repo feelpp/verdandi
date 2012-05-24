@@ -107,6 +107,8 @@ namespace Verdandi
         int Nskip_;
         //! Duration during which observations are assimilated.
         double final_time_;
+        //! How are read the observations.
+        string observation_storage_;
 
         /*** Observation times ***/
 
@@ -143,6 +145,8 @@ namespace Verdandi
 
         /*** Model domain ***/
 
+        //! The size of a model state.
+        int Nstate_model_;
         //! Number of points along x in the model.
         int Nx_model_;
         //! Number of points along y in the model.

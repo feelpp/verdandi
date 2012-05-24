@@ -5,10 +5,14 @@ observation = {
 
    -- Path to the file storing the observations.
    file = observation_file,
-   -- How are defined the observations? If the type is "observation, only
+   -- How are defined the observations? If the type is "observation", only
    -- observations are stored in the file. If the type is "state", the whole
    -- model state is stored.
    type = "state",
+   -- How must be read the observations? If they are under a Seldon
+   -- vector form, the type must be "vector". If the type is "data_block",
+   -- the observations are read in a matrix form.
+   storage = "vector",
    -- Is the period with which observations are available constant?
    Delta_t_constant = true,
    -- If the period with which observations are available non constant
@@ -88,4 +92,3 @@ end
 observation.operator.value[80] = 1.
 observation.operator.value[100 + 81] = 1.
 observation.operator.value[200 + 82] = 1.
-

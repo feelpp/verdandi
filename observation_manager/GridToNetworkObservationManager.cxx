@@ -110,8 +110,13 @@ namespace Verdandi
         Ny_model_ = model.GetNy();
         Nbyte_observation_ = Nx_model_ * Ny_model_ * sizeof(double);
 
+        Nstate_model_ = model.GetNstate();
+
         configuration.SetPrefix("observation.");
         configuration.Set("file", observation_file_);
+        configuration.Set("type", "", "state", observation_type_);
+        configuration.Set("storage", "ops_in(v, {'vector', 'data_block'}",
+                          "vector", observation_storage_);
         configuration.Set("Delta_t", "v > 0", Delta_t_);
         configuration.Set("Nskip", "v > 0", Nskip_);
         configuration.Set("final_time", "", numeric_limits<double>::max(),
@@ -1178,31 +1183,95 @@ namespace Verdandi
         const
     {
         observation.Reallocate(Nobservation_);
-        Matrix<T> input_data(Nx_model_, Ny_model_);
-        int iteration;
+        if (observation_storage_ == "data_block")
+        {
+            Matrix<T> input_data(Nx_model_, Ny_model_);
+            int iteration;
 
-        iteration = int(time / (Delta_t_ * Nskip_));
+            iteration = int(time / (Delta_t_ * Nskip_));
 
-        ifstream file_stream;
-        file_stream.open(observation_file_.c_str());
+            ifstream file_stream;
+            file_stream.open(observation_file_.c_str());
 
 #ifdef VERDANDI_CHECK_IO
-        // Checks if the file was opened.
-        if (!file_stream.is_open())
-            throw ErrorIO("GridToNetworkObservationManager" \
-                          "::LoadObservation(model)",
-                          string("Unable to open file \"")
-                          + observation_file_ + "\".");
+            // Checks if the file was opened.
+            if (!file_stream.is_open())
+                throw ErrorIO("GridToNetworkObservationManager" \
+                              "::LoadObservation(model)",
+                              string("Unable to open file \"")
+                              + observation_file_ + "\".");
 #endif
 
-        streampos position = iteration * Nbyte_observation_;
-        file_stream.seekg(position);
-        input_data.Read(file_stream, false);
-        file_stream.close();
+            streampos position = iteration * Nbyte_observation_;
+            file_stream.seekg(position);
+            input_data.Read(file_stream, false);
+            file_stream.close();
 
-        for (int i = 0; i < Nobservation_; i++)
-            observation(i) = input_data(location_x_(i), location_y_(i));
+            for (int i = 0; i < Nobservation_; i++)
+                observation(i) = input_data(location_x_(i), location_y_(i));
+        }
+        else
+        {
+            observation_vector input_data;
 
+            streampos position = (floor((time / (Delta_t_ * Nskip_) + 0.5))
+                                        + variable)
+                * (Nbyte_observation_ + sizeof(int));
+
+            ifstream file_stream;
+            file_stream.open(observation_file_.c_str());
+
+#ifdef VERDANDI_CHECK_IO
+            // Checks if the file was opened.
+            if (!file_stream.is_open())
+                throw ErrorIO("GridToNetworkObservationManager" \
+                              "::LoadObservation(model)",
+                              string("Unable to open file \"")
+                              + observation_file_ + "\".");
+#endif
+
+            file_stream.seekg(position);
+            input_data.Read(file_stream);
+            if (observation_type_ == "state")
+            {
+                if (input_data.GetSize() != Nstate_model_)
+                    throw ErrorIO("GridToNetworkObservationManager::"
+                                  "ReadObservation(ifstream& file_stream, "
+                                  "double time, int variable, "
+                                  "GridToNetworkObservationManager"
+                                  "::observation_vector& observation) const",
+                                  "The observation type is 'state', so the "
+                                  "whole model state is supposed to be "
+                                  "stored, but the size of the observation "
+                                  "read at time "
+                                  + to_str(time_) + " (Nread = "
+                                  + to_str(input_data.GetSize()) +
+                                  ") mismatches with the expected size "
+                                  "(Nstate = "
+                                  + to_str(Nstate_model_) + ").");
+                ApplyOperator(input_data, observation);
+            }
+            else
+            {
+                if (input_data.GetSize() != Nobservation_)
+                    throw ErrorIO("GridToNetworkObservationManager::"
+                                  "ReadObservation(ifstream& file_stream, "
+                                  "double time, int variable, "
+                                  "GridToNetworkObservationManager"
+                                  "::observation_vector& observation) const",
+                                  "The observation type is 'observation', so "
+                                  "only observations are stored in the file, "
+                                  "but the size of the observation read "
+                                  "at time "
+                                  + to_str(time_) + " (Nread = "
+                                  + to_str(input_data.GetSize())
+                                  + ") mismatches with the "
+                                  "expected size (Nobservation = "
+                                  + to_str(Nobservation_ ) + ").");
+                Copy(input_data, observation);
+            }
+            file_stream.close();
+        }
     }
 
 
