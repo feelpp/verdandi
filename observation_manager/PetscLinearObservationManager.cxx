@@ -269,7 +269,6 @@ namespace Verdandi
             return;
 
         observation_loaded_ = false;
-        GetObservation(current_observation_);
     }
 
 
@@ -1460,19 +1459,18 @@ namespace Verdandi
 
     //! Gets observation.
     /*!
-      \param[out] observation observation vector.
+      \return The observation vector.
     */
     template <class T>
-    void PetscLinearObservationManager<T>
-    ::GetObservation(observation& observation)
+    typename PetscLinearObservationManager<T>::observation&
+    PetscLinearObservationManager<T>::GetObservation()
     {
         if (observation_loaded_)
-        {
-            observation.Copy(current_observation_);
-            return;
-        }
-        GetAggregatedObservation(observation);
+            return current_observation_;
+
+        GetAggregatedObservation(current_observation_);
         observation_loaded_ = true;
+        return current_observation_;
     }
 
 
@@ -1484,20 +1482,18 @@ namespace Verdandi
     //! Gets innovation.
     /*!
       \param[in] state state vector.
-      \param[out] innovation innovation vector.
+      \return The innovation vector.
     */
     template <class T>
     template <class state>
-    void PetscLinearObservationManager<T>
-    ::GetInnovation(const state& x,
-                    observation& innovation)
+    typename PetscLinearObservationManager<T>::observation&
+    PetscLinearObservationManager<T>::GetInnovation(const state& x)
     {
-        innovation.Reallocate(Nobservation_);
-        observation observation;
-        GetObservation(observation);
-        ApplyOperator(x, innovation);
-        Mlt(T(-1), innovation);
-        Add(T(1), observation, innovation);
+        innovation_.Reallocate(Nobservation_);
+        ApplyOperator(x, innovation_);
+        Mlt(T(-1), innovation_);
+        Add(T(1), GetObservation(), innovation_);
+        return innovation_;
     }
 
 
@@ -1672,16 +1668,11 @@ namespace Verdandi
     //! Linearized observation operator.
     /*!
       \param[in] row row index.
-      \param[out] tangent_operator_row the row \a row of the linearized
-      operator.
+      \return The row \a row of the linearized operator.
     */
     template <class T>
-    void PetscLinearObservationManager<T>
-    ::GetTangentLinearOperatorRow(int row,
-                                  typename PetscLinearObservationManager<T>
-                                  ::tangent_linear_operator_row&
-                                  tangent_operator_row)
-        const
+    typename PetscLinearObservationManager<T>::tangent_linear_operator_row&
+    PetscLinearObservationManager<T>::GetTangentLinearOperatorRow(int row)
     {
         throw ErrorUndefined("PetscLinearObservationManager<T>"
                              "::GetTangentLinearOperatorRow");

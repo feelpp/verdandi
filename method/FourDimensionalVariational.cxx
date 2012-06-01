@@ -455,7 +455,7 @@ namespace Verdandi
             observation_manager_.SetTime(model_, model_.GetTime());
             if (observation_manager_.HasObservation())
             {
-                observation_manager_.GetInnovation(state, y);
+                observation& y = observation_manager_.GetInnovation(state);
                 Nobservation_ = y.GetSize();
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
@@ -483,12 +483,12 @@ namespace Verdandi
         for (int t = time.GetM() - 1; t >= 0; t--)
         {
             model_.SetTime(time(t));
-            observation y, Rinv_y;
+            observation Rinv_y;
             observation_manager_.SetTime(model_, model_.GetTime());
             if (observation_manager_.HasObservation())
             {
-                observation_manager_.
-                    GetInnovation(trajectory[t], y);
+                obsevation& y =
+                    observation_manager_.GetInnovation(trajectory[t]);
                 Nobservation_ = y.GetSize();
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
@@ -523,11 +523,11 @@ namespace Verdandi
         while (!model_.HasFinished())
         {
             model_state& state = model_.GetState();
-            observation y, Rinv_y;
+            observation Rinv_y;
             observation_manager_.SetTime(model_, model_.GetTime());
             if (observation_manager_.HasObservation())
             {
-                observation_manager_.GetInnovation(state, y);
+                observation& y = observation_manager_.GetInnovation(state);
                 Nobservation_ = y.GetSize();
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
@@ -556,12 +556,12 @@ namespace Verdandi
         {
             model_.SetTime(time(t));
             trajectory_manager_.SetTime(model_, model_.GetTime());
-            observation y, Rinv_y;
+            observation Rinv_y;
             observation_manager_.SetTime(model_, model_.GetTime());
             if (observation_manager_.HasObservation())
             {
-                observation_manager_.
-                    GetInnovation(trajectory_manager_.GetState(), y);
+                observation& y = observation_manager_.
+                    GetInnovation(trajectory_manager_.GetState());
                 Nobservation_ = y.GetSize();
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance

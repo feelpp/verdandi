@@ -70,6 +70,11 @@ namespace Verdandi
         //! Name of the Python observation manager class.
         string class_name_;
 
+        //! Observation currently stored.
+        observation observation_;
+        //! Innovation currently stored.
+        observation innovation_;
+
         /*** Observation operator ***/
 
         //! Tangent operator matrix (H).
@@ -79,6 +84,11 @@ namespace Verdandi
         error_variance error_variance_;
         //! Inverse of the observation error covariance matrix (R).
         error_variance error_variance_inverse_;
+
+        //! Index of the row of H  currently stored.
+        int current_row_;
+        //! Value of the row of H currently stored.
+        tangent_linear_operator_row tangent_operator_row_;
 
     public:
         // Constructor and destructor.
@@ -99,7 +109,7 @@ namespace Verdandi
         /////////////////
 
 
-        void GetObservation(observation& observation);
+        observation& GetObservation();
 
 
         ////////////////
@@ -108,7 +118,7 @@ namespace Verdandi
 
 
         template <class state>
-        void GetInnovation(const state& x, observation& innovation);
+        observation& GetInnovation(const state& x);
 
 
         ////////////
@@ -132,8 +142,7 @@ namespace Verdandi
         template <class state>
         void ApplyTangentLinearOperator(const state& x, observation& y) const;
         double GetTangentLinearOperator(int i, int j) const;
-        void GetTangentLinearOperatorRow(int row, tangent_linear_operator_row&
-                                         tangent_operator_row) const;
+        tangent_linear_operator_row& GetTangentLinearOperatorRow(int row);
         const tangent_linear_operator& GetTangentLinearOperator();
 
         template <class state>

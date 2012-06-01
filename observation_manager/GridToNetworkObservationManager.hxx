@@ -148,6 +148,15 @@ namespace Verdandi
         //! Number of points along y in the model.
         int Ny_model_;
 
+        //! Observation currently stored.
+        observation observation_;
+        //! Innovation currently stored.
+        observation innovation_;
+        //! Index of the row of H currently stored.
+        int current_row_;
+        //! Value of the row of H currently stored.
+        tangent_linear_operator_row tangent_operator_row_;
+
     public:
         // Constructors and destructor.
         GridToNetworkObservationManager();
@@ -343,7 +352,7 @@ namespace Verdandi
         ////////////////
 
 
-        void GetObservation(observation& observation);
+        observation& GetObservation();
 
 
         ////////////////
@@ -352,7 +361,7 @@ namespace Verdandi
 
 
         template <class state>
-        void GetInnovation(const state& x, observation& innovation);
+        observation& GetInnovation(const state& x);
 
 
         ////////////
@@ -379,8 +388,7 @@ namespace Verdandi
         template <class state>
         void ApplyTangentLinearOperator(const state& x, observation& y) const;
         T GetTangentLinearOperator(int i, int j) const;
-        void GetTangentLinearOperatorRow(int row, tangent_linear_operator_row&
-                                         tangent_operator_row) const;
+        tangent_linear_operator_row& GetTangentLinearOperatorRow(int row);
         const tangent_linear_operator& GetTangentLinearOperator() const;
 
         template <class state>

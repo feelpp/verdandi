@@ -433,9 +433,7 @@ namespace Verdandi
             MltAdd(T(1), P_xz, P_z, T(0), K);
 
             // Computes X_{n + 1}^+.
-            observation innovation;
-            observation_manager_.GetInnovation(x, innovation);
-            MltAdd(T(1), K, innovation, T(1), x);
+            MltAdd(T(1), K, observation_manager_.GetInnovation(x), T(1), x);
 
             model_.StateUpdated();
 
@@ -509,9 +507,7 @@ namespace Verdandi
             MltAdd(T(1), P_xz, P_z, T(0), K);
 
             // Computes X_{n + 1}^+.
-            observation innovation;
-            observation_manager_.GetInnovation(x, innovation);
-            MltAdd(T(1), K, innovation, T(1), x);
+            MltAdd(T(1), K, observation_manager_.GetInnovation(x), T(1), x);
 
             model_.StateUpdated();
 

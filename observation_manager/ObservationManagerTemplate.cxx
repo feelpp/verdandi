@@ -108,14 +108,14 @@ namespace Verdandi
     //! Returns the observations.
     /*! This method is called after 'SetTime' set the time at which the
       observations are requested.
-      \param[out] observation observation vector.
+      \return The observation vector.
     */
-    void ObservationManagerTemplate::GetObservation(
-        ObservationManagerTemplate::observation& observation)
+    ObservationManagerTemplate::observation&
+    ObservationManagerTemplate::GetObservation()
     {
         throw ErrorUndefined(
-            "void ObservationManagerTemplate::GetObservation("
-            "ObservationManagerTemplate::observation& observation)");
+            "ObservationManagerTemplate::observation& "
+            "ObservationManagerTemplate::GetObservation()");
     }
 
 
@@ -128,16 +128,15 @@ namespace Verdandi
     /*! This method is called after 'SetTime' set the time at which the
       innovation is requested.
       \param[in] state state vector.
-      \param[out] innovation innovation vector.
+      \return The innovation vector.
     */
     template <class state>
-    void ObservationManagerTemplate
-    ::GetInnovation(const state& x,
-                    ObservationManagerTemplate::observation& innovation)
+    ObservationManagerTemplate::observation&
+    ObservationManagerTemplate::GetInnovation(const state& x)
     {
         throw ErrorUndefined(
-            "void ObservationManagerTemplate::GetInnovation(const state& x,"
-            "ObservationManagerTemplate::observation& innovation)");
+            "ObservationManagerTemplate::observation& "
+            "ObservationManagerTemplate::GetInnovation(const state& x)");
     }
 
 
@@ -235,21 +234,14 @@ namespace Verdandi
     /*! This method is called after 'SetTime' set the time at which the
       operator is defined.
       \param[in] row row index.
-      \param[out] tangent_operator_row the row \a row of the tangent linear
-      operator.
+      \return The row \a row of the tangent linear operator.
     */
-    void ObservationManagerTemplate
-    ::GetTangentLinearOperatorRow(int row,
-                                  ObservationManagerTemplate
-                                  ::tangent_linear_operator_row&
-                                  tangent_operator_row)
-        const
+    ObservationManagerTemplate::tangent_linear_operator_row&
+    ObservationManagerTemplate::GetTangentLinearOperatorRow(int row)
     {
         throw ErrorUndefined(
-            " void ObservationManagerTemplate"
-            "::GetTangentLinearOperatorRow(int row,"
-            "ObservationManagerTemplate::tangent_linear_operator_row&"
-            "tangent_operator_row) const");
+            "tangent_linear_operator_row& ObservationManagerTemplate"
+            "::GetTangentLinearOperatorRow(int row)");
     }
 
 

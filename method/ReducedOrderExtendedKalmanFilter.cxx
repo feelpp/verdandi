@@ -464,8 +464,7 @@ namespace Verdandi
                                        displacement_gather_2_, MPI::DOUBLE);
             Transpose(U_);
 
-            observation y;
-            observation_manager_.GetInnovation(x, y);
+            observation & y = observation_manager_.GetInnovation(x);
             Nobservation_ = y.GetSize();
 
             model_state_error_variance_row state_innovation(Nreduced_),
@@ -527,8 +526,7 @@ namespace Verdandi
             model_state& x = model_.GetState();
             Nstate_ = model_.GetNstate();
 
-            observation y;
-            observation_manager_.GetInnovation(x, y);
+            observation& y = observation_manager_.GetInnovation(x);
             Nobservation_ = y.GetSize();
 
             /*** Updated matrix U ***/

@@ -42,7 +42,7 @@ namespace Verdandi
     */
     template <class T>
     GridToNetworkObservationManager<T>
-    ::GridToNetworkObservationManager()
+    ::GridToNetworkObservationManager(): current_row_(-1)
     {
     }
 
@@ -57,7 +57,8 @@ namespace Verdandi
     template <class Model>
     GridToNetworkObservationManager<T>
     ::GridToNetworkObservationManager(const Model& model,
-                                      string configuration_file)
+                                      string configuration_file):
+        current_row_(-1)
     {
     }
 
@@ -1243,13 +1244,15 @@ namespace Verdandi
 
     //! Gets observation.
     /*!
-      \param[out] observation observation vector.
+      \return The observation vector.
     */
     template <class T>
-    void GridToNetworkObservationManager<T>
-    ::GetObservation(observation& observation)
+    typename GridToNetworkObservationManager<T>::observation&
+    GridToNetworkObservationManager<T>
+    ::GetObservation()
     {
-        GetAggregatedObservation(observation);
+        GetAggregatedObservation(observation_);
+        return observation_;
     }
 
 
@@ -1261,20 +1264,18 @@ namespace Verdandi
     //! Gets innovation.
     /*!
       \param[in] state state vector.
-      \param[out] innovation innovation vector.
+      \return The innovation vector.
     */
     template <class T>
     template <class state>
-    void GridToNetworkObservationManager<T>
-    ::GetInnovation(const state& x,
-                    observation& innovation)
+    typename GridToNetworkObservationManager<T>::observation&
+    GridToNetworkObservationManager<T>::GetInnovation(const state& x)
     {
-        innovation.Reallocate(Nobservation_);
-        observation observation;
-        GetObservation(observation);
-        ApplyOperator(x, innovation);
-        Mlt(T(-1), innovation);
-        Add(T(1), observation, innovation);
+        innovation_.Reallocate(Nobservation_);
+        ApplyOperator(x, innovation_);
+        Mlt(T(-1), innovation_);
+        Add(T(1), GetObservation(), innovation_);
+        return innovation_;
     }
 
 
@@ -1438,18 +1439,24 @@ namespace Verdandi
     //! Linearized observation operator.
     /*!
       \param[in] row row index.
-      \param[out] tangent_operator_row the row \a row of the linearized
-      operator.
+      \return The row \a row of the linearized operator.
     */
     template <class T>
-    void GridToNetworkObservationManager<T>
-    ::GetTangentLinearOperatorRow(int row,
-                                  tangent_linear_operator_row&
-                                  tangent_operator_row)
-        const
+    typename GridToNetworkObservationManager<T>::tangent_linear_operator_row&
+    GridToNetworkObservationManager<T>::GetTangentLinearOperatorRow(int row)
     {
-        for (int i = 0; i < tangent_operator_row.GetLength(); i++)
-            tangent_operator_row(i) = GetTangentLinearOperator(row, i);
+        if (row == current_row_)
+            return tangent_operator_row_;
+
+        int Nstate = Nx_model_ * Ny_model_;
+        tangent_operator_row_.Reallocate(Nstate);
+
+        for (int i = 0; i < Nstate; i++)
+            tangent_operator_row_(i) = GetTangentLinearOperator(row, i);
+
+        current_row_ = row;
+
+        return tangent_operator_row_;
     }
 
 

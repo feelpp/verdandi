@@ -1655,13 +1655,14 @@ namespace Verdandi
 
     //! Gets observation.
     /*!
-      \param[out] observation observation vector.
+      \return The observation vector.
     */
     template <class T>
-    void LinearObservationManager<T>
-    ::GetObservation(observation& observation)
+    typename LinearObservationManager<T>::observation&
+    LinearObservationManager<T>::GetObservation()
     {
-        GetAggregatedObservation(observation);
+        GetAggregatedObservation(observation_);
+        return observation_;
     }
 
 
@@ -1673,20 +1674,18 @@ namespace Verdandi
     //! Gets innovation.
     /*!
       \param[in] state state vector.
-      \param[out] innovation innovation vector.
+      \return The innovation vector.
     */
     template <class T>
     template <class state>
-    void LinearObservationManager<T>
-    ::GetInnovation(const state& x,
-                    observation& innovation)
+    typename LinearObservationManager<T>::observation&
+    LinearObservationManager<T>::GetInnovation(const state& x)
     {
-        innovation.Reallocate(Nobservation_);
-        observation observation;
-        GetObservation(observation);
-        ApplyOperator(x, innovation);
-        Mlt(T(-1), innovation);
-        Add(T(1), observation, innovation);
+        innovation_.Reallocate(Nobservation_);
+        ApplyOperator(x, innovation_);
+        Mlt(T(-1), innovation_);
+        Add(T(1), GetObservation(), innovation_);
+        return innovation_;
     }
 
 
@@ -1849,24 +1848,27 @@ namespace Verdandi
     //! Linearized observation operator.
     /*!
       \param[in] row row index.
-      \param[out] tangent_operator_row the row \a row of the linearized
-      operator.
+      \return The row \a row of the linearized operator.
     */
     template <class T>
-    void LinearObservationManager<T>
-    ::GetTangentLinearOperatorRow(int row,
-                                  tangent_linear_operator_row&
-                                  tangent_operator_row)
-        const
+    typename LinearObservationManager<T>::tangent_linear_operator_row&
+    LinearObservationManager<T>::GetTangentLinearOperatorRow(int row)
     {
+        if (row == current_row_)
+            return tangent_operator_row_;
+
         if (operator_scaled_identity_)
         {
-            tangent_operator_row.Reallocate(Nobservation_);
-            tangent_operator_row.Zero();
-            tangent_operator_row(row) = operator_diagonal_value_;
+            tangent_operator_row_.Reallocate(Nobservation_);
+            tangent_operator_row_.Zero();
+            tangent_operator_row_(row) = operator_diagonal_value_;
         }
         else
-            GetRow(tangent_operator_matrix_, row, tangent_operator_row);
+            GetRow(tangent_operator_matrix_, row, tangent_operator_row_);
+
+        current_row_ = row;
+
+        return tangent_operator_row_;
     }
 
 

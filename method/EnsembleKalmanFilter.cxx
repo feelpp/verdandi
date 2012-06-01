@@ -498,8 +498,7 @@ namespace Verdandi
                 cout << "Performing EnKF at time step ["
                      << model_.GetTime() << "]..." << endl;
 
-            observation obs;
-            observation_manager_.GetObservation(obs);
+            observation& obs = observation_manager_.GetObservation();
             Nobservation_ = obs.GetLength();
 
             model_state mean_state_vector(model_.GetNstate());

@@ -836,8 +836,8 @@ namespace Verdandi
                     MltAdd(T(1), L_, tmp, T(0), K);
 
                     // Computes innovation.
-                    observation innovation;
-                    observation_manager_.GetObservation(innovation);
+                    observation& innovation =
+                        observation_manager_.GetObservation();
                     Add(T(-1), z, innovation);
 
                     // Updates.
@@ -852,7 +852,8 @@ namespace Verdandi
                 MPI::Request send_request[Nprocess_ - 1], recv_request;
                 if (rank_ == 0)
                 {
-                    observation_manager_.GetObservation(innovation);
+                    observation& innovation =
+                        observation_manager_.GetObservation();
                     for (int i = 1; i < Nprocess_; i++)
                         send_request[i] =
                             MPI::COMM_WORLD.
@@ -861,9 +862,10 @@ namespace Verdandi
                 }
                 else
                     recv_request =
-                        MPI::COMM_WORLD.Irecv(innovation.GetData(),
-                                              Nobservation_, MPI::DOUBLE, 0,
-                                              MPI::ANY_TAG);
+                        MPI::COMM_WORLD.Irecv(
+                            observation_manager_.GetObservation().GetData(),
+                            Nobservation_, MPI::DOUBLE, 0,
+                            MPI::ANY_TAG);
                 // Computes [HX_{n+1}^{*}].
                 sigma_point_matrix
                     Z_i_trans(Nlocal_sigma_point_, Nobservation_);
@@ -1030,12 +1032,13 @@ namespace Verdandi
             Reallocate(x_col, Nstate_, model_);
             model_.StateUpdated();
 
-            observation z_col, z(Nobservation_);
+            observation z(Nobservation_);
             z.Fill(T(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetCol(X_i_, i, x_col);
-                observation_manager_.GetInnovation(x_col, z_col);
+                observation& z_col =
+                    observation_manager_.GetInnovation(x_col);
                 Add(T(alpha_), z_col, z);
                 SetRow(z_col, i, Z_i_trans);
             }
@@ -1088,7 +1091,7 @@ namespace Verdandi
             // Computes [HX_{n+1}^{*}].
             sigma_point_matrix Z_i_trans(Nsigma_point_, Nobservation_);
             sigma_point x_col;
-            observation z_col, z(Nobservation_);
+            observation z(Nobservation_);
             z.Fill(T(0));
             if (!alpha_constant_)
                 throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
@@ -1098,12 +1101,14 @@ namespace Verdandi
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(X_i_trans_, i, x_col);
-                observation_manager_.GetInnovation(x_col, z_col);
+                observation& z_col =
+                    observation_manager_.GetInnovation(x_col);
                 Add(T(alpha_), z_col, z);
                 SetRow(z_col, i, Z_i_trans);
                 x_col.Nullify();
             }
 
+            observation z_col(Nobservation_);
             // Computes [Z] = [HX_{n+1}^{*} - E(HX_{n+1}^{*})].
             for (int i = 0; i < Nsigma_point_; i++)
             {

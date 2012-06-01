@@ -48,6 +48,13 @@ namespace Verdandi
     PythonObservationManager::~PythonObservationManager()
     {
         Py_Finalize();
+
+        observation_.Nullify();
+        innovation_.Nullify();
+        tangent_operator_row_.Nullify();
+        tangent_operator_matrix_.Nullify();
+        error_variance_.Nullify();
+        error_variance_inverse_.Nullify();
     }
 
 
@@ -164,11 +171,13 @@ namespace Verdandi
     //! Returns the observations.
     /*! This method is called after 'SetTime' set the time at which the
       observations are requested.
-      \param[out] observation observation vector.
+      \return The observation vector.
     */
-    void PythonObservationManager
-    ::GetObservation(PythonObservationManager::observation& observation)
+    PythonObservationManager::observation& PythonObservationManager
+    ::GetObservation()
     {
+        observation_.Nullify();
+
         char function_name[] = "GetObservation";
 
         PyObject *pyObs = PyObject_CallMethod(pyObservationManagerInstance_,
@@ -186,9 +195,10 @@ namespace Verdandi
         PyArrayObject *obsArray = reinterpret_cast<PyArrayObject*>(pyObs);
 
         int size = obsArray->dimensions[0];
-        observation.Reallocate(size);
-        memcpy(observation.GetDataVoid(), obsArray->data,
-               size * sizeof(double));
+
+        observation_.SetData(size,
+                             reinterpret_cast<double*>(obsArray->data));
+        return observation_;
     }
 
 
@@ -201,13 +211,14 @@ namespace Verdandi
     /*! This method is called after 'SetTime' set the time at which the
       innovation is requested.
       \param[in] state state vector.
-      \param[out] innovation innovation vector.
+      \return The innovation vector.
     */
     template <class state>
-    void PythonObservationManager
-    ::GetInnovation(const state& x,
-                    PythonObservationManager::observation& innovation)
+    PythonObservationManager::observation&
+    PythonObservationManager::GetInnovation(const state& x)
     {
+        innovation_.Nullify();
+
         char function_name[] = "GetInnovation";
         char format_unit[] = "O";
         npy_intp dim[1];
@@ -234,9 +245,9 @@ namespace Verdandi
             reinterpret_cast<PyArrayObject*>(pyInnovation);
 
         int size = innovationArray->dimensions[0];
-        innovation.Reallocate(size);
-        memcpy(innovation.GetDataVoid(), innovationArray->data,
-               size * sizeof(double));
+        innovation_.SetData(size, reinterpret_cast<double*>
+                            (innovationArray->data));
+        return innovation_;
     }
 
 
@@ -421,16 +432,16 @@ namespace Verdandi
     /*! This method is called after 'SetTime' set the time at which the
       operator is defined.
       \param[in] row row index.
-      \param[out] tangent_operator_row the row \a row of the tangent linear
-      operator.
+      \return The row \a row of the tangent linear operator.
     */
-    void PythonObservationManager
-    ::GetTangentLinearOperatorRow(int row,
-                                  PythonObservationManager
-                                  ::tangent_linear_operator_row&
-                                  tangent_operator_row)
-    const
+    PythonObservationManager::tangent_linear_operator_row&
+    PythonObservationManager::GetTangentLinearOperatorRow(int row)
     {
+        tangent_operator_row_.Nullify();
+
+        if (row == current_row_)
+            return tangent_operator_row_;
+
         char function_name[] = "GetTangentLinearOperatorRow";
         char format_unit[] = "i";
 
@@ -442,7 +453,7 @@ namespace Verdandi
             throw ErrorPythonUndefined("PythonObservationManager"
                                        "::GetTangentLinearOperatorRow",
                                        string(function_name),
-                                       "(self, row, tangent_operator_row)",
+                                       "(self, row)",
                                        module_);
 
         if (!PyArray_ISCONTIGUOUS(pyRow))
@@ -450,12 +461,15 @@ namespace Verdandi
                                   "::ApplyTangentLinearOperator",
                                   ErrorMessageNotContiguous(function_name));
 
+        current_row_ = row;
+
         PyArrayObject *rowArray = reinterpret_cast<PyArrayObject*>(pyRow);
 
         int size = rowArray->dimensions[0];
-        tangent_operator_row.Reallocate(size);
-        memcpy(tangent_operator_row.GetDataVoid(), rowArray->data,
-               size * sizeof(double));
+        tangent_operator_row_.SetData(size,
+                                      reinterpret_cast<double*>
+                                      (rowArray->data));
+        return tangent_operator_row_;
     }
 
 

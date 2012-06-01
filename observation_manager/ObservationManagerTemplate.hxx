@@ -77,7 +77,7 @@ namespace Verdandi
         /////////////////
 
 
-        void GetObservation(observation& observation);
+        observation& GetObservation();
 
 
         ////////////////
@@ -86,7 +86,7 @@ namespace Verdandi
 
 
         template <class state>
-        void GetInnovation(const state& x, observation& innovation);
+        observation& GetInnovation(const state& x);
 
 
         ////////////
@@ -110,8 +110,7 @@ namespace Verdandi
         template <class state>
         void ApplyTangentLinearOperator(const state& x, observation& y) const;
         double GetTangentLinearOperator(int i, int j) const;
-        void GetTangentLinearOperatorRow(int row, tangent_linear_operator_row&
-                                         tangent_operator_row) const;
+        tangent_linear_operator_row& GetTangentLinearOperatorRow(int row);
         const tangent_linear_operator& GetTangentLinearOperator() const;
 
         template <class state>

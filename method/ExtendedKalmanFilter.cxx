@@ -233,8 +233,7 @@ namespace Verdandi
 
             Nstate_ = model_.GetNstate();
             model_state& x = model_.GetState();
-            observation innovation;
-            observation_manager_.GetInnovation(x, innovation);
+            observation& innovation = observation_manager_.GetInnovation(x);
             Nobservation_ = innovation.GetSize();
 
             ComputeBLUE(innovation, x);

@@ -72,10 +72,6 @@ namespace Verdandi
                 + (rank - div) * Nlocal_state;
 #endif
 
-        // One row of tangent operator matrix.
-        typename ObservationManager::tangent_linear_operator_row
-            tangent_operator_row(Nstate);
-
         // Temporary matrix and vector.
         // 'HBHR_inv' will eventually contain the matrix (HBH' + R)^(-1).
         Matrix<T> HBHR_inv(Nobservation, Nobservation);
@@ -93,10 +89,9 @@ namespace Verdandi
             // Computes the j-th row of BH'.
             for (r = 0; r < Nobservation; r++)
             {
-                observation_manager
-                    .GetTangentLinearOperatorRow(r, tangent_operator_row);
                 row(r) = DotProd(state_error_variance_row,
-                                 tangent_operator_row);
+                                 observation_manager.
+                                 GetTangentLinearOperatorRow(r));
             }
 
             // Keeps on building HBH'.
@@ -146,10 +141,9 @@ namespace Verdandi
                 model.GetStateErrorVarianceRow(r + global_state_number);
             for (c = 0; c < Nobservation; c++)
             {
-                observation_manager
-                    .GetTangentLinearOperatorRow(c, tangent_operator_row);
                 BHt_row(c) = DotProd(state_error_variance_row,
-                                     tangent_operator_row);
+                                     observation_manager.
+                                     GetTangentLinearOperatorRow(c));
             }
 
 #if defined(VERDANDI_WITH_MPI)
@@ -218,10 +212,6 @@ namespace Verdandi
                 + (rank - div) * Nlocal_state;
 #endif
 
-        // One row of tangent operator matrix.
-        typename ObservationManager::tangent_linear_operator_row
-            tangent_operator_row(Nstate);
-
         // Temporary matrix and vector.
         // 'HBHR_inv' will eventually contain the matrix (HBH' + R)^(-1).
         Matrix<T> HBHR_inv(Nobservation, Nobservation);
@@ -239,10 +229,9 @@ namespace Verdandi
             // Computes the j-th row of BH'.
             for (r = 0; r < Nobservation; r++)
             {
-                observation_manager
-                    .GetTangentLinearOperatorRow(r, tangent_operator_row);
                 row(r) = DotProd(state_error_variance_row,
-                                 tangent_operator_row);
+                                 observation_manager.
+                                 GetTangentLinearOperatorRow(r));
             }
 
             // Keeps on building HBH'.
@@ -297,10 +286,9 @@ namespace Verdandi
                 = state_error_variance_row(r + global_state_number);
             for (c = 0; c < Nobservation; c++)
             {
-                observation_manager
-                    .GetTangentLinearOperatorRow(c, tangent_operator_row);
                 BHt_row(c) = DotProd(state_error_variance_row,
-                                     tangent_operator_row);
+                                     observation_manager.
+                                     GetTangentLinearOperatorRow(c));
             }
 
 #if defined(VERDANDI_WITH_MPI)

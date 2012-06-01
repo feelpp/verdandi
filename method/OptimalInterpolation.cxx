@@ -259,8 +259,8 @@ namespace Verdandi
             model_state& state = model_.GetState();
             Nstate_ = model_.GetNstate();
 
-            observation innovation;
-            observation_manager_.GetInnovation(state, innovation);
+            observation& innovation =
+                observation_manager_.GetInnovation(state);
             Nobservation_ = innovation.GetSize();
 
             matrix_state_observation matrix_state_observation_tmp;

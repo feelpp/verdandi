@@ -476,10 +476,8 @@ namespace Verdandi
             Vector<T> x(Ndimension_);
 
             int Nobservation = observation_manager_.GetNobservation();
-            Vector<T> y(Nobservation), innovation(Nobservation),
+            Vector<T> innovation(Nobservation),
                 Rinnovation(Nobservation);
-
-            observation_manager_.GetObservation(y);
 
             x = x_min_;
             Vector<int> position(Ndimension_);
@@ -488,7 +486,7 @@ namespace Verdandi
             {
                 observation_manager_.ApplyOperator(x, innovation);
                 Mlt(T(-1), innovation);
-                Add(T(1), y, innovation);
+                Add(T(1),observation_manager_.GetObservation(), innovation);
                 Mlt(R_, innovation, Rinnovation);
                 V_(i_cell) += Delta_t_ * DotProd(Rinnovation, innovation);
 
