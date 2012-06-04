@@ -60,8 +60,8 @@ class PythonObservationManagerTemplate:
     # This method is called after 'SetTime' set the time at which the
     # innovation is requested.
     #  @param[in] state state vector.
-    #  @param[out] innovation innovation vector.
-    def BackwardAdjoint(self, state):
+    #  @return innovation vector.
+    def GetInnovation(self, state):
         return innovation
 
 
