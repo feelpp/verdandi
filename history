@@ -1,3 +1,51 @@
+Version 1.3 (2012-06-04)
+-----------
+
+* Methods
+
+- Modified the model interface so that it only returns references to
+  large vectors and matrices.
+  The model methods
+  'GetTangentLinearOperator(tangent_linear_operator&)',
+  'GetAdjointState(state&)', 'SetAdjointState(state&)',
+  'GetStateErrorVarianceRow(int, state_error_variance_row&)' and
+  'GetStateErrorVarianceSqrt(state_error_variance&, state_error_variance&)'
+  have been replaced with respectively:
+  'tangent_linear_operator& GetTangentLinearOperator()',
+  'state& GetAdjointState()', 'AdjointStateUpdated()',
+  'state_error_variance_row& GetStateErrorVarianceRow(int)',
+  'state_error_variance& GetStateErrorVarianceProjector()' and
+  'state_error_variance_reduced& GetStateErrorVarianceReduced()'.
+- In the model interface, 'ApplyOperator' and 'ApplyTangentLinearOperator'
+  now return the time associated with the computed state.
+- Added an option to 'OptimalInterpolation' to compute the diagonal
+  of the analysis error variance.
+- Added an example for 'HamiltonJacobiBellman' with the quadratic model.
+
+* Observation manager
+
+- Modified the observation manager interface so that it only returns
+  references to large vectors and matrices.
+  The observation manager methods
+  'GetObservation(observation&)', 'GetInnovation(state&, observation&)' and
+  'GetTangentLinearOperatorRow(int, tangent_linear_operator_row&)'
+  have been replaced with respectively:
+  'observation& GetObservation()', observation& GetInnovation(state&)' and
+  'tangent_linear_operator_row& GetTangentLinearOperatorRow(int)'.
+
+* Example observation managers
+
+- Initial import of 'ObservationGenerator'.
+- Improved the performance of 'PetscLinearObservationManager'.
+- Modified 'GridToNetworkObservationManager' so that it can read
+  observations stored in a Seldon vector format.
+
+* Documentation
+
+- Added documentation about the optimization solver.
+- Improved documentation related to exceptions.
+
+
 Version 1.2.1 (2012-04-10)
 -------------
 
