@@ -476,15 +476,11 @@ namespace Verdandi
         displacement_0_.GetProcessorRange(disp_start, disp_end);
         int state_start, state_end;
         state_.GetProcessorRange(state_start, state_end);
-
         for (int i = disp_start; i < disp_end; i++)
+        {
             state_.SetBuffer(state_start++, displacement_0_(i));
-
-        int velo_start, velo_end;
-        velocity_0_.GetProcessorRange(velo_start, velo_end);
-        for (int i = velo_start; i < velo_end; i++)
             state_.SetBuffer(state_start++, velocity_0_(i));
-
+        }
         if (rank_ == Nprocess_ - 1)
             for (unsigned int i = 0; i < reduced_.size(); i++)
                 for (int j = 0; j < parameter_.GetVector(reduced_[i])
@@ -507,26 +503,20 @@ namespace Verdandi
     {
         int disp_start, disp_end;
         displacement_0_.GetProcessorRange(disp_start, disp_end);
-        int velo_start, velo_end;
-        velocity_0_.GetProcessorRange(velo_start, velo_end);
         int state_start, state_end;
         state_.GetProcessorRange(state_start, state_end);
-
         for (int i = disp_start; i < disp_end; i++)
+        {
             displacement_0_.SetBuffer(i, x(state_start++));
-
-        for (int i = velo_start; i < velo_end; i++)
             velocity_0_.SetBuffer(i, x(state_start++));
-
+        }
         if (rank_ == Nprocess_ - 1)
             for (unsigned int i = 0; i < reduced_.size(); i++)
                 for (int j = 0; j < parameter_.GetVector(reduced_[i])
                          .GetSize(); j++)
                     parameter_.GetVector(reduced_[i])(j) = x(state_start++);
-
         displacement_0_.Flush();
         velocity_0_.Flush();
-
         for (unsigned int i = 0; i < reduced_.size(); i++)
             MPI_Bcast(parameter_.GetVector(reduced_[i]).GetData(),
                       parameter_.GetVector(reduced_[i]).GetM(),
@@ -546,15 +536,11 @@ namespace Verdandi
         displacement_0_.GetProcessorRange(disp_start, disp_end);
         int state_start, state_end;
         state_.GetProcessorRange(state_start, state_end);
-
         for (int i = disp_start; i < disp_end; i++)
+        {
             state_.SetBuffer(state_start++, displacement_0_(i));
-
-        int velo_start, velo_end;
-        velocity_0_.GetProcessorRange(velo_start, velo_end);
-        for (int i = velo_start; i < velo_end; i++)
             state_.SetBuffer(state_start++, velocity_0_(i));
-
+        }
         if (rank_ == Nprocess_ - 1)
             for (unsigned int i = 0; i < reduced_.size(); i++)
                 for (int j = 0; j < parameter_.GetVector(reduced_[i])
@@ -573,27 +559,21 @@ namespace Verdandi
     {
         int disp_start, disp_end;
         displacement_0_.GetProcessorRange(disp_start, disp_end);
-        int velo_start, velo_end;
-        velocity_0_.GetProcessorRange(velo_start, velo_end);
         int state_start, state_end;
         state_.GetProcessorRange(state_start, state_end);
-
         for (int i = disp_start; i < disp_end; i++)
+        {
             displacement_0_.SetBuffer(i, state_(state_start++));
-
-        for (int i = velo_start; i < velo_end; i++)
-            velocity_0_.SetBuffer(i, state_(state_start++));
-
+                velocity_0_.SetBuffer(i, state_(state_start++));
+        }
         if (rank_ == Nprocess_ - 1)
             for (unsigned int i = 0; i < reduced_.size(); i++)
                 for (int j = 0; j < parameter_.GetVector(reduced_[i])
                          .GetSize(); j++)
                     parameter_.GetVector(reduced_[i])(j)
                         = state_(state_start++);
-
         displacement_0_.Flush();
         velocity_0_.Flush();
-
         for (unsigned int i = 0; i < reduced_.size(); i++)
             MPI_Bcast(parameter_.GetVector(reduced_[i]).GetData(),
                       parameter_.GetVector(reduced_[i]).GetM(),
