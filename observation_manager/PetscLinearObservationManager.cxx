@@ -172,15 +172,10 @@ namespace Verdandi
         configuration.Set("operator.Nobservation", Nobservation_);
         configuration.Set("error.variance", "v > 0", error_variance_value_);
 
-        tangent_operator_matrix_.Reallocate(Nstate_model_, Nobservation_,
-                                            Nlocal_state_model_);
-
-        if(rank_ == 0)
-            for(int i = 0; i < Nobservation_; i++)
-                tangent_operator_matrix_.SetBuffer(i, i,
-                                                   operator_diagonal_value_);
-        tangent_operator_matrix_.Flush();
-
+        if (Nobservation_ > Nlocal_state_model_)
+            throw ErrorConfiguration("InitializeOperator", "Nobservation = "
+                        + to_str(Nobservation_) + " should be lower than "
+                        " Nlocal_state = " + to_str(Nlocal_state_model_));
 
 #ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
         build_diagonal_sparse_matrix(Nobservation_,
@@ -1604,33 +1599,14 @@ namespace Verdandi
     {
         if (x.GetSize() == 0)
             return;
-
-        state Hx;
-        Hx.Reallocate(Nobservation_);
-
-        MatMultTranspose(tangent_operator_matrix_.GetPetscMatrix(),
-                         x.GetPetscVector(), Hx.GetPetscVector());
-
-        Vec Hx_seq;
-        VecScatter ctx;
-        VecScatterCreateToAll(Hx.GetPetscVector(), &ctx, &Hx_seq);
-        VecScatterBegin(ctx, Hx.GetPetscVector(), Hx_seq,
-                        INSERT_VALUES,SCATTER_FORWARD);
-        VecScatterEnd(ctx, Hx.GetPetscVector(), Hx_seq,
-                      INSERT_VALUES, SCATTER_FORWARD);
-        VecScatterDestroy(&ctx);
-
-        PetscInt ix[Nobservation_];
-        PetscScalar Hx_seq_data[Nobservation_];
-        Vector<int> ix_v;
-        ix_v.SetData(Nobservation_, ix);
-        ix_v.Fill();
-        ix_v.Nullify();
-        VecGetValues(Hx_seq, Nobservation_ , ix, Hx_seq_data);
-        Vector<T> Hx_seq_v;
-        Hx_seq_v.SetData(Nobservation_, Hx_seq_data);
-        y.Copy(Hx_seq_v);
-        Hx_seq_v.Nullify();
+        if (rank_ == 0)
+        {
+            Copy(x, y);
+            y.Resize(Nobservation_);
+        }
+        else
+            y.Reallocate(Nobservation_);
+        MPI_Bcast(y.GetData(), Nobservation_, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     }
 
 
