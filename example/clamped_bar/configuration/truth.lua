@@ -60,4 +60,5 @@ forward = {
 
 
 observation_generator = forward
-observation_generator.output_saver.variable_list = {"observation"}
+observation_generator.output_saver.variable_list
+    = {"observation", "state_forecast"}
