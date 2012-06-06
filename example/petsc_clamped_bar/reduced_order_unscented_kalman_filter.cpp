@@ -9,10 +9,11 @@
 
 //#define VERDANDI_WITH_DIRECT_SOLVER
 //#define SELDON_WITH_MUMPS
-//#define VERDANDI_WITH_MPI
 //#define VERDANDI_WITH_OMP
 
 //#define VERDANDI_LOGGING_LEVEL -7
+
+//#define VERDANDI_WITH_MPI
 
 #if defined(VERDANDI_WITH_MPI)
 #include <mpi.h>

@@ -37,11 +37,11 @@ namespace Verdandi
 
     //! Main constructor.
     /*! Builds the driver and reads option keys in the configuration file.
-     \param[in] configuration configuration file.
-     */
+      \param[in] configuration configuration file.
+    */
     template <class Model, class ObservationManager>
     ObservationGenerator<Model, ObservationManager>::ObservationGenerator():
-    iteration_(-1)
+        iteration_(-1)
     {
 
         /*** Initializations ***/
@@ -69,9 +69,9 @@ namespace Verdandi
 
     //! Initializes the simulation.
     /*! Initializes the model.
-     \param[in] configuration_file configuration file to be given to the
-     model initialization method.
-     */
+      \param[in] configuration_file configuration file to be given to the
+      model initialization method.
+    */
     template <class Model, class ObservationManager>
     void ObservationGenerator<Model, ObservationManager>
     ::Initialize(string configuration_file, bool initialize_model,
@@ -84,9 +84,9 @@ namespace Verdandi
 
     //! Initializes the simulation.
     /*! Initializes the model.
-     \param[in] configuration configuration file to be given to the
-     model initialization method.
-     */
+      \param[in] configuration configuration file to be given to the
+      model initialization method.
+    */
     template <class Model, class ObservationManager>
     void ObservationGenerator<Model, ObservationManager>
     ::Initialize(VerdandiOps& configuration, bool initialize_model,
@@ -96,6 +96,26 @@ namespace Verdandi
 
         configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("observation_generator.");
+
+#ifdef VERDANDI_WITH_MPI
+        MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
+        MPI_Comm_size(MPI_COMM_WORLD, &Nprocess_);
+        configuration.Set("mpi_grid.Nrow", Nrow_);
+        configuration.Set("mpi_grid.Ncol", Ncol_);
+
+        if (Nprocess_ != Nrow_ * Ncol_)
+            throw ErrorConfiguration("ObservationGenerator<Model>::Initialize"
+                                     , "Wrong number of processes: " +
+                                     to_str(Nprocess_)
+                                     + ". The dimension of the MPI grid ("
+                                     + to_str(Nrow_) + ", " + to_str(Ncol_) +
+                                     ") requires " + to_str(Nrow_ * Ncol_)
+                                     + " processes.");
+
+        SetGridCommunicator(Nrow_, Ncol_, &row_communicator_,
+                            &col_communicator_);
+        MPI_Comm_rank(row_communicator_, &model_task_);
+#endif
 
 
         /*********
@@ -107,15 +127,26 @@ namespace Verdandi
                           configuration_file_,
                           model_configuration_file_);
         if (initialize_model)
+        {
+#ifdef VERDANDI_WITH_MPI
+            model_.SetMPICommunicator(col_communicator_);
+#endif
             model_.Initialize(model_configuration_file_);
+        }
+
 
         configuration.Set("observation_manager.configuration_file", "",
                           configuration_file_,
                           observation_configuration_file_);
         if (initialize_observation_manager)
+        {
+#ifdef VERDANDI_WITH_MPI
+            observation_manager_.SetMPICommunicator(col_communicator_);
+#endif
+
             observation_manager_.Initialize(model_,
                                             observation_configuration_file_);
-
+        }
 
         /***************************
          * Reads the configuration *
@@ -128,6 +159,10 @@ namespace Verdandi
         configuration.Set("display.show_iteration", show_iteration_);
         // Should the time be displayed on screen?
         configuration.Set("display.show_time", show_time_);
+#ifdef VERDANDI_WITH_MPI
+        // Should the MPI grid be displayed on screen?
+        configuration.Set("display.show_mpi_grid", show_mpi_grid_);
+#endif
 
         if (show_iteration_)
             Logger::StdOut(*this, "Initialization");
@@ -135,6 +170,30 @@ namespace Verdandi
             Logger::Log<-3>(*this, "Initialization");
 
         iteration_ = 0;
+
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+            if (show_mpi_grid_)
+                Logger::StdOut(*this, "world rank\tmodel task\tmodel rank");
+            else
+                Logger::Log<-3>(*this,
+                                "world rank\tmodel task\tmodel rank");
+        }
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        int model_rank;
+        MPI_Comm_rank(col_communicator_, &model_rank);
+        if (show_mpi_grid_)
+            Logger::StdOut(*this, to_str(world_rank_) + "\t\t"
+                           + to_str(model_task_) + "\t\t" +
+                           to_str(model_rank));
+        else
+            Logger::Log<-3>(*this, to_str(world_rank_) + "\t\t"
+                            + to_str(model_task_) + "\t\t" +
+                            to_str(model_rank));
+#endif
+
 
         /*** Ouput saver ***/
 
@@ -186,6 +245,10 @@ namespace Verdandi
 
         MessageHandler::Send(*this, "all", "::Forward begin");
 
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
         if (show_time_)
             Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
@@ -197,6 +260,9 @@ namespace Verdandi
         else
             Logger::Log<-3>(*this, "Iteration " + to_str(iteration_) + " -> "
                             + to_str(iteration_ + 1));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
 
         model_.Forward();
         iteration_++;
@@ -240,8 +306,8 @@ namespace Verdandi
 
     //! Checks whether the model has finished.
     /*!
-     \return True if no more data assimilation is required, false otherwise.
-     */
+      \return True if no more data assimilation is required, false otherwise.
+    */
     template <class Model, class ObservationManager>
     bool ObservationGenerator<Model, ObservationManager>::HasFinished()
     {
@@ -251,8 +317,8 @@ namespace Verdandi
 
     //! Returns the model.
     /*!
-     \return The model.
-     */
+      \return The model.
+    */
     template <class Model, class ObservationManager>
     Model& ObservationGenerator<Model, ObservationManager>::GetModel()
     {
@@ -262,8 +328,8 @@ namespace Verdandi
 
     //! Returns the output saver.
     /*!
-     \return The output saver.
-     */
+      \return The output saver.
+    */
     template <class Model, class ObservationManager>
     OutputSaver&
     ObservationGenerator<Model, ObservationManager>::GetOutputSaver()
@@ -274,8 +340,8 @@ namespace Verdandi
 
     //! Returns the name of the class.
     /*!
-     \return The name of the class.
-     */
+      \return The name of the class.
+    */
     template <class Model, class ObservationManager>
     string ObservationGenerator<Model, ObservationManager>::GetName() const
     {
@@ -285,8 +351,8 @@ namespace Verdandi
 
     //! Receives and handles a message.
     /*
-     \param[in] message the received message.
-     */
+      \param[in] message the received message.
+    */
     template <class Model, class ObservationManager>
     void  ObservationGenerator<Model, ObservationManager>
     ::Message(string message)

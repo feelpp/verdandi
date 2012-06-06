@@ -10,6 +10,12 @@
 //#define VERDANDI_WITH_DIRECT_SOLVER
 //#define SELDON_WITH_MUMPS
 
+#define VERDANDI_WITH_MPI
+
+#if defined(VERDANDI_WITH_MPI)
+#include <mpi.h>
+#endif
+
 #include <petscmat.h>
 #include <petscvec.h>
 #include <petscksp.h>

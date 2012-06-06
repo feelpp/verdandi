@@ -121,8 +121,17 @@ namespace Verdandi
         //! Are current observations loaded.
         bool observation_loaded_;
 
+        /*** MPI parameters ***/
+
+        //! The rank of the current process in MPI_COMM_WORLD.
+        int world_rank_;
+        //! The rank of the current process in mpi_communicator_.
         int rank_;
+        //! The number of processes in MPI_COMM_WORLD.
+        int Nworld_process_;
+        //! The number of processes in mpi_communicator_.
         int Nprocess_;
+        //! MPI communicator.
         MPI_Comm mpi_communicator_;
 
         /*** Observation times ***/
@@ -158,8 +167,9 @@ namespace Verdandi
 
         /*** Model domain ***/
 
-        //! The size of a model state.
+        //! The size of a model state vector.
         int Nstate_model_;
+        //! The size of a local model state vector.
         int Nlocal_state_model_;
 
         //! Innovation currently stored.
@@ -182,6 +192,7 @@ namespace Verdandi
         void Initialize(Model& model, string configuration_file);
         template <class Model>
         void InitializeOperator(Model& model, string configuration_file);
+        void SetMPICommunicator(MPI_Comm& mpi_communicator);
 
         void DiscardObservation(bool discard_observation);
         int CreateTrack();

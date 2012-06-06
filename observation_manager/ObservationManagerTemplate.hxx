@@ -73,6 +73,14 @@ namespace Verdandi
 
 
         /////////////////
+        // PARALLEL OM //
+        /////////////////
+
+#ifdef VERDANDI_WITH_MPI
+        void SetMPICommunicator(MPI_Comm& mpi_communicator);
+#endif
+
+        /////////////////
         // OBSERVATION //
         /////////////////
 

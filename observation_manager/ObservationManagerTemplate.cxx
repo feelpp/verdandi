@@ -101,6 +101,24 @@ namespace Verdandi
 
 
     /////////////////
+    // PARALLEL OM //
+    /////////////////
+
+
+#ifdef VERDANDI_WITH_MPI
+    //! Sets the MPI communicator.
+    /*!
+     \param[in] mpi_communicator the MPI communicator to be set.
+     */
+    void ObservationManagerTemplate>
+    ::SetMPICommunicator(MPI_Comm& mpi_communicator)
+    {
+        throw ErrorUndefined("void ObservationManagerTemplate::"
+                             "SetMPICommunicator(MPI_Comm&)");
+    }
+#endif
+
+    /////////////////
     // OBSERVATION //
     /////////////////
 

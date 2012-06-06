@@ -928,6 +928,31 @@ namespace Verdandi
     }
 
 
+#ifdef VERDANDI_WITH_MPI
+    //! Builds the row and the column communicator of the current process.
+    /*! Builds the row and the column communicator of the current process in a
+      grid of size \a Nrow * \a Ncol.
+      \param[in] Nrow the number of row of the grid.
+      \param[in] Ncol the number of column of the grid.
+      \param[out] row_communicator current process MPI row communicator.
+      \param[out] col_communicator current process MPI column communicator.
+    */
+    void SetGridCommunicator(int Nrow, int Ncol, MPI_Comm *row_communicator,
+                             MPI_Comm *col_communicator)
+   {
+       int irow, icol, color, key, world_rank;
+       // Establishes the row and column to which this processor belongs.
+       MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+       irow = world_rank % Nrow;
+       icol = world_rank / Nrow;
+       color = irow;
+       key = world_rank;
+       MPI_Comm_split(MPI_COMM_WORLD, color, key, row_communicator);
+       color = icol;
+       MPI_Comm_split(MPI_COMM_WORLD, color, key, col_communicator);
+   }
+#endif
+
 } // namespace Verdandi.
 
 

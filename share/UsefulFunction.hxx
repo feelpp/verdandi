@@ -159,6 +159,10 @@ namespace Verdandi
     void Reallocate(Vector<T0, Storage0, Allocator0>& V, int i,
                     const Model& model);
 
+#ifdef VERDANDI_WITH_MPI
+    void SetGridCommunicator(int Nrow, int Ncol, MPI_Comm *row_communicator,
+                             MPI_Comm *col_communicator);
+#endif
 
 } // namespace Verdandi.
 

@@ -89,6 +89,11 @@ namespace Verdandi
         void FinalizeStep();
         void Finalize();
 
+        // Parallel model.
+#ifdef VERDANDI_WITH_MPI
+        void SetMPICommunicator(MPI_Comm& mpi_communicator);
+#endif
+
         // Operators.
         double ApplyOperator(state& x, bool forward = false,
                              bool preserve_state = true);

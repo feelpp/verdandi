@@ -42,7 +42,8 @@ namespace Verdandi
       with this implementation.
     */
     template <class T>
-    PetscLinearObservationManager<T>::PetscLinearObservationManager()
+    PetscLinearObservationManager<T>::PetscLinearObservationManager():
+        mpi_communicator_(MPI_COMM_WORLD)
     {
     }
 
@@ -58,7 +59,8 @@ namespace Verdandi
     PetscLinearObservationManager<T>
     ::PetscLinearObservationManager(Model& model,
                                     string configuration_file):
-        observation_aggregator_(configuration_file)
+        observation_aggregator_(configuration_file),
+        mpi_communicator_(MPI_COMM_WORLD)
     {
     }
 
@@ -152,8 +154,11 @@ namespace Verdandi
     void PetscLinearObservationManager<T>
     ::InitializeOperator(Model& model, string configuration_file)
     {
-        mpi_communicator_ = PETSC_COMM_WORLD;
         int ierr;
+        ierr = MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
+        CHKERRABORT(mpi_communicator_, ierr);
+        ierr = MPI_Comm_size(MPI_COMM_WORLD, &Nworld_process_);
+        CHKERRABORT(mpi_communicator_, ierr);
         ierr = MPI_Comm_rank(mpi_communicator_, &rank_);
         CHKERRABORT(mpi_communicator_, ierr);
         ierr = MPI_Comm_size(mpi_communicator_, &Nprocess_);
@@ -187,6 +192,18 @@ namespace Verdandi
         Mlt(T(T(1)/ error_variance_value_), error_variance_inverse_);
 #endif
 
+    }
+
+
+    //! Sets the MPI communicator.
+    /*!
+     \param[in] mpi_communicator the MPI communicator to be set.
+     */
+    template <class T>
+    void PetscLinearObservationManager<T>
+    ::SetMPICommunicator(MPI_Comm& mpi_communicator)
+    {
+        mpi_communicator_ = mpi_communicator;
     }
 
 
@@ -1353,7 +1370,7 @@ namespace Verdandi
             observation.Read(file_stream);
         }
         MPI_Bcast(observation.GetData(), Nobservation_, MPI_DOUBLE, 0,
-                  MPI_COMM_WORLD);
+                  mpi_communicator_);
     }
 
 
@@ -1606,7 +1623,8 @@ namespace Verdandi
         }
         else
             y.Reallocate(Nobservation_);
-        MPI_Bcast(y.GetData(), Nobservation_, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        MPI_Bcast(y.GetData(), Nobservation_, MPI_DOUBLE,
+                  0, mpi_communicator_);
     }
 
 

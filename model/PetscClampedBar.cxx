@@ -46,7 +46,8 @@ namespace Verdandi
 
     //! Constructor.
     template <class T>
-    PetscClampedBar<T>::PetscClampedBar(): time_(0.), current_row_(-1)
+    PetscClampedBar<T>::PetscClampedBar(): time_(0.), current_row_(-1),
+                                           mpi_communicator_(MPI_COMM_WORLD)
     {
     }
 
@@ -57,7 +58,7 @@ namespace Verdandi
     */
     template <class T>
     PetscClampedBar<T>::PetscClampedBar(string configuration_file):
-        time_(0.), current_row_(-1)
+        time_(0.), current_row_(-1), mpi_communicator_(MPI_COMM_WORLD)
     {
     }
 
@@ -82,8 +83,11 @@ namespace Verdandi
     template <class T>
     void PetscClampedBar<T>::Initialize(string configuration_file)
     {
-        mpi_communicator_ = PETSC_COMM_WORLD;
         int ierr;
+        ierr = MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
+        CHKERRABORT(mpi_communicator_, ierr);
+        ierr = MPI_Comm_size(MPI_COMM_WORLD, &Nworld_process_);
+        CHKERRABORT(mpi_communicator_, ierr);
         ierr = MPI_Comm_rank(mpi_communicator_, &rank_);
         CHKERRABORT(mpi_communicator_, ierr);
         ierr = MPI_Comm_size(mpi_communicator_, &Nprocess_);
@@ -180,10 +184,13 @@ namespace Verdandi
 
         /*** State initialization ***/
 
+        displacement_0_.SetCommunicator(mpi_communicator_);
         displacement_0_.Reallocate(Ndof_);
         displacement_0_.Fill(T(0));
+        velocity_0_.SetCommunicator(mpi_communicator_);
         velocity_0_.Reallocate(Ndof_);
         velocity_0_.Fill(T(0));
+        rhs_.SetCommunicator(mpi_communicator_);
         rhs_.Reallocate(Ndof_);
         rhs_.Fill(T(1));
 
@@ -206,10 +213,23 @@ namespace Verdandi
         if (rank_ == Nprocess_ - 1)
             Nstate_local_ += Nreduced_;
 
+        state_.SetCommunicator(mpi_communicator_);
         state_.Reallocate(Nstate_, Nstate_local_);
+        state_.Fill(T(0));
 
         newmark_0_assembled_ = false;
         newmark_1_assembled_ = false;
+    }
+
+
+    //! Sets the MPI communicator.
+    /*!
+      \param[in] mpi_communicator the MPI communicator to be set.
+    */
+    template <class T>
+    void PetscClampedBar<T>::SetMPICommunicator(MPI_Comm& mpi_communicator)
+    {
+        mpi_communicator_ = mpi_communicator;
     }
 
 
@@ -255,7 +275,7 @@ namespace Verdandi
     template <class T>
     void PetscClampedBar<T>::Forward(bool update_force)
     {
-        //Timer timer;
+
         /*** Update time ***/
 
         time_ += Delta_t_;
@@ -265,7 +285,9 @@ namespace Verdandi
         if (update_force)
         {
             AssembleMassMatrix(theta_force_, theta_force_index_);
-            state one(Ndof_);
+            state one;
+            one.SetCommunicator(mpi_communicator_);
+            one.Reallocate(Ndof_);
             one.Fill(T(1));
             MltAdd(T(sin(Pi_ * (time_ + 0.5 * Delta_t_) / final_time_)),
                    mass_, one, T(0), rhs_);
@@ -280,8 +302,12 @@ namespace Verdandi
         AssembleNewMarkMatrix0();
         AssembleNewMarkMatrix1();
 
-        state displacement_1(Ndof_);
-        state velocity_1(Ndof_);
+        state displacement_1;
+        displacement_1.SetCommunicator(mpi_communicator_);
+        displacement_1.Reallocate(Ndof_);
+        state velocity_1;
+        velocity_1.SetCommunicator(mpi_communicator_);
+        velocity_1.Reallocate(Ndof_);
         velocity_1.Fill(T(0));
 
         MltAdd(T(2) / Delta_t_, mass_, displacement_0_, T(1), rhs_);
@@ -564,7 +590,7 @@ namespace Verdandi
         for (int i = disp_start; i < disp_end; i++)
         {
             displacement_0_.SetBuffer(i, state_(state_start++));
-                velocity_0_.SetBuffer(i, state_(state_start++));
+            velocity_0_.SetBuffer(i, state_(state_start++));
         }
         if (rank_ == Nprocess_ - 1)
             for (unsigned int i = 0; i < reduced_.size(); i++)
@@ -703,6 +729,7 @@ namespace Verdandi
         int Nreduced = 0;
         for (unsigned int i = 0; i < reduced_.size(); i++)
             Nreduced += parameter_.GetVector(reduced_[i]).GetSize();
+        state_error_variance_projector_.SetCommunicator(mpi_communicator_);
         state_error_variance_projector_.Reallocate(Nstate_,
                                                    Nreduced_, Nstate_local_);
         if (rank_ == Nprocess_ - 1)
@@ -1072,6 +1099,12 @@ namespace Verdandi
         Matrix<T, General, RowSparse> tridiagonal_rs(Ndof_, Ndof_);
         Copy(tridiagonal_array, tridiagonal_rs);
 
+        mass_.SetCommunicator(mpi_communicator_);
+        newmark_0_.SetCommunicator(mpi_communicator_);
+        newmark_1_.SetCommunicator(mpi_communicator_);
+        damp_.SetCommunicator(mpi_communicator_);
+        stiffness_.SetCommunicator(mpi_communicator_);
+
         mass_.Copy(tridiagonal_rs);
         newmark_0_.Copy(mass_);
         newmark_1_.Copy(mass_);
@@ -1088,20 +1121,20 @@ namespace Verdandi
         int ierr;
         KSP ksp;
         PC pc;
-        ierr = KSPCreate(PETSC_COMM_WORLD, &ksp);
-        CHKERRABORT(PETSC_COMM_WORLD, ierr);
+        ierr = KSPCreate(mpi_communicator_, &ksp);
+        CHKERRABORT(mpi_communicator_, ierr);
         ierr = KSPSetOperators(ksp, A.GetPetscMatrix(), A.GetPetscMatrix(),
                                DIFFERENT_NONZERO_PATTERN);
-        CHKERRABORT(PETSC_COMM_WORLD, ierr);
+        CHKERRABORT(mpi_communicator_, ierr);
         ierr = KSPGetPC(ksp,&pc);
-        CHKERRABORT(PETSC_COMM_WORLD, ierr);
+        CHKERRABORT(mpi_communicator_, ierr);
         ierr = KSPSetType(ksp, KSPGMRES);
-        CHKERRABORT(PETSC_COMM_WORLD, ierr);
+        CHKERRABORT(mpi_communicator_, ierr);
         ierr = KSPSetTolerances(ksp, 1.e-6, PETSC_DEFAULT,
                                 PETSC_DEFAULT, PETSC_DEFAULT);
-        CHKERRABORT(PETSC_COMM_WORLD, ierr);
+        CHKERRABORT(mpi_communicator_, ierr);
         ierr = KSPSolve(ksp, b.GetPetscVector(), x.GetPetscVector());
-        CHKERRABORT(PETSC_COMM_WORLD, ierr);
+        CHKERRABORT(mpi_communicator_, ierr);
         KSPDestroy(&ksp);
     }
 

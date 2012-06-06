@@ -45,7 +45,8 @@ forward = {
    display = {
 
       show_iteration = false,
-      show_time = true
+      show_time = true,
+      show_mpi_grid = true
 
    },
 
@@ -54,6 +55,14 @@ forward = {
       configuration = output_directory .. "truth.lua",
       log = output_directory .. "truth.log"
 
+   },
+
+  mpi_grid = {
+
+      -- The number of processes for each model task.
+      Nrow = 3,
+      -- The number of model tasks.
+      Ncol = 1
    }
 
 }

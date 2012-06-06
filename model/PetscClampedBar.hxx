@@ -148,13 +148,6 @@ namespace Verdandi
         // Damp FEM matrix.
         Matrix<T, General, RowMajor> damp_FEM_matrix_;
 
-        //! The MPI communicator to use.
-        MPI_Comm mpi_communicator_;
-        //! Process rank.
-        int rank_;
-        //! Process rank.
-        int Nprocess_;
-
         //! Mass matrix.
         Matrix<T, General, PETScMPIAIJ> mass_;
         //! Newmark matrix 0.
@@ -194,6 +187,18 @@ namespace Verdandi
         //! Value of the row of B currently stored.
         state_error_variance_row state_error_variance_row_;
 
+        /*** MPI parameters ***/
+
+        //! The rank of the current process in MPI_COMM_WORLD.
+        int world_rank_;
+        //! The rank of the current process in mpi_communicator_.
+        int rank_;
+        //! The number of processes in MPI_COMM_WORLD.
+        int Nworld_process_;
+        //! The number of processes in mpi_communicator_.
+        int Nprocess_;
+        //! MPI communicator.
+        MPI_Comm mpi_communicator_;
 
         static const double Pi_;
 
@@ -208,6 +213,7 @@ namespace Verdandi
         PetscClampedBar(string configuration_file);
         ~PetscClampedBar();
         void Initialize(string configuration_file);
+        void SetMPICommunicator(MPI_Comm& mpi_communicator);
         void Finalize();
         void InitializeFirstStep();
         void InitializeStep();

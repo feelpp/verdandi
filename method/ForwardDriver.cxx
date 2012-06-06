@@ -92,6 +92,24 @@ namespace Verdandi
         configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("forward.");
 
+#ifdef VERDANDI_WITH_MPI
+        MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
+        MPI_Comm_size(MPI_COMM_WORLD, &Nprocess_);
+        configuration.Set("mpi_grid.Nrow", Nrow_);
+        configuration.Set("mpi_grid.Ncol", Ncol_);
+
+        if (Nprocess_ != Nrow_ * Ncol_)
+            throw ErrorConfiguration("ForwardDriver<Model>::Initialize",
+                                     "Wrong number of processes: " + to_str(Nprocess_)
+                                     + ". The dimension of the MPI grid ("
+                                     + to_str(Nrow_) + ", " + to_str(Ncol_) +
+                                     ") requires " + to_str(Nrow_ * Ncol_)
+                                     + " processes.");
+
+        SetGridCommunicator(Nrow_, Ncol_, &row_communicator_,
+                            &col_communicator_);
+        MPI_Comm_rank(row_communicator_, &model_task_);
+#endif
 
         /*********
          * Model *
@@ -102,8 +120,12 @@ namespace Verdandi
                           configuration_file_,
                           model_configuration_file_);
         if (initialize_model)
+        {
+#ifdef VERDANDI_WITH_MPI
+            model_.SetMPICommunicator(col_communicator_);
+#endif
             model_.Initialize(model_configuration_file_);
-
+        }
 
         /***************************
          * Reads the configuration *
@@ -116,6 +138,10 @@ namespace Verdandi
         configuration.Set("display.show_iteration", show_iteration_);
         // Should the time be displayed on screen?
         configuration.Set("display.show_time", show_time_);
+#ifdef VERDANDI_WITH_MPI
+        // Should the MPI grid be displayed on screen?
+        configuration.Set("display.show_mpi_grid", show_mpi_grid_);
+#endif
 
         if (show_iteration_)
             Logger::StdOut(*this, "Initialization");
@@ -123,6 +149,29 @@ namespace Verdandi
             Logger::Log<-3>(*this, "Initialization");
 
         iteration_ = 0;
+
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+            if (show_mpi_grid_)
+                Logger::StdOut(*this, "world rank\tmodel task\tmodel rank");
+            else
+                Logger::Log<-3>(*this,
+                                "world rank\tmodel task\tmodel rank");
+        }
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        int model_rank;
+        MPI_Comm_rank(col_communicator_, &model_rank);
+        if (show_mpi_grid_)
+            Logger::StdOut(*this, to_str(world_rank_) + "\t\t"
+                           + to_str(model_task_) + "\t\t" +
+                           to_str(model_rank));
+        else
+            Logger::Log<-3>(*this, to_str(world_rank_) + "\t\t"
+                            + to_str(model_task_) + "\t\t" +
+                            to_str(model_rank));
+#endif
 
         /*** Ouput saver ***/
 
@@ -172,7 +221,10 @@ namespace Verdandi
         time_.PushBack(model_.GetTime());
 
         MessageHandler::Send(*this, "all", "::Forward begin");
-
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
         if (show_time_)
             Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
@@ -184,6 +236,9 @@ namespace Verdandi
         else
             Logger::Log<-3>(*this, "Iteration " + to_str(iteration_) + " -> "
                             + to_str(iteration_ + 1));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
 
         model_.Forward();
         iteration_++;

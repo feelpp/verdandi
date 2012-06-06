@@ -54,7 +54,8 @@ reduced_order_unscented_kalman_filter = {
    display = {
 
       show_iteration = false,
-      show_time = true
+      show_time = true,
+      show_mpi_grid = true
 
    },
 
@@ -75,11 +76,13 @@ reduced_order_unscented_kalman_filter = {
 
    },
 
-   mpi = {
+   mpi_grid = {
 
-        algorithm = 0,
-        master_process_contribution = 1.0
-    }
+      -- The number of processes for each model task.
+      Nrow = 3,
+      -- The number of model tasks.
+      Ncol = 1
+   }
 
 }
 
@@ -90,7 +93,8 @@ forward = {
    display = {
 
       show_iteration = false,
-      show_time = true
+      show_time = true,
+      show_mpi_grid = true
 
    },
 
@@ -109,6 +113,14 @@ forward = {
       configuration = output_directory .. "forward.lua",
       log = output_directory .. "forward.log"
 
+   },
+
+   mpi_grid = {
+
+      -- The number of processes for each model task.
+      Nrow = 3,
+      -- The number of model tasks.
+      Ncol = 1
    }
 
 }

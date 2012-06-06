@@ -71,6 +71,26 @@ namespace Verdandi
         //! Should the current time be displayed?
         bool show_time_;
 
+#ifdef VERDANDI_WITH_MPI
+        //! The rank in MPI_COMM_WORLD.
+        int world_rank_;
+        //! The rank in the model communicator.
+        int model_task_;
+        //! The number of rows of the MPI grid.
+        int Nrow_;
+        //! The number of columns of the MPI grid.
+        int Ncol_;
+        //! The number of processes in MPI_COMM_WORLD.
+        int Nprocess_;
+        //! The MPI grid row communicator of the current process.
+        MPI_Comm row_communicator_;
+        //! The MPI grid column communicator of the current process.
+        MPI_Comm col_communicator_;
+
+        //! Should the grid be displayed?
+        bool show_mpi_grid_;
+#endif
+
         /*** Output saver ***/
 
         //! Output saver.

@@ -117,6 +117,23 @@ namespace Verdandi
     }
 
 
+    ////////////////////
+    // PARALLEL MODEL //
+    ////////////////////
+
+
+#ifdef VERDANDI_WITH_MPI
+    //! Sets the MPI communicator.
+    /*!
+     \param[in] mpi_communicator the MPI communicator to be set.
+     */
+    void ModelTemplate::SetMPICommunicator(MPI_Comm& mpi_communicator)
+    {
+        throw ErrorUndefined("ModelTemplate::SetMPICommunicator()");
+    }
+#endif
+
+
     ///////////////
     // OPERATORS //
     ///////////////
