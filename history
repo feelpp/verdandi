@@ -21,7 +21,7 @@ Version 1.2 (2012-03-30)
   'SetFullState(state&)' have been replaced with 'state& GetState()',
   'StateUpdated()', 'state& GetFullState()' and 'FullStateUpdated()'.
   Also replaced the model methods 'GetStateLowerBound(state&)' and
-  'GetStateUpperBound(state&)' with 'state& GetStateLowerBound()' and 
+  'GetStateUpperBound(state&)' with 'state& GetStateLowerBound()' and
   'state& GetStateUpperBound()'.
 - 'ForwardDriver' and 'ReducedOrderUnscentedKalmanFilter' can now efficiently
   handle models parallelized by MPI.
@@ -31,7 +31,7 @@ Version 1.2 (2012-03-30)
 - Added support for parallel computations in 'ComputeBLUE_vector'.
 - Enforced the rule that the member functions of the data assimilation
   methods are non const, except 'GetName'.
-- Modified the interface to 'MonteCarlo' so that it is consistent with the 
+- Modified the interface to 'MonteCarlo' so that it is consistent with the
   interface to 'EnsembleKalmanFilter'.
 - Made 'MonteCarlo' template of the perturbation manager.
 - Added methods 'GetModel', "GetObservationManager', 'GetPerturbationManager',
@@ -77,9 +77,9 @@ Version 1.2 (2012-03-30)
 - Added an interface to the random number generator library from C++ TR1.
 - Set TR1 as the default random number generator library.
 
-* Debugging 
+* Debugging
 
-- Added the option "dump_env" to dump the SCons environment in the file 
+- Added the option "dump_env" to dump the SCons environment in the file
   "scons_env.log"
 
 * Documentation
