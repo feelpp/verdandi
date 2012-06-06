@@ -138,11 +138,11 @@ namespace Verdandi
 
         /*** Ouput saver ***/
 
-        configuration.SetPrefix("forward.output_saver.");
+        configuration.SetPrefix("observation_generator.output_saver.");
         output_saver_.Initialize(configuration);
         output_saver_.Empty("state_forecast");
         output_saver_.Empty("observation");
-        configuration.SetPrefix("forward.");
+        configuration.SetPrefix("observation_generator.");
 
         /*** Logger and read configuration ***/
 
