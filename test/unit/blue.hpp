@@ -39,6 +39,7 @@ public:
     typedef Vector<T> state_error_variance_row;
 protected:
     int Nstate_;
+    state_error_variance_row row_;
 public:
     IdentityStateErrorVariance(int Nstate): Nstate_(Nstate)
     {
@@ -47,11 +48,12 @@ public:
     {
         return Nstate_;
     }
-    void GetStateErrorVarianceRow(int i, state_error_variance_row& row)
+    state_error_variance_row& GetStateErrorVarianceRow(int i)
     {
-        row.Reallocate(Nstate_);
-        row.Zero();
-        row(i) = T(1);
+        row_.Reallocate(Nstate_);
+        row_.Zero();
+        row_(i) = T(1);
+        return row_;
     }
 };
 
@@ -64,6 +66,7 @@ public:
 protected:
     int Nobservation_;
     int Nstate_;
+    tangent_linear_operator_row row_;
 public:
     IdentityObservationManager(int Nobservation, int Nstate):
         Nobservation_(Nobservation), Nstate_(Nstate)
@@ -80,11 +83,12 @@ public:
         else
             return T(0);
     }
-    void GetTangentLinearOperatorRow(int i, tangent_linear_operator_row& row)
+    tangent_linear_operator_row& GetTangentLinearOperatorRow(int i)
     {
-        row.Reallocate(Nstate_);
-        row.Zero();
-        row(i) = T(1);
+        row_.Reallocate(Nstate_);
+        row_.Zero();
+        row_(i) = T(1);
+        return row_;
     }
     T GetErrorVariance(int i, int j)
     {

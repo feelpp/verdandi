@@ -43,7 +43,8 @@ namespace Verdandi
         typedef Matrix<double, General, RowSparse> state_error_variance;
         /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
           decomposition of the state error variance. */
-        typedef Matrix<T, General, RowSparse> state_error_variance_reduced;
+        typedef Matrix<double, General, RowSparse>
+        state_error_variance_reduced;
         //! Type of a row of the state error variance.
         typedef Vector<double, VectSparse> state_error_variance_row;
         //! Type of the state/observation crossed matrix.
@@ -55,7 +56,7 @@ namespace Verdandi
         typedef Matrix<double> state_error_variance;
         /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
           decomposition of the state error variance. */
-        typedef Matrix<T, General, RowSparse> state_error_variance_reduced;
+        typedef Matrix<double> state_error_variance_reduced;
         //! Type of a row of the state error variance.
         typedef Vector<double> state_error_variance_row;
         //! Type of the state/observation crossed matrix.
