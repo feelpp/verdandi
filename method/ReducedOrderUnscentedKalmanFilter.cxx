@@ -48,26 +48,26 @@ namespace Verdandi
     ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
     ::ReducedOrderUnscentedKalmanFilter()
     {
-
-        /*** Initializations ***/
-
-#if defined(VERDANDI_WITH_MPI)
-        MPI::Init();
-        rank_ = MPI::COMM_WORLD.Get_rank();
-        Nprocess_ = MPI::COMM_WORLD.Get_size();
-        if (rank_ == 0)
-        {
-#endif
-            MessageHandler::AddRecipient("model", model_,
-                                         Model::StaticMessage);
-            MessageHandler::AddRecipient("observation_manager",
-                                         observation_manager_,
-                                         ObservationManager::StaticMessage);
-            MessageHandler::AddRecipient("driver", *this,
-                                         ReducedOrderUnscentedKalmanFilter
-                                         ::StaticMessage);
-#if defined(VERDANDI_WITH_MPI)
-        }
+#ifndef VERDANDI_WITH_MPI
+        MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
+        MessageHandler::AddRecipient("observation_manager",
+                                     observation_manager_,
+                                     ObservationManager::StaticMessage);
+        MessageHandler::AddRecipient("driver",
+                                     *this, ReducedOrderUnscentedKalmanFilter
+                                     ::StaticMessage);
+#else
+        MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
+        MPI_Comm_size(MPI_COMM_WORLD, &Nworld_process_);
+        MessageHandler::AddRecipient("model" + to_str(world_rank_), model_,
+                                     Model::StaticMessage);
+        MessageHandler::AddRecipient("observation_manager"
+                                     + to_str(world_rank_),
+                                     observation_manager_,
+                                     ObservationManager::StaticMessage);
+        MessageHandler::AddRecipient("driver" + to_str(world_rank_), *this,
+                                     ReducedOrderUnscentedKalmanFilter
+                                     ::StaticMessage);
 #endif
     }
 
@@ -106,10 +106,7 @@ namespace Verdandi
     ::Initialize(VerdandiOps& configuration,
                  bool initialize_model, bool initialize_observation_manager)
     {
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-#endif
-            MessageHandler::Send(*this, "all", "::Initialize begin");
+        MessageHandler::Send(*this, "all", "::Initialize begin");
 
 
         /***************************
@@ -138,6 +135,11 @@ namespace Verdandi
                           option_display_["show_iteration"]);
         // Should current time be displayed on screen?
         configuration.Set("display.show_time", option_display_["show_time"]);
+#ifdef VERDANDI_WITH_MPI
+        // Should the MPI grid be displayed on screen?
+        configuration.Set("display.show_mpi_grid",
+                          option_display_["show_mpi_grid"]);
+#endif
 
         /*** Assimilation options ***/
 
@@ -156,25 +158,27 @@ namespace Verdandi
                           sigma_point_type_);
 
 #if defined(VERDANDI_WITH_MPI)
+        configuration.Set("mpi_grid.Nrow", Nrow_);
+        configuration.Set("mpi_grid.Ncol", Ncol_);
+        SetGridCommunicator(Nrow_, Ncol_, &row_communicator_,
+                            &col_communicator_);
+        MPI_Comm_rank(row_communicator_, &model_task_);
+        MPI_Comm_size(row_communicator_, &Nprocess_);
 
-        /*** MPI ***/
-
-        configuration.Set("mpi.algorithm", "ops_in(v, {0, 1, 2})",
-                          algorithm_);
-        configuration.Set("mpi.master_process_contribution",
-                          master_process_contribution_);
-        if (master_process_contribution_ < 0. ||
-            master_process_contribution_ > 1.)
-            throw "Contribution of process 0 should be in [0, 1] "
-                "], but " + to_str(master_process_contribution_) +
-                " was provided.";
-
+        if (Nworld_process_ != Nrow_ * Ncol_)
+            throw ErrorConfiguration("ObservationGenerator<Model>::Initialize"
+                                     , "Wrong number of processes: " +
+                                     to_str(Nprocess_)
+                                     + ". The dimension of the MPI grid ("
+                                     + to_str(Nrow_) + ", " + to_str(Ncol_) +
+                                     ") requires " + to_str(Nrow_ * Ncol_)
+                                     + " processes.");
 #endif
 
         /*** Ouput saver ***/
 
 #if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
+        if (model_task_ == 0)
         {
 #endif
             configuration.
@@ -202,12 +206,44 @@ namespace Verdandi
         if (configuration.Exists("output.log"))
             Logger::SetFileName(configuration.Get<string>("output.log"));
 
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+            if (option_display_["show_mpi_grid"])
+                Logger::StdOut(*this, "world rank\tmodel task\tmodel rank");
+            else
+                Logger::Log<-3>(*this,
+                                "world rank\tmodel task\tmodel rank");
+        }
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        int model_rank;
+        MPI_Comm_rank(col_communicator_, &model_rank);
+        if (option_display_["show_mpi_grid"])
+            Logger::StdOut(*this, to_str(world_rank_) + "\t\t"
+                           + to_str(model_task_) + "\t\t" +
+                           to_str(model_rank));
+        else
+            Logger::Log<-3>(*this, to_str(world_rank_) + "\t\t"
+                            + to_str(model_task_) + "\t\t" +
+                            to_str(model_rank));
+#endif
+
+
         /*** Initializations ***/
 
         if (initialize_model)
+        {
+#ifdef VERDANDI_WITH_MPI
+            model_.SetMPICommunicator(col_communicator_);
+#endif
             model_.Initialize(model_configuration_file_);
+        }
         if (initialize_observation_manager)
         {
+#ifdef VERDANDI_WITH_MPI
+            observation_manager_.SetMPICommunicator(col_communicator_);
+#endif
             observation_manager_.Initialize(model_,
                                             observation_configuration_file_);
             observation_manager_.DiscardObservation(false);
@@ -215,7 +251,6 @@ namespace Verdandi
         Nstate_ = model_.GetNstate();
         Nobservation_ = observation_manager_.GetNobservation();
 
-        Copy(model_.GetStateErrorVarianceProjector(), L_);
         Copy(model_.GetStateErrorVarianceReduced(), U_);
         U_inv_.Copy(U_);
 
@@ -260,10 +295,6 @@ namespace Verdandi
         I_.Copy(I_trans_);
         Transpose(I_);
 
-#if defined(VERDANDI_WITH_PETSC)
-        MPI_Comm_rank(PETSC_COMM_WORLD, &rank_);
-#endif
-
         // Initializes D_v.
         D_v_.Reallocate(Nsigma_point_, Nsigma_point_);
         if (alpha_constant_)
@@ -280,7 +311,7 @@ namespace Verdandi
 
         Nlocal_sigma_point_ = int(Nsigma_point_ / Nprocess_);
         int r = Nsigma_point_ % Nprocess_;
-        if (Nprocess_ - rank_ - 1 < r)
+        if (Nprocess_ - model_task_ - 1 < r)
             Nlocal_sigma_point_++;
 
         Nlocal_sigma_point_sum_.Reallocate(Nprocess_ + 1);
@@ -293,61 +324,16 @@ namespace Verdandi
             Nlocal_sigma_point_sum_(i + 1) += Nlocal_sigma_point_sum_(i);
         }
 
-        int Nsigma_point_0;
-        Nsigma_point_0 =  int(master_process_contribution_ *
-                              Nlocal_sigma_point_sum_(1));
-        int q;
-        q = int((Nlocal_sigma_point_sum_(1) - Nsigma_point_0) /
-                (Nprocess_ - 1));
-        r = (Nlocal_sigma_point_sum_(1) - Nsigma_point_0) % (Nprocess_ - 1);
-        for (int i = 1; i < Nprocess_; i++)
-        {
-            Nlocal_sigma_point_sum_(i + 1) -= Nlocal_sigma_point_sum_(1) -
-                Nsigma_point_0;
-            Nlocal_sigma_point_sum_(i + 1) += q * i;
-            if (i <= r)
-                Nlocal_sigma_point_sum_(i + 1) += i;
-            else
-                Nlocal_sigma_point_sum_(i + 1) += r;
-
-        }
-        Nlocal_sigma_point_sum_(1) = Nsigma_point_0;
-        for (int i = Nlocal_sigma_point_sum_(rank_);
-             i < Nlocal_sigma_point_sum_(rank_ + 1); i++)
-            local_sigma_point_.PushBack(i);
-        Nlocal_sigma_point_ = local_sigma_point_.GetM();
-
-        I_trans_global_.Copy(I_trans_);
-        I_trans_.Reallocate(Nlocal_sigma_point_, Nreduced_);
-        sigma_point I_col;
-        for (int i = 0; i < Nlocal_sigma_point_; i++)
-        {
-            GetRow(I_trans_global_, local_sigma_point_(i), I_col);
-            SetRow(I_col, i, I_trans_);
-        }
-
-        /*** Local columns of covariance matrix ***/
-
-        Nlocal_filtered_column_ = int(Nreduced_ / Nprocess_);
-        r = Nreduced_ % Nprocess_;
-        if (Nprocess_ - rank_ - 1 < r)
-            Nlocal_filtered_column_++;
-
-        Nlocal_filtered_column_sum_.Reallocate(Nprocess_ + 1);
-        Nlocal_filtered_column_sum_(0) = 0;
-        for (int i = 0; i < Nprocess_; i++)
-        {
-            Nlocal_filtered_column_sum_(i + 1) = int(Nreduced_ / Nprocess_);
-            if (Nprocess_ - i - 1 < r)
-                Nlocal_filtered_column_sum_(i + 1) += 1;
-            Nlocal_filtered_column_sum_(i + 1)
-                += Nlocal_filtered_column_sum_(i);
-        }
-
-        for (int i = Nlocal_filtered_column_sum_(rank_);
-             i < Nlocal_filtered_column_sum_(rank_ + 1); i++)
-            local_filtered_column_.PushBack(i);
-
+        x_.SetCommunicator(col_communicator_);
+        x_col_.SetCommunicator(col_communicator_);
+        Reallocate(x_col_, model_.GetNstate(), model_);
+        X_i_.SetCommunicator(col_communicator_);
+        Reallocate(X_i_, Nstate_, Nsigma_point_, model_);
+        X_i_local_.SetCommunicator(col_communicator_);
+        Reallocate(X_i_local_, Nstate_, Nlocal_sigma_point_, model_);
+        Z_i_trans_.Reallocate(Nsigma_point_, Nobservation_);
+        HL_trans_.Reallocate(Nreduced_, Nobservation_);
+        HL_trans_R_.Reallocate(Nreduced_, Nobservation_);
 #endif
 
         /*** Assimilation ***/
@@ -355,21 +341,19 @@ namespace Verdandi
         if (analyze_first_step_)
             Analyze();
 
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
+        if (initialize_model)
         {
+#ifndef VERDANDI_WITH_MPI
+            MessageHandler::Send(*this, "model", "initial condition");
+            MessageHandler::Send(*this, "driver", "initial condition");
+#else
+            MessageHandler::Send(*this, "model" + to_str(world_rank_),
+                                 "initial condition");
+            MessageHandler::Send(*this, "driver" + to_str(world_rank_),
+                                 "initial condition");
 #endif
-            if (initialize_model)
-            {
-                MessageHandler::Send(*this, "model", "initial condition");
-                MessageHandler::Send(*this, "driver", "initial condition");
-            }
-
-            MessageHandler::Send(*this, "all", "::Initialize end");
-
-#if defined(VERDANDI_WITH_MPI)
         }
-#endif
+        MessageHandler::Send(*this, "all", "::Initialize end");
     }
 
 
@@ -381,14 +365,14 @@ namespace Verdandi
     ::InitializeStep()
     {
 #if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
+        if (model_task_ == 0)
 #endif
             MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
         model_.InitializeStep();
 
 #if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
+        if (model_task_ == 0)
 #endif
             MessageHandler::Send(*this, "all", "::InitializeStep end");
     }
@@ -399,170 +383,113 @@ namespace Verdandi
     void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
     ::Forward()
     {
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-#endif
-            MessageHandler::Send(*this, "all", "::Forward begin");
+        MessageHandler::Send(*this, "all", "::Forward begin");
 
         if (sigma_point_type_ == "simplex")
         {
 #if defined(VERDANDI_WITH_MPI)
-            model_state& x = model_.GetState();
 
-            if (algorithm_ == 0)
+            x_.Copy(model_.GetState());
+
+            /*** Sampling ***/
+
+            int Nlocal_state = model_.GetLocalNstate();
+            // Local rows, global columns.
+            Matrix<double> X_i_global_double;
+            model_state_error_variance tmp;
+            if (model_task_ == 0)
             {
-                sigma_point_matrix X_i_trans_global;
-                sigma_point x_col;
-                X_i_trans_.Reallocate(Nlocal_sigma_point_, Nstate_);
-                if (rank_ == 0)
-                {
-                    sigma_point_matrix tmp;
-                    GetCholesky(U_inv_);
-                    Copy(L_, tmp);
-                    MltAdd(T(1), tmp, U_inv_, T(0), L_);
-
-                    // Computes X_n^{(i)+}.
-                    X_i_trans_global.Reallocate(Nsigma_point_, Nstate_);
-                    for (int i = 0; i < Nsigma_point_; i++)
-                        SetRow(x, i, X_i_trans_global);
-                    MltAdd(T(1), SeldonNoTrans, I_trans_global_, SeldonTrans,
-                           L_, T(1), X_i_trans_global);
-                }
-
-                int displacement[Nprocess_],  sendcount[Nprocess_];
-                for (int i = 0; i < Nprocess_; i++)
-                {
-                    sendcount[i] = (Nlocal_sigma_point_sum_(i + 1)
-                                    - Nlocal_sigma_point_sum_(i))
-                        * Nstate_;
-                    displacement[i] = Nlocal_sigma_point_sum_(i)
-                        * Nstate_;
-                }
-
-                MPI::COMM_WORLD.Scatterv(X_i_trans_global.GetData(),
-                                         sendcount, displacement, MPI::DOUBLE,
-                                         X_i_trans_.GetData(),
-                                         Nlocal_sigma_point_ * Nstate_,
-                                         MPI::DOUBLE, 0);
-
-                /*** Prediction ***/
-
-                // Computes X_{n + 1}^-.
-                x.Fill(T(0));
-                for (int i = 0; i < Nlocal_sigma_point_; i++)
-                {
-                    GetRow(X_i_trans_, i, x_col);
-                    model_.ApplyOperator(x_col, i + 1 == Nlocal_sigma_point_,
-                                         true);
-                    Add(T(alpha_), x_col, x);
-                    if (rank_ == 0)
-                        SetRow(x_col, i, X_i_trans_global);
-                    SetRow(x_col, i, X_i_trans_);
-                }
-
-                model_state working_vector;
-
-                if (rank_ == 0)
-                {
-                    working_vector.Copy(x);
-                    working_vector.Fill(T(0));
-                }
-
-                MPI::COMM_WORLD.Reduce(x.GetData(), working_vector.GetData(),
-                                       x.GetM(), MPI::DOUBLE, MPI::SUM, 0);
-
-
-                if (rank_ == 0)
-                    Copy(working_vector, x);
-
-                model_.StateUpdated();
-
-                MPI::COMM_WORLD.
-                    Gatherv(X_i_trans_.GetData(),
-                            Nlocal_sigma_point_ * Nstate_, MPI::DOUBLE,
-                            X_i_trans_global.GetData(),  sendcount,
-                            displacement, MPI::DOUBLE, 0);
-
-                if (rank_ == 0)
-                    MltAdd(T(alpha_), SeldonTrans, X_i_trans_global,
-                           SeldonNoTrans, I_trans_global_, T(0), L_);
-            }
-            else if (algorithm_ == 1 || algorithm_ == 2)
-            {
-
-                /*** Sampling ***/
-
-                sigma_point_matrix tmp;
+                X_i_global_double.Reallocate(Nlocal_state, Nsigma_point_);
                 GetCholesky(U_inv_);
-                Copy(L_, tmp);
-                MltAdd(T(1), tmp, U_inv_, T(0), L_);
-
+                Copy(model_.GetStateErrorVarianceProjector(), tmp);
+                MltAdd(T(1), tmp, U_inv_, T(0),
+                       model_.GetStateErrorVarianceProjector());
                 // Computes X_n^{(i)+}.
-                X_i_trans_.Reallocate(Nlocal_sigma_point_, Nstate_);
-                sigma_point x_col;
-                for (int i = 0; i < Nlocal_sigma_point_; i++)
-                    SetRow(x, i, X_i_trans_);
-                MltAdd(T(1), SeldonNoTrans, I_trans_, SeldonTrans, L_, T(1),
-                       X_i_trans_);
+                for (int i = 0; i < Nsigma_point_; i++)
+                    SetCol(x_, i, X_i_);
+                MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
+                       I_, T(1), X_i_);
+                Copy(X_i_, X_i_global_double);
+                Transpose(X_i_global_double);
+            }
 
-                /*** Prediction ***/
+            int displacement[Nprocess_],  sendcount[Nprocess_];
+            for (int i = 0; i < Nprocess_; i++)
+            {
+                sendcount[i] = (Nlocal_sigma_point_sum_(i + 1)
+                                - Nlocal_sigma_point_sum_(i)) * Nlocal_state;
+                displacement[i] = Nlocal_sigma_point_sum_(i) * Nlocal_state;
+            }
 
-                // Computes X_{n + 1}^-.
-                x.Fill(T(0));
-                for (int i = 0; i < Nlocal_sigma_point_; i++)
-                {
-                    GetRow(X_i_trans_, i, x_col);
-                    model_.ApplyOperator(x_col, i + 1 == Nlocal_sigma_point_,
-                                         true);
-                    Add(T(alpha_), x_col, x);
-                    SetRow(x_col, i, X_i_trans_);
-                }
+            // Local rows, local columns.
+            Matrix<double> X_i_local_double(Nlocal_sigma_point_, Nlocal_state);
+            MPI_Scatterv(X_i_global_double.GetData(),
+                         sendcount, displacement, MPI_DOUBLE,
+                         X_i_local_double.GetData(),
+                         Nlocal_sigma_point_ * Nlocal_state,
+                         MPI_DOUBLE, 0, row_communicator_);
+            Transpose(X_i_local_double);
 
-                model_state working_vector;
-                Copy(x, working_vector);
-                MPI::COMM_WORLD.Allreduce(x.GetData(),
-                                          working_vector.GetData(), x.GetM(),
-                                          MPI::DOUBLE, MPI::SUM);
+            Copy(X_i_local_double, X_i_local_);
 
-                int displacement[Nprocess_],  recvcount[Nprocess_];
-                for (int i = 0; i < Nprocess_; i++)
-                {
-                    recvcount[i] = (Nlocal_sigma_point_sum_(i + 1)
-                                    - Nlocal_sigma_point_sum_(i))
-                        * Nstate_;
-                    displacement[i] = Nlocal_sigma_point_sum_(i)
-                        * Nstate_;
-                }
+            /*** Prediction ***/
 
-                // Computes L_{n + 1}.
-                if (algorithm_ == 1)
-                {
-                    sigma_point_matrix
-                        X_i_trans_global(Nsigma_point_, Nstate_);
+            // Computes X_{n + 1}^-.
+            x_.Zero();
+            for (int i = 0; i < Nlocal_sigma_point_; i++)
+            {
+                GetCol(X_i_local_, i, x_col_);
+                model_.ApplyOperator(x_col_, i + 1 == Nlocal_sigma_point_,
+                                     false);
+                Add(T(alpha_), x_col_, x_);
+                SetCol(x_col_, i, X_i_local_);
+            }
 
-                    MPI::COMM_WORLD.
-                        Allgatherv(X_i_trans_.GetData(),
-                                   Nlocal_sigma_point_ * Nstate_, MPI::DOUBLE,
-                                   X_i_trans_global.GetData(),  recvcount,
-                                   displacement, MPI::DOUBLE);
+            Vector<double> x_double, working_vector;
+            Copy(x_, x_double);
+            if (model_task_ == 0)
+            {
+                working_vector.Reallocate(Nlocal_state);
+                working_vector.Fill(0.);
+            }
 
-                    MltAdd(T(alpha_), SeldonTrans, X_i_trans_global,
-                           SeldonNoTrans, I_trans_global_, T(0), L_);
-                }
-                else
-                {
-                    sigma_point_matrix L_local(Nstate_, Nreduced_);
-                    MltAdd(T(alpha_), SeldonTrans, X_i_trans_, SeldonNoTrans,
-                           I_trans_, T(0), L_local);
+            MPI_Reduce(x_double.GetData(), working_vector.GetData(),
+                       x_double.GetM(), MPI_DOUBLE, MPI_SUM,
+                       0, row_communicator_);
 
-                    L_.Fill(T(0));
-                    MPI::COMM_WORLD.
-                        Allreduce(L_local.GetData(), L_.GetData(),
-                                  L_.GetSize(), MPI::DOUBLE, MPI::SUM);
-                }
-
+            if (model_task_ == 0)
+            {
+                Copy(working_vector, model_.GetState());
                 model_.StateUpdated();
             }
+
+            /*** Resampling ***/
+
+            Copy(X_i_local_, X_i_local_double);
+            if (model_task_ == 0)
+                X_i_global_double.Reallocate(Nsigma_point_, Nlocal_state);
+
+            Transpose(X_i_local_double);
+
+            MPI_Gatherv(X_i_local_double.GetData(),
+                        Nlocal_sigma_point_ * Nlocal_state, MPI_DOUBLE,
+                        X_i_global_double.GetData(),  sendcount,
+                        displacement, MPI_DOUBLE, 0, row_communicator_);
+            if (model_task_ == 0)
+            {
+                Transpose(X_i_global_double);
+                Copy(X_i_global_double, X_i_);
+            }
+
+            if (with_resampling_)
+                throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
+                                     "Forward()", "'resampling 'option "
+                                     "not supported yet.");
+            // Computes L_{n + 1}.
+            if (model_task_ == 0)
+                MltAdd(T(alpha_), X_i_, I_trans_, T(0),
+                       model_.GetStateErrorVarianceProjector());
+
 #else
             model_state x;
             x.Copy(model_.GetState());
@@ -572,15 +499,17 @@ namespace Verdandi
             model_state_error_variance tmp;
             GetCholesky(U_inv_);
 
-            Copy(L_, tmp);
-            MltAdd(T(1), tmp, U_inv_, T(0), L_);
+            Copy(model_.GetStateErrorVarianceProjector(), tmp);
+            MltAdd(T(1), tmp, U_inv_, T(0),
+                   model_.GetStateErrorVarianceProjector());
 
             // Computes X_n^{(i)+}.
             Reallocate(X_i_, Nstate_, Nsigma_point_, model_);
             for (int i = 0; i < Nsigma_point_; i++)
                 SetCol(x, i, X_i_);
 
-            MltAdd(T(1), L_, I_, T(1), X_i_);
+            MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
+                   I_, T(1), X_i_);
 
             /*** Prediction ***/
 
@@ -603,17 +532,20 @@ namespace Verdandi
 #if defined(VERDANDI_WITH_PETSC)
                 throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
                                      "Forward()", "'resampling 'option "
-                                     "not support yet.");
+                                     "not supported yet.");
 #else
-                MltAdd(T(alpha_), X_i_, I_trans_, T(0), L_);
+                MltAdd(T(alpha_), X_i_, I_trans_, T(0),
+                       model_.GetStateErrorVarianceProjector());
                 for(int i = 0; i < Nsigma_point_; i++)
                     SetCol(x, i, X_i_);
-                MltAdd(T(1), L_, I_, T(1), X_i_);
+                MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
+                       I_, T(1), X_i_);
 #endif
             }
 
             // Computes L_{n + 1}.
-            MltAdd(T(alpha_), X_i_, I_trans_, T(0), L_);
+            MltAdd(T(alpha_), X_i_, I_trans_, T(0),
+                   model_.GetStateErrorVarianceProjector());
 
             model_.GetState().Copy(x);
             model_.StateUpdated();
@@ -634,8 +566,9 @@ namespace Verdandi
 
             sigma_point_matrix tmp;
             GetCholesky(U_inv_);
-            Copy(L_, tmp);
-            MltAdd(T(1), tmp, U_inv_, T(0), L_);
+            Copy(model_.GetStateErrorVarianceProjector(), tmp);
+            MltAdd(T(1), tmp, U_inv_, T(0),
+                   model_.GetStateErrorVarianceProjector());
 
             // Computes X_n^{(i)+}.
             X_i_trans_.Reallocate(Nsigma_point_, Nstate_);
@@ -643,8 +576,8 @@ namespace Verdandi
             for (int i = 0; i < Nsigma_point_; i++)
                 SetRow(x, i, X_i_trans_);
 
-            MltAdd(T(1), SeldonNoTrans, I_trans_, SeldonTrans, L_, T(1),
-                   X_i_trans_);
+            MltAdd(T(1), SeldonNoTrans, I_trans_, SeldonTrans,
+                   model_.GetStateErrorVarianceProjector(), T(1), X_i_trans_);
 
             /*** Prediction ***/
 
@@ -701,22 +634,23 @@ namespace Verdandi
 
             // Computes L_{n + 1}.
             MltAdd(T(alpha_), SeldonTrans, X_i_trans_, SeldonNoTrans,
-                   I_trans_, T(0), L_);
+                   I_trans_, T(0), model_.GetStateErrorVarianceProjector());
 #endif
         }
 
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-        {
+#ifndef VERDANDI_WITH_MPI
+        MessageHandler::Send(*this, "model", "forecast");
+        MessageHandler::Send(*this, "observation_manager", "forecast");
+        MessageHandler::Send(*this, "driver", "forecast");
+#else
+        MessageHandler::Send(*this, "model" +
+                             to_str(world_rank_), "forecast");
+        MessageHandler::Send(*this, "observation_manager" +
+                             to_str(world_rank_), "forecast");
+        MessageHandler::Send(*this, "driver" + to_str(world_rank_),
+                             "forecast");
 #endif
-            MessageHandler::Send(*this, "model", "forecast");
-            MessageHandler::Send(*this, "observation_manager", "forecast");
-            MessageHandler::Send(*this, "driver", "forecast");
-
-            MessageHandler::Send(*this, "all", "::Forward end");
-#if defined(VERDANDI_WITH_MPI)
-        }
-#endif
+        MessageHandler::Send(*this, "all", "::Forward end");
     }
 
 
@@ -728,7 +662,7 @@ namespace Verdandi
     {
 
 #if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
+        if (model_task_ == 0)
 #endif
             MessageHandler::Send(*this, "all", "::Analyze begin");
 
@@ -737,7 +671,7 @@ namespace Verdandi
         if (!observation_manager_.HasObservation())
         {
 #if defined(VERDANDI_WITH_MPI)
-            if (rank_ == 0)
+            if (model_task_ == 0)
 #endif
                 MessageHandler::Send(*this, "all", "::Analyze end");
             return;
@@ -746,7 +680,7 @@ namespace Verdandi
         Nobservation_  = observation_manager_.GetNobservation();
 
 #if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
+        if (world_rank_ == 0)
         {
 #endif
             if (option_display_["show_time"])
@@ -759,272 +693,42 @@ namespace Verdandi
         if (sigma_point_type_ == "simplex")
         {
 #if defined(VERDANDI_WITH_MPI)
-            if (algorithm_ == 0)
+            observation z_col(Nobservation_), z(Nobservation_);
+            z.Fill(T(0));
+            observation reduced_innovation(Nreduced_);
+            if (model_task_ == 0)
             {
-                // Computes [HX_{n+1}^{*}].
-                sigma_point_matrix Z_i_trans,
-                    Z_i_trans_local(Nlocal_sigma_point_, Nobservation_);
-                sigma_point x_col;
-                observation z_col(Nobservation_), z_local(Nobservation_), z;
-                z_local.Fill(T(0));
-                for (int i = 0; i < Nlocal_sigma_point_; i++)
+                for (int i = 0; i < Nsigma_point_; i++)
                 {
-                    GetRowPointer(X_i_trans_, i, x_col);
-                    observation_manager_.ApplyOperator(x_col, z_col);
-                    SetRow(z_col, i, Z_i_trans_local);
-                    Add(T(alpha_), z_col, z_local);
-                    x_col.Nullify();
+                    GetCol(X_i_, i, x_col_);
+                    observation& z_col =
+                        observation_manager_.GetInnovation(x_col_);
+                    Add(T(alpha_), z_col, z);
+                    SetRow(z_col, i, Z_i_trans_);
                 }
-
-                if (rank_ == 0)
-                {
-                    z.Reallocate(Nobservation_);
-                    z.Fill(T(0));
-                    Z_i_trans.Reallocate(Nsigma_point_, Nobservation_);
-                }
-
-                MPI::COMM_WORLD.
-                    Reduce(z_local.GetData(), z.GetData(),
-                           z_local.GetM(), MPI::DOUBLE, MPI::SUM, 0);
-
-                int displacement[Nprocess_],  sendcount[Nprocess_];
-                for (int i = 0; i < Nprocess_; i++)
-                {
-                    sendcount[i] = (Nlocal_sigma_point_sum_(i + 1)
-                                    - Nlocal_sigma_point_sum_(i))
-                        * Nobservation_;
-                    displacement[i] = Nlocal_sigma_point_sum_(i)
-                        * Nobservation_;
-                }
-
-                MPI::COMM_WORLD.
-                    Gatherv(Z_i_trans_local.GetData(),
-                            Nlocal_sigma_point_ * Nobservation_, MPI::DOUBLE,
-                            Z_i_trans.GetData(),  sendcount, displacement,
-                            MPI::DOUBLE, 0);
-
-                if (rank_ == 0)
-                {
-                    sigma_point_matrix HL_trans(Nreduced_, Nobservation_);
-                    MltAdd(T(alpha_), SeldonTrans, I_trans_global_,
-                           SeldonNoTrans, Z_i_trans, T(0), HL_trans);
-                    sigma_point_matrix
-                        working_matrix_po(Nreduced_, Nobservation_), tmp;
-
-                    if (observation_error_variance_ == "matrix_inverse")
-                        Mlt(HL_trans,
-                            observation_manager_.GetErrorVarianceInverse(),
-                            working_matrix_po);
-                    else
-                    {
-                        observation_error_variance R_inv;
-                        Copy(observation_manager_.GetErrorVariance(),
-                             R_inv);
-                        GetInverse(R_inv);
-                        Mlt(HL_trans, R_inv, working_matrix_po);
-                    }
-
-                    U_inv_.SetIdentity();
-                    MltAdd(T(1), SeldonNoTrans, working_matrix_po,
-                           SeldonTrans, HL_trans, T(1), U_inv_);
-                    GetInverse(U_inv_);
-
-                    // Computes K.
-                    sigma_point_matrix K(Nstate_, Nobservation_);
-                    Copy(working_matrix_po, tmp);
-                    MltAdd(T(1), U_inv_, working_matrix_po, T(0), tmp);
-                    MltAdd(T(1), L_, tmp, T(0), K);
-
-                    // Computes innovation.
-                    observation& innovation =
-                        observation_manager_.GetObservation();
-                    Add(T(-1), z, innovation);
-
-                    // Updates.
-                    model_state& x =  model_.GetState();
-                    MltAdd(T(1), K, innovation, T(1), x);
-                    model_.StateUpdated();
-                }
-            }
-            else if (algorithm_ == 1 || algorithm_ == 2)
-            {
-                observation innovation(Nobservation_);
-                MPI::Request send_request[Nprocess_ - 1], recv_request;
-                if (rank_ == 0)
-                {
-                    observation& innovation =
-                        observation_manager_.GetObservation();
-                    for (int i = 1; i < Nprocess_; i++)
-                        send_request[i] =
-                            MPI::COMM_WORLD.
-                            Isend(innovation.GetData(),
-                                  Nobservation_, MPI::DOUBLE, i, 0);
-                }
-                else
-                    recv_request =
-                        MPI::COMM_WORLD.Irecv(
-                            observation_manager_.GetObservation().GetData(),
-                            Nobservation_, MPI::DOUBLE, 0,
-                            MPI::ANY_TAG);
-                // Computes [HX_{n+1}^{*}].
-                sigma_point_matrix
-                    Z_i_trans(Nlocal_sigma_point_, Nobservation_);
-                sigma_point x_col;
-                observation z_col, z(Nobservation_), z_local(Nobservation_);
-                z_local.Fill(T(0));
-                for (int i = 0; i < Nlocal_sigma_point_; i++)
-                {
-                    GetRowPointer(X_i_trans_, i, x_col);
-                    GetRowPointer(Z_i_trans, i, z_col);
-                    observation_manager_.ApplyOperator(x_col, z_col);
-                    Add(T(alpha_), z_col, z_local);
-                    x_col.Nullify();
-                    z_col.Nullify();
-                }
-
-                sigma_point_matrix HL_local_trans(Nreduced_, Nobservation_),
-                    HL_trans(Nreduced_, Nobservation_);
                 MltAdd(T(alpha_), SeldonTrans, I_trans_, SeldonNoTrans,
-                       Z_i_trans, T(0), HL_local_trans);
-
-                MPI::COMM_WORLD.Allreduce(HL_local_trans.GetData(),
-                                          HL_trans.GetData(),
-                                          HL_trans.GetSize(), MPI::DOUBLE,
-                                          MPI::SUM);
-
-                sigma_point_matrix
-                    working_matrix_po(Nreduced_, Nobservation_), tmp;
-                sigma_point_matrix K;
-                if (algorithm_ == 1)
-                {
-                    if (observation_error_variance_ == "matrix_inverse")
-                        Mlt(HL_trans,
-                            observation_manager_.GetErrorVarianceInverse(),
-                            working_matrix_po);
-                    else
-                    {
-                        observation_error_variance R_inv;
-                        Copy(observation_manager_.GetErrorVariance(),
-                             R_inv);
-                        GetInverse(R_inv);
-                        Mlt(HL_trans, R_inv, working_matrix_po);
-                    }
-
-                    U_inv_.SetIdentity();
-                    MltAdd(T(1), SeldonNoTrans, working_matrix_po,
-                           SeldonTrans, HL_trans, T(1), U_inv_);
-                    GetInverse(U_inv_);
-
-                    // Computes K.
-                    K.Reallocate(Nstate_, Nobservation_);
-                    Copy(working_matrix_po, tmp);
-                    MltAdd(T(1), U_inv_, working_matrix_po, T(0), tmp);
-                    MltAdd(T(1), L_, tmp, T(0), K);
-                }
+                       Z_i_trans_, T(0), HL_trans_);
+                observation_error_variance R_inv;
+                if (observation_error_variance_ == "matrix_inverse")
+                    Mlt(HL_trans_, observation_manager_.
+                        GetErrorVarianceInverse(), HL_trans_R_);
                 else
                 {
-                    sigma_point_matrix working_matrix_po_local(
-                        Nlocal_filtered_column_, Nobservation_);
-                    sigma_point_matrix
-                        U_local(Nlocal_filtered_column_, Nreduced_);
-
-                    HL_local_trans.
-                        Reallocate(Nlocal_filtered_column_, Nobservation_);
-                    for (int i = 0; i < Nlocal_filtered_column_; i++)
-                    {
-                        GetRow(HL_trans, local_filtered_column_(i), z_col);
-                        SetRow(z_col, i, HL_local_trans);
-                    }
-
-                    if (observation_error_variance_ == "matrix_inverse")
-                        Mlt(HL_local_trans,
-                            observation_manager_.GetErrorVarianceInverse(),
-                            working_matrix_po_local);
-                    else
-                    {
-                        observation_error_variance R_inv;
-                        Copy(observation_manager_.GetErrorVariance(),
-                             R_inv);
-                        GetInverse(R_inv);
-                        Mlt(HL_local_trans, R_inv, working_matrix_po_local);
-                    }
-
-                    U_local.Fill(T(0));
-                    for (int i = 0; i < Nlocal_filtered_column_; i++)
-                        U_local(i, local_filtered_column_(i)) = T(1);
-
-                    MltAdd(T(1), SeldonNoTrans, working_matrix_po_local,
-                           SeldonTrans, HL_trans, T(1), U_local);
-
-                    int displacement[Nprocess_],  recvcount[Nprocess_];
-                    for (int i = 0; i < Nprocess_; i++)
-                    {
-                        recvcount[i] = (Nlocal_filtered_column_sum_(i + 1)
-                                        - Nlocal_filtered_column_sum_(i))
-                            * Nreduced_;
-                        displacement[i] = Nlocal_filtered_column_sum_(i)
-                            * Nreduced_;
-                    }
-
-                    MPI::COMM_WORLD.
-                        Allgatherv(U_local.GetData(),
-                                   Nlocal_filtered_column_ * Nreduced_,
-                                   MPI::DOUBLE, U_inv_.GetData(),  recvcount,
-                                   displacement, MPI::DOUBLE);
-
-                    for (int i = 0; i < Nprocess_; i++)
-                    {
-                        recvcount[i] = (Nlocal_filtered_column_sum_(i + 1)
-                                        - Nlocal_filtered_column_sum_(i))
-                            * Nobservation_;
-                        displacement[i] = Nlocal_filtered_column_sum_(i)
-                            * Nobservation_;
-                    }
-
-                    MPI::COMM_WORLD.
-                        Allgatherv(working_matrix_po_local.GetData(),
-                                   Nlocal_filtered_column_ * Nobservation_,
-                                   MPI::DOUBLE, working_matrix_po.GetData(),
-                                   recvcount, displacement, MPI::DOUBLE);
-
-                    GetInverse(U_inv_);
-
-                    // Computes K.
-                    K.Reallocate(Nstate_, Nobservation_);
-                    for (int i = 0; i < Nlocal_filtered_column_; i++)
-                    {
-                        GetRow(U_inv_, local_filtered_column_(i), z_col);
-                        SetRow(z_col, i, U_local);
-                    }
-
-                    MltAdd(T(1), U_local, working_matrix_po, T(0),
-                           working_matrix_po_local);
-
-                    MPI::COMM_WORLD.
-                        Allgatherv(working_matrix_po_local.GetData(),
-                                   Nlocal_filtered_column_ * Nobservation_,
-                                   MPI::DOUBLE, working_matrix_po.GetData(),
-                                   recvcount, displacement, MPI::DOUBLE);
-
-                    MltAdd(T(1), L_, working_matrix_po, T(0), K);
+                    observation_error_variance R_inv;
+                    Copy(observation_manager_.GetErrorVariance(), R_inv);
+                    GetInverse(R_inv);
+                    Mlt(HL_trans_, R_inv, HL_trans_R_);
                 }
-
-                // Computes innovation.
-                if (rank_ == 0)
-                    MPI::Request::Waitall(Nprocess_ - 1, send_request);
-                else
-                    recv_request.Wait();
-
-                MPI::COMM_WORLD.Allreduce(z_local.GetData(), z.GetData(),
-                                          Nobservation_, MPI::DOUBLE,
-                                          MPI::SUM);
-                Add(T(-1), z, innovation);
-
-                // Updates.
-                model_state& x =  model_.GetState();
-                MltAdd(T(1), K, innovation, T(1), x);
-                model_.StateUpdated();
+                U_inv_.SetIdentity();
+                MltAdd(T(1), SeldonNoTrans, HL_trans_R_,
+                       SeldonTrans, HL_trans_, T(1), U_inv_);
+                GetInverse(U_inv_);
+                MltAdd(T(1), U_inv_, HL_trans_R_, T(0), HL_trans_);
+                MltAdd(T(-1), HL_trans_, z, T(0), reduced_innovation);
             }
+            MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
+                   reduced_innovation, T(1), model_.GetState());
+            model_.StateUpdated();
 #else
             // Computes [HX_{n+1}^{*}].
             sigma_point_matrix Z_i_trans(Nsigma_point_, Nobservation_);
@@ -1076,7 +780,8 @@ namespace Verdandi
 
             // Updates.
             model_state& x =  model_.GetState();
-            MltAdd(T(1), L_, reduced_innovation, T(1), x);
+            MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
+                   reduced_innovation, T(1), x);
             model_.StateUpdated();
 #endif
         }
@@ -1201,7 +906,8 @@ namespace Verdandi
             else
                 Mlt(HL_trans, R_inv, working_matrix_po);
             Mlt(U_inv_, working_matrix_po, working_matrix_po2);
-            Mlt(L_, working_matrix_po2, K);
+            Mlt(model_.GetStateErrorVarianceProjector(),
+                working_matrix_po2, K);
 
             // Updates.
             model_state& x =  model_.GetState();
@@ -1210,22 +916,19 @@ namespace Verdandi
 #endif
         }
 
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-        {
+#ifndef VERDANDI_WITH_MPI
+        MessageHandler::Send(*this, "model", "forecast");
+        MessageHandler::Send(*this, "observation_manager", "forecast");
+        MessageHandler::Send(*this, "driver", "forecast");
+#else
+        MessageHandler::Send(*this, "model" +
+                             to_str(world_rank_), "analysis");
+        MessageHandler::Send(*this, "observation_manager" +
+                             to_str(world_rank_), "analysis");
+        MessageHandler::Send(*this, "driver" + to_str(world_rank_),
+                             "analysis");
 #endif
-            if (option_display_["show_time"])
-                cout << " done." << endl;
-
-            MessageHandler::Send(*this, "model", "analysis");
-            MessageHandler::Send(*this, "observation_manager", "analysis");
-            MessageHandler::Send(*this, "driver", "analysis");
-
-            MessageHandler::Send(*this, "all", "::Analyze end");
-
-#if defined(VERDANDI_WITH_MPI)
-        }
-#endif
+        MessageHandler::Send(*this, "all", "::Analyze end");
     }
 
 
@@ -1234,17 +937,11 @@ namespace Verdandi
     void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
     ::FinalizeStep()
     {
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-#endif
-            MessageHandler::Send(*this, "all", "::FinalizeStep begin");
+        MessageHandler::Send(*this, "all", "::FinalizeStep begin");
 
         model_.FinalizeStep();
 
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-#endif
-            MessageHandler::Send(*this, "all", "::FinalizeStep end");
+        MessageHandler::Send(*this, "all", "::FinalizeStep end");
     }
 
 
@@ -1253,20 +950,11 @@ namespace Verdandi
     void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
     ::Finalize()
     {
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-#endif
-            MessageHandler::Send(*this, "all", "::Finalize begin");
+        MessageHandler::Send(*this, "all", "::Finalize begin");
 
         model_.Finalize();
 
-#if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
-#endif
-            MessageHandler::Send(*this, "all", "::Finalize end");
-#if defined(VERDANDI_WITH_MPI)
-        MPI::Finalize();
-#endif
+        MessageHandler::Send(*this, "all", "::Finalize end");
     }
 
 
@@ -1343,7 +1031,7 @@ namespace Verdandi
     ::Message(string message)
     {
 #if defined(VERDANDI_WITH_MPI)
-        if (rank_ == 0)
+        if (model_task_ == 0)
         {
 #endif
             if (message.find("initial condition") != string::npos)

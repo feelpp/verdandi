@@ -79,9 +79,9 @@ reduced_order_unscented_kalman_filter = {
    mpi_grid = {
 
       -- The number of processes for each model task.
-      Nrow = 3,
+      Nrow = 2,
       -- The number of model tasks.
-      Ncol = 1
+      Ncol = 3
    }
 
 }

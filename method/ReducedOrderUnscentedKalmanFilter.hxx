@@ -90,8 +90,6 @@ namespace Verdandi
         //! Observation manager.
         ObservationManager observation_manager_;
 
-        //! Matrix L in the P SVD decomposition.
-        model_state_error_variance L_;
         //! Matrix U in the P SVD decomposition.
         model_state_error_variance_reduced U_;
         //! Inverse of matrix U.
@@ -131,13 +129,23 @@ namespace Verdandi
         sigma_point_matrix I_;
         //! Matrix of sigma-points (transposed).
         sigma_point_matrix I_trans_;
-#if defined(VERDANDI_WITH_MPI)
-        //! Transpose of [X_n^(*)].
-        sigma_point_matrix X_i_trans_;
-#else
         //! [X_n^(*)].
         model_state_error_variance X_i_;
-        //! [X_n^(*)] (transposed).
+#if defined(VERDANDI_WITH_MPI)
+        //! Local [X_n^(*)].
+        model_state_error_variance X_i_local_;
+        //! [Z^i]ˆt.
+        sigma_point_matrix Z_i_trans_;
+        //! H * Lˆt.
+        sigma_point_matrix HL_trans_;
+        //! H * Lˆt * R
+        sigma_point_matrix HL_trans_R_;
+        //! State vector.
+        model_state x_;
+        //! State error variance column.
+        model_state x_col_;
+#else
+        //! [X_n^(*)]ˆt.
         model_state_error_variance X_i_trans_;
 #endif
         //! Coefficient vector associated with sigma-points.
@@ -151,33 +159,33 @@ namespace Verdandi
         //! Number of sigma-points.
         int Nsigma_point_;
 
-        //! Process rank.
-        int rank_;
-
 #if defined(VERDANDI_WITH_MPI)
-
-        /*** Parallel data ***/
-
-        //! Process rank.
-        int algorithm_;
-        //! Number of processes.
+        //! The rank in MPI_COMM_WORLD.
+        int world_rank_;
+        //! Process method rank.
+        int model_task_;
+        //! The number of rows of the MPI grid.
+        int Nrow_;
+        //! The number of columns of the MPI grid.
+        int Ncol_;
+        //! The number of processes in MPI_COMM_WORLD.
+        int Nworld_process_;
+        //! The number of processes in MPI_COMM_WORLD.
         int Nprocess_;
+        //! The MPI grid row communicator of the current process.
+        MPI_Comm row_communicator_;
+        //! The MPI grid column communicator of the current process.
+        MPI_Comm col_communicator_;
+
+        //! Should the grid be displayed?
+        bool show_mpi_grid_;
+
         //! Number of local sigma-points.
         int Nlocal_sigma_point_;
         //! Local sigma-points sum.
         Vector<int> Nlocal_sigma_point_sum_;
         //! Local sigma-points.
         Vector<int> local_sigma_point_;
-        //! Number of local columns of covariance matrix.
-        int Nlocal_filtered_column_;
-        //! Local sigma-points.
-        Vector<int> local_filtered_column_;
-        //! Local columns sum.
-        Vector<int> Nlocal_filtered_column_sum_;
-        //! Global matrix of sigma-points.
-        sigma_point_matrix I_trans_global_;
-        //! Contribution of process 0.
-        double master_process_contribution_;
 #endif
 
         /*** Output saver ***/
