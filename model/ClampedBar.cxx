@@ -235,6 +235,8 @@ namespace Verdandi
         Mlt(T(state_error_variance_value_), state_error_variance_inverse_);
 #endif
         is_adjoint_initialized_ = false;
+        variance_projector_allocated_ = false;
+        variance_reduced_allocated_ = false;
     }
 
 
@@ -1022,29 +1024,33 @@ namespace Verdandi
     typename ClampedBar<T>::state_error_variance&
     ClampedBar<T>::GetStateErrorVarianceProjector()
     {
-        int Nreduced = 0;
-        for (unsigned int i = 0; i < reduced_.size(); i++)
-            Nreduced += x_.GetVector(reduced_[i]).GetSize();
+        if (!variance_projector_allocated_)
+        {
+            int Nreduced = 0;
+            for (unsigned int i = 0; i < reduced_.size(); i++)
+                Nreduced += x_.GetVector(reduced_[i]).GetSize();
 #ifndef VERDANDI_STATE_ERROR_SPARSE
-        // Initializes L.
-        state_error_variance_projector_.Reallocate(Nstate_, Nreduced);
-        state_error_variance_projector_.Fill(T(0));
-        for (unsigned int i = 0, l = 0; i < reduced_.size(); i++)
-            for(int k = x_.GetIndex(reduced_[i]);
-                k < x_.GetIndex(reduced_[i]) +
-                    x_.GetVector(reduced_[i]).GetSize(); k++)
-                state_error_variance_projector_(k, l++) = 1;
+            // Initializes L.
+            state_error_variance_projector_.Reallocate(Nstate_, Nreduced);
+            state_error_variance_projector_.Fill(T(0));
+            for (unsigned int i = 0, l = 0; i < reduced_.size(); i++)
+                for(int k = x_.GetIndex(reduced_[i]);
+                    k < x_.GetIndex(reduced_[i]) +
+                        x_.GetVector(reduced_[i]).GetSize(); k++)
+                    state_error_variance_projector_(k, l++) = 1;
 
 #else
-        // Initializes L.
-        Matrix<T, General, ArrayRowSparse> L_array(Nstate_, Nreduced);
-        for (unsigned int i = 0, l = 0; i < reduced_.size(); i++)
-            for(int k = x_.GetIndex(reduced_[i]);
-                k < x_.GetIndex(reduced_[i]) +
-                    x_.GetVector(reduced_[i]).GetSize(); k++)
-                L_array(k, l++) = 1;
-        Copy(L_array, state_error_variance_projector_);
+            // Initializes L.
+            Matrix<T, General, ArrayRowSparse> L_array(Nstate_, Nreduced);
+            for (unsigned int i = 0, l = 0; i < reduced_.size(); i++)
+                for(int k = x_.GetIndex(reduced_[i]);
+                    k < x_.GetIndex(reduced_[i]) +
+                        x_.GetVector(reduced_[i]).GetSize(); k++)
+                    L_array(k, l++) = 1;
+            Copy(L_array, state_error_variance_projector_);
 #endif
+            variance_projector_allocated_ = true;
+        }
         return state_error_variance_projector_;
     }
 
@@ -1059,25 +1065,27 @@ namespace Verdandi
     typename ClampedBar<T>::state_error_variance_reduced&
     ClampedBar<T>::GetStateErrorVarianceReduced()
     {
-        int Nreduced = 0;
-        for (unsigned int i = 0; i < reduced_.size(); i++)
-            Nreduced += x_.GetVector(reduced_[i]).GetSize();
+        if (!variance_reduced_allocated_)
+        {
+            int Nreduced = 0;
+            for (unsigned int i = 0; i < reduced_.size(); i++)
+                Nreduced += x_.GetVector(reduced_[i]).GetSize();
 #ifndef VERDANDI_STATE_ERROR_SPARSE
-
-        // Initializes U.
-        state_error_variance_reduced_.Reallocate(Nreduced,  Nreduced);
-        state_error_variance_reduced_.Fill(T(0));
-        for (int i = 0; i < Nreduced; i++)
-            state_error_variance_reduced_(i, i) =
-                T(T(1) / state_error_variance_value_);
+            // Initializes U.
+            state_error_variance_reduced_.Reallocate(Nreduced,  Nreduced);
+            state_error_variance_reduced_.Fill(T(0));
+            for (int i = 0; i < Nreduced; i++)
+                state_error_variance_reduced_(i, i) =
+                    T(T(1) / state_error_variance_value_);
 #else
-
-        // Initializes U.
-        Matrix<T, General, ArrayRowSparse> U_array(Nreduced,  Nreduced);
-        for (int i = 0; i < Nreduced; i++)
-            U_array(i, i) = T(T(1) / state_error_variance_value_);
-        Copy(U_array, state_error_variance_reduced_);
+            // Initializes U.
+            Matrix<T, General, ArrayRowSparse> U_array(Nreduced,  Nreduced);
+            for (int i = 0; i < Nreduced; i++)
+                U_array(i, i) = T(T(1) / state_error_variance_value_);
+            Copy(U_array, state_error_variance_reduced_);
 #endif
+            variance_reduced_allocated_ = true;
+        }
         return state_error_variance_reduced_;
     }
 

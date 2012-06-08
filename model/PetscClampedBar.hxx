@@ -181,6 +181,10 @@ namespace Verdandi
         /*! \brief Reduced matrix U in the decomposition of the
           background error covariance matrix (\f$B\f$) as a product LUL^T */
         state_error_variance_reduced state_error_variance_reduced_;
+        //! Is state error variance projector allocated?
+        bool variance_projector_allocated_;
+        //! Is reduced state error variance allocated?
+        bool variance_reduced_allocated_;
 
         //! Index of the row of B currently stored.
         int current_row_;

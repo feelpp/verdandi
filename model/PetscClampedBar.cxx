@@ -219,6 +219,8 @@ namespace Verdandi
 
         newmark_0_assembled_ = false;
         newmark_1_assembled_ = false;
+        variance_projector_allocated_ = false;
+        variance_reduced_allocated_ = false;
     }
 
 
@@ -726,18 +728,22 @@ namespace Verdandi
     typename PetscClampedBar<T>::state_error_variance& PetscClampedBar<T>
     ::GetStateErrorVarianceProjector()
     {
-        int Nreduced = 0;
-        for (unsigned int i = 0; i < reduced_.size(); i++)
-            Nreduced += parameter_.GetVector(reduced_[i]).GetSize();
-        state_error_variance_projector_.SetCommunicator(mpi_communicator_);
-        state_error_variance_projector_.Reallocate(Nstate_,
-                                                   Nreduced_, Nstate_local_);
-        if (rank_ == Nprocess_ - 1)
-            for (int i = 0; i < Nreduced_; i++)
-                state_error_variance_projector_.SetBuffer(Nstate_ - 1 - i,
-                                                          Nreduced_ - 1 - i,
-                                                          T(1));
-        state_error_variance_projector_.Flush();
+        if (!variance_projector_allocated_)
+        {
+            int Nreduced = 0;
+            for (unsigned int i = 0; i < reduced_.size(); i++)
+                Nreduced += parameter_.GetVector(reduced_[i]).GetSize();
+            state_error_variance_projector_
+                .SetCommunicator(mpi_communicator_);
+            state_error_variance_projector_
+                .Reallocate(Nstate_, Nreduced_, Nstate_local_);
+            if (rank_ == Nprocess_ - 1)
+                for (int i = 0; i < Nreduced_; i++)
+                    state_error_variance_projector_
+                        .SetBuffer(Nstate_ - 1 - i, Nreduced_ - 1 - i, T(1));
+            state_error_variance_projector_.Flush();
+            variance_projector_allocated_ = true;
+        }
         return state_error_variance_projector_;
     }
 
@@ -752,16 +758,19 @@ namespace Verdandi
     typename PetscClampedBar<T>::state_error_variance_reduced&
     PetscClampedBar<T>::GetStateErrorVarianceReduced()
     {
-        int Nreduced = 0;
-        for (unsigned int i = 0; i < reduced_.size(); i++)
-            Nreduced += parameter_.GetVector(reduced_[i]).GetSize();
+        if (!variance_reduced_allocated_)
+        {
+            int Nreduced = 0;
+            for (unsigned int i = 0; i < reduced_.size(); i++)
+                Nreduced += parameter_.GetVector(reduced_[i]).GetSize();
 
-        state_error_variance_reduced_.Reallocate(Nreduced_, Nreduced_);
-        state_error_variance_reduced_.Fill(T(0));
-        for (int i = 0; i < Nreduced_; i++)
-            state_error_variance_reduced_(i, i) =
-                T(T(1) / state_error_variance_value_);
-
+            state_error_variance_reduced_.Reallocate(Nreduced_, Nreduced_);
+            state_error_variance_reduced_.Fill(T(0));
+            for (int i = 0; i < Nreduced_; i++)
+                state_error_variance_reduced_(i, i) =
+                    T(T(1) / state_error_variance_value_);
+            variance_reduced_allocated_ = true;
+        }
         return state_error_variance_reduced_;
     }
 
