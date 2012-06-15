@@ -101,61 +101,28 @@ namespace Verdandi
         bool is_constant_perturbed_;
 
         //! Parameters to be perturbed.
-        uncertain_parameter parameter_;
+        vector<uncertain_parameter*> parameter_;
 
         //! List of parameters to be perturbed.
         vector<string> uncertain_parameter_vector_;
-
-        //! Number of "global" parameters to be perturbed.
-        int Nglob_parameter_;
 
         //! Number of parameters to be perturbed.
         int Nparameter_;
 
         //! Correlations between the constant term and the other terms.
-        Vector<T> constant_correlation_;
+        vector<Vector<T> > correlation_;
 
         //! Name of the probability distribution for the constant term.
-        string constant_pdf_;
+        vector<string> pdf_;
 
         //! Mean of the probability distribution for the constant term.
-        Vector<T> constant_mean_;
+        vector<Vector<T> > mean_;
 
         //! Covariance matrix for the constant term.
-        Matrix<T, Symmetric, RowSymPacked> constant_variance_;
+        vector<Matrix<T, Symmetric, RowSymPacked> > variance_;
 
         //! PDF parameters for the constant term.
-        Vector<T> constant_parameter_;
-
-        //! Correlations between the parameters for the linear term.
-        Vector<T> linear_correlation_;
-
-        //! Name of the probability distribution for the linear term.
-        string linear_pdf_;
-
-        //! Mean of the probability distribution for the linear term.
-        Vector<T> linear_mean_;
-
-        //! Covariance matrix for the linear term.
-        Matrix<T, Symmetric, RowSymPacked> linear_variance_;
-
-        //! PDF parameters for the linear term.
-        Vector<T> linear_parameter_;
-
-        //! Correlations between the quadratic term and the other terms.
-        Vector<T> quadratic_correlation_;
-
-        //! Name of the probability distribution for the quadratic term
-        string quadratic_pdf_;
-
-        //! Mean of the probability distribution for the quadratic term.
-        Vector<T> quadratic_mean_;
-
-        //! Covariance matrix for the quadratic term
-        Matrix<T, Symmetric, RowSymPacked> quadratic_variance_;
-
-        //! PDF parameters for the quadratic term.
-        Vector<T> quadratic_parameter_;
+        vector<Vector<T> > optional_parameters_;
 
 
         /*** Errors ***/
@@ -218,7 +185,7 @@ namespace Verdandi
         void StateUpdated();
         state& GetFullState();
         void FullStateUpdated();
-        std::pair<int, int> GetParameterIndex(int i);
+
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);
         void SetParameter(int i, uncertain_parameter& parameter);

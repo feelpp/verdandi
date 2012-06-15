@@ -59,8 +59,14 @@ namespace Verdandi
     template <class T>
     QuadraticModel<T>::~QuadraticModel()
     {
-        if (parameter_.GetData() != NULL)
-            parameter_.Nullify();
+        int start_nullify = 0;
+        if (with_constant_term_)
+            start_nullify = 1;
+        for (int i = start_nullify; i < Nparameter_; i++)
+        {
+            parameter_[i]->Nullify();
+            delete(parameter_[i]);
+        }
     }
 
 
@@ -150,7 +156,6 @@ namespace Verdandi
         /*** Distribution for the constant term ***/
 
         configuration.ClearPrefix();
-        Nparameter_ = 0;
 
         if (configuration.Exists("quadratic_model.uncertainty"))
         {
@@ -161,119 +166,145 @@ namespace Verdandi
                               "'constant'})",
                               uncertain_parameter_vector_);
 
-            Nglob_parameter_ = int(uncertain_parameter_vector_.size());
-            is_quadratic_perturbed_ = false;
-            is_linear_perturbed_ = false;
-            is_constant_perturbed_ = false;
+            // We perturb a term only if it is in the uncertain parameter list
+            // and if it is applied in the model.
+            is_quadratic_perturbed_ =
+                (find (uncertain_parameter_vector_.begin(),
+                       uncertain_parameter_vector_.end(),  "quadratic_term")
+                 != uncertain_parameter_vector_.end()) &&
+                with_quadratic_term_;
 
-            if (find (uncertain_parameter_vector_.begin(),
-                      uncertain_parameter_vector_.end(),
-                      "quadratic_term")
-                != uncertain_parameter_vector_.end())
-                if (with_quadratic_term_)
-                    is_quadratic_perturbed_ = true;
-                else
-                    Nglob_parameter_--;
-            if (find (uncertain_parameter_vector_.begin(),
-                      uncertain_parameter_vector_.end(),
-                      "linear_term")
-                != uncertain_parameter_vector_.end())
-                if (with_linear_term_)
-                    is_linear_perturbed_ = true;
-                else
-                    Nglob_parameter_--;
-            if (find (uncertain_parameter_vector_.begin(),
-                      uncertain_parameter_vector_.end(),
-                      "constant")
-                != uncertain_parameter_vector_.end())
-                if (with_constant_term_)
-                    is_constant_perturbed_ = true;
-                else
-                    Nglob_parameter_--;
+            is_linear_perturbed_ =
+                (find (uncertain_parameter_vector_.begin(),
+                       uncertain_parameter_vector_.end(),  "linear_term")
+                 != uncertain_parameter_vector_.end()) &&
+                with_linear_term_;
 
-            Nparameter_ = Nglob_parameter_;
-
-            if (is_quadratic_perturbed_)
-                Nparameter_ += Nstate_ * Nstate_ - 1;
-            if (is_linear_perturbed_)
-                Nparameter_ += Nstate_ - 1;
+            is_constant_perturbed_ =
+                (find (uncertain_parameter_vector_.begin(),
+                       uncertain_parameter_vector_.end(),  "constant")
+                 != uncertain_parameter_vector_.end()) &&
+                with_constant_term_;
 
             if (is_constant_perturbed_)
             {
-                constant_mean_.Reallocate(b_.GetLength());
-                configuration.Set("constant.mean", constant_mean_);
-                Add(T(1), constant_mean_, b_);
+                Vector<T> constant_mean;
+                constant_mean.Reallocate(b_.GetLength());
+                configuration.Set("constant.mean", constant_mean);
+                Add(T(1), constant_mean, b_);
 
-                constant_variance_.Reallocate(Nstate_, Nstate_);
+                Matrix<T, Symmetric, RowSymPacked> constant_variance;
+                constant_variance.Reallocate(Nstate_, Nstate_);
                 configuration.Set("constant.variance",
-                                  constant_variance_);
+                                  constant_variance);
+                variance_.push_back(constant_variance);
 
+                string constant_pdf;
                 configuration.Set("constant.distribution",
                                   "ops_in(v, {'Normal', 'LogNormal', "
                                   "'NormalHomogeneous',"
                                   "'LogNormalHomogeneous'})",
-                                  constant_pdf_);
+                                  constant_pdf);
+                pdf_.push_back(constant_pdf);
 
+                Vector<T> constant_parameter;
                 configuration.Set("constant.parameter",
-                                  constant_parameter_);
+                                  constant_parameter);
+                optional_parameters_.push_back(constant_parameter);
+
+                parameter_.push_back(&b_);
             }
 
             if (is_linear_perturbed_)
             {
-                linear_mean_.Reallocate(Nstate_);
-                configuration.Set("linear_term.mean", linear_mean_);
+                Vector<T> linear_mean;
+                linear_mean.Reallocate(Nstate_);
+                configuration.Set("linear_term.mean", linear_mean);
 
-                linear_variance_.Reallocate(Nstate_, Nstate_);
+                Matrix<T, Symmetric, RowSymPacked> linear_variance;
+                linear_variance.Reallocate(Nstate_, Nstate_);
                 configuration.Set("linear_term.variance",
-                                  linear_variance_);
+                                  linear_variance);
 
+                string linear_pdf;
                 configuration.Set("linear_term.distribution",
                                   "ops_in(v, {'Normal', 'LogNormal', "
                                   "'NormalHomogeneous', "
                                   "'LogNormalHomogeneous'})",
-                                  linear_pdf_);
+                                  linear_pdf);
 
+                Vector<T> linear_parameter;
                 configuration.Set("linear_term.parameter",
-                                  linear_parameter_);
+                                  linear_parameter);
 
                 for (int i = 0; i < Nstate_; i++)
                 {
                     Vector<double> row;
                     GetRow(L_, i, row);
-                    Add(T(1), linear_mean_, row);
+                    Add(T(1), linear_mean, row);
                     SetRow(row, i, L_);
                 }
 
+                for (int i = 0; i < Nstate_; i++)
+                {
+                    Vector<double> *row = new Vector<double>;
+                    row->SetData(Nstate_, L_.GetMe()[i]);
+                    parameter_.push_back(row);
+                    variance_.push_back(linear_variance);
+                    pdf_.push_back(linear_pdf);
+                    optional_parameters_.push_back(linear_parameter);
+                }
             }
 
             if (is_quadratic_perturbed_)
             {
-                quadratic_mean_.Reallocate(Nstate_);
-                configuration.Set("quadratic_term.mean", quadratic_mean_);
+                Vector<T> quadratic_mean;
+                quadratic_mean.Reallocate(Nstate_);
+                configuration.Set("quadratic_term.mean", quadratic_mean);
 
-                quadratic_variance_.Reallocate(Nstate_, Nstate_);
+                Matrix<T, Symmetric, RowSymPacked> quadratic_variance;
+                quadratic_variance.Reallocate(Nstate_, Nstate_);
                 configuration.Set("quadratic_term.variance",
-                                  quadratic_variance_);
+                                  quadratic_variance);
 
+                string quadratic_pdf;
                 configuration.Set("quadratic_term.distribution",
                                   "ops_in(v, {'Normal', 'LogNormal', "
                                   "'NormalHomogeneous',"
                                   "'LogNormalHomogeneous'})",
-                                  quadratic_pdf_);
+                                  quadratic_pdf);
 
+                Vector<T> quadratic_parameter;
                 configuration.Set("quadratic_term.parameter",
-                                  quadratic_parameter_);
+                                  quadratic_parameter);
 
                 Vector<double> row;
                 for (int i = 0; i < Nstate_; i++)
                     for (int j = 0; j < Nstate_; j++)
                     {
                         GetRow(S_[i], j, row);
-                        Add(T(1), quadratic_mean_, row);
+                        Add(T(1), quadratic_mean, row);
                         SetRow(row, j, S_[i]);
+                    }
+
+                for (int i = 0; i < Nstate_; i++)
+                    for (int j = 0; j < Nstate_; j++)
+                    {
+                        Vector<double> *row = new Vector<double>;
+                        row->SetData(Nstate_, S_[i].GetMe()[j]);
+                        parameter_.push_back(row);
+                        variance_.push_back(quadratic_variance);
+                        pdf_.push_back(quadratic_pdf);
+                        optional_parameters_.push_back(quadratic_parameter);
                     }
             }
         }
+
+        // No correlation.
+        Vector<double> empty_vector;
+        correlation_.push_back(empty_vector);
+
+        Nparameter_ = parameter_.size();
 
         /*** Errors ***/
 
@@ -620,42 +651,6 @@ namespace Verdandi
     }
 
 
-    /*! \brief Returns the appropriate pair associated with the i-th
-      uncertain parameter.*/
-    /*!
-      \param[in] i uncertain parameter index.
-      \return The pair associated with the i-th uncertain parameter.
-      First element of the pair is the term to perturb (0 : constant,
-      1 : linear_term, 2 : quadratic_term), second element is the row index
-      of the term to perturb.
-    */
-    template<class T>
-    std::pair<int, int> QuadraticModel<T>::GetParameterIndex(int i)
-    {
-        if (is_constant_perturbed_ && i == 0) return make_pair(0, i);
-
-        if (Nglob_parameter_ == 1)
-        {
-            if (is_linear_perturbed_) return make_pair(1, i);
-            else return make_pair(2, i);
-        }
-        else if (Nglob_parameter_ == 2)
-        {
-            if (is_constant_perturbed_)
-                if (is_linear_perturbed_) return make_pair(1, i - 1);
-                else return make_pair(2, i - 1);
-            else
-                if (i < Nstate_) return make_pair(1, i);
-                else return make_pair(2, i - Nstate_);
-        }
-        else
-        {
-            if (i < 1 + Nstate_) return make_pair(1, i - 1);
-            else return make_pair(2, i - 1 - Nstate_);
-        }
-    }
-
-
     //! Returns the number of parameters to be perturbed.
     /*!
       \return The number of parameters to be perturbed.
@@ -676,28 +671,7 @@ namespace Verdandi
     typename QuadraticModel<T>::uncertain_parameter&
     QuadraticModel<T>::GetParameter(int i)
     {
-        pair<int, int> parameter_index = GetParameterIndex(i);
-        if (parameter_.GetData() != NULL)
-            parameter_.Nullify();
-        if (parameter_index.first == 0)
-            parameter_.SetData(b_.GetLength(), b_.GetData());
-        else if (parameter_index.first == 1)
-        {
-            Vector<T> row;
-            GetRow(L_, parameter_index.second, row);
-            parameter_.SetData(row.GetLength(),
-                               L_.GetMe()[parameter_index.second]);
-        }
-        else
-        {
-            Vector<T> row;
-            GetRow(S_[parameter_index.second / Nstate_],
-                   parameter_index.second % Nstate_, row);
-            parameter_.SetData(row.GetLength(),
-                               S_[parameter_index.second / Nstate_].GetMe()
-                               [parameter_index.second % Nstate_]);
-        }
-        return parameter_;
+        return *(parameter_[i]);
     }
 
 
@@ -710,13 +684,7 @@ namespace Verdandi
     void QuadraticModel<T>::SetParameter(int i,
                                          uncertain_parameter& parameter)
     {
-        pair<int, int> parameter_index = GetParameterIndex(i);
-        if (parameter_index.first == 0)
-            b_ = parameter;
-        else if (parameter_index.first == 1)
-            SetRow(parameter, parameter_index.second, L_);
-        else SetRow(parameter, parameter_index.second / Nstate_,
-                    S_[parameter_index.second % Nstate_]);
+        *(parameter_[i]) = parameter;
     }
 
 
@@ -729,13 +697,7 @@ namespace Verdandi
     template<class T>
     Vector<T>& QuadraticModel<T>::GetParameterCorrelation(int i)
     {
-        pair<int, int> parameter_index = GetParameterIndex(i);
-        if (parameter_index.first == 0)
-            return constant_correlation_;
-        else if (parameter_index.first == 1)
-            return linear_correlation_;
-        else
-            return quadratic_correlation_;
+        return correlation_[0];
     }
 
 
@@ -747,11 +709,7 @@ namespace Verdandi
     template<class T>
     string QuadraticModel<T>::GetParameterPDF(int i)
     {
-        pair<int, int> parameter_index = GetParameterIndex(i);
-        if (parameter_index.first == 0) return constant_pdf_;
-        else if (parameter_index.first == 1)
-            return linear_pdf_;
-        else return quadratic_pdf_;
+        return pdf_[i];
     }
 
 
@@ -765,11 +723,7 @@ namespace Verdandi
     Matrix<T, Symmetric, RowSymPacked>&
     QuadraticModel<T>::GetParameterVariance(int i)
     {
-        pair<int, int> parameter_index = GetParameterIndex(i);
-        if (parameter_index.first == 0) return constant_variance_;
-        else if (parameter_index.first == 1)
-            return linear_variance_;
-        else return quadratic_variance_;
+        return variance_[i];
     }
 
 
@@ -782,11 +736,7 @@ namespace Verdandi
     template<class T>
     Vector<T>& QuadraticModel<T>::GetParameterParameter(int i)
     {
-        pair<int, int> parameter_index = GetParameterIndex(i);
-        if (parameter_index.first == 0) return constant_parameter_;
-        else if (parameter_index.first == 1)
-            return linear_parameter_;
-        else return quadratic_parameter_;
+        return optional_parameters_[i];
     }
 
 
@@ -798,11 +748,7 @@ namespace Verdandi
     template<class T>
     string QuadraticModel<T>::GetParameterOption(int i)
     {
-        pair<int, int> parameter_index = GetParameterIndex(i);
-        if (parameter_index.first == 0) return "init_step";
-        else if (parameter_index.first == 1)
-            return "init_step";
-        else return "init_step";
+        return "init_step";
     }
 
 
