@@ -249,17 +249,17 @@ namespace Verdandi
         if (world_rank_ == 0)
         {
 #endif
-        if (show_time_)
-            Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
-        else
-            Logger::Log<-3>(*this,
-                            "Time: " + to_str(model_.GetTime()));
-        if (show_iteration_)
-            Logger::StdOut(*this, "Iteration " + to_str(iteration_) + " -> "
-                           + to_str(iteration_ + 1));
-        else
-            Logger::Log<-3>(*this, "Iteration " + to_str(iteration_) + " -> "
-                            + to_str(iteration_ + 1));
+            if (show_time_)
+                Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Time: " + to_str(model_.GetTime()));
+            if (show_iteration_)
+                Logger::StdOut(*this, "Iteration " + to_str(iteration_)
+                               + " -> " + to_str(iteration_ + 1));
+            else
+                Logger::Log<-3>(*this, "Iteration " + to_str(iteration_)
+                                + " -> " + to_str(iteration_ + 1));
 #ifdef VERDANDI_WITH_MPI
         }
 #endif
