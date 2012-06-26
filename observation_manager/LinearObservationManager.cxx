@@ -42,7 +42,8 @@ namespace Verdandi
       with this implementation.
     */
     template <class T>
-    LinearObservationManager<T>::LinearObservationManager()
+    LinearObservationManager<T>::LinearObservationManager():
+    current_row_(-1)
     {
     }
 
@@ -58,7 +59,7 @@ namespace Verdandi
     LinearObservationManager<T>
     ::LinearObservationManager(const Model& model,
                                string configuration_file):
-        observation_aggregator_(configuration_file)
+        observation_aggregator_(configuration_file), current_row_(-1)
     {
     }
 
