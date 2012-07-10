@@ -5,6 +5,33 @@
 /*!
 \page debugging Debugging
 
+\section compilation_options Compilation options
+ 
+To enable the -g compilation option, you can use the <code>debug</code> option with SCons. The possible values for this variable are
+
+<ul>
+
+<li>-1: no optimization or debugging compilation option; this is for fast compilation;</li>
+
+<li>0 (the default value): -O2</li>
+
+<li>1: -g</li>
+
+<li>2: -O2 -g</li>
+
+</ul>
+
+For example, a call to
+\prescreen
+$ scons debug=2
+\endprescreen
+will compile the source files with the options -O2 and -g.
+
+The SCons option <code>line</code> enables to print the full command line used to compile your source files. To use it, launch
+\prescreen
+$ scons line=yes
+\endprescreen
+
 \section dumping_scons_environment Dumping SCons environment
 
 If you need to access the SCons environment variables, you may launch
