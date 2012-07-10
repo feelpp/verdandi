@@ -297,9 +297,7 @@ for flag in to_string_list("link_flag"):
     env.Append(LINKFLAGS = flag)
 conf = Configure(env)
 for library in library_list:
-    if conf.CheckLib(library):
-        if env['PLATFORM'] != 'win32':
-            env.Append(LINKFLAGS = "-l" + library)
+    conf.CheckLib(library)
 
 # Link to the appropriate version of Python.
 for python_version in ["2.7", "2.6", "2.5", ""]:
