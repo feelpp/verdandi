@@ -27,17 +27,17 @@ $ cp ModelTemplate.cxx MyModel.cxx
 <li>
 Open the files <code>MyModel.*xx</code>, rename the preprocessing variables.
 
-\precode
+\code
 #ifndef VERDANDI_FILE_MODEL_MODELTEMPLATE_*XX
 #define VERDANDI_FILE_MODEL_MODELTEMPLATE_*XX
-\endprecode
+\endcode
 
 into
 
-\precode
+\code
 #ifndef VERDANDI_FILE_MODEL_MYMODEL_*XX
 #define VERDANDI_FILE_MODEL_MYMODEL_*XX
-\endprecode
+\endcode
 </li>
 
  <li>
@@ -88,6 +88,178 @@ Usually, one wants to create an interface for an existing model and to rely on e
 We recommend the following procedure:
 <ol>
     <li> Create a class which <b>encapsulates</b> the existing model and which implements the Verdandi model interface (follow the same steps as in the previous section, \ref own_model "Create your own model").
+
+<b> Example </b>    
+
+\code
+class ExampleModel
+{
+
+    private:
+        //! Size of the displacement vector.
+        int Ndisplacement;
+        //! Displacement vector.
+        double* displacement;
+        //! Size of the velocity vector.
+        int Nvelocity;
+        //! Velocity vector.
+        double* velocity;
+
+        ...
+
+    public:
+        // Constructor and destructor.
+        ExampleModel();
+        ~ExampleModel();
+
+        int GetNdisplacement();
+        double* GetDisplament();
+        int GetNvelocity();
+        double* GetVelocity();
+        
+       	...
+}
+\endcode
+
+\code
+class MyModel: public Verdandi:VerdandiBase
+{
+    //! Type of the state vector.
+     typedef Vector<double> state;
+
+    private:
+        //! Encapsulated example model.
+        ExampleModel model_;
+        //! State vector.
+        state x_;
+
+    public:
+        // Constructor and destructor.
+        MyModel();
+        ~MyModel();
+
+        ...
+
+        // Access methods.
+        int GetNstate();
+        state& GetState();
+        void StateUpdated();
+
+	...
+}
+\endcode
+
+For each method needed in the model class, see the contract provided by the  \link Verdandi::ModelTemplate ModelTemplate\endlink and implement it. For example, the 
+\link Verdandi::ModelTemplate::GetNstate GetNstate\endlink method  contract is available \link Verdandi::ModelTemplate::GetNstate here\endlink  and its corresponding implementation could be:
+
+\code
+    int MyModel::GetNstate()
+    {
+        return model_.GetNdisplacement() + model_.GetNvelocity();
+    }
+\endcode
+
+
+<b>Accessing the Model State by Copy</b>
+
+Access to the model state vector can be performed by copy or reference through
+the methods \link Verdandi::ModelTemplate::GetState GetState\endlink and 
+\link Verdandi::ModelTemplate::StateUpdated StateUpdated\endlink.
+
+ Here is described an implementation of these methods which enables to access the model state by copy.
+
+\code
+    MyModel::state& MyModel::GetState()
+    {
+        x_.Reallocate(model_.GetNdisplacement() + model_.GetNvelocity());
+        int position = 0;
+        for (int i = 0; i < model_.GetNdisplacement(); i++)
+            x_(position++) = model_.GetDisplacement()[i];
+        for (int i = 0; i < model_.GetNvelocity(); i++)
+            x_(position++) = model_.GetVelocity()[i];
+        return x_;
+    }
+\endcode
+
+
+\code
+    void MyModel::StateUpdated()
+    {
+        int position = 0;
+        for (int i = 0; i < model_.GetNdisplacement(); i++)
+           model_.GetDisplacement()[i] = x_(position++);
+        for (int i = 0; i < model_.GetNvelocity(); i++)
+            model_.GetVelocity()[i] = x_(position++);
+    }
+\endcode
+
+
+<b>Accessing the Model State by Reference</b>
+
+In case of large-scale model, it is advised to pass the model state vector by reference. If the state vector is not contiguously stored in memory, the type of the model state vector has to be changed from a <a href="http://www.seldon.sourceforge.net">Seldon</a> dense vector to a <a href="http://www.seldon.sourceforge.net"> Seldon </a> collection vector (a structure for distributed vectors):
+
+\code
+class MyModel: public Verdandi:VerdandiBase
+{
+     //! Type of the state vector.
+     typedef Vector<double, Collection> state;
+     ...
+}
+\endcode
+
+Here is described an implementation of the \link Verdandi::ModelTemplate::Initialize Initialize\endlink method to show how the 
+<a href="http://www.seldon.sourceforge.net"> Seldon </a>  collection vector can be initialized.
+
+
+\code
+    void MyModel::Initialize(string configuration_file)
+    {
+    	...
+	
+        Vector<double> displacement;
+        // This method sets the inner vector displacement pointer
+        // to the 'ModelExample' array containing elements.
+        displacement.SetData(model_.GetDisplacement());
+        Vector<double> velocity;
+        // This method sets the inner vector velocity pointer 
+        // to the 'ModelExample' array containing elements.
+        velocity.SetData(model_.GetVelocity());
+        
+        // Adds a vector to the list of vectors.
+        x_.AddVector(displacement, "displacement");
+        // The vector is "appended" to the existing data.
+        x_.AddVector(velocity, "velocity");
+
+        // Clears the vector without releasing memory.
+        // On exit, the vector is empty and the memory has not been
+        // released.
+        displacement.Nullify();
+        velocity.Nullify();
+        
+        ...
+    }
+\endcode
+
+For the \link Verdandi::ModelTemplate::GetState GetState\endlink method, copies are no longer required since the  \link Verdandi::ModelTemplate ModelTemplate\endlink state is a collection of vectors in which the inner pointer is set to the 'ModelExample' array containing state elements. The corresponding implementation should look something like this:
+
+\code
+    MyModel::state& MyModel::GetState()
+    {
+    	return x_;
+    }
+\endcode
+
+
+
+For the \link Verdandi::ModelTemplate::StateUpdated StateUpdated\endlink, calculations when the update of the model state is done are no longer required.
+
+\code
+    void MyModel::StateUpdated()
+    {
+        
+    }
+\endcode
+
     </li>
     <li> Create an object file from this class using your own compilation tools.</li>
     <li> Add this object file to the Verdandi SConstruct <code>dependency_list</code> variable.
