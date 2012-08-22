@@ -253,6 +253,7 @@ namespace Verdandi
                 GetRow(X_i_trans_, i, x_col);
                 model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, true);
                 Add(T(1), x_col, x);
+                SetRow(x_col, i, X_i_trans_);
             }
             Mlt(alpha_, x);
             model_.StateUpdated();
@@ -283,6 +284,7 @@ namespace Verdandi
                 GetRow(X_i_trans_, i, x_col);
                 model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, true);
                 Add(alpha_i_(i), x_col, x);
+                SetRow(x_col, i, X_i_trans_);
             }
             model_.StateUpdated();
 
