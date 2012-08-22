@@ -48,9 +48,9 @@ namespace Verdandi
         /*** Initializations ***/
 
 #if defined(VERDANDI_WITH_MPI)
-        MPI::Init();
-        rank_ = MPI::COMM_WORLD.Get_rank();
-        Nprocess_ = MPI::COMM_WORLD.Get_size();
+        MPI_Init(NULL, NULL);
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+        MPI_Comm_size(MPI_COMM_WORLD, &Nprocess_);
         if (rank_ == 0)
         {
 #endif
@@ -446,22 +446,21 @@ namespace Verdandi
             Mlt(observation_manager_.GetTangentLinearOperator(), L_,
                 HL_local_trans);
             Transpose(HL_local_trans);
-            MPI::COMM_WORLD.Allgatherv(HL_local_trans.GetData(),
-                                       Nlocal_reduced_ * Nobservation_,
-                                       MPI::DOUBLE, HL_global_trans.GetData(),
-                                       recvcount_gather_1_,
-                                       displacement_gather_1_, MPI::DOUBLE);
+            MPI_Allgatherv(HL_local_trans.GetData(), Nlocal_reduced_ *
+                           Nobservation_, MPI_DOUBLE,
+                           HL_global_trans.GetData(), recvcount_gather_1_,
+                           displacement_gather_1_, MPI_DOUBLE,
+                           MPI_COMM_WORLD);
             Transpose(HL_local_trans);
             Mlt(observation_manager_.GetErrorVarianceInverse(),
                 HL_local_trans, working_matrix_or);
             MltAdd(T(1), HL_global_trans, working_matrix_or, T(1), U_);
 
             Transpose(U_);
-            MPI::COMM_WORLD.Allgatherv(U_.GetData(),
-                                       Nlocal_reduced_ * Nreduced_,
-                                       MPI::DOUBLE, U_global.GetData(),
-                                       recvcount_gather_2_,
-                                       displacement_gather_2_, MPI::DOUBLE);
+            MPI_Allgatherv(U_.GetData(), Nlocal_reduced_ * Nreduced_,
+                           MPI_DOUBLE, U_global.GetData(),
+                           recvcount_gather_2_, displacement_gather_2_,
+                           MPI_DOUBLE, MPI_COMM_WORLD);
             Transpose(U_);
 
             observation & y = observation_manager_.GetInnovation(x);
@@ -473,12 +472,10 @@ namespace Verdandi
             MltAdd(T(1), SeldonTrans, working_matrix_or, y,
                    T(0), state_innovation_local);
 
-            MPI::COMM_WORLD.Allgatherv(state_innovation_local.GetData(),
-                                       Nlocal_reduced_,
-                                       MPI::DOUBLE,
-                                       state_innovation.GetData(),
-                                       recvcount_gather_3_,
-                                       displacement_gather_3_, MPI::DOUBLE);
+            MPI_Allgatherv(state_innovation_local.GetData(), Nlocal_reduced_,
+                           MPI_DOUBLE, state_innovation.GetData(),
+                           recvcount_gather_3_, displacement_gather_3_,
+                           MPI_DOUBLE, MPI_COMM_WORLD);
 
             GetInverse(U_global);
             MltAdd(T(1), U_global, state_innovation, T(0), x_local);
@@ -491,9 +488,8 @@ namespace Verdandi
             model_state_error_variance_row dx_local(Nstate_), dx(Nstate_);
             MltAdd(T(1), L_, x_local_local, T(0), dx_local);
             dx.Fill(T(0));
-            MPI::COMM_WORLD.Allreduce(dx_local.GetData(), dx.GetData(),
-                                      Nstate_, MPI::DOUBLE,
-                                      MPI::SUM);
+            MPI_Allreduce(dx_local.GetData(), dx.GetData(), Nstate_,
+                          MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             Add(T(1), dx, x);
 
             model_.StateUpdated();
@@ -578,14 +574,14 @@ namespace Verdandi
 #if defined(VERDANDI_WITH_MPI)
         if (rank_ == 0)
 #endif
-        MessageHandler::Send(*this, "all", "::FinalizeStep begin");
+            MessageHandler::Send(*this, "all", "::FinalizeStep begin");
 
         model_.FinalizeStep();
 
 #if defined(VERDANDI_WITH_MPI)
         if (rank_ == 0)
 #endif
-        MessageHandler::Send(*this, "all", "::FinalizeStep end");
+            MessageHandler::Send(*this, "all", "::FinalizeStep end");
     }
 
 
@@ -597,16 +593,16 @@ namespace Verdandi
 #if defined(VERDANDI_WITH_MPI)
         if (rank_ == 0)
 #endif
-        MessageHandler::Send(*this, "all", "::Finalize begin");
+            MessageHandler::Send(*this, "all", "::Finalize begin");
 
         model_.Finalize();
 
 #if defined(VERDANDI_WITH_MPI)
         if (rank_ == 0)
 #endif
-        MessageHandler::Send(*this, "all", "::Finalize end");
+            MessageHandler::Send(*this, "all", "::Finalize end");
 #if defined(VERDANDI_WITH_MPI)
-        MPI::Finalize();
+        MPI_Finalize();
 #endif
     }
 

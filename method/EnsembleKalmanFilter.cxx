@@ -45,9 +45,9 @@ namespace Verdandi
         /*** Initializations ***/
 
 #if defined(VERDANDI_WITH_MPI)
-        MPI::Init();
-        rank_ = MPI::COMM_WORLD.Get_rank();
-        Nprocess_ = MPI::COMM_WORLD.Get_size();
+        MPI_Init(NULL, NULL);
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+        MPI_Comm_size(MPI_COMM_WORLD, &Nprocess_);
 #endif
 
         MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
@@ -66,7 +66,7 @@ namespace Verdandi
     ::~EnsembleKalmanFilter()
     {
 #if defined(VERDANDI_WITH_MPI)
-        MPI::Finalize();
+        MPI_Finalize();
 #endif
     }
 
@@ -460,11 +460,9 @@ namespace Verdandi
 
 #if defined(VERDANDI_WITH_MPI)
         model_state mean_state_global_vector(model_.GetNstate());
-        MPI::COMM_WORLD.Allreduce(mean_state_vector.GetData(),
-                                  mean_state_global_vector.GetData(),
-                                  model_.GetNstate(),
-                                  MPI::DOUBLE,
-                                  MPI::SUM);
+        MPI_Allreduce(mean_state_vector.GetData(), mean_state_global_vector.
+                      GetData(), model_.GetNstate(), MPI_DOUBLE, MPI_SUM,
+                      MPI_COMM_WORLD);
         mean_state_vector = mean_state_global_vector;
 #endif
 
@@ -570,11 +568,10 @@ namespace Verdandi
 
 #if defined(VERDANDI_WITH_MPI)
             model_state mean_state_global_vector(model_.GetNstate());
-            MPI::COMM_WORLD.Allreduce(mean_state_vector.GetData(),
-                                      mean_state_global_vector.GetData(),
-                                      model_.GetNstate(),
-                                      MPI::DOUBLE,
-                                      MPI::SUM);
+            MPI_Allreduce(mean_state_vector.GetData(),
+                          mean_state_global_vector.GetData(),
+                          model_.GetNstate(), MPI_DOUBLE, MPI_SUM,
+                          MPI_COMM_WORLD);
             mean_state_vector = mean_state_global_vector;
 #endif
 

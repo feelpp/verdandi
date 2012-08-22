@@ -48,8 +48,8 @@ namespace Verdandi
         /*** Initializations ***/
 
 #if defined(VERDANDI_WITH_MPI)
-        MPI::Init();
-	rank_ = MPI::COMM_WORLD.Get_rank();
+        MPI_Init(NULL, NULL);
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
 #endif
         MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
         MessageHandler::AddRecipient("observation_manager",
@@ -66,7 +66,7 @@ namespace Verdandi
     ::~OptimalInterpolation()
     {
 #if defined(VERDANDI_WITH_MPI)
-        MPI::Finalize();
+        MPI_Finalize();
 #endif
     }
 

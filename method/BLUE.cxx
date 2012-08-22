@@ -59,8 +59,10 @@ namespace Verdandi
         int global_state_number = 0;
 
 #if defined(VERDANDI_WITH_MPI)
-        int rank = MPI::COMM_WORLD.Get_rank();
-        int Nprocess = MPI::COMM_WORLD.Get_size();
+        int rank;
+        int Nprocess;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &Nprocess);
         Nlocal_state = Nstate / Nprocess;
         if (rank < Nstate % Nprocess)
             Nlocal_state ++;
@@ -105,13 +107,10 @@ namespace Verdandi
         }
 
 #if defined(VERDANDI_WITH_MPI)
-	Matrix<T> HBHR_recv(Nobservation, Nobservation);
-        MPI::COMM_WORLD.Allreduce(HBHR_inv.GetData(),
-                                  HBHR_recv.GetData(),
-                                  Nobservation * Nobservation,
-                                  MPI::DOUBLE,
-                                  MPI::SUM);
-	HBHR_inv = HBHR_recv;
+        Matrix<T> HBHR_recv(Nobservation, Nobservation);
+        MPI_Allreduce(HBHR_inv.GetData(), HBHR_recv.GetData(), Nobservation *
+                      Nobservation, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        HBHR_inv = HBHR_recv;
 #endif
 
         // Computes (HBH' + R).
@@ -157,9 +156,9 @@ namespace Verdandi
 #if defined(VERDANDI_WITH_MPI)
         typename Model::state state_update_recv(Nstate);
         state_update_recv.Fill(T(0.));
-        MPI::COMM_WORLD.Allreduce(state_update_send.GetDataVoid(),
-                                  state_update_recv.GetDataVoid(),
-                                  Nstate, MPI::DOUBLE, MPI::SUM);
+        MPI_Allreduce(state_update_send.GetDataVoid(), state_update_recv.
+                      GetDataVoid(), Nstate, MPI_DOUBLE, MPI_SUM,
+                      MPI_COMM_WORLD);
         Add(T(1.), state_update_recv, state);
 #endif
     }
@@ -199,8 +198,10 @@ namespace Verdandi
         int global_state_number = 0;
 
 #if defined(VERDANDI_WITH_MPI)
-        int rank = MPI::COMM_WORLD.Get_rank();
-        int Nprocess = MPI::COMM_WORLD.Get_size();
+        int rank;
+        int Nprocess;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &Nprocess);
         Nlocal_state = Nstate / Nprocess;
         if (rank < Nstate % Nprocess)
             Nlocal_state ++;
@@ -245,13 +246,10 @@ namespace Verdandi
         }
 
 #if defined(VERDANDI_WITH_MPI)
-	Matrix<T> HBHR_recv(Nobservation, Nobservation);
-        MPI::COMM_WORLD.Allreduce(HBHR_inv.GetData(),
-                                  HBHR_recv.GetData(),
-                                  Nobservation * Nobservation,
-                                  MPI::DOUBLE,
-                                  MPI::SUM);
-	HBHR_inv = HBHR_recv;
+        Matrix<T> HBHR_recv(Nobservation, Nobservation);
+        MPI_Allreduce(HBHR_inv.GetData(), HBHR_recv.GetData(), Nobservation *
+                      Nobservation, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        HBHR_inv = HBHR_recv;
 #endif
 
         // Computes (HBH' + R).
@@ -305,9 +303,9 @@ namespace Verdandi
 #if defined(VERDANDI_WITH_MPI)
         typename Model::state state_update_recv(Nstate);
         state_update_recv.Fill(T(0.));
-        MPI::COMM_WORLD.Allreduce(state_update_send.GetDataVoid(),
-                                  state_update_recv.GetDataVoid(),
-                                  Nstate, MPI::DOUBLE, MPI::SUM);
+        MPI_Allreduce(state_update_send.GetDataVoid(), state_update_recv.
+                      GetDataVoid(), Nstate, MPI_DOUBLE, MPI_SUM,
+                      MPI_COMM_WORLD);
         Add(T(1.), state_update_recv, state);
 #endif
     }
