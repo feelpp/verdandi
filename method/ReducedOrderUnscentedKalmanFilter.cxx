@@ -491,8 +491,8 @@ namespace Verdandi
                        model_.GetStateErrorVarianceProjector());
 
 #else
-            model_state x;
-            x.Copy(model_.GetState());
+            model_state_error_variance_row x(Nstate_);
+            Copy(model_.GetState(), x);
 
             /*** Sampling ***/
 
@@ -515,7 +515,7 @@ namespace Verdandi
 
             // Computes X_{n + 1}^-.
             x.Fill(T(0));
-            model_state x_col;
+            model_state_error_variance_row x_col;
             Reallocate(x_col, x.GetM(), model_);
             for (int i = 0; i < Nsigma_point_; i++)
             {
@@ -559,8 +559,8 @@ namespace Verdandi
                                  "implemented yet for the 'no"
                                  " simplex' cases.");
 #else
-            model_state x =  model_.GetState();
-            x.Copy(model_.GetState());
+            model_state_error_variance_row x(Nstate_);
+            Copy(model_.GetState(), x);
 
             /*** Sampling ***/
 
@@ -732,7 +732,7 @@ namespace Verdandi
 #else
             // Computes [HX_{n+1}^{*}].
             sigma_point_matrix Z_i_trans(Nsigma_point_, Nobservation_);
-            model_state x_col;
+            model_state_error_variance_row x_col;
             Reallocate(x_col, Nstate_, model_);
             model_.StateUpdated();
 
