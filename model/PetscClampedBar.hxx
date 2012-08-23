@@ -122,8 +122,6 @@ namespace Verdandi
 
         //! Parameter collection.
         parameter_collection parameter_;
-        //! Full parameter collection.
-        parameter_collection all_parameter_;
 
         //! State.
         set<string> stable_;
