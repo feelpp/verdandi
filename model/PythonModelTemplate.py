@@ -51,11 +51,9 @@ class PythonModelTemplate:
     ## Applies the model to a given vector.
     # The current state of the model is modified.
     # @param[in, out] state a vector.
-    # @param[in] forward Boolean to indicate if the model has to go on to the
-    #  next step.
     # @param[in] preserve_state Boolean to indicate if the model state has to
     #  be preserved.
-    def ApplyOperator(self, state, forward = False, preserve_state = True):
+    def ApplyOperator(self, state, preserve_state = True):
         return
 
 

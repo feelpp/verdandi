@@ -245,8 +245,7 @@ namespace Verdandi
         void BackwardAdjoint(state& state_innovation);
 
         // Operators.
-        double ApplyOperator(state& x, bool forward = false,
-                             bool preserve_state = true,
+        double ApplyOperator(state& x, bool preserve_state = true,
                              bool update_force = true);
         double ApplyTangentLinearOperator(state& x);
         tangent_linear_operator& GetTangentLinearOperator();

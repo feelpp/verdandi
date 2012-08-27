@@ -436,14 +436,15 @@ namespace Verdandi
 
             // Computes X_{n + 1}^-.
             x_.Zero();
+            double new_time;
             for (int i = 0; i < Nlocal_sigma_point_; i++)
             {
                 GetCol(X_i_local_, i, x_col_);
-                model_.ApplyOperator(x_col_, i + 1 == Nlocal_sigma_point_,
-                                     false);
+                model_.ApplyOperator(x_col_, false);
                 Add(T(alpha_), x_col_, x_);
                 SetCol(x_col_, i, X_i_local_);
             }
+            model_.SetTime(new_time);
 
             Vector<double> x_double, working_vector;
             Copy(x_, x_double);
@@ -517,13 +518,15 @@ namespace Verdandi
             x.Fill(T(0));
             model_state_error_variance_row x_col;
             Reallocate(x_col, x.GetM(), model_);
+            double new_time;
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetCol(X_i_, i, x_col);
-                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, false);
+                new_time = model_.ApplyOperator(x_col, false);
                 Add(T(alpha_), x_col, x);
                 SetCol(x_col, i, X_i_);
             }
+            model_.SetTime(new_time);
 
             /*** Resampling ***/
 
@@ -583,13 +586,15 @@ namespace Verdandi
 
             // Computes X_{n + 1}^-.
             x.Fill(T(0));
+            double new_time;
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRow(X_i_trans_, i, x_col);
-                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, false);
+                new_time = model_.ApplyOperator(x_col, false);
                 Add(T(alpha_), x_col, x);
                 SetRow(x_col, i, X_i_trans_);
             }
+            model_.SetTime(new_time);
 
             model_.GetState().Copy(x);
             model_.StateUpdated();

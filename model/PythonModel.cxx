@@ -241,17 +241,15 @@ namespace Verdandi
     /*! The current state of the model is modified.
       \param[in,out] x on entry, the state vector to which the model is
       applied; on exit, the state vector after the model is applied.
-      \param[in] forward Boolean to indicate if the model has to go on to the
-      next step.
       \param[in] preserve_state Boolean to indicate if the model state has to
       be preserved.
       \return The time associated with \a x on exit. If \a forward is true,
       this time should coincide with the model time on exit. If \a forward is
       false, this time should coincide with the model time on exit plus one
       time step.
+      \warning The time of the model has to be preserved.
     */
-    double PythonModel::ApplyOperator(state& x,
-                                      bool forward, bool preserve_state)
+    double PythonModel::ApplyOperator(state& x, bool preserve_state)
     {
         char function_name[] = "ApplyOperator";
         char format_unit[] = "Oii";
@@ -262,13 +260,11 @@ namespace Verdandi
                                                        x.GetDataVoid());
         PyObject *pyTime = PyObject_CallMethod(pyModelInstance_,
                                                function_name, format_unit,
-                                               pyState, forward,
-                                               preserve_state);
+                                               pyState, preserve_state);
         if (pyTime == NULL)
             throw ErrorPythonUndefined("PythonModel::ApplyOperator",
                                        string(function_name),
-                                       "(self, state, forward,"
-                                       " preserve_state)",
+                                       "(self, state, preserve_state)",
                                        module_);
 
         return PyFloat_AsDouble(pyTime);

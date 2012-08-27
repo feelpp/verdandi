@@ -247,13 +247,14 @@ namespace Verdandi
 
         if (alpha_constant_)
         {
+            double new_time;
             // Computes X_{n + 1}^-.
             x.Fill(T(0));
             x_col.Reallocate(Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRow(X_i_trans_, i, x_col);
-                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, false);
+                new_time = model_.ApplyOperator(x_col, false);
                 Add(T(1), x_col, x);
                 SetRow(x_col, i, X_i_trans_);
             }
@@ -261,6 +262,7 @@ namespace Verdandi
             Mlt(alpha_, x);
             model_.GetState().Copy(x);
             model_.StateUpdated();
+            model_.SetTime(new_time);
 
             // Computes P_{n + 1}^-.
             background_error_variance_.Fill(T(0));
@@ -275,18 +277,20 @@ namespace Verdandi
         }
         else
         {
+            double new_time;
             // Computes X_{n + 1}^-.
             x.Fill(T(0));
             x_col.Reallocate(Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRow(X_i_trans_, i, x_col);
-                model_.ApplyOperator(x_col, i + 1 == Nsigma_point_, false);
+                new_time =  model_.ApplyOperator(x_col, false);
                 Add(alpha_i_(i), x_col, x);
                 SetRow(x_col, i, X_i_trans_);
             }
             model_.GetState().Copy(x);
             model_.StateUpdated();
+            model_.SetTime(new_time);
 
             // Computes P_{n + 1}^-.
             background_error_variance_.Fill(T(0));

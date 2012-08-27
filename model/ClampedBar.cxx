@@ -577,24 +577,18 @@ namespace Verdandi
     /*!
       \param[in,out] x on entry, the state vector to which the model is
       applied; on exit, the state vector after the model is applied.
-      \param[in] forward Boolean to indicate if the model has to go on to the
-      next step.
       \param[in] preserve_state Boolean to indicate if the model state has to
       be preserved.
-      \return The time associated with \a x on exit. If \a forward is true,
-      this time should coincide with the model time on exit. If \a forward is
-      false, this time should coincide with the model time on exit plus one
-      time step.
+      \return The time associated with \a x on exit plus one time step.
+      \warning The time of the model has to be preserved.
     */
     template <class T>
-    double ClampedBar<T>::ApplyOperator(state& x, bool forward,
-                                        bool preserve_state,
+    double ClampedBar<T>::ApplyOperator(state& x, bool preserve_state,
                                         bool update_force)
     {
         double saved_time = 0;
         state saved_state;
-        if (!forward)
-            saved_time = GetTime();
+        saved_time = GetTime();
 
         if (preserve_state)
             saved_state.SetData(duplicated_state_);
@@ -610,8 +604,7 @@ namespace Verdandi
 
         duplicated_state_.Nullify();
 
-        if (!forward)
-            SetTime(saved_time);
+        SetTime(saved_time);
 
         if (preserve_state)
         {

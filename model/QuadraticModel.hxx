@@ -163,9 +163,7 @@ namespace Verdandi
 
         // Processing.
         void Forward();
-        double ApplyOperator(state& x,
-                             bool forward = false,
-                             bool preserve_state = true);
+        double ApplyOperator(state& x, bool preserve_state = true);
         double ApplyTangentLinearOperator(state& x);
         tangent_linear_operator& GetTangentLinearOperator();
 
