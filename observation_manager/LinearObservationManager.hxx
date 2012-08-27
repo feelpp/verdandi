@@ -181,15 +181,15 @@ namespace Verdandi
         // Constructors and destructor.
         LinearObservationManager();
         template <class Model>
-        LinearObservationManager(const Model& model,
+        LinearObservationManager(Model& model,
                                  string configuration_file);
         ~LinearObservationManager();
 
         // Initialization.
         template <class Model>
-        void Initialize(const Model& model, string configuration_file);
+        void Initialize(Model& model, string configuration_file);
         template <class Model>
-        void InitializeOperator(const Model& model,
+        void InitializeOperator(Model& model,
                                 string configuration_file);
 
         void DiscardObservation(bool discard_observation);
@@ -197,7 +197,7 @@ namespace Verdandi
         void SetTrack(int track);
 
         template <class Model>
-        void SetTime(const Model& model, double time);
+        void SetTime(Model& model, double time);
         void SetTime(double time);
         void SetAvailableTime(double time, time_vector& available_time);
         void SetAvailableTime(double time_inf, double time_sup, time_vector&

@@ -257,7 +257,7 @@ namespace Verdandi
     template <class T>
     template <class Model>
     void PetscLinearObservationManager<T>
-    ::SetTime(const Model& model, double time)
+    ::SetTime(Model& model, double time)
     {
         SetTime(time);
     }

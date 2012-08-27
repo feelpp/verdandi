@@ -63,11 +63,11 @@ namespace Verdandi
     */
     template <class Model>
     void ObservationManagerTemplate
-    ::Initialize(const Model& model, string configuration_file)
+    ::Initialize(Model& model, string configuration_file)
     {
         throw ErrorUndefined(
             "void ObservationManagerTemplate"
-            "::Initialize(const Model& model, string configuration_file)");
+            "::Initialize(Model& model, string configuration_file)");
     }
 
 
@@ -92,11 +92,11 @@ namespace Verdandi
     */
     template <class Model>
     void ObservationManagerTemplate
-    ::SetTime(const Model& model, double time)
+    ::SetTime(Model& model, double time)
     {
         throw ErrorUndefined(
             "void ObservationManagerTemplate"
-            "::SetTime(const Model& model, double time)");
+            "::SetTime(Model& model, double time)");
     }
 
 

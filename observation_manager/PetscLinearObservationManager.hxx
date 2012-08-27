@@ -199,7 +199,7 @@ namespace Verdandi
         void SetTrack(int track);
 
         template <class Model>
-        void SetTime(const Model& model, double time);
+        void SetTime(Model& model, double time);
         void SetTime(double time);
         void SetAvailableTime(double time, time_vector& available_time);
         void SetAvailableTime(double time_inf, double time_sup, time_vector&

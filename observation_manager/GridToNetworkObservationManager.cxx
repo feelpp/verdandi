@@ -56,7 +56,7 @@ namespace Verdandi
     template <class T>
     template <class Model>
     GridToNetworkObservationManager<T>
-    ::GridToNetworkObservationManager(const Model& model,
+    ::GridToNetworkObservationManager(Model& model,
                                       string configuration_file):
         current_row_(-1)
     {
@@ -85,7 +85,7 @@ namespace Verdandi
     template <class T>
     template <class Model>
     void GridToNetworkObservationManager<T>
-    ::Initialize(const Model& model, string configuration_file)
+    ::Initialize(Model& model, string configuration_file)
     {
         observation_aggregator_.Initialize(configuration_file);
 
@@ -271,7 +271,7 @@ namespace Verdandi
     template <class T>
     template <class Model>
     void GridToNetworkObservationManager<T>
-    ::SetTime(const Model& model, double time)
+    ::SetTime(Model& model, double time)
     {
         SetTime(time);
     }

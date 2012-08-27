@@ -57,7 +57,7 @@ namespace Verdandi
     template <class T>
     template <class Model>
     LinearObservationManager<T>
-    ::LinearObservationManager(const Model& model,
+    ::LinearObservationManager(Model& model,
                                string configuration_file):
         observation_aggregator_(configuration_file), current_row_(-1)
     {
@@ -86,7 +86,7 @@ namespace Verdandi
     template <class T>
     template <class Model>
     void LinearObservationManager<T>
-    ::Initialize(const Model& model, string configuration_file)
+    ::Initialize(Model& model, string configuration_file)
     {
         observation_aggregator_.Initialize(configuration_file);
 
@@ -186,7 +186,7 @@ namespace Verdandi
     template <class T>
     template <class Model>
     void LinearObservationManager<T>
-    ::InitializeOperator(const Model& model, string configuration_file)
+    ::InitializeOperator(Model& model, string configuration_file)
     {
         VerdandiOps configuration(configuration_file);
         Nstate_model_ = model.GetNstate();
@@ -355,7 +355,7 @@ namespace Verdandi
     template <class T>
     template <class Model>
     void LinearObservationManager<T>
-    ::SetTime(const Model& model, double time)
+    ::SetTime(Model& model, double time)
     {
         SetTime(time);
     }

@@ -165,13 +165,13 @@ namespace Verdandi
         // Constructors and destructor.
         GridToNetworkObservationManager();
         template <class Model>
-        GridToNetworkObservationManager(const Model& model,
+        GridToNetworkObservationManager(Model& model,
                                         string configuration_file);
         ~GridToNetworkObservationManager();
 
         // Initialization.
         template <class Model>
-        void Initialize(const Model& model, string configuration_file);
+        void Initialize(Model& model, string configuration_file);
 
         void DiscardObservation(bool discard_observation);
         void SetAllActive();
@@ -180,7 +180,7 @@ namespace Verdandi
         void SetTrack(int track);
 
         template <class Model>
-        void SetTime(const Model& model, double time);
+        void SetTime(Model& model, double time);
         void SetTime(double time);
         void SetAvailableTime(double time, time_vector& available_time) const;
         void SetAvailableTime(double time_inf, double time_sup,

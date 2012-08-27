@@ -65,11 +65,11 @@ namespace Verdandi
 
         // Initialization.
         template <class Model>
-        void Initialize(const Model& model, string configuration_file);
+        void Initialize(Model& model, string configuration_file);
 
         void DiscardObservation(bool discard_observation);
         template <class Model>
-        void SetTime(const Model& model, double time);
+        void SetTime(Model& model, double time);
 
 
         /////////////////
