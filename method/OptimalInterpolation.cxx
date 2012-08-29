@@ -40,8 +40,8 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class Model, class ObservationManager>
-    OptimalInterpolation<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    OptimalInterpolation<Model, ObservationManager>
     ::OptimalInterpolation()
     {
 
@@ -64,8 +64,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class Model, class ObservationManager>
-    OptimalInterpolation<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    OptimalInterpolation<Model, ObservationManager>
     ::~OptimalInterpolation()
     {
 #if defined(VERDANDI_WITH_MPI)
@@ -85,8 +85,8 @@ namespace Verdandi
     //! Initializes the optimal interpolation driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>
     ::Initialize(string configuration_file,
                  bool initialize_model, bool initialize_observation_manager)
     {
@@ -99,8 +99,8 @@ namespace Verdandi
     //! Initializes the optimal interpolation driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>
     ::Initialize(VerdandiOps& configuration,
                  bool initialize_model, bool initialize_observation_manager)
     {
@@ -215,8 +215,8 @@ namespace Verdandi
     //! Initializes a step for the optimal interpolation.
     /*! Initializes a step for the model.
      */
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>::InitializeStep()
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
@@ -230,8 +230,8 @@ namespace Verdandi
 
 
     //! Performs a step forward, with optimal interpolation at the end.
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>::Forward()
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
@@ -249,8 +249,8 @@ namespace Verdandi
     //! Computes an analysis.
     /*! Whenever observations are available, it computes BLUE.
      */
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>::Analyze()
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>::Analyze()
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
 
@@ -314,8 +314,8 @@ namespace Verdandi
 
 
     //! Finalizes a step for the model.
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>::FinalizeStep()
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>::FinalizeStep()
     {
         MessageHandler::Send(*this, "all", "::FinalizeStep begin");
 
@@ -326,8 +326,8 @@ namespace Verdandi
 
 
     //! Finalizes the model.
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>::Finalize()
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>::Finalize()
     {
         MessageHandler::Send(*this, "all", "::Finalize begin");
 
@@ -341,8 +341,8 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class Model, class ObservationManager>
-    bool OptimalInterpolation<T, Model, ObservationManager>::HasFinished()
+    template <class Model, class ObservationManager>
+    bool OptimalInterpolation<Model, ObservationManager>::HasFinished()
     {
         return model_.HasFinished();
     }
@@ -352,9 +352,8 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class Model, class ObservationManager>
-    Model&
-    OptimalInterpolation<T, Model, ObservationManager>::GetModel()
+    template <class Model, class ObservationManager>
+    Model& OptimalInterpolation<Model, ObservationManager>::GetModel()
     {
         return model_;
     }
@@ -364,9 +363,8 @@ namespace Verdandi
     /*!
       \return The observation manager.
     */
-    template <class T, class Model, class ObservationManager>
-    ObservationManager&
-    OptimalInterpolation<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    ObservationManager& OptimalInterpolation<Model, ObservationManager>
     ::GetObservationManager()
     {
         return observation_manager_;
@@ -377,9 +375,9 @@ namespace Verdandi
     /*!
       \return The output saver.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     OutputSaver&
-    OptimalInterpolation<T, Model, ObservationManager>::GetOutputSaver()
+    OptimalInterpolation<Model, ObservationManager>::GetOutputSaver()
     {
         return output_saver_;
     }
@@ -389,8 +387,8 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class Model, class ObservationManager>
-    string OptimalInterpolation<T, Model, ObservationManager>::GetName() const
+    template <class Model, class ObservationManager>
+    string OptimalInterpolation<Model, ObservationManager>::GetName() const
     {
         return "OptimalInterpolation";
     }
@@ -400,8 +398,8 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class Model, class ObservationManager>
-    void OptimalInterpolation<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>
     ::Message(string message)
     {
 #if defined(VERDANDI_WITH_MPI)

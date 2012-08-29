@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::UnscentedKalmanFilter<real, Verdandi::QuadraticModel<real>,
+    Verdandi::UnscentedKalmanFilter<Verdandi::QuadraticModel<real>,
         Verdandi::LinearObservationManager<real> > driver;
 
     driver.Initialize(argv[1]);

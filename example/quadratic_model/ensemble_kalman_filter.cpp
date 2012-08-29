@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::EnsembleKalmanFilter<real, Verdandi::QuadraticModel<real>,
+    Verdandi::EnsembleKalmanFilter<Verdandi::QuadraticModel<real>,
         Verdandi::LinearObservationManager<real>,
         Verdandi::TR1PerturbationManager> driver;
 

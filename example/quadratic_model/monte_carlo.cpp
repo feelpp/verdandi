@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::MonteCarlo<real, Verdandi::QuadraticModel<real>,
+    Verdandi::MonteCarlo<Verdandi::QuadraticModel<real>,
         Verdandi::TR1PerturbationManager> driver;
 
     driver.Initialize(argv[1]);

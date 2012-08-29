@@ -31,8 +31,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::UnscentedKalmanFilter<real,
-        Verdandi::ClampedBar<real>,
+    Verdandi::UnscentedKalmanFilter<Verdandi::ClampedBar<real>,
         Verdandi::LinearObservationManager<real> > driver;
 
     driver.Initialize(argv[1]);

@@ -31,7 +31,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Verdandi::ReducedOrderExtendedKalmanFilter<double,
+    Verdandi::ReducedOrderExtendedKalmanFilter<
         Verdandi::ModelTemplate,
         Verdandi::ObservationManagerTemplate> driver;
 

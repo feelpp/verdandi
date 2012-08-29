@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::ReducedOrderUnscentedKalmanFilter<real,
+    Verdandi::ReducedOrderUnscentedKalmanFilter<
         Verdandi::PetscClampedBar<real>,
         Verdandi::PetscLinearObservationManager<real> > driver;
     driver.Initialize(argv[1]);

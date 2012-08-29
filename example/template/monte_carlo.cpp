@@ -25,7 +25,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Verdandi::MonteCarlo<double, Verdandi::ModelTemplate,
+    Verdandi::MonteCarlo<Verdandi::ModelTemplate,
         Verdandi::TR1PerturbationManager> driver;
 
     driver.Initialize(argv[1]);

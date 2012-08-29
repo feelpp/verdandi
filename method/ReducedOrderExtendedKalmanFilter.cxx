@@ -40,8 +40,8 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class Model, class ObservationManager>
-    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::ReducedOrderExtendedKalmanFilter()
     {
 
@@ -73,8 +73,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class Model, class ObservationManager>
-    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::~ReducedOrderExtendedKalmanFilter()
     {
     }
@@ -88,8 +88,8 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::Initialize(string configuration_file,
                  bool initialize_model, bool initialize_observation_manager)
     {
@@ -102,8 +102,8 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::Initialize(VerdandiOps& configuration,
                  bool initialize_model, bool initialize_observation_manager)
     {
@@ -224,7 +224,7 @@ namespace Verdandi
             local_reduced_column_.PushBack(i);
 
         U_.Reallocate(Nreduced_, Nlocal_reduced_);
-        Vector<T> col(Nreduced_);
+        Vector<Ts> col(Nreduced_);
         for (int i = 0; i < Nlocal_reduced_; i++)
         {
             GetCol(U, local_reduced_column_(i), col);
@@ -377,8 +377,8 @@ namespace Verdandi
     //! Initializes a step for the extended Kalman filter.
     /*! Initializes a step for the model.
      */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::InitializeStep()
     {
         model_.InitializeStep();
@@ -386,8 +386,8 @@ namespace Verdandi
 
 
     //! Performs a step forward, with optimal interpolation at the end.
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::Forward()
     {
 #if defined(VERDANDI_WITH_MPI)
@@ -418,8 +418,8 @@ namespace Verdandi
 
     //! Computes an analysis.
     /*! Whenever observations are available, it computes BLUE. */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::Analyze()
     {
 #if defined(VERDANDI_WITH_MPI)
@@ -457,7 +457,7 @@ namespace Verdandi
             Transpose(HL_local_trans);
             Mlt(observation_manager_.GetErrorVarianceInverse(),
                 HL_local_trans, working_matrix_or);
-            MltAdd(T(1), HL_global_trans, working_matrix_or, T(1), U_);
+            MltAdd(Ts(1), HL_global_trans, working_matrix_or, Ts(1), U_);
 
             Transpose(U_);
             MPI_Allgatherv(U_.GetData(), Nlocal_reduced_ * Nreduced_,
@@ -472,8 +472,8 @@ namespace Verdandi
             model_state_error_variance_row state_innovation(Nreduced_),
                 state_innovation_local(Nlocal_reduced_),
                 x_local(Nreduced_);
-            MltAdd(T(1), SeldonTrans, working_matrix_or, y,
-                   T(0), state_innovation_local);
+            MltAdd(Ts(1), SeldonTrans, working_matrix_or, y,
+                   Ts(0), state_innovation_local);
 
             MPI_Allgatherv(state_innovation_local.GetData(), Nlocal_reduced_,
                            MPI_DOUBLE, state_innovation.GetData(),
@@ -481,7 +481,7 @@ namespace Verdandi
                            MPI_DOUBLE, MPI_COMM_WORLD);
 
             GetInverse(U_global);
-            MltAdd(T(1), U_global, state_innovation, T(0), x_local);
+            MltAdd(Ts(1), U_global, state_innovation, Ts(0), x_local);
 
             model_state_error_variance_row x_local_local(Nlocal_reduced_);
             for (int i = 0; i < Nlocal_reduced_; i++)
@@ -489,11 +489,11 @@ namespace Verdandi
                     x_local(Nlocal_reduced_column_sum_(rank_) + i);
 
             model_state_error_variance_row dx_local(Nstate_), dx(Nstate_);
-            MltAdd(T(1), L_, x_local_local, T(0), dx_local);
-            dx.Fill(T(0));
+            MltAdd(Ts(1), L_, x_local_local, Ts(0), dx_local);
+            dx.Fill(Ts(0));
             MPI_Allreduce(dx_local.GetData(), dx.GetData(), Nstate_,
                           MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-            Add(T(1), dx, x);
+            Add(Ts(1), dx, x);
 
             model_.StateUpdated();
 
@@ -535,8 +535,8 @@ namespace Verdandi
             Mlt(observation_manager_.GetTangentLinearOperator(), L_, HL);
             Mlt(observation_manager_.GetErrorVarianceInverse(), HL,
                 working_matrix_or);
-            MltAdd(T(1), SeldonTrans, HL, SeldonNoTrans,
-                   working_matrix_or, T(1), U_);
+            MltAdd(Ts(1), SeldonTrans, HL, SeldonNoTrans,
+                   working_matrix_or, Ts(1), U_);
 
             /*** Updated K ***/
 
@@ -546,13 +546,13 @@ namespace Verdandi
             Mlt(observation_manager_.GetErrorVarianceInverse(), HL,
                 working_matrix_or);
             model_state_error_variance_row state_innovation(Nreduced_);
-            MltAdd(T(1), SeldonTrans, working_matrix_or, y, T(0),
+            MltAdd(Ts(1), SeldonTrans, working_matrix_or, y, Ts(0),
                    state_innovation);
 
             model_state_error_variance_row correction(Nreduced_);
             GetInverse(U_inv);
-            MltAdd(T(1), U_inv, state_innovation, T(0), correction);
-            MltAdd(T(1), L_, correction, T(1), x);
+            MltAdd(Ts(1), U_inv, state_innovation, Ts(0), correction);
+            MltAdd(Ts(1), L_, correction, Ts(1), x);
 
             model_.StateUpdated();
 
@@ -570,8 +570,8 @@ namespace Verdandi
 
 
     //! Finalizes a step for the model.
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::FinalizeStep()
     {
 #if defined(VERDANDI_WITH_MPI)
@@ -589,8 +589,8 @@ namespace Verdandi
 
 
     //! Finalizes the model.
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::Finalize()
     {
 #if defined(VERDANDI_WITH_MPI)
@@ -614,8 +614,8 @@ namespace Verdandi
 
 
     //! Computes Covariance.
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::PropagateCovarianceMatrix()
     {
 #ifdef VERDANDI_WITH_MPI
@@ -655,8 +655,8 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class Model, class ObservationManager>
-    bool ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    bool ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::HasFinished()
     {
         return model_.HasFinished();
@@ -667,9 +667,9 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     Model&
-    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::GetModel()
     {
         return model_;
@@ -680,9 +680,9 @@ namespace Verdandi
     /*!
       \return The observation manager..
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     ObservationManager&
-    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::GetObservationManager()
     {
         return observation_manager_;
@@ -693,9 +693,9 @@ namespace Verdandi
     /*!
       \return The output saver.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     OutputSaver&
-    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::GetOutputSaver()
     {
         return output_saver_;
@@ -706,9 +706,9 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     string
-    ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::GetName() const
     {
         return "ReducedOrderExtendedKalmanFilter";
@@ -719,8 +719,8 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderExtendedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::Message(string message)
     {
 #if defined(VERDANDI_WITH_MPI)

@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    UnscentedKalmanFilter<real, ModelTemplate,
+    UnscentedKalmanFilter<ModelTemplate,
         ObservationManagerTemplate> driver;
 
     driver.Initialize(argv[1]);

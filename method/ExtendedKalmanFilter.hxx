@@ -33,11 +33,13 @@ namespace Verdandi
 
 
     //! This class implements the extended Kalman filter.
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     class ExtendedKalmanFilter: public VerdandiBase
     {
 
     public:
+        //! Value type of the model state.
+        typedef typename Model::state::value_type Ts;
         //! Type of a row of the background error variance.
         typedef typename Model::state_error_variance_row
         model_state_error_variance_row;

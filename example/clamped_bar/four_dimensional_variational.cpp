@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::FourDimensionalVariational<real,
+    Verdandi::FourDimensionalVariational<
         Verdandi::ClampedBar<real>,
         Verdandi::LinearObservationManager<real>,
         Seldon::NLoptSolver> driver;

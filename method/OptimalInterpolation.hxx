@@ -33,7 +33,7 @@ namespace Verdandi
 
 
     //! This class performs optimal interpolation.
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     class OptimalInterpolation: public VerdandiBase
     {
 
@@ -43,6 +43,12 @@ namespace Verdandi
         model_state_error_variance_row;
         //! Type of the model state vector.
         typedef typename Model::state model_state;
+        //! Value type of the model state vector.
+        typedef typename Model::state::value_type Ts;
+        //! Value type of the observations.
+        typedef typename ObservationManager::observation::value_type To;
+        //! Value type of the model parameters.
+        //typedef typename Model::parameter::value_type Tp;
         //! Type of the model/observation crossed matrix.
         typedef typename Model::matrix_state_observation
         matrix_state_observation;

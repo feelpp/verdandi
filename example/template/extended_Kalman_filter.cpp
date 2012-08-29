@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    ExtendedKalmanFilter<double, ModelTemplate,
+    ExtendedKalmanFilter<ModelTemplate,
         ObservationManagerTemplate> driver;
 
     driver.Initialize(argv[1]);

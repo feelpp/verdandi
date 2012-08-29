@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     }
 
 
-    Verdandi::FourDimensionalVariational<double,
+    Verdandi::FourDimensionalVariational<
         Verdandi::ModelTemplate,
         Verdandi::ObservationManagerTemplate,
         Seldon::NLoptSolver> driver;

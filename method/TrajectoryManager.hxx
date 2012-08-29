@@ -30,11 +30,13 @@ namespace Verdandi
 
 
     //! This class manages model trajectory.
-    template <class T, class Model>
+    template <class Model>
     class TrajectoryManager
     {
 
     public:
+        //! Value type of the model state.
+        typedef typename Model::state::value_type Ts;
         //! Type of the model state vector.
         typedef typename Model::state model_state;
 

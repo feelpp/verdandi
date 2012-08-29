@@ -36,9 +36,9 @@ namespace Verdandi
     //! Main constructor.
     /*! Builds the driver.
      */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    EnsembleKalmanFilter<T, Model, ObservationManager, PerturbationManager>
+    EnsembleKalmanFilter<Model, ObservationManager, PerturbationManager>
     ::EnsembleKalmanFilter()
     {
 
@@ -63,9 +63,9 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    EnsembleKalmanFilter<T, Model, ObservationManager, PerturbationManager>
+    EnsembleKalmanFilter<Model, ObservationManager, PerturbationManager>
     ::~EnsembleKalmanFilter()
     {
 #if defined(VERDANDI_WITH_MPI)
@@ -98,9 +98,9 @@ namespace Verdandi
       \warning If \a initialize_model is set to false, the model should be
       initialized before calling this function.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>
     ::Initialize(string configuration_file,
                  bool initialize_model, bool initialize_observation_manager,
@@ -130,10 +130,9 @@ namespace Verdandi
       \warning If \a initialize_model is set to false, the model should be
       initialized before calling this function.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
-                              PerturbationManager>
+    void EnsembleKalmanFilter<Model, ObservationManager, PerturbationManager>
     ::Initialize(VerdandiOps& configuration,
                  bool initialize_model, bool initialize_observation_manager,
                  bool initialize_perturbation_manager)
@@ -278,9 +277,9 @@ namespace Verdandi
     /*! \brief The perturbations of the parameters are generated independently
       for each member.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::InitializeEnsemble()
     {
         uncertain_parameter reference_parameter;
@@ -350,9 +349,9 @@ namespace Verdandi
 
 
     //! Initializes a step for the method.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
@@ -427,9 +426,9 @@ namespace Verdandi
 
 
     //! Performs a step forward for the ensemble.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
@@ -461,7 +460,7 @@ namespace Verdandi
         {
             model_.GetFullState() = ensemble_[m];
             model_.FullStateUpdated();
-            Add(T(1), model_.GetState(), mean_state_vector);
+            Add(Ts(1), model_.GetState(), mean_state_vector);
         }
 
 #if defined(VERDANDI_WITH_MPI)
@@ -472,7 +471,7 @@ namespace Verdandi
         mean_state_vector = mean_state_global_vector;
 #endif
 
-        Mlt(T(1) / T(Nmember_), mean_state_vector);
+        Mlt(Ts(1) / Ts(Nmember_), mean_state_vector);
         model_.GetState() = mean_state_vector;
         model_.StateUpdated();
 
@@ -488,9 +487,9 @@ namespace Verdandi
 
 
     //! Computes an analysis.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::Analyze()
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
@@ -511,7 +510,7 @@ namespace Verdandi
 
             // Computes the innovation vectors d = y - Hx where H is the
             // observation operator.
-            Matrix<T> innovation_matrix(Nobservation_, Nlocal_member_);
+            Matrix<To> innovation_matrix(Nobservation_, Nlocal_member_);
             observation Hx(Nobservation_);
             model_state state(Nstate_);
             for (int m = 0; m < Nlocal_member_; m++)
@@ -519,44 +518,45 @@ namespace Verdandi
                 model_.GetFullState() = ensemble_[m];
                 model_.FullStateUpdated();
                 observation_manager_.ApplyOperator(model_.GetState(), Hx);
-                Mlt(T(-1), Hx);
-                Add(T(1), obs, Hx);
+                Mlt(To(-1), Hx);
+                Add(To(1), obs, Hx);
                 SetCol(Hx, m, innovation_matrix);
             }
 
             // Constructs state ensemble perturbation matrix L.
-            Matrix<T> ensemble_perturbation(Nstate_, Nlocal_member_);
+            Matrix<Ts> ensemble_perturbation(Nstate_, Nlocal_member_);
             for (int l = 0; l < Nlocal_member_; l++)
                 for (int k = 0; k < Nstate_; k++)
                     ensemble_perturbation(k, l) =
                         ensemble_[l](k) - mean_state_vector(k);
 
             // Computes H times L.
-            Matrix<T> HL(Nobservation_, Nlocal_member_);
-            MltAdd(T(1), observation_manager_.GetTangentLinearOperator(),
-                   ensemble_perturbation, T(0), HL);
+            Matrix<To> HL(Nobservation_, Nlocal_member_);
+            MltAdd(To(1), observation_manager_.GetTangentLinearOperator(),
+                   ensemble_perturbation, To(0), HL);
 
             // Reads R.
-            Matrix<T> working_matrix(Nobservation_,Nobservation_);
+            Matrix<To> working_matrix(Nobservation_,Nobservation_);
             working_matrix = observation_manager_.GetErrorVariance();
 
             // 'working_matrix' stores HLL'H' + R.
-            MltAdd(T(1), SeldonNoTrans, HL, SeldonTrans, HL,
-                   T(1), working_matrix);
+            MltAdd(To(1), SeldonNoTrans, HL, SeldonTrans, HL,
+                   To(1), working_matrix);
 
             // Computes (HLL'H' + R)^{-1} d.
-            Matrix<T> correction(Nobservation_, Nlocal_member_);
+            Matrix<To> correction(Nobservation_, Nlocal_member_);
             GetInverse(working_matrix);
-            MltAdd(T(1), working_matrix, innovation_matrix, T(0), correction);
+            MltAdd(To(1), working_matrix, innovation_matrix,
+                   To(0), correction);
 
             // Computes LL'H'
-            Matrix<T> LLH(Nstate_, Nobservation_);
-            MltAdd(T(1), SeldonNoTrans, ensemble_perturbation, SeldonTrans,
-                   HL, T(0), LLH);
+            Matrix<Ts> LLH(Nstate_, Nobservation_);
+            MltAdd(Ts(1), SeldonNoTrans, ensemble_perturbation, SeldonTrans,
+                   HL, Ts(0), LLH);
 
             // Computes LL'H' (HLL'H' + R)^{-1} d.
-            Matrix<T> Kd(Nstate_, Nlocal_member_);
-            MltAdd(T(1), LLH, correction, T(0), Kd);
+            Matrix<Ts> Kd(Nstate_, Nlocal_member_);
+            MltAdd(Ts(1), LLH, correction, Ts(0), Kd);
 
             // Updates the ensemble A += K * d.
             for (int m = 0; m < Nlocal_member_; m++)
@@ -569,7 +569,7 @@ namespace Verdandi
             {
                 model_.GetFullState() = ensemble_[m];
                 model_.FullStateUpdated();
-                Add(T(1), model_.GetState(), mean_state_vector);
+                Add(Ts(1), model_.GetState(), mean_state_vector);
             }
 
 #if defined(VERDANDI_WITH_MPI)
@@ -581,7 +581,7 @@ namespace Verdandi
             mean_state_vector = mean_state_global_vector;
 #endif
 
-            Mlt(T(1) / T(Nmember_), mean_state_vector);
+            Mlt(Ts(1) / Ts(Nmember_), mean_state_vector);
             model_.GetState() = mean_state_vector;
             model_.StateUpdated();
 
@@ -595,9 +595,9 @@ namespace Verdandi
 
 
     //! Finalizes a step for the model.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::FinalizeStep()
     {
         MessageHandler::Send(*this, "all", "::FinalizeStep begin");
@@ -609,9 +609,9 @@ namespace Verdandi
 
 
     //! Finalizes the model.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::Finalize()
     {
         MessageHandler::Send(*this, "all", "::Finalize begin");
@@ -626,9 +626,9 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    bool EnsembleKalmanFilter<T, Model, ObservationManager,
+    bool EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::HasFinished()
         const
     {
@@ -640,10 +640,10 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
     Model&
-    EnsembleKalmanFilter<T, Model, ObservationManager,
+    EnsembleKalmanFilter<Model, ObservationManager,
                          PerturbationManager>::GetModel()
     {
         return model_;
@@ -654,10 +654,10 @@ namespace Verdandi
     /*!
       \return The observation manager.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
     ObservationManager&
-    EnsembleKalmanFilter<T, Model, ObservationManager,
+    EnsembleKalmanFilter<Model, ObservationManager,
                          PerturbationManager>::GetObservationManager()
     {
         return observation_manager_;
@@ -668,10 +668,10 @@ namespace Verdandi
     /*!
       \return The perturbation manager.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
     PerturbationManager&
-    EnsembleKalmanFilter<T, Model, ObservationManager,
+    EnsembleKalmanFilter<Model, ObservationManager,
                          PerturbationManager>::GetPerturbationManager()
     {
         return perturbation_manager_;
@@ -682,11 +682,10 @@ namespace Verdandi
     /*!
       \return The output saver.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    OutputSaver&
-    EnsembleKalmanFilter<T, Model, ObservationManager,
-                         PerturbationManager>::GetOutputSaver()
+    OutputSaver& EnsembleKalmanFilter<Model, ObservationManager,
+                                      PerturbationManager>::GetOutputSaver()
     {
         return output_saver_;
     }
@@ -696,11 +695,10 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    string
-    EnsembleKalmanFilter<T, Model, ObservationManager,
-                         PerturbationManager>::GetName() const
+    string EnsembleKalmanFilter<Model, ObservationManager,
+                                PerturbationManager>::GetName() const
     {
         return "EnsembleKalmanFilter";
     }
@@ -710,9 +708,9 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::Message(string message)
     {
 
@@ -804,10 +802,10 @@ namespace Verdandi
       \param[in] pdf probability density function: Normal, NormalHomogeneous,
       LogNormal or LogNormalHomogeneous.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
     template <class T0, class Allocator0>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>
     ::Fill(Vector<T0, Collection, Allocator0>& in,
            string pdf)
@@ -828,10 +826,10 @@ namespace Verdandi
       \param[in] pdf probability density function: Normal, NormalHomogeneous,
       LogNormal or LogNormalHomogeneous.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
     template <class T0, class Storage0, class Allocator0>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>
     ::Fill(Vector<T0, Storage0, Allocator0>& in, string pdf)
     {
@@ -847,10 +845,10 @@ namespace Verdandi
       \param[in] in input vector.
       \param[out] out output vector.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
     template <class T0, class Storage0, class Allocator0>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>
     ::SetDimension(Vector<T0, Storage0, Allocator0>& in,
                    Vector<T0, Storage0, Allocator0>& out)
@@ -865,10 +863,10 @@ namespace Verdandi
       \param[in] in input collection vector.
       \param[out] out output collection vector.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
     template <class T0, class Allocator0>
-    void EnsembleKalmanFilter<T, Model, ObservationManager,
+    void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>
     ::SetDimension(Vector<T0, Collection, Allocator0>& in,
                    Vector<T0, Collection, Allocator0>& out)

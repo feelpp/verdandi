@@ -29,8 +29,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Verdandi::EnsembleKalmanFilter<double,
-        Verdandi::ModelTemplate,
+    Verdandi::EnsembleKalmanFilter<Verdandi::ModelTemplate,
         Verdandi::ObservationManagerTemplate,
         Verdandi::TR1PerturbationManager> driver;
 

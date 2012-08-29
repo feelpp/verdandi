@@ -44,8 +44,8 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class Model, class ObservationManager>
-    ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::ReducedOrderUnscentedKalmanFilter()
     {
 #ifndef VERDANDI_WITH_MPI
@@ -73,8 +73,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class Model, class ObservationManager>
-    ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::~ReducedOrderUnscentedKalmanFilter()
     {
     }
@@ -88,8 +88,8 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::Initialize(string configuration_file,
                  bool initialize_model, bool initialize_observation_manager)
     {
@@ -101,8 +101,8 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::Initialize(VerdandiOps& configuration,
                  bool initialize_model, bool initialize_observation_manager)
     {
@@ -281,12 +281,12 @@ namespace Verdandi
 
         if (alpha_constant_)
         {
-            MltAdd(T(alpha_), SeldonTrans, V_trans, SeldonNoTrans, V_trans,
-                   T(0), P_alpha_v);
+            MltAdd(Ts(alpha_), SeldonTrans, V_trans, SeldonNoTrans, V_trans,
+                   Ts(0), P_alpha_v);
             GetInverse(P_alpha_v);
             GetCholesky(P_alpha_v);
-            MltAdd(T(1), SeldonNoTrans, V_trans, SeldonTrans, P_alpha_v,
-                   T(0), I_trans_);
+            MltAdd(Ts(1), SeldonNoTrans, V_trans, SeldonTrans, P_alpha_v,
+                   Ts(0), I_trans_);
         }
         else
             throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
@@ -298,8 +298,8 @@ namespace Verdandi
         // Initializes D_v.
         D_v_.Reallocate(Nsigma_point_, Nsigma_point_);
         if (alpha_constant_)
-            MltAdd(T(alpha_ * alpha_), SeldonNoTrans, I_trans_, SeldonTrans,
-                   I_trans_, T(0), D_v_);
+            MltAdd(Ts(alpha_ * alpha_), SeldonNoTrans, I_trans_, SeldonTrans,
+                   I_trans_, Ts(0), D_v_);
         else
             throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
                                  "Initialize()", "Calculation not "
@@ -360,8 +360,8 @@ namespace Verdandi
     //! Initializes a step for the unscented Kalman filter.
     /*! Initializes a step for the model.
      */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::InitializeStep()
     {
 #if defined(VERDANDI_WITH_MPI)
@@ -379,8 +379,8 @@ namespace Verdandi
 
 
     //! Performs a step forward, with optimal interpolation at the end.
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
@@ -402,13 +402,13 @@ namespace Verdandi
                 X_i_global_double.Reallocate(Nlocal_state, Nsigma_point_);
                 GetCholesky(U_inv_);
                 Copy(model_.GetStateErrorVarianceProjector(), tmp);
-                MltAdd(T(1), tmp, U_inv_, T(0),
+                MltAdd(Ts(1), tmp, U_inv_, Ts(0),
                        model_.GetStateErrorVarianceProjector());
                 // Computes X_n^{(i)+}.
                 for (int i = 0; i < Nsigma_point_; i++)
                     SetCol(x_, i, X_i_);
-                MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
-                       I_, T(1), X_i_);
+                MltAdd(Ts(1), model_.GetStateErrorVarianceProjector(),
+                       I_, Ts(1), X_i_);
                 Copy(X_i_, X_i_global_double);
                 Transpose(X_i_global_double);
             }
@@ -441,7 +441,7 @@ namespace Verdandi
             {
                 GetCol(X_i_local_, i, x_col_);
                 model_.ApplyOperator(x_col_, false);
-                Add(T(alpha_), x_col_, x_);
+                Add(Ts(alpha_), x_col_, x_);
                 SetCol(x_col_, i, X_i_local_);
             }
             model_.SetTime(new_time);
@@ -488,7 +488,7 @@ namespace Verdandi
                                      "not supported yet.");
             // Computes L_{n + 1}.
             if (model_task_ == 0)
-                MltAdd(T(alpha_), X_i_, I_trans_, T(0),
+                MltAdd(Ts(alpha_), X_i_, I_trans_, Ts(0),
                        model_.GetStateErrorVarianceProjector());
 
 #else
@@ -501,7 +501,7 @@ namespace Verdandi
             GetCholesky(U_inv_);
 
             Copy(model_.GetStateErrorVarianceProjector(), tmp);
-            MltAdd(T(1), tmp, U_inv_, T(0),
+            MltAdd(Ts(1), tmp, U_inv_, Ts(0),
                    model_.GetStateErrorVarianceProjector());
 
             // Computes X_n^{(i)+}.
@@ -509,21 +509,21 @@ namespace Verdandi
             for (int i = 0; i < Nsigma_point_; i++)
                 SetCol(x, i, X_i_);
 
-            MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
-                   I_, T(1), X_i_);
+            MltAdd(Ts(1), model_.GetStateErrorVarianceProjector(),
+                   I_, Ts(1), X_i_);
 
             /*** Prediction ***/
 
             // Computes X_{n + 1}^-.
-            x.Fill(T(0));
+            x.Fill(Ts(0));
             model_state_error_variance_row x_col;
             Reallocate(x_col, x.GetM(), model_);
-            double new_time;
+            double new_time(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetCol(X_i_, i, x_col);
                 new_time = model_.ApplyOperator(x_col, false);
-                Add(T(alpha_), x_col, x);
+                Add(Ts(alpha_), x_col, x);
                 SetCol(x_col, i, X_i_);
             }
             model_.SetTime(new_time);
@@ -537,17 +537,17 @@ namespace Verdandi
                                      "Forward()", "'resampling 'option "
                                      "not supported yet.");
 #else
-                MltAdd(T(alpha_), X_i_, I_trans_, T(0),
+                MltAdd(Ts(alpha_), X_i_, I_trans_, Ts(0),
                        model_.GetStateErrorVarianceProjector());
                 for(int i = 0; i < Nsigma_point_; i++)
                     SetCol(x, i, X_i_);
-                MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
-                       I_, T(1), X_i_);
+                MltAdd(Ts(1), model_.GetStateErrorVarianceProjector(),
+                       I_, Ts(1), X_i_);
 #endif
             }
 
             // Computes L_{n + 1}.
-            MltAdd(T(alpha_), X_i_, I_trans_, T(0),
+            MltAdd(Ts(alpha_), X_i_, I_trans_, Ts(0),
                    model_.GetStateErrorVarianceProjector());
 
             model_.GetState().Copy(x);
@@ -570,7 +570,7 @@ namespace Verdandi
             sigma_point_matrix tmp;
             GetCholesky(U_inv_);
             Copy(model_.GetStateErrorVarianceProjector(), tmp);
-            MltAdd(T(1), tmp, U_inv_, T(0),
+            MltAdd(Ts(1), tmp, U_inv_, Ts(0),
                    model_.GetStateErrorVarianceProjector());
 
             // Computes X_n^{(i)+}.
@@ -579,19 +579,20 @@ namespace Verdandi
             for (int i = 0; i < Nsigma_point_; i++)
                 SetRow(x, i, X_i_trans_);
 
-            MltAdd(T(1), SeldonNoTrans, I_trans_, SeldonTrans,
-                   model_.GetStateErrorVarianceProjector(), T(1), X_i_trans_);
+            MltAdd(Ts(1), SeldonNoTrans, I_trans_, SeldonTrans,
+                   model_.GetStateErrorVarianceProjector(),
+                   Ts(1), X_i_trans_);
 
             /*** Prediction ***/
 
             // Computes X_{n + 1}^-.
-            x.Fill(T(0));
-            double new_time;
+            x.Fill(Ts(0));
+            double new_time(0);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRow(X_i_trans_, i, x_col);
                 new_time = model_.ApplyOperator(x_col, false);
-                Add(T(alpha_), x_col, x);
+                Add(Ts(alpha_), x_col, x);
                 SetRow(x_col, i, X_i_trans_);
             }
             model_.SetTime(new_time);
@@ -604,8 +605,8 @@ namespace Verdandi
             sigma_point_matrix M_trans(Nsigma_point_, Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
                 SetRow(x, i, M_trans);
-            Mlt(T(-1), M_trans);
-            Add(T(1), X_i_trans_, M_trans);
+            Mlt(Ts(-1), M_trans);
+            Add(Ts(1), X_i_trans_, M_trans);
 
             if (alpha_constant_)
                 Mlt(sqrt(alpha_), M_trans);
@@ -615,11 +616,11 @@ namespace Verdandi
                                      "implemented for no constant alpha_i.");
 
             sigma_point_matrix G(Nsigma_point_, Nsigma_point_);
-            MltAdd(T(1), SeldonNoTrans, M_trans, SeldonTrans, M_trans,
-                   T(0), G);
+            MltAdd(Ts(1), SeldonNoTrans, M_trans, SeldonTrans, M_trans,
+                   Ts(0), G);
 
-            Vector<T> lambda;
-            Matrix<T> U, V;
+            Vector<Ts> lambda;
+            Matrix<Ts> U, V;
             GetSVD(G, lambda, U, V);
             U.Resize(Nsigma_point_, Nreduced_);
 
@@ -627,19 +628,19 @@ namespace Verdandi
                 working_matrix_rr(Nsigma_point_, Nsigma_point_),
                 working_matrix_rN(X_i_trans_);
 
-            MltAdd(T(sqrt(alpha_)), SeldonNoTrans, U, SeldonTrans, I_trans_,
-                   T(0), working_matrix_rr);
+            MltAdd(Ts(sqrt(alpha_)), SeldonNoTrans, U, SeldonTrans, I_trans_,
+                   Ts(0), working_matrix_rr);
 
             for(int i = 0; i < Nsigma_point_; i++)
                 SetRow(x, i, X_i_trans_);
-            Add(T(-1), X_i_trans_, working_matrix_rN);
+            Add(Ts(-1), X_i_trans_, working_matrix_rN);
 
-            MltAdd(T(1), SeldonTrans, working_matrix_rr, SeldonNoTrans,
-                   working_matrix_rN, T(1), X_i_trans_);
+            MltAdd(Ts(1), SeldonTrans, working_matrix_rr, SeldonNoTrans,
+                   working_matrix_rN, Ts(1), X_i_trans_);
 
             // Computes L_{n + 1}.
-            MltAdd(T(alpha_), SeldonTrans, X_i_trans_, SeldonNoTrans,
-                   I_trans_, T(0), model_.GetStateErrorVarianceProjector());
+            MltAdd(Ts(alpha_), SeldonTrans, X_i_trans_, SeldonNoTrans,
+                   I_trans_, Ts(0), model_.GetStateErrorVarianceProjector());
 #endif
         }
 
@@ -661,8 +662,8 @@ namespace Verdandi
 
     //! Computes an analysis.
     /*! Whenever observations are available, it computes BLUE. */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::Analyze()
     {
 
@@ -699,7 +700,7 @@ namespace Verdandi
         {
 #if defined(VERDANDI_WITH_MPI)
             observation z_col(Nobservation_), z(Nobservation_);
-            z.Fill(T(0));
+            z.Fill(To(0));
             observation reduced_innovation(Nreduced_);
             if (model_task_ == 0)
             {
@@ -708,11 +709,11 @@ namespace Verdandi
                     GetCol(X_i_, i, x_col_);
                     observation& z_col =
                         observation_manager_.GetInnovation(x_col_);
-                    Add(T(alpha_), z_col, z);
+                    Add(To(alpha_), z_col, z);
                     SetRow(z_col, i, Z_i_trans_);
                 }
-                MltAdd(T(alpha_), SeldonTrans, I_trans_, SeldonNoTrans,
-                       Z_i_trans_, T(0), HL_trans_);
+                MltAdd(Ts(alpha_), SeldonTrans, I_trans_, SeldonNoTrans,
+                       Z_i_trans_, Ts(0), HL_trans_);
                 observation_error_variance R_inv;
                 if (observation_error_variance_ == "matrix_inverse")
                     Mlt(HL_trans_, observation_manager_.
@@ -725,14 +726,14 @@ namespace Verdandi
                     Mlt(HL_trans_, R_inv, HL_trans_R_);
                 }
                 U_inv_.SetIdentity();
-                MltAdd(T(1), SeldonNoTrans, HL_trans_R_,
-                       SeldonTrans, HL_trans_, T(1), U_inv_);
+                MltAdd(Ts(1), SeldonNoTrans, HL_trans_R_,
+                       SeldonTrans, HL_trans_, Ts(1), U_inv_);
                 GetInverse(U_inv_);
-                MltAdd(T(1), U_inv_, HL_trans_R_, T(0), HL_trans_);
-                MltAdd(T(-1), HL_trans_, z, T(0), reduced_innovation);
+                MltAdd(Ts(1), U_inv_, HL_trans_R_, Ts(0), HL_trans_);
+                MltAdd(Ts(-1), HL_trans_, z, Ts(0), reduced_innovation);
             }
-            MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
-                   reduced_innovation, T(1), model_.GetState());
+            MltAdd(Ts(1), model_.GetStateErrorVarianceProjector(),
+                   reduced_innovation, Ts(1), model_.GetState());
             model_.StateUpdated();
 #else
             // Computes [HX_{n+1}^{*}].
@@ -742,19 +743,19 @@ namespace Verdandi
             model_.StateUpdated();
 
             observation z(Nobservation_);
-            z.Fill(T(0));
+            z.Fill(To(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetCol(X_i_, i, x_col);
                 observation& z_col =
                     observation_manager_.GetInnovation(x_col);
-                Add(T(alpha_), z_col, z);
+                Add(To(alpha_), z_col, z);
                 SetRow(z_col, i, Z_i_trans);
             }
 
             sigma_point_matrix HL_trans(Nreduced_, Nobservation_);
-            MltAdd(T(alpha_), SeldonTrans, I_trans_, SeldonNoTrans, Z_i_trans,
-                   T(0), HL_trans);
+            MltAdd(Ts(alpha_), SeldonTrans, I_trans_, SeldonNoTrans, Z_i_trans,
+                   Ts(0), HL_trans);
 
             observation_error_variance R_inv;
             sigma_point_matrix working_matrix_po(Nreduced_, Nobservation_),
@@ -772,21 +773,21 @@ namespace Verdandi
             }
 
             U_inv_.SetIdentity();
-            MltAdd(T(1), SeldonNoTrans, working_matrix_po,
-                   SeldonTrans, HL_trans, T(1), U_inv_);
+            MltAdd(Ts(1), SeldonNoTrans, working_matrix_po,
+                   SeldonTrans, HL_trans, Ts(1), U_inv_);
             GetInverse(U_inv_);
 
             tmp.Reallocate(Nreduced_, Nobservation_);
-            tmp.Fill(T(0));
+            tmp.Fill(Ts(0));
 
             observation reduced_innovation(Nreduced_);
-            MltAdd(T(1), U_inv_, working_matrix_po, T(0), tmp);
-            MltAdd(T(-1), tmp, z, T(0), reduced_innovation);
+            MltAdd(Ts(1), U_inv_, working_matrix_po, Ts(0), tmp);
+            MltAdd(Ts(-1), tmp, z, Ts(0), reduced_innovation);
 
             // Updates.
             model_state& x =  model_.GetState();
-            MltAdd(T(1), model_.GetStateErrorVarianceProjector(),
-                   reduced_innovation, T(1), x);
+            MltAdd(Ts(1), model_.GetStateErrorVarianceProjector(),
+                   reduced_innovation, Ts(1), x);
             model_.StateUpdated();
 #endif
         }
@@ -802,7 +803,7 @@ namespace Verdandi
             sigma_point_matrix Z_i_trans(Nsigma_point_, Nobservation_);
             sigma_point x_col;
             observation z(Nobservation_);
-            z.Fill(T(0));
+            z.Fill(To(0));
             if (!alpha_constant_)
                 throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
                                      "Analyse()", "Calculation not "
@@ -813,7 +814,7 @@ namespace Verdandi
                 GetRowPointer(X_i_trans_, i, x_col);
                 observation& z_col =
                     observation_manager_.GetInnovation(x_col);
-                Add(T(alpha_), z_col, z);
+                Add(To(alpha_), z_col, z);
                 SetRow(z_col, i, Z_i_trans);
                 x_col.Nullify();
             }
@@ -823,7 +824,7 @@ namespace Verdandi
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(Z_i_trans, i, z_col);
-                Add(T(-1), z, z_col);
+                Add(To(-1), z, z_col);
                 z_col.Nullify();
             }
 
@@ -844,8 +845,8 @@ namespace Verdandi
             }
 
             // Computes D_m.
-            MltAdd(T(1), SeldonNoTrans, working_matrix_ro, SeldonTrans,
-                   Z_i_trans, T(0), D_m);
+            MltAdd(To(1), SeldonNoTrans, working_matrix_ro, SeldonTrans,
+                   Z_i_trans, To(0), D_m);
 
             // Computes U_{n+1}.
             sigma_point_matrix
@@ -855,23 +856,23 @@ namespace Verdandi
                 working_matrix_rr3(Nsigma_point_, Nsigma_point_);
 
             Copy(D_v_, working_matrix_rr);
-            Mlt(T(-1), working_matrix_rr);
+            Mlt(Ts(-1), working_matrix_rr);
             if (alpha_constant_)
             {
                 for(int i = 0; i < Nsigma_point_; i++ )
                     working_matrix_rr(i, i) += alpha_;
-                MltAdd(T(1), D_m, working_matrix_rr, T(0),
+                MltAdd(Ts(1), D_m, working_matrix_rr, Ts(0),
                        working_matrix_rr2);
                 for(int i = 0; i < Nsigma_point_; i++ )
                     working_matrix_rr2(i, i) += 1;
                 GetInverse(working_matrix_rr2);
-                MltAdd(T(1), working_matrix_rr2, D_m, T(0),
+                MltAdd(Ts(1), working_matrix_rr2, D_m, Ts(0),
                        working_matrix_rr);
-                MltAdd(T(alpha_), working_matrix_rr, I_trans_, T(0),
+                MltAdd(Ts(alpha_), working_matrix_rr, I_trans_, Ts(0),
                        working_matrix_rp);
                 U_.SetIdentity();
-                MltAdd(T(alpha_), SeldonTrans, I_trans_, SeldonNoTrans,
-                       working_matrix_rp, T(1), U_);
+                MltAdd(Ts(alpha_), SeldonTrans, I_trans_, SeldonNoTrans,
+                       working_matrix_rp, Ts(1), U_);
 
                 Copy(U_, U_inv_);
                 GetInverse(U_inv_);
@@ -879,21 +880,21 @@ namespace Verdandi
                 // Computes {HL}_{n+1}.
                 HL_trans.Reallocate(Nreduced_, Nobservation_);
                 working_matrix_rr2.SetIdentity();
-                MltAdd(T(1), D_v_, working_matrix_rr, T(1),
+                MltAdd(Ts(1), D_v_, working_matrix_rr, Ts(1),
                        working_matrix_rr2);
 
                 working_matrix_rr.SetIdentity();
-                Add(T(alpha_), D_m, working_matrix_rr);
+                Add(Ts(alpha_), D_m, working_matrix_rr);
                 GetInverse(working_matrix_rr);
 
                 Mlt(working_matrix_rr, working_matrix_rr2,
                     working_matrix_rr3);
 
-                MltAdd(T(alpha_), working_matrix_rr3, I_trans_, T(0),
+                MltAdd(Ts(alpha_), working_matrix_rr3, I_trans_, Ts(0),
                        working_matrix_rp);
 
-                MltAdd(T(1), SeldonTrans, working_matrix_rp, SeldonNoTrans,
-                       Z_i_trans, T(0), HL_trans);
+                MltAdd(Ts(1), SeldonTrans, working_matrix_rp, SeldonNoTrans,
+                       Z_i_trans, Ts(0), HL_trans);
             }
             else
                 throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
@@ -916,7 +917,7 @@ namespace Verdandi
 
             // Updates.
             model_state& x =  model_.GetState();
-            MltAdd(T(-1), K, z, T(1), x);
+            MltAdd(Ts(-1), K, z, Ts(1), x);
             model_.StateUpdated();
 #endif
         }
@@ -938,8 +939,8 @@ namespace Verdandi
 
 
     //! Finalizes a step for the model.
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::FinalizeStep()
     {
         MessageHandler::Send(*this, "all", "::FinalizeStep begin");
@@ -951,8 +952,8 @@ namespace Verdandi
 
 
     //! Finalizes the model.
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::Finalize()
     {
         MessageHandler::Send(*this, "all", "::Finalize begin");
@@ -967,8 +968,8 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class Model, class ObservationManager>
-    bool ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    bool ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::HasFinished()
     {
         return model_.HasFinished();
@@ -979,9 +980,9 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     Model&
-    ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::GetModel()
     {
         return model_;
@@ -992,9 +993,9 @@ namespace Verdandi
     /*!
       \return The observation manager..
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     ObservationManager&
-    ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::GetObservationManager()
     {
         return observation_manager_;
@@ -1005,9 +1006,9 @@ namespace Verdandi
     /*!
       \return The output saver.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     OutputSaver&
-    ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::GetOutputSaver()
     {
         return output_saver_;
@@ -1018,9 +1019,9 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     string
-    ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::GetName() const
     {
         return "ReducedOrderUnscentedKalmanFilter";
@@ -1031,8 +1032,8 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class Model, class ObservationManager>
-    void ReducedOrderUnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
     ::Message(string message)
     {
 #if defined(VERDANDI_WITH_MPI)

@@ -33,11 +33,13 @@ namespace Verdandi
 
 
     //! This class implements a reduced order extended Kalman filter.
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     class ReducedOrderExtendedKalmanFilter: public VerdandiBase
     {
 
     public:
+        //! Value type of the model state.
+        typedef typename Model::state::value_type Ts;
         //! Type of a row of the background error variance.
         typedef typename Model::state_error_variance_row
         model_state_error_variance_row;
@@ -65,7 +67,7 @@ namespace Verdandi
         typedef typename ObservationManager::observation
         observation;
         //! Type of dense matrix.
-        typedef Matrix<T, General, RowMajor> dense_matrix;
+        typedef Matrix<Ts, General, RowMajor> dense_matrix;
         /*! \brief Type of the reduced matrix \f$U\f$ in the \f$LUL^T\f$
           decomposition of the background error covariance matrix. */
         typedef typename Model::state_error_variance_reduced

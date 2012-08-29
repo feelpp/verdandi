@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::OptimalInterpolation<real, Verdandi::ShallowWater<real>,
+    Verdandi::OptimalInterpolation<Verdandi::ShallowWater<real>,
         Verdandi::OBSERVATION_OPERATOR<real> > driver;
 
     driver.Initialize(argv[1]);

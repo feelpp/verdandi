@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::OptimalInterpolation<real, Verdandi::QuadraticModel<real>,
+    Verdandi::OptimalInterpolation<Verdandi::QuadraticModel<real>,
         Verdandi::LinearObservationManager<real> > driver;
 
     driver.Initialize(argv[1]);

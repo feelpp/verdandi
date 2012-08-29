@@ -42,9 +42,9 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::FourDimensionalVariational()
     {
 
@@ -62,9 +62,9 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::~FourDimensionalVariational()
     {
     }
@@ -78,9 +78,9 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T,
+    void FourDimensionalVariational<
                                     Model, ObservationManager, Optimization>
     ::Initialize(string configuration_file,
                  bool initialize_model, bool initialize_observation_manager)
@@ -94,9 +94,9 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T,
+    void FourDimensionalVariational<
                                     Model, ObservationManager, Optimization>
     ::Initialize(VerdandiOps& configuration,
                  bool initialize_model, bool initialize_observation_manager)
@@ -232,9 +232,9 @@ namespace Verdandi
     //! Initializes a step for the extended Kalman filter.
     /*! Initializes a step for the model.
      */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T, Model, ObservationManager,
+    void FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>::InitializeStep()
     {
         model_.InitializeStep();
@@ -242,9 +242,9 @@ namespace Verdandi
 
 
     //! Performs a step forward, with optimal interpolation at the end.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T, Model, ObservationManager,
+    void FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
@@ -260,9 +260,9 @@ namespace Verdandi
 
 
     //! Computes an analysis.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T, Model, ObservationManager,
+    void FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>::Analyze()
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
@@ -285,9 +285,9 @@ namespace Verdandi
 
 
     //! Finalizes a step for the model.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T, Model, ObservationManager,
+    void FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>::FinalizeStep()
     {
         MessageHandler::Send(*this, "all", "::FinalizeStep begin");
@@ -299,9 +299,9 @@ namespace Verdandi
 
 
     //! Finalizes the model.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T, Model, ObservationManager,
+    void FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>::Finalize()
     {
         MessageHandler::Send(*this, "all", "::Finalize begin");
@@ -316,9 +316,9 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    bool FourDimensionalVariational<T, Model, ObservationManager,
+    bool FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>::HasFinished()
     {
         return model_.HasFinished();
@@ -329,10 +329,10 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
     Model&
-    FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::GetModel()
     {
         return model_;
@@ -343,10 +343,10 @@ namespace Verdandi
     /*!
       \return The observation manager.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
     ObservationManager&
-    FourDimensionalVariational<T, Model, ObservationManager, Optimization>
+    FourDimensionalVariational<Model, ObservationManager, Optimization>
     ::GetObservationManager()
     {
         return observation_manager_;
@@ -357,10 +357,10 @@ namespace Verdandi
     /*!
       \return The output saver.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
     OutputSaver&
-    FourDimensionalVariational<T, Model, ObservationManager, Optimization>
+    FourDimensionalVariational<Model, ObservationManager, Optimization>
     ::GetOutputSaver()
     {
         return output_saver_;
@@ -371,10 +371,10 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
     string
-    FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::GetName() const
     {
         return "FourDimensionalVariational";
@@ -385,9 +385,9 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T, Model, ObservationManager,
+    void FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>::Message(string message)
     {
         if (message.find("initial condition") != string::npos)
@@ -409,9 +409,11 @@ namespace Verdandi
       exit, it returns the gradient vector for optimized parameters.
       \return the cost value at x.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    T FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    typename FourDimensionalVariational<Model, ObservationManager, 
+    Optimization>::Ts
+    FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::Cost(const model_state& x, model_state& gradient)
     {
         Vector<double> time;
@@ -429,13 +431,13 @@ namespace Verdandi
         /*** Background contribution ***/
 
         model_state x_b(state_first_guess_);
-        Add(T(-1), x_b, delta);
+        Add(Ts(-1), x_b, delta);
 
         model_state_error_variance B_inv(model_.GetStateErrorVariance());
         GetInverse(B_inv);
-        MltAdd(T(1), B_inv, delta, T(0), x_b);
+        MltAdd(Ts(1), B_inv, delta, Ts(0), x_b);
 
-        T cost_background;
+        Ts cost_background;
         cost_background = DotProd(delta, x_b);
 
         /*** Observation contribution ***/
@@ -444,7 +446,7 @@ namespace Verdandi
 
         vector<model_state> trajectory;
 
-        T cost_observation(0);
+        Ts cost_observation(0);
         Copy(x, model_.GetState());
         model_.StateUpdated();
         model_.SetTime(initial_time_);
@@ -460,7 +462,7 @@ namespace Verdandi
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
                     Rinv = observation_manager_.GetErrorVarianceInverse();
-                MltAdd(T(1), Rinv, y, T(0), Rinv_y);
+                MltAdd(Ts(1), Rinv, y, Ts(0), Rinv_y);
                 cost_observation += DotProd(y, Rinv_y);
             }
 
@@ -472,13 +474,13 @@ namespace Verdandi
         }
 
         if (!with_gradient)
-            return T(0.5) * (cost_background + cost_observation);
+            return Ts(0.5) * (cost_background + cost_observation);
 
         /*** Backward loop ***/
 
         model_state adjoint_source(Nstate_);
-        adjoint_source.Fill(T(0));
-        model_.GetAdjointState().Fill(T(0));
+        adjoint_source.Fill(Ts(0));
+        model_.GetAdjointState().Fill(Ts(0));
         model_.AdjointStateUpdated();
         for (int t = time.GetM() - 1; t >= 0; t--)
         {
@@ -493,13 +495,13 @@ namespace Verdandi
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
                     Rinv(observation_manager_.GetErrorVarianceInverse());
-                MltAdd(T(1), Rinv, y, T(0), Rinv_y);
-                MltAdd(T(1), SeldonTrans, observation_manager_.
-                       GetTangentLinearOperator(), Rinv_y, T(0),
+                MltAdd(Ts(1), Rinv, y, Ts(0), Rinv_y);
+                MltAdd(Ts(1), SeldonTrans, observation_manager_.
+                       GetTangentLinearOperator(), Rinv_y, Ts(0),
                        adjoint_source);
             }
             else
-                adjoint_source.Fill(T(0));
+                adjoint_source.Fill(Ts(0));
 
             Copy(trajectory[t], model_.GetState());
             model_.StateUpdated();
@@ -509,14 +511,14 @@ namespace Verdandi
         }
 
         Copy(model_.GetAdjointState(), gradient);
-        Mlt(T(-1), gradient);
-        Add(T(1), x_b, gradient);
+        Mlt(Ts(-1), gradient);
+        Add(Ts(1), x_b, gradient);
 
-        return T(0.5) * (cost_background + cost_observation);
+        return Ts(0.5) * (cost_background + cost_observation);
 
 #else
 
-        T cost_observation(0);
+        Ts cost_observation(0);
         Copy(x, model_.GetState());
         model_.StateUpdated();
         model_.SetTime(initial_time_);
@@ -532,7 +534,7 @@ namespace Verdandi
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
                     Rinv = observation_manager_.GetErrorVarianceInverse();
-                MltAdd(T(1), Rinv, y, T(0), Rinv_y);
+                MltAdd(Ts(1), Rinv, y, Ts(0), Rinv_y);
                 cost_observation += DotProd(y, Rinv_y);
             }
 
@@ -544,13 +546,13 @@ namespace Verdandi
         }
 
         if (!with_gradient)
-            return T(0.5) * (cost_background + cost_observation);
+            return Ts(0.5) * (cost_background + cost_observation);
 
         /*** Backward loop ***/
 
         model_state adjoint_source(Nstate_);
-        adjoint_source.Fill(T(0));
-        model_.GetAdjointState().Fill(T(0));
+        adjoint_source.Fill(Ts(0));
+        model_.GetAdjointState().Fill(Ts(0));
         model_.AdjointStateUpdated();
         for (int t = time.GetM() - 1; t >= 0; t--)
         {
@@ -566,13 +568,13 @@ namespace Verdandi
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
                     Rinv(observation_manager_.GetErrorVarianceInverse());
-                MltAdd(T(1), Rinv, y, T(0), Rinv_y);
-                MltAdd(T(1), SeldonTrans, observation_manager_.
-                       GetTangentLinearOperator(), Rinv_y, T(0),
+                MltAdd(Ts(1), Rinv, y, Ts(0), Rinv_y);
+                MltAdd(Ts(1), SeldonTrans, observation_manager_.
+                       GetTangentLinearOperator(), Rinv_y, Ts(0),
                        adjoint_source);
             }
             else
-                adjoint_source.Fill(T(0));
+                adjoint_source.Fill(Ts(0));
 
             Copy(trajectory_manager_.GetState(), model_.GetState());
             model_.StateUpdated();
@@ -582,11 +584,11 @@ namespace Verdandi
         }
 
         Copy(model_.GetAdjointState(), gradient);
-        Mlt(T(-1), gradient);
-        Add(T(1), x_b, gradient);
+        Mlt(Ts(-1), gradient);
+        Add(Ts(1), x_b, gradient);
         trajectory_manager_.Deallocate();
 
-        return T(0.5) * (cost_background + cost_observation);
+        return Ts(0.5) * (cost_background + cost_observation);
 
 #endif
     }
@@ -598,9 +600,11 @@ namespace Verdandi
       \param[in] gradient vector that stores constaint gradient values.
       \return the constraint value at x.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    T FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    typename FourDimensionalVariational<Model, ObservationManager, 
+    Optimization>::Ts
+    FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::Constraint(const model_state& x, model_state& gradient)
     {
         throw ErrorUndefined("FourDimensionalVariational::Constraint");
@@ -611,9 +615,9 @@ namespace Verdandi
     /*
       \param[in] time the initial time value to be set.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    void FourDimensionalVariational<T, Model, ObservationManager,
+    void FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>
     ::SetInitialTime(double time)
     {
@@ -626,17 +630,19 @@ namespace Verdandi
       \param[in] x vector that stores parameters values.
       \param[in,out] gradient vector that stores gradient values, on final
       exit, it returns the gradient vector for optimized parameters.
-      \param[in] parameter the current FourDimensionalVariational<T, Model,
+      \param[in] parameter the current FourDimensionalVariational<Model,
       ObservationManager,  Optimization> object.
       \return the cost value at x.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    T FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    typename FourDimensionalVariational<Model, ObservationManager, 
+    Optimization>::Ts
+    FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::StaticCost(const model_state& x, model_state& gradient,
                  void* this_object)
     {
-        return reinterpret_cast<FourDimensionalVariational<T, Model,
+        return reinterpret_cast<FourDimensionalVariational<Model,
             ObservationManager, Optimization>* >(this_object)
             ->Cost(x, gradient);
     }
@@ -646,13 +652,15 @@ namespace Verdandi
     /*
       \param[in] x vector that stores constraints parameters values.
       \param[in] gradient vector that stores constaint gradient values.
-      \param[in] parameter the current FourDimensionalVariational<T, Model,
+      \param[in] parameter the current FourDimensionalVariational<Model,
       ObservationManager,  Optimization> object.
       \return the constraint value at x.
     */
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
-    T FourDimensionalVariational<T, Model, ObservationManager,  Optimization>
+    typename FourDimensionalVariational<Model, ObservationManager, 
+    Optimization>::Ts
+    FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::StaticConstraint(const model_state& x, model_state& gradient,
                        void* parameter)
     {

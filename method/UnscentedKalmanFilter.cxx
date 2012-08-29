@@ -45,8 +45,8 @@ namespace Verdandi
     /*! Builds the driver and reads option keys in the configuration file.
       \param[in] configuration_file configuration file.
     */
-    template <class T, class Model, class ObservationManager>
-    UnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    UnscentedKalmanFilter<Model, ObservationManager>
     ::UnscentedKalmanFilter()
     {
 
@@ -62,8 +62,8 @@ namespace Verdandi
 
 
     //! Destructor.
-    template <class T, class Model, class ObservationManager>
-    UnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    UnscentedKalmanFilter<Model, ObservationManager>
     ::~UnscentedKalmanFilter()
     {
         sigma_point_collection_.Deallocate();
@@ -78,8 +78,8 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>
     ::Initialize(string configuration_file,
                  bool initialize_model, bool initialize_observation_manager)
     {
@@ -92,8 +92,8 @@ namespace Verdandi
     //! Initializes the driver.
     /*! Initializes the model and the observation manager. Optionally computes
       the analysis of the first step. */
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>
     ::Initialize(VerdandiOps& configuration,
                  bool initialize_model, bool initialize_observation_manager)
     {
@@ -208,8 +208,8 @@ namespace Verdandi
     //! Initializes a step for the unscented Kalman filter.
     /*! Initializes a step for the model.
      */
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>::InitializeStep()
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
@@ -220,8 +220,8 @@ namespace Verdandi
 
 
     //! Performs a step forward, with optimal interpolation at the end.
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>::Forward()
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>::Forward()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
@@ -240,8 +240,8 @@ namespace Verdandi
         {
             SetRow(x, i, X_i_trans_);
             GetRowPointer(X_i_trans_, i, x_col);
-            MltAdd(T(1), background_error_variance_sqrt,
-                   sigma_point_collection_.GetVector(i), T(1), x_col);
+            MltAdd(Ts(1), background_error_variance_sqrt,
+                   sigma_point_collection_.GetVector(i), Ts(1), x_col);
             x_col.Nullify();
         }
 
@@ -249,13 +249,13 @@ namespace Verdandi
         {
             double new_time;
             // Computes X_{n + 1}^-.
-            x.Fill(T(0));
+            x.Fill(Ts(0));
             x_col.Reallocate(Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRow(X_i_trans_, i, x_col);
                 new_time = model_.ApplyOperator(x_col, false);
-                Add(T(1), x_col, x);
+                Add(Ts(1), x_col, x);
                 SetRow(x_col, i, X_i_trans_);
             }
 
@@ -265,12 +265,12 @@ namespace Verdandi
             model_.SetTime(new_time);
 
             // Computes P_{n + 1}^-.
-            background_error_variance_.Fill(T(0));
+            background_error_variance_.Fill(Ts(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(X_i_trans_, i, x_col);
-                Add(T(-1), x, x_col);
-                Rank1Update(T(1), x_col, x_col, background_error_variance_);
+                Add(Ts(-1), x, x_col);
+                Rank1Update(Ts(1), x_col, x_col, background_error_variance_);
                 x_col.Nullify();
             }
             Mlt(alpha_, background_error_variance_);
@@ -279,7 +279,7 @@ namespace Verdandi
         {
             double new_time;
             // Computes X_{n + 1}^-.
-            x.Fill(T(0));
+            x.Fill(Ts(0));
             x_col.Reallocate(Nstate_);
             for (int i = 0; i < Nsigma_point_; i++)
             {
@@ -293,11 +293,11 @@ namespace Verdandi
             model_.SetTime(new_time);
 
             // Computes P_{n + 1}^-.
-            background_error_variance_.Fill(T(0));
+            background_error_variance_.Fill(Ts(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(X_i_trans_, i, x_col);
-                Add(T(-1), x, x_col);
+                Add(Ts(-1), x, x_col);
                 Rank1Update(alpha_i_(i), x_col, x_col,
                             background_error_variance_);
                 x_col.Nullify();
@@ -314,8 +314,8 @@ namespace Verdandi
 
     //! Computes an analysis.
     /*! Whenever observations are available, it computes BLUE. */
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>::Analyze()
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>::Analyze()
     {
 
         MessageHandler::Send(*this, "all", "::Analyze begin");
@@ -345,8 +345,8 @@ namespace Verdandi
         {
             SetRow(x, i, X_i_trans_);
             GetRowPointer(X_i_trans_, i, x_col);
-            MltAdd(T(1), background_error_variance_sqrt,
-                   sigma_point_collection_.GetVector(i), T(1), x_col);
+            MltAdd(Ts(1), background_error_variance_sqrt,
+                   sigma_point_collection_.GetVector(i), Ts(1), x_col);
             x_col.Nullify();
         }
 
@@ -367,36 +367,36 @@ namespace Verdandi
             // Computes the predicted measurement Z_{n + 1}.
             observation z;
             z.Reallocate(Nobservation_);
-            z.Fill(T(0));
+            z.Fill(To(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(Z_i_trans, i, z_col);
-                Add(T(1), z_col, z);
+                Add(To(1), z_col, z);
                 z_col.Nullify();
             }
             Mlt(alpha_, z);
 
             // Computes X_{n+1}-.
-            x.Fill(T(0));
+            x.Fill(Ts(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(X_i_trans_, i, x_col);
-                Add(T(1), x_col, x);
+                Add(Ts(1), x_col, x);
                 x_col.Nullify();
             }
             Mlt(alpha_, x);
 
             // Computes P_XZ = cov(X_{n + 1}^*, Z_{n + 1}^*).
             model_state_error_variance P_xz(Nstate_, Nobservation_);
-            P_xz.Fill(T(0));
+            P_xz.Fill(Ts(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(X_i_trans_, i, x_col);
-                Add(T(-1), x, x_col);
+                Add(Ts(-1), x, x_col);
                 GetRowPointer(Z_i_trans, i, z_col);
-                Add(T(-1), z, z_col);
+                Add(To(-1), z, z_col);
 
-                Rank1Update(T(1), x_col, z_col, P_xz);
+                Rank1Update(Ts(1), x_col, z_col, P_xz);
 
                 x_col.Nullify();
                 z_col.Nullify();
@@ -405,29 +405,29 @@ namespace Verdandi
 
             // Computes P_Z = cov(Z_{n + 1}^*, Z_{n + 1}^*).
             model_state_error_variance P_z(Nobservation_, Nobservation_);
-            P_z.Fill(T(0));
+            P_z.Fill(To(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(Z_i_trans, i, z_col);
-                Rank1Update(T(1), z_col, z_col, P_z);
+                Rank1Update(To(1), z_col, z_col, P_z);
                 z_col.Nullify();
             }
             Mlt(alpha_, P_z);
-            Add(T(1), observation_manager_.GetErrorVariance(), P_z);
+            Add(To(1), observation_manager_.GetErrorVariance(), P_z);
 
             // Computes the Kalman gain K_{n + 1}.
             matrix_state_observation K(Nstate_, Nobservation_);
-            K.Fill(T(0));
+            K.Fill(Ts(0));
             GetInverse(P_z);
-            MltAdd(T(1), P_xz, P_z, T(0), K);
+            MltAdd(Ts(1), P_xz, P_z, Ts(0), K);
 
             // Computes X_{n + 1}^+.
-            MltAdd(T(1), K, observation_manager_.GetInnovation(x), T(1), x);
+            MltAdd(Ts(1), K, observation_manager_.GetInnovation(x), Ts(1), x);
 
             model_.StateUpdated();
 
             // Computes P_{n + 1}^+.
-            MltAdd(T(-1), SeldonNoTrans, K, SeldonTrans, P_xz, T(1),
+            MltAdd(Ts(-1), SeldonNoTrans, K, SeldonTrans, P_xz, Ts(1),
                    background_error_variance_);
         }
         else
@@ -435,7 +435,7 @@ namespace Verdandi
             // Computes the predicted measurement Z_{n + 1}.
             observation z;
             z.Reallocate(Nobservation_);
-            z.Fill(T(0));
+            z.Fill(To(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(Z_i_trans, i, z_col);
@@ -444,7 +444,7 @@ namespace Verdandi
             }
 
             // Computes X_{n+1}-.
-            x.Fill(T(0));
+            x.Fill(Ts(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(X_i_trans_, i, x_col);
@@ -454,13 +454,13 @@ namespace Verdandi
 
             // Computes P_XZ = cov(X_{n + 1}^*, Z_{n + 1}^*).
             model_state_error_variance P_xz(Nstate_, Nobservation_);
-            P_xz.Fill(T(0));
+            P_xz.Fill(Ts(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(X_i_trans_, i, x_col);
-                Add(T(-1), x, x_col);
+                Add(Ts(-1), x, x_col);
                 GetRowPointer(Z_i_trans, i, z_col);
-                Add(T(-1), z, z_col);
+                Add(To(-1), z, z_col);
 
                 Rank1Update(alpha_i_(i), x_col, z_col, P_xz);
 
@@ -470,28 +470,28 @@ namespace Verdandi
 
             // Computes P_Z = cov(Z_{n + 1}^*, Z_{n + 1}^*).
             model_state_error_variance P_z(Nobservation_, Nobservation_);
-            P_z.Fill(T(0));
+            P_z.Fill(To(0));
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetRowPointer(Z_i_trans, i, z_col);
                 Rank1Update(alpha_i_(i), z_col, z_col, P_z);
                 z_col.Nullify();
             }
-            Add(T(1), observation_manager_.GetErrorVariance(), P_z);
+            Add(To(1), observation_manager_.GetErrorVariance(), P_z);
 
             // Computes the Kalman gain K_{n + 1}.
             matrix_state_observation K(Nstate_, Nobservation_);
-            K.Fill(T(0));
+            K.Fill(Ts(0));
             GetInverse(P_z);
-            MltAdd(T(1), P_xz, P_z, T(0), K);
+            MltAdd(Ts(1), P_xz, P_z, Ts(0), K);
 
             // Computes X_{n + 1}^+.
-            MltAdd(T(1), K, observation_manager_.GetInnovation(x), T(1), x);
+            MltAdd(Ts(1), K, observation_manager_.GetInnovation(x), Ts(1), x);
 
             model_.StateUpdated();
 
             // Computes P_{n + 1}^+.
-            MltAdd(T(-1), SeldonNoTrans, K, SeldonTrans, P_xz, T(1),
+            MltAdd(Ts(-1), SeldonNoTrans, K, SeldonTrans, P_xz, Ts(1),
                    background_error_variance_);
         }
 
@@ -507,8 +507,8 @@ namespace Verdandi
 
 
     //! Finalizes a step for the model.
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>::FinalizeStep()
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>::FinalizeStep()
     {
         MessageHandler::Send(*this, "all", "::FinalizeStep begin");
 
@@ -519,8 +519,8 @@ namespace Verdandi
 
 
     //! Finalizes the model.
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>
     ::Finalize()
     {
         MessageHandler::Send(*this, "all", "::Finalize begin");
@@ -535,8 +535,8 @@ namespace Verdandi
     /*!
       \return True if no more data assimilation is required, false otherwise.
     */
-    template <class T, class Model, class ObservationManager>
-    bool UnscentedKalmanFilter<T, Model, ObservationManager>::HasFinished()
+    template <class Model, class ObservationManager>
+    bool UnscentedKalmanFilter<Model, ObservationManager>::HasFinished()
     {
         return model_.HasFinished();
     }
@@ -546,9 +546,9 @@ namespace Verdandi
     /*!
       \return The model.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     Model&
-    UnscentedKalmanFilter<T, Model, ObservationManager>::GetModel()
+    UnscentedKalmanFilter<Model, ObservationManager>::GetModel()
     {
         return model_;
     }
@@ -558,9 +558,9 @@ namespace Verdandi
     /*!
       \return The observation manager.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     ObservationManager&
-    UnscentedKalmanFilter<T, Model, ObservationManager>
+    UnscentedKalmanFilter<Model, ObservationManager>
     ::GetObservationManager()
     {
         return observation_manager_;
@@ -571,9 +571,9 @@ namespace Verdandi
     /*!
       \return The output saver.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     OutputSaver&
-    UnscentedKalmanFilter<T, Model, ObservationManager>::GetOutputSaver()
+    UnscentedKalmanFilter<Model, ObservationManager>::GetOutputSaver()
     {
         return output_saver_;
     }
@@ -583,9 +583,9 @@ namespace Verdandi
     /*!
       \return The name of the class.
     */
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     string
-    UnscentedKalmanFilter<T, Model, ObservationManager>::GetName() const
+    UnscentedKalmanFilter<Model, ObservationManager>::GetName() const
     {
         return "UnscentedKalmanFilter";
     }
@@ -595,8 +595,8 @@ namespace Verdandi
     /*
       \param[in] message the received message.
     */
-    template <class T, class Model, class ObservationManager>
-    void UnscentedKalmanFilter<T, Model, ObservationManager>
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>
     ::Message(string message)
     {
         if (message.find("initial condition") != string::npos)

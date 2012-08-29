@@ -31,12 +31,14 @@ namespace Verdandi
 
 
     //! This class implements 4D-Var.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class Optimization>
     class FourDimensionalVariational: public VerdandiBase
     {
 
     public:
+        //! Value type of the model state.
+        typedef typename Model::state::value_type Ts;
         //! Type of a row of the background error variance.
         typedef typename Model::state_error_variance_row
         model_state_error_variance_row;
@@ -98,7 +100,7 @@ namespace Verdandi
 
 #ifdef VERDANDI_WITH_TRAJECTORY_MANAGER
         //! Trajectory manager.
-        TrajectoryManager<T, Model> trajectory_manager_;
+        TrajectoryManager<Model> trajectory_manager_;
 #endif
 
         /*** Optimization ***/
@@ -146,14 +148,14 @@ namespace Verdandi
         string GetName() const;
         void Message(string message);
 
-        T Cost(const model_state& x, model_state& gradient);
-        T Constraint(const model_state& x, model_state& gradient);
+        Ts Cost(const model_state& x, model_state& gradient);
+        Ts Constraint(const model_state& x, model_state& gradient);
 
         void SetInitialTime(double time);
 
-        static T StaticCost(const model_state& x, model_state& gradient,
+        static Ts StaticCost(const model_state& x, model_state& gradient,
                             void* object);
-        static T StaticConstraint(const model_state& x,
+        static Ts StaticConstraint(const model_state& x,
                                   model_state& gradient, void* object);
     };
 

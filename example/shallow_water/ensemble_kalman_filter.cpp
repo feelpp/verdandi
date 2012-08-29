@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::EnsembleKalmanFilter<real, Verdandi::ShallowWater<real>,
+    Verdandi::EnsembleKalmanFilter<Verdandi::ShallowWater<real>,
         Verdandi::LinearObservationManager<real>,
         Verdandi::TR1PerturbationManager> driver;
 

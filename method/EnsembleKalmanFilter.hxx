@@ -32,7 +32,7 @@ namespace Verdandi
 
 
     //! This class implements the ensemble Kalman filter.
-    template <class T, class Model, class ObservationManager,
+    template <class Model, class ObservationManager,
               class PerturbationManager>
     class EnsembleKalmanFilter: public VerdandiBase
     {
@@ -42,8 +42,14 @@ namespace Verdandi
         //! Type of the observation vector.
         typedef typename ObservationManager::observation
         observation;
+        //! Value type of the model state vector.
+        typedef typename Model::state::value_type Ts;
+        //! Value type of the observations.
+        typedef typename ObservationManager::observation::value_type To;
         //! Type of an uncertain parameter.
         typedef typename Model::uncertain_parameter uncertain_parameter;
+        //! Value type of an uncertain parameter.
+        typedef typename Model::uncertain_parameter::value_type Tp;
         //! Type of the ensemble of state vectors.
         typedef vector<model_state> ensemble;
 

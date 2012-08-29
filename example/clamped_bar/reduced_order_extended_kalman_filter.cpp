@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::ReducedOrderExtendedKalmanFilter<real,
+    Verdandi::ReducedOrderExtendedKalmanFilter<
         Verdandi::ClampedBar<real>,
         Verdandi::LinearObservationManager<real> > driver;
 

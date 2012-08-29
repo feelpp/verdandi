@@ -33,18 +33,24 @@ namespace Verdandi
       to complete a full Monte Carlo simulation, one has to launch several
       simulations using this class.
     */
-    template <class T, class ClassModel, class PerturbationManager>
+    template <class Model, class PerturbationManager>
     class MonteCarlo: public VerdandiBase
     {
 
     public:
-        typedef typename ClassModel::state model_state;
-        typedef typename ClassModel::uncertain_parameter uncertain_parameter;
+        //! Type of the model state vector.
+        typedef typename Model::state model_state;
+        //! Value type of the model state vector.
+        typedef typename Model::state::value_type Ts;
+        //! Type of the uncertain parameter.
+        typedef typename Model::uncertain_parameter uncertain_parameter;
+        //! Value type of the uncertain parameter.
+        typedef typename Model::uncertain_parameter::value_type Tp;
 
     protected:
 
         //! Underlying model.
-        ClassModel model_;
+        Model model_;
 
         //! Pertubation managers.
         PerturbationManager perturbation_manager_;
@@ -116,7 +122,7 @@ namespace Verdandi
 
         /*** Access methods ***/
 
-        ClassModel& GetModel();
+        Model& GetModel();
         OutputSaver& GetOutputSaver();
         string GetName() const;
         void Message(string message);

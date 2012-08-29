@@ -36,11 +36,13 @@ namespace Verdandi
 
 
     //! This class implements the unscented Kalman filter.
-    template <class T, class Model, class ObservationManager>
+    template <class Model, class ObservationManager>
     class UnscentedKalmanFilter: public VerdandiBase
     {
 
     public:
+        //! Value type of the model state.
+        typedef typename Model::state::value_type Ts;
         //! Type of a row of the background error variance.
         typedef typename Model::state_error_variance_row
         model_state_error_variance_row;
@@ -55,6 +57,8 @@ namespace Verdandi
         //! Type of the tangent linear model.
         typedef typename Model::tangent_linear_operator
         model_tangent_linear_operator;
+        //! Value type of the observation vector.
+        typedef typename ObservationManager::observation::value_type To;
         //! Type of the tangent linear observation operator.
         typedef typename ObservationManager
         ::tangent_linear_operator observation_tangent_linear_operator;
@@ -65,11 +69,11 @@ namespace Verdandi
         typedef typename ObservationManager::observation
         observation;
         //! Type of the sigma point vector.
-        typedef Vector<T, VectFull, MallocAlloc<T> > sigma_point;
+        typedef Vector<Ts, VectFull, MallocAlloc<Ts> > sigma_point;
         //! Type of the sigma point collection.
         typedef Vector<sigma_point, Collection> sigma_point_collection;
         //! Type of the sigma point matrix.
-        typedef Matrix<T, General, RowMajor, MallocAlloc<T> >
+        typedef Matrix<Ts, General, RowMajor, MallocAlloc<Ts> >
         sigma_point_matrix;
         //! Type of the state vector collection.
         typedef Vector<model_state, Collection> state_collection;
@@ -123,7 +127,7 @@ namespace Verdandi
         //! Boolean to indicate if the coefficients alpha are constants.
         bool alpha_constant_;
         //! alpha.
-        T alpha_;
+        Ts alpha_;
 
         //! Number of sigma-points.
         int Nsigma_point_;

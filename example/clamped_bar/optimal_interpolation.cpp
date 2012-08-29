@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::OptimalInterpolation<real, Verdandi::ClampedBar<real>,
+    Verdandi::OptimalInterpolation<Verdandi::ClampedBar<real>,
         Verdandi::LinearObservationManager<real> > driver;
 
     driver.Initialize(argv[1]);

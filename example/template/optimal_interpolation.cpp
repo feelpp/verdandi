@@ -26,7 +26,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    OptimalInterpolation<double, ModelTemplate,
+    OptimalInterpolation<ModelTemplate,
         ObservationManagerTemplate> driver;
 
     driver.Initialize(argv[1]);
