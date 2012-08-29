@@ -624,7 +624,7 @@ namespace Verdandi
     //! Static cost function.
     /*
       \param[in] x vector that stores parameters values.
-      \param[in, out] gradient vector that stores gradient values, on final
+      \param[in,out] gradient vector that stores gradient values, on final
       exit, it returns the gradient vector for optimized parameters.
       \param[in] parameter the current FourDimensionalVariational<T, Model,
       ObservationManager,  Optimization> object.
