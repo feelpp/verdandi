@@ -79,7 +79,6 @@ namespace Verdandi
         VerdandiOps configuration(configuration_file);
         Initialize(configuration,
                    initialize_model, initialize_observation_manager);
-
     }
 
 
