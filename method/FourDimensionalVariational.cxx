@@ -489,7 +489,7 @@ namespace Verdandi
             observation_manager_.SetTime(model_, model_.GetTime());
             if (observation_manager_.HasObservation())
             {
-                obsevation& y =
+                observation& y =
                     observation_manager_.GetInnovation(trajectory[t]);
                 Nobservation_ = y.GetSize();
                 Rinv_y.Reallocate(Nobservation_);
