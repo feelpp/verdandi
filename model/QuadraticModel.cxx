@@ -669,16 +669,15 @@ namespace Verdandi
     }
 
 
-    //! Sets the i-th parameter.
+    /*! Performs some calculations when the update of the i-th uncertain
+      parameter is done.
+    */
     /*!
       \param[in] i index of the parameter.
-      \param[in] parameter the parameter to assign.
     */
     template<class T>
-    void QuadraticModel<T>::SetParameter(int i,
-                                         uncertain_parameter& parameter)
+    void QuadraticModel<T>::ParameterUpdated(int i)
     {
-        *(parameter_[i]) = parameter;
     }
 
 
@@ -714,7 +713,7 @@ namespace Verdandi
       \return The covariance matrix associated with the i-th parameter.
     */
     template<class T>
-    Matrix<T, Symmetric, RowSymPacked>&
+    typename QuadraticModel<T>::parameter_variance&
     QuadraticModel<T>::GetParameterVariance(int i)
     {
         return variance_[i];
@@ -728,7 +727,7 @@ namespace Verdandi
       \return The parameters associated with the i-th parameter.
     */
     template<class T>
-    Vector<T>& QuadraticModel<T>::GetParameterParameter(int i)
+    Vector<T>& QuadraticModel<T>::GetParameterPDFData(int i)
     {
         return optional_parameters_[i];
     }

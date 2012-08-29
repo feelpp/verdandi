@@ -70,6 +70,8 @@ namespace Verdandi
         typedef Vector<double> state;
         //! Type of an uncertain parameter.
         typedef Vector<double> uncertain_parameter;
+        //! Type of the uncertain parameter covariance matrix.
+        typedef Matrix<double, Symmetric, RowSymPacked> parameter_variance;
 
 
 
@@ -116,11 +118,11 @@ namespace Verdandi
         // Uncertainty.
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);
-        void SetParameter(int i, uncertain_parameter parameter);
+        void ParameterUpdated(int i);
         Vector<double>& GetParameterCorrelation(int i);
         string GetParameterPDF(int i);
-        Matrix<double, Symmetric, RowSymPacked>& GetParameterVariance(int i);
-        Vector<double>& GetParameterParameter(int i);
+        parameter_variance& GetParameterVariance(int i);
+        Vector<double>& GetParameterPDFData(int i);
         string GetParameterOption(int i);
 
         // Errors.

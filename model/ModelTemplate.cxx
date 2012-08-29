@@ -297,7 +297,7 @@ namespace Verdandi
     }
 
 
-    /*! Carries out some calculations when the the adjoint state
+    /*! Carries out some calculations when the adjoint state
       has been updated.
     */
     void ModelTemplate::AdjointStateUpdated()
@@ -328,15 +328,15 @@ namespace Verdandi
     }
 
 
-    //! Sets the i-th uncertain parameter.
+    /*! Carries out some calculations when the i-th parameter
+      has been updated.
+    */
     /*!
       \param[in] i index of the parameter.
-      \param[in] parameter the parameter to assign.
     */
-    void ModelTemplate::SetParameter(int i, uncertain_parameter parameter)
+    void ModelTemplate::ParameterUpdated(int i)
     {
-        throw ErrorUndefined("ModelTemplate::SetParameter(int i, "
-                             "uncertain_parameter parameter");
+        throw ErrorUndefined("ModelTemplate::ParameterUpdated(int i)");
     }
 
 
@@ -367,7 +367,7 @@ namespace Verdandi
       \param[in] i parameter index.
       \return The covariance matrix associated with the i-th parameter.
     */
-    Matrix<double, Symmetric, RowSymPacked>&
+    ModelTemplate::parameter_variance&
     ModelTemplate::GetParameterVariance(int i)
     {
         throw ErrorUndefined("ModelTemplate::GetParameterVariance(int i)");
@@ -380,7 +380,7 @@ namespace Verdandi
       \param[in] i model parameter index.
       \return The parameters associated with the i-th parameter.
     */
-    Vector<double>& ModelTemplate::GetParameterParameter(int i)
+    Vector<double>& ModelTemplate::GetParameterPDFData(int i)
     {
         throw ErrorUndefined("ModelTemplate::GetParameterParameter(int i)");
     }

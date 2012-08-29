@@ -54,6 +54,7 @@ namespace Verdandi
         typedef Matrix<T> matrix_state_observation;
         typedef Matrix<T> error_variance;
         typedef Vector<T> uncertain_parameter;
+        typedef Matrix<T, Symmetric, Seldon::RowSymPacked> parameter_variance;
 
     protected:
 
@@ -186,12 +187,11 @@ namespace Verdandi
 
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);
-        void SetParameter(int i, uncertain_parameter& parameter);
+        void ParameterUpdated(int i);
         Vector<T>& GetParameterCorrelation(int i);
         string GetParameterPDF(int i);
-        Matrix<T, Symmetric, Seldon::RowSymPacked>&
-        GetParameterVariance(int i);
-        Vector<T>& GetParameterParameter(int i);
+        parameter_variance& GetParameterVariance(int i);
+        Vector<T>& GetParameterPDFData(int i);
         string GetParameterOption(int i);
 
         // Errors.

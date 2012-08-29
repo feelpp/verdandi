@@ -840,18 +840,15 @@ namespace Verdandi
     }
 
 
-    //! Sets the i-th parameter.
+    /*! Performs some calculations when the update of the i-th uncertain
+      parameter is done.
+    */
     /*!
       \param[in] i index of the parameter.
-      \param[in] parameter the parameter to assign.
     */
     template<class T>
-    void ShallowWater<T>::SetParameter(int i, uncertain_parameter parameter)
+    void ShallowWater<T>::ParameterUpdated(int i)
     {
-        if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
-            value_ = parameter(0);
-        else
-            value_left_ = parameter(0);
     }
 
 
@@ -893,7 +890,7 @@ namespace Verdandi
       \return The covariance matrix associated with the i-th parameter.
     */
     template<class T>
-    Matrix<T, Symmetric, RowSymPacked>&
+    typename ShallowWater<T>::parameter_variance&
     ShallowWater<T>::GetParameterVariance(int i)
     {
         if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
@@ -911,7 +908,7 @@ namespace Verdandi
       \return The parameters associated with the i-th parameter.
     */
     template<class T>
-    Vector<T>& ShallowWater<T>::GetParameterParameter(int i)
+    Vector<T>& ShallowWater<T>::GetParameterPDFData(int i)
     {
         if (i == 0 && uncertain_parameter_vector_[0] == "step_height")
             return step_height_parameter_;

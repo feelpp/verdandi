@@ -304,7 +304,7 @@ namespace Verdandi
                         perturbation_manager_
                             .Sample(model_.GetParameterPDF(i),
                                     model_.GetParameterVariance(i),
-                                    model_.GetParameterParameter(i),
+                                    model_.GetParameterPDFData(i),
                                     model_.GetParameterCorrelation(i),
                                     sample);
                     else if (model_.GetParameterPDF(i) == "NormalHomogeneous"
@@ -317,7 +317,7 @@ namespace Verdandi
                         perturbation_manager_
                             .Sample(model_.GetParameterPDF(i),
                                     model_.GetParameterVariance(i)(0, 0),
-                                    model_.GetParameterParameter(i),
+                                    model_.GetParameterPDFData(i),
                                     model_.GetParameterCorrelation(i),
                                     sample);
 
@@ -339,7 +339,8 @@ namespace Verdandi
 
                     parameter_[i][m] = model_.GetParameter(i);
                     // Puts back the reference parameter into the model.
-                    model_.SetParameter(i, reference_parameter);
+                    model_.GetParameter(i) = reference_parameter;
+                    model_.ParameterUpdated(i);
                 }
 
                 MessageHandler::Send(*this, "model", "perturbation");
@@ -380,7 +381,7 @@ namespace Verdandi
                         perturbation_manager_
                             .Sample(model_.GetParameterPDF(i),
                                     model_.GetParameterVariance(i),
-                                    model_.GetParameterParameter(i),
+                                    model_.GetParameterPDFData(i),
                                     model_.GetParameterCorrelation(i),
                                     sample);
                     else if (model_.GetParameterPDF(i) == "NormalHomogeneous"
@@ -393,7 +394,7 @@ namespace Verdandi
                         perturbation_manager_
                             .Sample(model_.GetParameterPDF(i),
                                     model_.GetParameterVariance(i)(0, 0),
-                                    model_.GetParameterParameter(i),
+                                    model_.GetParameterPDFData(i),
                                     model_.GetParameterCorrelation(i),
                                     sample);
                     if (model_.GetParameterPDF(i) == "Normal"
@@ -414,7 +415,8 @@ namespace Verdandi
 
                     parameter_[i][m] = model_.GetParameter(i);
                     // Puts back the reference parameter into the model.
-                    model_.SetParameter(i, reference_parameter);
+                    model_.GetParameter(i) = reference_parameter;
+                    model_.ParameterUpdated(i);
                 }
 
                 MessageHandler::Send(*this, "model", "perturbation");
@@ -441,7 +443,10 @@ namespace Verdandi
         for (int m = 0; m < Nlocal_member_; m++)
         {
             for (int i = 0; i < Nparameter_; i++)
-                model_.SetParameter(i, parameter_[i][m]);
+            {
+                model_.GetParameter(i) = parameter_[i][m];
+                model_.ParameterUpdated(i);
+            }
             model_.GetFullState() = ensemble_[m];
             model_.FullStateUpdated();
 
@@ -477,7 +482,10 @@ namespace Verdandi
 
         // Puts back the reference parameters.
         for (int i = 0; i < Nparameter_; i++)
-            model_.SetParameter(i, reference_parameter[i]);
+        {
+            model_.GetParameter(i) = reference_parameter[i];
+            model_.ParameterUpdated(i);
+        }
 
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");

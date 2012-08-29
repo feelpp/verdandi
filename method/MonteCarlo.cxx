@@ -296,7 +296,7 @@ namespace Verdandi
                 perturbation_manager_
                     .Sample(model_.GetParameterPDF(i),
                             model_.GetParameterVariance(i),
-                            model_.GetParameterParameter(i),
+                            model_.GetParameterPDFData(i),
                             model_.GetParameterCorrelation(i),
                             output);
             }
@@ -311,7 +311,7 @@ namespace Verdandi
                 perturbation_manager_
                     .Sample(model_.GetParameterPDF(i),
                             model_.GetParameterVariance(i)(0, 0),
-                            model_.GetParameterParameter(i),
+                            model_.GetParameterPDFData(i),
                             model_.GetParameterCorrelation(i),
                             output);
             }
@@ -338,7 +338,8 @@ namespace Verdandi
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
 
-            model_.SetParameter(i, parameter);
+            model_.GetParameter(i) =  parameter;
+            model_.ParameterUpdated(i);
 
             output_saver_.Save(perturbation_[i], "perturbation");
         }
@@ -373,7 +374,8 @@ namespace Verdandi
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
 
-            model_.SetParameter(i, parameter);
+            model_.GetParameter(i) = parameter;
+            model_.ParameterUpdated(i);
         }
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
