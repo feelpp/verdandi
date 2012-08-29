@@ -247,7 +247,7 @@ namespace Verdandi
 
         if (alpha_constant_)
         {
-            double new_time;
+            double new_time(0.);
             // Computes X_{n + 1}^-.
             x.Fill(Ts(0));
             x_col.Reallocate(Nstate_);
@@ -277,7 +277,7 @@ namespace Verdandi
         }
         else
         {
-            double new_time;
+            double new_time(0.);
             // Computes X_{n + 1}^-.
             x.Fill(Ts(0));
             x_col.Reallocate(Nstate_);
