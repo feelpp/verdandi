@@ -75,6 +75,26 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "overview")
 
 </li>
 
+<li class="jelly"> <?php HL($file, "dependencies", "Dependencies");?>
+
+<?php if (basename($_SERVER['REQUEST_URI'], ".php") == "dependencies"
+          or basename($_SERVER['REQUEST_URI'], ".php") == "linear_algebra"
+          or basename($_SERVER['REQUEST_URI'], ".php") == "configuration_files"
+          or basename($_SERVER['REQUEST_URI'], ".php") == "compilation")
+    {
+        echo '<ul class="navsubul"> <li class="jelly">';
+        HL($file, "linear_algebra", "Linear Algebra Library");
+        echo '</li>';
+        echo '<li class="jelly">';
+        HL($file, "configuration_files", "Configuration Files");
+        echo '</li>';
+        echo '<li class="jelly">';
+        HL($file, "compilation", "Compilation");
+        echo '</li> </ul>';
+    } ?>
+</li>
+
+
 <li class="jelly"> <?php HL($file, "assimilation_methods", "Assimilation Methods");?>
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "assimilation_methods"
@@ -193,24 +213,6 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "plugging_observation")
 
 </li>
 
-<li class="jelly"> <?php HL($file, "using_verdandi", "Using Verdandi");?>
-
-<?php if (basename($_SERVER['REQUEST_URI'], ".php") == "using_verdandi"
-or basename($_SERVER['REQUEST_URI'], ".php") == "tips"
-or basename($_SERVER['REQUEST_URI'], ".php") == "configuration_files"
-or basename($_SERVER['REQUEST_URI'], ".php") == "scons")
-{
-  echo '<ul class="navsubul"> <li class="jelly">';
-  HL($file, "configuration_files", "Lua Configuration Files");
-  echo '</li>';
-  echo '<li class="jelly">';
-  HL($file, "scons", "SCons");
-  echo '</li>';
-  echo '<li class="jelly">';
-  HL($file, "tips", "Tips");
-  echo '</li> </ul>';
-} ?>
-</li>
 
 <li class="jelly"> <?php HL($file, "debugging", "Debugging");?>  </li>
 
