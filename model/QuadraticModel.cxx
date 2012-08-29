@@ -239,7 +239,7 @@ namespace Verdandi
 
                 for (int i = 0; i < Nstate_; i++)
                 {
-                    Vector<double> row;
+                    Vector<T> row;
                     GetRow(L_, i, row);
                     Add(T(1), linear_mean, row);
                     SetRow(row, i, L_);
@@ -247,7 +247,7 @@ namespace Verdandi
 
                 for (int i = 0; i < Nstate_; i++)
                 {
-                    Vector<double> *row = new Vector<double>;
+                    Vector<T> *row = new Vector<T>;
                     row->SetData(Nstate_, L_.GetMe()[i]);
                     parameter_.push_back(row);
                     variance_.push_back(linear_variance);
@@ -278,7 +278,7 @@ namespace Verdandi
                 configuration.Set("quadratic_term.parameter",
                                   quadratic_parameter);
 
-                Vector<double> row;
+                Vector<T> row;
                 for (int i = 0; i < Nstate_; i++)
                     for (int j = 0; j < Nstate_; j++)
                     {
@@ -290,7 +290,7 @@ namespace Verdandi
                 for (int i = 0; i < Nstate_; i++)
                     for (int j = 0; j < Nstate_; j++)
                     {
-                        Vector<double> *row = new Vector<double>;
+                        Vector<T> *row = new Vector<T>;
                         row->SetData(Nstate_, S_[i].GetMe()[j]);
                         parameter_.push_back(row);
                         variance_.push_back(quadratic_variance);
@@ -301,7 +301,7 @@ namespace Verdandi
         }
 
         // No correlation.
-        Vector<double> empty_vector;
+        Vector<T> empty_vector;
         correlation_.push_back(empty_vector);
 
         Nparameter_ = parameter_.size();
