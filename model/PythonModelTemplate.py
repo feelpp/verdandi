@@ -66,7 +66,7 @@ class PythonModelTemplate:
 
     ## Returns the tangent linear model.
     # @param[out] M the matrix of the tangent linear model.
-    def GetTangentLinearOperator(self)
+    def GetTangentLinearOperator(self):
         return self.M_
 
 
