@@ -33,7 +33,7 @@ class PythonModelTemplate:
         return
 
 
-    ### Processing ###
+    # ## Processing ## #
 
 
     ## Advances one step forward in time.
@@ -85,7 +85,7 @@ class PythonModelTemplate:
         return
 
 
-    ### Access methods ###
+    # ## Access methods ## #
 
 
     ## Returns the current time.
@@ -212,7 +212,7 @@ class PythonModelTemplate:
         return self.parameter_option_[i]
 
 
-    ### Errors ###
+    # ## Errors ## #
 
 
     ## Returns the state error variance.

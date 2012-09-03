@@ -42,7 +42,7 @@ class PythonObservationManagerTemplate:
         return
 
 
-    ### Observation ###
+    # ## Observation ## #
 
 
     ## Returns the observations.
@@ -53,7 +53,7 @@ class PythonObservationManagerTemplate:
         return observation
 
 
-    ### Innovation ###
+    # ## Innovation ## #
 
 
     ## Returns an innovation
@@ -65,7 +65,7 @@ class PythonObservationManagerTemplate:
         return innovation
 
 
-    ### Access ###
+    # ## Access ## #
 
 
     ## Indicates if some observations are available at a given time or at
@@ -81,7 +81,7 @@ class PythonObservationManagerTemplate:
         return Nobservation
 
 
-    ### Operators ###
+    # ## Operators ## #
 
 
     ## Applies the observation operator to a given vector.
@@ -132,7 +132,7 @@ class PythonObservationManagerTemplate:
         return
 
 
-    ### Errors ###
+    # ## Errors ## #
 
 
     ## Returns an element of the observation error covariance matrix, or the
