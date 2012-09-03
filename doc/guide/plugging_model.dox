@@ -58,7 +58,7 @@ $ cp quadratic_model/{SConstruct,forward.cpp} my_model/
 $ cp quadratic_model/configuration/truth.lua my_model/configuration/
 \endprecode
 
-<li> In the file <code>forward.cpp</code> replace all "ModelTemplate" occurrences with "MyModel".</li>
+<li> In the file <code>forward.cpp</code>, replace all "ModelTemplate" occurrences with "MyModel".</li>
 
 <li> Compile the program forward.cpp.
 </li>
