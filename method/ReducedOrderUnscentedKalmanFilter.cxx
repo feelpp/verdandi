@@ -440,7 +440,7 @@ namespace Verdandi
             for (int i = 0; i < Nlocal_sigma_point_; i++)
             {
                 GetCol(X_i_local_, i, x_col_);
-                model_.ApplyOperator(x_col_, false);
+                new_time = model_.ApplyOperator(x_col_, false);
                 Add(Ts(alpha_), x_col_, x_);
                 SetCol(x_col_, i, X_i_local_);
             }
