@@ -417,7 +417,7 @@ namespace Verdandi
     */
     template <class Model, class ObservationManager,
               class Optimization>
-    typename FourDimensionalVariational<Model, ObservationManager, 
+    typename FourDimensionalVariational<Model, ObservationManager,
     Optimization>::Ts
     FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::Cost(const model_state& x, model_state& gradient)
@@ -632,7 +632,7 @@ namespace Verdandi
     */
     template <class Model, class ObservationManager,
               class Optimization>
-    typename FourDimensionalVariational<Model, ObservationManager, 
+    typename FourDimensionalVariational<Model, ObservationManager,
     Optimization>::Ts
     FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::Constraint(const model_state& x, model_state& gradient)
@@ -666,7 +666,7 @@ namespace Verdandi
     */
     template <class Model, class ObservationManager,
               class Optimization>
-    typename FourDimensionalVariational<Model, ObservationManager, 
+    typename FourDimensionalVariational<Model, ObservationManager,
     Optimization>::Ts
     FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::StaticCost(const model_state& x, model_state& gradient,
@@ -688,7 +688,7 @@ namespace Verdandi
     */
     template <class Model, class ObservationManager,
               class Optimization>
-    typename FourDimensionalVariational<Model, ObservationManager, 
+    typename FourDimensionalVariational<Model, ObservationManager,
     Optimization>::Ts
     FourDimensionalVariational<Model, ObservationManager,  Optimization>
     ::StaticConstraint(const model_state& x, model_state& gradient,
