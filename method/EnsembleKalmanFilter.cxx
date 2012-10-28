@@ -245,6 +245,12 @@ namespace Verdandi
             observation_manager_.Initialize(model_,
                                             observation_configuration_file_);
 
+        configuration.SetPrefix("ensemble_kalman_filter.");
+
+        configuration.Set("observation_tangent_linear_operator_access",
+                          "ops_in(v, {'element', 'matrix'})",
+                          observation_tangent_linear_operator_access_);
+
         /*** Ensemble initialization ***/
 
         model_state state;
@@ -540,8 +546,21 @@ namespace Verdandi
 
             // Computes H times L.
             Matrix<To> HL(Nobservation_, Nlocal_member_);
-            MltAdd(To(1), observation_manager_.GetTangentLinearOperator(),
-                   ensemble_perturbation, To(0), HL);
+
+            if (observation_tangent_linear_operator_access_ == "matrix")
+                MltAdd(To(1), observation_manager_.GetTangentLinearOperator(),
+                       ensemble_perturbation, To(0), HL);
+            else // "element".
+            {
+                HL.Fill(To(0));
+                for (int i = 0; i < Nobservation_; i++)
+                    for (int j = 0; j < Nlocal_member_; j++)
+                        for (int k = 0; k < Nstate_; k++)
+                            HL(i, j) +=
+                                observation_manager_.
+                                GetTangentLinearOperator(i, k) *
+                                ensemble_perturbation(k, j);
+            }
 
             // Reads R.
             Matrix<To> working_matrix(Nobservation_,Nobservation_);

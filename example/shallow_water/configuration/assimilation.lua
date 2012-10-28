@@ -83,6 +83,9 @@ ensemble_kalman_filter = {
 
    Nmember = 10,
 
+   -- How the tangent linear operator is accessed: "element" or "matrix".
+   observation_tangent_linear_operator_access = "matrix",
+
    data_assimilation = {
 
       analyze_first_step = false,

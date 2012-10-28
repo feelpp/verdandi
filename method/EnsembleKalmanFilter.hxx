@@ -106,6 +106,10 @@ namespace Verdandi
         //! Current time.
         double time_;
 
+        /*! \brief Method of access to the tangent linear operator: "element"
+          or "matrix". */
+        string observation_tangent_linear_operator_access_;
+
 #if defined(VERDANDI_WITH_MPI)
 
         /*** Parallel settings ***/
