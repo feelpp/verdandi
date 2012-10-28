@@ -246,6 +246,9 @@ reduced_order_extended_kalman_filter = {
 -- Simulation with assimilation using 4D-VAR.
 four_dimensional_variational = {
 
+   -- How the tangent linear operator is accessed: "element" or "matrix".
+   observation_tangent_linear_operator_access = "matrix",
+
    nlopt = {
 
       -- Optimization algorithm (LD_VAR1, LD_LBFGS, LD_SLSQP, LD_MMA,

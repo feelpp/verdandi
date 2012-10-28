@@ -226,6 +226,12 @@ namespace Verdandi
             MessageHandler::Send(*this, "model", "initial condition");
             MessageHandler::Send(*this, "driver", "initial condition");
         }
+
+        configuration.SetPrefix("four_dimensional_variational.");
+
+        configuration.Set("observation_tangent_linear_operator_access",
+                          "ops_in(v, {'element', 'matrix'})",
+                          observation_tangent_linear_operator_access_);
     }
 
 
@@ -495,10 +501,22 @@ namespace Verdandi
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
                     Rinv(observation_manager_.GetErrorVarianceInverse());
+
                 MltAdd(Ts(1), Rinv, y, Ts(0), Rinv_y);
-                MltAdd(Ts(1), SeldonTrans, observation_manager_.
-                       GetTangentLinearOperator(), Rinv_y, Ts(0),
-                       adjoint_source);
+
+                if (observation_tangent_linear_operator_access_ == "matrix")
+                    MltAdd(Ts(1), SeldonTrans, observation_manager_.
+                           GetTangentLinearOperator(), Rinv_y, Ts(0),
+                           adjoint_source);
+                else // "element".
+                {
+                    adjoint_source.Fill(Ts(0));
+                    for (int i = 0; i < Nstate_; i++)
+                        for (int j = 0; j < Nobservation_; j++)
+                            adjoint_source(i) +=
+                                observation_manager_.
+                                GetTangentLinearOperator(j, i) * Rinv_y(j);
+                }
             }
             else
                 adjoint_source.Fill(Ts(0));
@@ -568,10 +586,22 @@ namespace Verdandi
                 Rinv_y.Reallocate(Nobservation_);
                 observation_error_variance
                     Rinv(observation_manager_.GetErrorVarianceInverse());
+
                 MltAdd(Ts(1), Rinv, y, Ts(0), Rinv_y);
-                MltAdd(Ts(1), SeldonTrans, observation_manager_.
-                       GetTangentLinearOperator(), Rinv_y, Ts(0),
-                       adjoint_source);
+
+                if (observation_tangent_linear_operator_access_ == "matrix")
+                    MltAdd(Ts(1), SeldonTrans, observation_manager_.
+                           GetTangentLinearOperator(), Rinv_y, Ts(0),
+                           adjoint_source);
+                else // "element".
+                {
+                    adjoint_source.Fill(Ts(0));
+                    for (int i = 0; i < Nstate_; i++)
+                        for (int j = 0; j < Nobservation_; j++)
+                            adjoint_source(i) +=
+                                observation_manager_.
+                                GetTangentLinearOperator(j, i) * Rinv_y(j);
+                }
             }
             else
                 adjoint_source.Fill(Ts(0));

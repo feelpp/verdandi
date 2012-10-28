@@ -96,6 +96,10 @@ namespace Verdandi
         bool analyze_first_step_;
         int Ncall_cost_;
 
+        /*! \brief Method of access to the tangent linear operator: "element"
+          or "matrix". */
+        string observation_tangent_linear_operator_access_;
+
         /*** Trajectory ***/
 
 #ifdef VERDANDI_WITH_TRAJECTORY_MANAGER
