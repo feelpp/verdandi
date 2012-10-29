@@ -1,3 +1,80 @@
+Version 1.4 (2012-11-13)
+-----------
+
+* Methods
+
+- Removed the template parameter T in all assimilation methods.
+- Added support for elementwise access to the tangent linear observation
+  operator in 'EnsembleKalmanFilter' and 'FourDimensionalVariational'.
+- Added the option to save the forecast and analysis times.
+- Renamed the saved variables "state_forecast" and "state_analysis" to 
+  "forecast_state" and "analysis_state".
+- Improved 'UnscentedKalmanFilter' and 'ReducedOrderUnscentedKalmanFilter'
+  with more suitable types for several intermediate variables.
+- Modified 'HamiltonJacobiBellman' so that it can save the time in addition to
+  the time step, and so that the output saver decides to save variables using
+  the time, not the time step.
+- Removed the deprecated calls to MPI in the form 'MPI::Function', instead of
+  'MPI_Function'.
+- Added tests to check whether MPI has been initialized/finalized before
+  calling 'MPI_Init'/'MPI_Finalize'.
+
+* Models
+
+- Improved the model interface for the uncertain parameters.
+- Initial import of 'CheckingModel'.
+- Simplified 'ApplyOperator' to remove the option 'forward' which is now set
+  to 'false' all time.
+
+* Output saver
+
+- Added the option to read and store observations in HDF5 format. Implemented
+  an example for 'QuadraticModel'.
+
+* Example models
+
+- Added the forecast and analysis times in output variables.
+- In 'QuadraticModel', added tests on the dimensions of uncertainty
+  descriptions provided in the configuration.
+- In 'ShallowWater', the state vector and the full state vector are now stored
+  in two distinct attributes ('state_' and 'full_state_').
+
+* Documentation
+
+- Added the script "methods_requirements" in "bin/" to list the member
+  functions of a model and of an observation manager that are required by a
+  specified assimilation method.
+- Improved the section "Plugging an Existing Model".
+- Renamed the section "Using Verdandi" to "Dependencies" and improved its
+  contents.
+- Added documentation about the compilation options in "Debugging".
+- Added a section in "Plugging a Model" for plugging a Python model.
+
+* Bug fixes
+
+- In 'EnsembleKalmanFilter', the empirical variance derived from
+  the ensemble was (Nmember - 1) times higher than expected, where Nmember is
+  the number of members in the ensemble.
+- The example observation managers returned the wrong observations when the
+  variable 'Nskip' was different from 1.
+- In 'FourDimensionalVariational', the method did not compile when the option
+  'VERDANDI_WITH_TRAJECTORY_MANAGER' was deactivated.
+- In 'HamiltonJacobiBellman', the model was not initialized when the source
+  term was included but not the advection term. 
+- In 'UnscentedKalmanFilter', the sigma-point matrix was no longer updated.
+- In the model 'ShallowWater', the size of the full state vector was erroneous.
+- 'QuadraticModel<T>' was compiling only if 'T' was double.
+- In 'HamiltonJacobiBellman', the model methods 'FinalizeStep' and 'Finalize'
+  are now called only if the advection term or the source term are included.
+
+* Miscellaneous
+
+- Optimized the general SConstruct file: the link flags for the external
+  libraries were set twice.
+- Removed all exception specifications in class 'Error' and in its derived
+  classes.
+
+
 Version 1.3 (2012-06-27)
 -----------
 
@@ -259,8 +336,6 @@ Version 1.0 (2011-05-27)
 - Improved 'GetCholesky' in the sparse case: the 'RowSparse' matrix is no
   longer converted to a dense matrix but to an 'ArrayRowSymSparse' matrix
   before the decomposition.
-
-* Bug fixes
 
 
 Version 0.9 (2011-05-12)

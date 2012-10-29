@@ -1,8 +1,8 @@
-Verdandi 1.3+
+Verdandi 1.4
 
 Required dependencies:
-    - Seldon 5.2-rc2
-    - Ops 1.1
+    - Seldon 5.2-rc3
+    - Ops 1.1.1
     - Lua 5.1
 
 Recommended dependencies:
