@@ -104,7 +104,7 @@ shallow_water = {
    output_saver = {
 
       variable_list = {"u", "v", "h"},
-      file = output_directory .. "/%{name}.bin",
+      file = output_directory .. "model-%{name}.bin",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,
       mode_scalar = output_mode_scalar

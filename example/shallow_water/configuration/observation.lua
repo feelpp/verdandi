@@ -17,7 +17,7 @@ observation = {
    Delta_t_constant = true,
    -- If the period with which observations are available non constant
    -- one should define the observation time file.
-   observation_time_file = "result/time.dat",
+   observation_time_file = output_directory .. "time.dat",
    -- Period with which observations are available.
    Delta_t = Delta_t_shallow_water * Nskip_save,
    -- Period with which available observations are actually assimilated.

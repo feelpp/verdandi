@@ -99,7 +99,7 @@ quadratic_model = {
    output_saver = {
 
       variable_list = {"state", "S", "L", "b"},
-      file = output_directory .. "%{name}.bin",
+      file = output_directory .. "model-%{name}.bin",
       time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
 
    }

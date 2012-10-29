@@ -13,7 +13,7 @@ observation = {
    Delta_t_constant = true,
    -- If the period with which observations are available is non constant
    -- one should define the observation time file.
-   observation_time_file = "result/time.dat",
+   observation_time_file = output_directory .. "time.dat",
    -- Else  one should define the period with which
    -- observations are available.
    Delta_t = Delta_t_clamped_bar * Nskip_save,

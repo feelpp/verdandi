@@ -24,7 +24,7 @@ Since no observations are given yet, we have to generate some. Execute the follo
 \precode
 $ forward configuration/truth.lua
 \endprecode
-to run the model with the initial conditions described in <code>truth.lua</code>, without data assimilation. This should generate a few result files in the directory <code>example/shallow_water/result/</code>. The water height is stored in the file <code>truth-state_forecast.bin</code>, and the horizontal velocity along x and y in respectively <code>u.bin</code> and <code>v.bin</code>. These files store time trajectories.
+to run the model with the initial conditions described in <code>truth.lua</code>, without data assimilation. This should generate a few result files in the directory <code>example/shallow_water/result/</code>. The water height is stored in the file <code>truth-state_forecast.bin</code>, and the horizontal velocity along x and y in respectively <code>model-u.bin</code> and <code>model-v.bin</code>. These files store time trajectories.
 
 The generated state (water height) will serve as observations for the assimilation. To plot it, you can use <a href="http://ipython.scipy.org/">IPython</a> with the module pylab. Refer to the \ref python section to make sure you can use the Python interface of Verdandi.
 

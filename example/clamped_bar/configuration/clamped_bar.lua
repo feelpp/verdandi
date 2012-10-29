@@ -42,7 +42,7 @@ clamped_bar = {
     output_saver = {
 
         variable_list = {"disp_0", "velo_0"},
-        file = output_directory .. "/%{name}.bin",
+        file = output_directory .. "model-%{name}.bin",
         time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
         mode = output_mode,
         mode_scalar = output_mode_scalar

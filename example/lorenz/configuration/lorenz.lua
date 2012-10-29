@@ -30,7 +30,7 @@ lorenz = {
    output_saver = {
 
       variable_list = {"X", "Y", "Z"},
-      file = "result/%{name}.bin",
+      file = output_directory .. "model-%{name}.bin",
       mode_scalar = "binary"
 
    }
