@@ -5,6 +5,10 @@ observation = {
 
    -- Path to the file storing the observations.
    file = observation_file,
+   -- Type of the observation file: "binary" (default) or "HDF".
+   -- file_type = "HDF",
+   -- Path to the dataset where observations are stored (HDF5 filetype).
+   -- observation_dataset_path = "observation/forecast",
    -- How are defined the observations? If the type is "observation, only
    -- observations are stored in the file. If the type is "state", the whole
    -- model state is stored.

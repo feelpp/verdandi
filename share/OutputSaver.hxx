@@ -54,6 +54,12 @@ namespace Verdandi
         //! Default mode.
         string mode_;
 
+        //! Name of the group where to store the variable (HDF mode).
+        string group_;
+
+        //! Name of the dataset where to store the variable (HDF mode).
+        string dataset_;
+
         //! Default mode for scalar variables.
         string mode_scalar_;
 
@@ -94,6 +100,11 @@ namespace Verdandi
         void WriteText(const double& x, string file_name) const;
         template <class S>
         void WriteText(const S& x, string file_name) const;
+#ifdef VERDANDI_WITH_HDF5
+        template <class S>
+        void WriteHDF5(const S& x, string file_name,
+                       string group_name, string dataset_name) const;
+#endif
         template <class S>
         void WriteBinary(const S& x, string file_name) const;
         template <class T, class Prop, class Allocator>

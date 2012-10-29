@@ -87,6 +87,8 @@ namespace Verdandi
 
 
         configuration.Set("mode", "", "binary", mode_);
+        configuration.Set("group", "", "", group_);
+        configuration.Set("dataset", "", "binary", dataset_);
         configuration.Set("mode_scalar", "", "text", mode_scalar_);
 
         vector<string> variable_vector;
@@ -185,7 +187,23 @@ namespace Verdandi
     {
         if (is_active_ && (save_period_ == 0.
             || is_multiple(time, save_period_, time_tolerance_)))
+        {
             Save(x, variable_name);
+#ifdef VERDANDI_WITH_HDF5
+            if (mode_ == "HDF")
+            {
+                map<string, Variable>::iterator im;
+
+                im = variable_list_.find(variable_name);
+                Variable& variable = im->second;
+                string dataset_time_name = dataset_ + "_time";
+                Vector<double> vector_time(1);
+                vector_time(0) = time;
+                WriteHDF5(vector_time, variable.GetFile(), group_,
+                          dataset_time_name);
+            }
+#endif
+        }
     }
 
 
@@ -231,6 +249,10 @@ namespace Verdandi
             WriteText(x, variable.GetFile());
         else if (variable.GetMode() == "binary")
             WriteBinary(x, variable.GetFile());
+#ifdef VERDANDI_WITH_HDF5
+        else if (variable.GetMode() == "HDF")
+            WriteHDF5(x, variable.GetFile(), group_, dataset_);
+#endif
     }
 
 
@@ -315,6 +337,22 @@ namespace Verdandi
         file.close();
     }
 
+#ifdef VERDANDI_WITH_HDF5
+    //! Writes \a x in a HDF5 file.
+    /*!
+      \param[in] x variable to be written.
+      \param[in] file_name output filename.
+      \param[in] group_name name of the group \a x must be stored in.
+      \param[in] dataset_name name of the dataset \a x must be stored in.
+      \param[in] time corresponding time of the variable.
+    */
+    template <class S>
+    void OutputSaver::WriteHDF5(const S& x, string file_name,
+                                string group_name, string dataset_name) const
+    {
+        x.WriteHDF5(file_name, group_name, dataset_name);
+    }
+#endif
 
     //! Writes \a x in a binary file.
     /*!
@@ -639,6 +677,8 @@ namespace Verdandi
             extension = "bin";
         else if (extension == "text")
             extension = "dat";
+        else if (extension == "HDF")
+            extension = "h5";
         variable.SetFile(find_replace(variable.GetFile(),
                                       "%{extension}", extension));
     }

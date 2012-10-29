@@ -42,8 +42,7 @@ namespace Verdandi
       with this implementation.
     */
     template <class T>
-    LinearObservationManager<T>::LinearObservationManager():
-    current_row_(-1)
+    LinearObservationManager<T>::LinearObservationManager():current_row_(-1)
     {
     }
 
@@ -100,6 +99,9 @@ namespace Verdandi
             return;
 
         configuration.Set("file", observation_file_);
+        configuration.Set("file_type", "", "binary", observation_file_type_);
+        configuration.Set("observation_dataset_path","", "",
+                          observation_dataset_path_);
         configuration.Set("type", "", "state", observation_type_);
         configuration.Set("Delta_t_constant", is_delta_t_constant_);
         if (!is_delta_t_constant_)
@@ -1468,12 +1470,19 @@ namespace Verdandi
                           "Unable to open file \""
                           + observation_file_ + "\".");
 #endif
-
         int Nt = available_time.GetSize();
         observation2.Reallocate(Nt);
-        for (int h = 0; h < Nt; h++)
-            ReadObservation(file_stream, available_time(h), 0,
-                            observation2(h));
+        if (observation_file_type_ == "binary")
+            for (int h = 0; h < Nt; h++)
+                ReadObservation(file_stream, available_time(h), 0,
+                                observation2(h));
+#ifdef VERDANDI_WITH_HDF5
+        else if (observation_file_type_ == "HDF")
+            for (int h = 0; h < Nt; h++)
+                ReadObservation(file_stream, available_time(h), 0,
+                                observation_dataset_path_,
+                                observation2(h));
+#endif
 
         file_stream.close();
     }
@@ -1558,6 +1567,157 @@ namespace Verdandi
         }
     }
 
+#ifdef VERDANDI_WITH_HDF5
+    //! Reads observation from observation file given a time and a variable.
+    /*!
+      \param[in] file_stream the observation file stream.
+      \param[in] time the time.
+      \param[in] variable the variable.
+      \param[out] observation the observations.
+    */
+    template <class T>
+    void LinearObservationManager<T>
+    ::ReadObservation(ifstream& file_stream, double time, int variable,
+                      string dataset_path, observation_vector& observation)
+        const
+    {
+        observation.Reallocate(Nobservation_);
+        observation_vector input_data;
+        int position;
+
+        hid_t file_id = H5Fopen(observation_file_.c_str(), H5F_ACC_RDONLY,
+                                H5P_DEFAULT);
+
+        if (is_delta_t_constant_)
+            position = (floor((time - initial_time_)
+                              / (Delta_t_ * Nskip_) + 0.5) + variable);
+        else
+        {
+
+            string dataset_time = dataset_path + "_time";
+            hid_t dataset_id = H5Dopen(file_id, dataset_time.c_str());
+
+            if (dataset_id < 0)
+                throw ErrorIO("LinearObservationManager::ReadObservation"
+                              "(ifstream& file_stream, double time,"
+                              "int variable, "
+                              "string dataset_path, LinearObservationManager"
+                              "::observation_vector& observation) const",
+                              "The dataset path \"" + dataset_time
+                              + "\" cannot be opened in "
+                              + observation_file_);
+
+            hid_t dataspace_id = H5Dget_space (dataset_id);
+            double x(0);
+            hid_t datatype = GetH5Type(x);
+
+            int index;
+            bool observation_available = false;
+
+            for (index = 0; index < observation_time_.GetM(); index++)
+            {
+                hsize_t offset[1] = {index};
+                hsize_t count_out[1] = {1};
+                herr_t status = H5Sselect_hyperslab(dataspace_id,
+                                                    H5S_SELECT_SET,
+                                                    offset, NULL,
+                                                    count_out, NULL);
+
+                hid_t memspace = H5Screate_simple (1, count_out, NULL);
+
+                hid_t memtype = H5Tvlen_create(datatype);
+                hvl_t rdata[1];
+                status = H5Dread(dataset_id, memtype, memspace, dataspace_id,
+                                 H5P_DEFAULT, rdata);;
+
+                if (reinterpret_cast<double*>(rdata[0].p)[0] == time)
+                {
+                    observation_available = true;
+                    break;
+                }
+            }
+
+            if (!observation_available)
+                throw ErrorIO("LinearObservationManager::ReadObservation"
+                              "(ifstream& file_stream, double time, "
+                              "int variable, string dataset_path, "
+                              "int variable, LinearObservationManager"
+                              "::observation_vector& observation) const",
+                              "No observation available at time "
+                              + to_str(time) + ".");
+
+            position = index;
+        }
+
+        hid_t dataset_id = H5Dopen(file_id, dataset_path.c_str());
+
+        if (dataset_id < 0)
+            throw ErrorIO("LinearObservationManager::ReadObservation"
+                          "(ifstream& file_stream, double time, int variable,"
+                          "string dataset_path, LinearObservationManager"
+                          "::observation_vector& observation) const",
+                          "The dataset path \"" + dataset_path
+                          + "\" cannot be opened in "
+                          + observation_file_);
+
+        hid_t dataspace_id = H5Dget_space (dataset_id);
+        T x(0);
+        hid_t datatype = GetH5Type(x);
+
+        // Select the appropriate observation.
+        hsize_t offset[1] = {position};
+        hsize_t count_out[1] = {1};
+        herr_t status = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET,
+                                            offset, NULL,
+                                            count_out, NULL);
+
+        hid_t memspace = H5Screate_simple (1, count_out, NULL);
+
+        hid_t memtype = H5Tvlen_create(datatype);
+        hvl_t rdata[1];
+        status = H5Dread(dataset_id, memtype, memspace, dataspace_id,
+                         H5P_DEFAULT, rdata);
+
+        input_data.SetData(static_cast<int>(rdata[0].len),
+                           reinterpret_cast<T*>(rdata[0].p));
+
+        if (observation_type_ == "state")
+        {
+            if (input_data.GetSize() != Nstate_model_)
+                throw ErrorIO("LinearObservationManager::ReadObservation"
+                              "(ifstream& file_stream, double time, "
+                              "int variable, LinearObservationManager"
+                              "::observation_vector& observation) const",
+                              "The observation type is 'state', so the whole"
+                              " model state is supposed to be stored, but "
+                              "the size of the observation read at time "
+                              + to_str(time_) + " (Nread = "
+                              + to_str(input_data.GetSize()) +
+                              ") mismatches with the expected size (Nstate = "
+                              + to_str(Nstate_model_) + ").");
+            ApplyOperator(input_data, observation);
+        }
+        else
+        {
+            if (input_data.GetSize() != Nobservation_)
+                throw ErrorIO("LinearObservationManager::ReadObservation"
+                              "(ifstream& file_stream, double time, "
+                              "int variable, LinearObservationManager"
+                              "::observation_vector& observation) const",
+                              "The observation type is 'observation', so "
+                              "only observations are stored in the file, but"
+                              " the size of the observation read at time "
+                              + to_str(time_) + " (Nread = "
+                              + to_str(input_data.GetSize())
+                              + ") mismatches with the "
+                              "expected size (Nobservation = "
+                              + to_str(Nobservation_ ) + ").");
+            Copy(input_data, observation);
+        }
+
+        input_data.Nullify();
+    }
+#endif
 
     //! Reads observations indexes.
     /*!

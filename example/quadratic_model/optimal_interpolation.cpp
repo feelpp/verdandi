@@ -5,6 +5,9 @@
 #define VERDANDI_DENSE
 #define VERDANDI_WITH_ABORT
 
+//#define SELDON_WITH_HDF5
+//#define VERDANDI_WITH_HDF5
+
 #include "Verdandi.hxx"
 
 #include "model/QuadraticModel.cxx"

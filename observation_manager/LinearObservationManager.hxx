@@ -106,6 +106,10 @@ namespace Verdandi
 
         //! File that stores the observations.
         string observation_file_;
+        //! Type of the file.
+        string observation_file_type_;
+        //! Path to the dataset where observations are stored (HDF5 filetype).
+        string observation_dataset_path_;
         //! How are stored the observations.
         string observation_type_;
         //! Total number of observations at current time.
@@ -366,6 +370,11 @@ namespace Verdandi
                              observation_vector2& observation2) const;
         void ReadObservation(ifstream& file_stream, double time, int variable,
                              observation_vector& observation) const;
+#ifdef VERDANDI_WITH_HDF5
+        void ReadObservation(ifstream& file_stream, double time, int variable,
+                             string dataset_path,
+                             observation_vector& observation) const;
+#endif
         void ReadObservationIndex(const time_vector& available_time, const
                                   variable_vector2& observation_variable2,
                                   index_vector3& observation_index3) const;
