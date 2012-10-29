@@ -31,9 +31,9 @@
 
 int main(int argc, char** argv)
 {
-    
+
     VERDANDI_TRY;
-    
+
     if (argc != 2)
     {
         string mesg  = "Usage:\n";
@@ -41,15 +41,15 @@ int main(int argc, char** argv)
         std::cout << mesg << std::endl;
         return 1;
     }
-    
+
     typedef double real;
-    
-    Verdandi::ReducedOrderUnscentedKalmanFilter<real,
-    Verdandi::CheckingModel<Verdandi::ClampedBar<real> >,
-    Verdandi::LinearObservationManager<real> > driver;
-    
+
+    Verdandi::ReducedOrderUnscentedKalmanFilter<
+        Verdandi::CheckingModel<Verdandi::ClampedBar<real> >,
+        Verdandi::LinearObservationManager<real> > driver;
+
     driver.Initialize(argv[1]);
-    
+
     while (!driver.HasFinished())
     {
         driver.InitializeStep();
@@ -57,11 +57,11 @@ int main(int argc, char** argv)
         driver.Analyze();
         driver.FinalizeStep();
     }
-    
+
     driver.Finalize();
-    
+
     VERDANDI_END;
-    
+
     return 0;
-    
+
 }
