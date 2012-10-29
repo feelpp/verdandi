@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 
     typedef double real;
 
-    Verdandi::OptimalInterpolation<real, Verdandi::PythonModel,
+    Verdandi::OptimalInterpolation<Verdandi::PythonModel,
         Verdandi::PythonObservationManager > driver;
 
     driver.Initialize(argv[1]);
