@@ -109,7 +109,7 @@ Version 1.2 (2012-03-30)
 
 - Added the possibility to use an observation manager written in Python.  A
   generic interface between Python and C++ is implemented in
-  'PythonObservationManager.
+  'PythonObservationManager'.
 
 * Example models
 
