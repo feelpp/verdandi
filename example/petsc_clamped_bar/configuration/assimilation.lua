@@ -6,11 +6,11 @@ final_time_petsc_clamped_bar = 10
 -- Saving period.
 Nskip_save = 1
 
-observation_file = "result/truth-observation.bin"
-
 output_mode = "text"
 output_directory = "result/"
 output_mode_scalar = "text"
+
+observation_file = output_directory .. "truth-state_forecast.bin"
 
 
 ----------------------------------- MODEL ------------------------------------
@@ -124,5 +124,3 @@ forward = {
    }
 
 }
-
-

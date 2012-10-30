@@ -8,7 +8,7 @@ observation = {
    -- How are defined the observations? If the type is "observation, only
    -- observations are stored in the file. If the type is "state", the whole
    -- model state is stored.
-   type = "observation",
+   type = "state",
    -- Period with which observations are available.
    Delta_t = Delta_t_petsc_clamped_bar * Nskip_save,
    -- Period with which available observations are actually assimilated.

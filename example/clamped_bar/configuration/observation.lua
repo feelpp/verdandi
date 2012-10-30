@@ -8,7 +8,7 @@ observation = {
    -- How are defined the observations? If the type is "observation, only
    -- observations are stored in the file. If the type is "state", the whole
    -- model state is stored.
-   type = "observation",
+   type = "state",
    -- Is the period with which observations are available constant?
    Delta_t_constant = true,
    -- If the period with which observations are available is non constant
