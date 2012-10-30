@@ -30,12 +30,11 @@
 
 // Instantiate one or several of the following methods.
 #define VSWIG_METHOD ForwardDriver<VSWIG_MODEL >
-#define VSWIG_METHOD1 OptimalInterpolation<VSWIG_REAL, VSWIG_MODEL, \
+#define VSWIG_METHOD1 OptimalInterpolation<VSWIG_MODEL, \
                                           VSWIG_LINEAR_OBSERVATION >
 #define VSWIG_METHOD2 ForwardDriver<VSWIG_MODEL1 >
-#define VSWIG_METHOD3 ReducedOrderExtendedKalmanFilter<VSWIG_REAL, \
-                                          VSWIG_MODEL1, \
+#define VSWIG_METHOD3 ReducedOrderExtendedKalmanFilter<VSWIG_MODEL1, \
                                           VSWIG_LINEAR_OBSERVATION >
 #define VSWIG_METHOD4 ForwardDriver<VSWIG_MODEL2 >
-#define VSWIG_METHOD5 OptimalInterpolation<VSWIG_REAL, VSWIG_MODEL2, \
+#define VSWIG_METHOD5 OptimalInterpolation<VSWIG_MODEL2, \
                                           VSWIG_LINEAR_OBSERVATION2 >
