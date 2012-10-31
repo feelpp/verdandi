@@ -138,7 +138,7 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "four_dimensional_variational")
 
 </li>
 
-<li class="jelly"> <?php HL($file, "models", "Models");?>
+<li class="jelly"> <?php HL($file, "example_models", "Example Models");?>
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "models"
 or basename($_SERVER['REQUEST_URI'], ".php") == "quadratic_model"
