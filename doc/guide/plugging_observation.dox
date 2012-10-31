@@ -5,4 +5,6 @@
 /*!
 \page plugging_observation Plugging the Observation Manager
 
+To plug your own observation manager, the same approach as for \link plugging_model plugging a model\endlink (possibly \link plugging_python_model in Python\endlink) should be followed. Use the \link Verdandi::ObservationManagerTemplate\endlink in C++, or  \link PythonObservationManagerTemplate::PythonObservationManagerTemplate \endlink in Python as reference, and the \link observation_requirements observation managers requirements\endlink to know precisely which methods need to be implemented for each assimilation method. Also note that a \link LinearObservationManager::LinearObservationManager Python implementation of the linear observation manager\endlink provides an example in Python.
+
 */
