@@ -191,12 +191,34 @@ namespace Verdandi
                 Vector<T> constant_mean;
                 constant_mean.Reallocate(b_.GetLength());
                 configuration.Set("constant.mean", constant_mean);
+                if (constant_mean.GetLength() != Nstate_)
+                    throw ErrorConfiguration("QuadraticModel::QuadraticModel",
+                                             "The initial state has "
+                                             + to_str(Nstate_) + " elements, "
+                                             "but the entry \"uncertainty."
+                                             "constant.mean\" has "
+                                             + to_str(int(constant_mean
+                                                          .GetLength()))
+                                             + " elements.");
                 Add(T(1), constant_mean, b_);
 
                 Matrix<T, Symmetric, RowSymPacked> constant_variance;
                 constant_variance.Reallocate(Nstate_, Nstate_);
                 configuration.Set("constant.variance",
                                   constant_variance);
+                if (constant_variance.GetM() != Nstate_
+                    || constant_variance.GetN() != Nstate_)
+                    throw ErrorConfiguration("QuadraticModel::QuadraticModel",
+                                             "The initial state has "
+                                             + to_str(Nstate_) + " elements, "
+                                             "but the entry \"uncertainty."
+                                             "constant.variance\" has "
+                                             "dimensions "
+                                             + to_str(int(constant_variance
+                                                          .GetM()))
+                                             + " x "
+                                             + to_str(int(constant_variance
+                                                          .GetN())) + ".");
                 variance_.push_back(constant_variance);
 
                 string constant_pdf;
@@ -220,11 +242,33 @@ namespace Verdandi
                 Vector<T> linear_mean;
                 linear_mean.Reallocate(Nstate_);
                 configuration.Set("linear_term.mean", linear_mean);
+                if (linear_mean.GetLength() != Nstate_)
+                    throw ErrorConfiguration("QuadraticModel::QuadraticModel",
+                                             "The initial state has "
+                                             + to_str(Nstate_) + " elements, "
+                                             "but the entry \"uncertainty."
+                                             "linear.mean\" has "
+                                             + to_str(int(linear_mean
+                                                          .GetLength()))
+                                             + " elements.");
 
                 Matrix<T, Symmetric, RowSymPacked> linear_variance;
                 linear_variance.Reallocate(Nstate_, Nstate_);
                 configuration.Set("linear_term.variance",
                                   linear_variance);
+                if (linear_variance.GetM() != Nstate_
+                    || linear_variance.GetN() != Nstate_)
+                    throw ErrorConfiguration("QuadraticModel::QuadraticModel",
+                                             "The initial state has "
+                                             + to_str(Nstate_) + " elements, "
+                                             "but the entry \"uncertainty."
+                                             "linear.variance\" has "
+                                             "dimensions "
+                                             + to_str(int(linear_variance
+                                                          .GetM()))
+                                             + " x "
+                                             + to_str(int(linear_variance
+                                                          .GetN())) + ".");
 
                 string linear_pdf;
                 configuration.Set("linear_term.distribution",
@@ -261,11 +305,33 @@ namespace Verdandi
                 Vector<T> quadratic_mean;
                 quadratic_mean.Reallocate(Nstate_);
                 configuration.Set("quadratic_term.mean", quadratic_mean);
+                if (quadratic_mean.GetLength() != Nstate_)
+                    throw ErrorConfiguration("QuadraticModel::QuadraticModel",
+                                             "The initial state has "
+                                             + to_str(Nstate_) + " elements, "
+                                             "but the entry \"uncertainty."
+                                             "quadratic.mean\" has "
+                                             + to_str(int(quadratic_mean
+                                                          .GetLength()))
+                                             + " elements.");
 
                 Matrix<T, Symmetric, RowSymPacked> quadratic_variance;
                 quadratic_variance.Reallocate(Nstate_, Nstate_);
                 configuration.Set("quadratic_term.variance",
                                   quadratic_variance);
+                if (quadratic_variance.GetM() != Nstate_
+                    || quadratic_variance.GetN() != Nstate_)
+                    throw ErrorConfiguration("QuadraticModel::QuadraticModel",
+                                             "The initial state has "
+                                             + to_str(Nstate_) + " elements, "
+                                             "but the entry \"uncertainty."
+                                             "quadratic.variance\" has "
+                                             "dimensions "
+                                             + to_str(int(quadratic_variance
+                                                          .GetM()))
+                                             + " x "
+                                             + to_str(int(quadratic_variance
+                                                          .GetN())) + ".");
 
                 string quadratic_pdf;
                 configuration.Set("quadratic_term.distribution",
