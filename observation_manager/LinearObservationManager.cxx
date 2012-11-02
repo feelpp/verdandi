@@ -158,7 +158,7 @@ namespace Verdandi
                               "::Initialize(model, configuration_file)",
                               "Too few available observations, the size of \""
                               + observation_file_ + "\" must be greater than "
-                              + to_str(expected_file_size) + "B.");
+                              + to_str(expected_file_size) + " B.");
         }
         else
         {
