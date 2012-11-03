@@ -278,6 +278,9 @@ forward = {
 
 
 -- Hamilton-Jacobi-Bellman.
+
+Delta_t_hjb = 0.0003
+
 hjb = {
 
    domain = {
@@ -285,8 +288,8 @@ hjb = {
       discretization = {-1., 0.01, 201,
                         -1., 0.01, 201},
       initial_time = 0.,
-      Delta_t = 0.0003,
-      Nt = math.floor(0.1 / 0.0003)
+      Delta_t = Delta_t_hjb,
+      Nt = math.floor(0.1 / Delta_t_hjb)
 
    },
 
@@ -349,9 +352,9 @@ hjb = {
 
    output_saver = {
 
-      variable_list = {"time", "value_function"},
+      variable_list = {"time_step", "time", "value_function"},
       file = output_directory .. "hjb-%{name}.%{extension}",
-      time = "step 50",
+      time = "step " .. Delta_t_hjb * 50 .. " 1.e-8"
 
    }
 

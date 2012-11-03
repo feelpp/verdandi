@@ -317,6 +317,7 @@ namespace Verdandi
         configuration.SetPrefix("hjb.output_saver.");
         output_saver_.Initialize(configuration);
         output_saver_.Empty("time");
+        output_saver_.Empty("time_step");
         output_saver_.Empty("value_function");
 
         /*** Logger and read configuration ***/
@@ -1037,8 +1038,10 @@ namespace Verdandi
         if (message.find("initial value") != string::npos
             || message.find("forecast value") != string::npos)
         {
-            output_saver_.Save(double(time_step_), time_step_, "time");
-            output_saver_.Save(V_, time_step_, "value_function");
+            double time = T(time_step_) * Delta_t_;
+            output_saver_.Save(time, time, "time");
+            output_saver_.Save(double(time_step_), time, "time_step");
+            output_saver_.Save(V_, time, "value_function");
         }
     }
 
