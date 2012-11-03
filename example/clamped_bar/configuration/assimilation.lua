@@ -54,7 +54,8 @@ optimal_interpolation = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "oi-%{name}.%{extension}",
       time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -94,7 +95,8 @@ extended_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "ekf-%{name}.%{extension}",
       time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -137,7 +139,8 @@ unscented_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "ukf-%{name}.%{extension}",
       time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -183,7 +186,8 @@ reduced_order_unscented_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "roukf-%{name}.%{extension}",
       time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -225,7 +229,8 @@ reduced_order_extended_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "roekf-%{name}.%{extension}",
       time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -294,7 +299,8 @@ four_dimensional_variational = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "4dvar-%{name}.%{extension}",
       time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -324,7 +330,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"forecast_state"},
+      variable_list = {"forecast_time", "forecast_state"},
       file = output_directory .. "forward-%{name}.%{extension}",
       time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,

@@ -60,7 +60,8 @@ optimal_interpolation = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "oi-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -101,7 +102,8 @@ ensemble_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "enkf-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
 
@@ -135,7 +137,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"forecast_state"},
+      variable_list = {"forecast_time", "forecast_state"},
       file = output_directory .. "forward-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,

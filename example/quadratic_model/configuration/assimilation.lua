@@ -76,7 +76,8 @@ optimal_interpolation = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "oi-%{name}.%{extension}",
       time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
 
@@ -114,7 +115,8 @@ extended_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "ekf-%{name}.%{extension}",
       time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
 
@@ -155,7 +157,8 @@ unscented_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "ukf-%{name}.%{extension}",
       time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
 
@@ -183,7 +186,7 @@ monte_carlo = {
 
    output_saver = {
       file_string = output_file_string,
-      variable_list = {"perturbation", "state"},
+      variable_list = {"perturbation", "forecast_time", "forecast_state"},
       file = output_directory  .. output_file_string .. "mc-%{name}.%{extension}",
       time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
 
@@ -222,7 +225,8 @@ ensemble_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"forecast_state", "analysis_state"},
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
       file = output_directory .. "enkf-%{name}.%{extension}",
       time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6",
 
@@ -257,7 +261,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"forecast_state"},
+      variable_list = {"forecast_time", "forecast_state"},
       file = output_directory .. "forward-%{name}.%{extension}",
       time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
 
@@ -345,7 +349,7 @@ hjb = {
 
    output_saver = {
 
-      variable_list = {"value_function"},
+      variable_list = {"time", "value_function"},
       file = output_directory .. "hjb-%{name}.%{extension}",
       time = "step 50",
 
