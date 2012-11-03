@@ -42,11 +42,11 @@ namespace Verdandi
 
     public:
         // Constructors.
-        Error(string function, string comment) throw();
-        Error(string description, string function, string comment) throw();
+        Error(string function, string comment);
+        Error(string description, string function, string comment);
 
         // Destructor.
-        virtual ~Error() throw();
+        virtual ~Error();
 
         virtual  string GetName() const;
         virtual string What();
@@ -60,7 +60,7 @@ namespace Verdandi
     {
     public:
         // Constructor.
-        ErrorConfiguration(string function, string comment) throw();
+        ErrorConfiguration(string function, string comment);
 
         string GetName() const;
     };
@@ -72,7 +72,7 @@ namespace Verdandi
     {
     public:
         // Constructor.
-        ErrorIO(string function, string comment) throw();
+        ErrorIO(string function, string comment);
 
         string GetName() const;
     };
@@ -84,7 +84,7 @@ namespace Verdandi
     {
     public:
         // Constructor.
-        ErrorProcessing(string function, string comment) throw();
+        ErrorProcessing(string function, string comment);
 
         string GetName() const;
     };
@@ -96,7 +96,7 @@ namespace Verdandi
     {
     public:
         // Constructor.
-        ErrorUndefined(string function, string comment) throw();
+        ErrorUndefined(string function, string comment);
 
         virtual string What();
         string GetName() const;
@@ -109,7 +109,7 @@ namespace Verdandi
     {
     public:
         // Constructor.
-        ErrorArgument(string function, string comment) throw();
+        ErrorArgument(string function, string comment);
 
         string GetName() const;
     };
@@ -129,12 +129,10 @@ namespace Verdandi
     public:
         // Constructor.
         ErrorPythonUndefined(string function, string function_name,
-                             string arguments,
-                             string module,
-                             string comment) throw();
+                             string arguments, string module, string comment);
 
         // Destructor.
-        ~ErrorPythonUndefined() throw ();
+        ~ErrorPythonUndefined();
 
         virtual string What();
         string GetName() const;
