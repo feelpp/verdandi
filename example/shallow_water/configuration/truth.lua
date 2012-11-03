@@ -31,7 +31,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"state_forecast"},
+      variable_list = {"forecast_state"},
       file = output_directory .. "truth-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,

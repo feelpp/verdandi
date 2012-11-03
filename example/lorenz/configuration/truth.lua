@@ -25,7 +25,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"state_forecast"},
+      variable_list = {"forecast_state"},
       file = output_directory .. "truth-%{name}.%{extension}",
       mode = "binary",
       mode_scalar = "text"

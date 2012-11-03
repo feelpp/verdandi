@@ -37,7 +37,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"state_forecast"},
+      variable_list = {"forecast_time", "forecast_state"},
       file = output_directory .. "truth-%{name}.%{extension}",
       time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6",
       -- mode = "HDF",

@@ -34,7 +34,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"state_forecast"},
+      variable_list = {"forecast_state"},
       file = output_directory .. "truth-%{name}.%{extension}",
       time = "step " .. Delta_t_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -61,4 +61,4 @@ forward = {
 
 observation_generator = forward
 observation_generator.output_saver.variable_list
-    = {"observation", "state_forecast"}
+    = {"observation", "forecast_state"}

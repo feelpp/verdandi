@@ -178,7 +178,7 @@ namespace Verdandi
         configuration.SetPrefix("forward.output_saver.");
         output_saver_.Initialize(configuration);
         output_saver_.Empty("forecast_time");
-        output_saver_.Empty("state_forecast");
+        output_saver_.Empty("forecast_state");
         configuration.SetPrefix("forward.");
 
         /*** Logger and read configuration ***/
@@ -332,14 +332,14 @@ namespace Verdandi
             output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                "forecast_time");
             output_saver_.Save(model_.GetState(), model_.GetTime(),
-                               "state_forecast");
+                               "forecast_state");
         }
         if (message.find("forecast") != string::npos)
         {
             output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                "forecast_time");
             output_saver_.Save(model_.GetState(), model_.GetTime(),
-                               "state_forecast");
+                               "forecast_state");
         }
     }
 

@@ -199,7 +199,7 @@ namespace Verdandi
 
         configuration.SetPrefix("observation_generator.output_saver.");
         output_saver_.Initialize(configuration);
-        output_saver_.Empty("state_forecast");
+        output_saver_.Empty("forecast_state");
         output_saver_.Empty("observation_time");
         output_saver_.Empty("observation");
         configuration.SetPrefix("observation_generator.");
@@ -363,7 +363,7 @@ namespace Verdandi
             output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                "observation_time");
             output_saver_.Save(model_.GetState(), double(model_.GetTime()),
-                               "state_forecast");
+                               "forecast_state");
             observation y(observation_manager_.GetNobservation());
             observation_manager_.ApplyOperator(model_.GetState(), y);
             output_saver_.Save(y, double(model_.GetTime()), "observation");
@@ -373,7 +373,7 @@ namespace Verdandi
             output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                "observation_time");
             output_saver_.Save(model_.GetState(), model_.GetTime(),
-                               "state_forecast");
+                               "forecast_state");
             observation y(observation_manager_.GetNobservation());
             observation_manager_.ApplyOperator(model_.GetState(), y);
             output_saver_.Save(y, double(model_.GetTime()), "observation");

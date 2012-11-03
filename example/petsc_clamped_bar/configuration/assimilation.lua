@@ -10,7 +10,7 @@ output_mode = "text"
 output_directory = "result/"
 output_mode_scalar = "text"
 
-observation_file = output_directory .. "truth-state_forecast.bin"
+observation_file = output_directory .. "truth-forecast_state.bin"
 
 
 ----------------------------------- MODEL ------------------------------------
@@ -61,7 +61,7 @@ reduced_order_unscented_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"state_forecast", "state_analysis"},
+      variable_list = {"forecast_state", "analysis_state"},
       file = output_directory .. "roukf-%{name}.%{extension}",
       time = "step " .. Delta_t_petsc_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -100,7 +100,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"state_forecast"},
+      variable_list = {"forecast_state"},
       file = output_directory .. "forward-%{name}.%{extension}",
       time = "step " .. Delta_t_petsc_clamped_bar * Nskip_save .. " 1.e-6",
       mode = output_mode,

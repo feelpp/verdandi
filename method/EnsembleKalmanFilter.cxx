@@ -202,15 +202,15 @@ namespace Verdandi
         output_saver_.Initialize(configuration);
 
         output_saver_.Empty("forecast_time");
-        output_saver_.Empty("state_forecast");
+        output_saver_.Empty("forecast_state");
         output_saver_.Empty("analysis_time");
-        output_saver_.Empty("state_analysis");
+        output_saver_.Empty("analysis_state");
 
         for (int k = 0; k < Nlocal_member_; k++)
         {
-            output_saver_.Empty("state_forecast-"
+            output_saver_.Empty("forecast_state-"
                                 + to_str(k + global_member_number));
-            output_saver_.Empty("state_analysis-"
+            output_saver_.Empty("analysis_state-"
                                 + to_str(k + global_member_number));
         }
 
@@ -752,7 +752,7 @@ namespace Verdandi
                                    "forecast_time");
                 output_saver_.Save(model_.GetState(),
                                    double(model_.GetTime()),
-                                   "state_forecast");
+                                   "forecast_state");
             }
 #if defined(VERDANDI_WITH_MPI)
         if (rank_ == 0)
@@ -762,7 +762,7 @@ namespace Verdandi
                 output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                    "forecast_time");
                 output_saver_.Save(model_.GetState(), model_.GetTime(),
-                                   "state_forecast");
+                                   "forecast_state");
             }
         int global_member_number = 0;
 
@@ -782,14 +782,14 @@ namespace Verdandi
 
             for (int m = 0; m < Nlocal_member_; m++)
                 if (output_saver_
-                    .IsVariable("state_forecast-"
+                    .IsVariable("forecast_state-"
                                 + to_str(m + global_member_number)))
                 {
                     model_.GetFullState() = ensemble_[m];
                     model_.FullStateUpdated();
                     output_saver_.Save(model_.GetState(),
                                        model_.GetTime(),
-                                       "state_forecast-"
+                                       "forecast_state-"
                                        + to_str(m + global_member_number));
                 }
 
@@ -805,7 +805,7 @@ namespace Verdandi
                 output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                    "analysis_time");
                 output_saver_.Save(model_.GetState(), model_.GetTime(),
-                                   "state_analysis");
+                                   "analysis_state");
             }
 
         if (message.find("analysis") != string::npos)
@@ -815,14 +815,14 @@ namespace Verdandi
 
             for (int m = 0; m < Nlocal_member_; m++)
                 if (output_saver_
-                    .IsVariable("state_analysis-"
+                    .IsVariable("analysis_state-"
                                 + to_str(m + global_member_number)))
                 {
                     model_.GetFullState() = ensemble_[m];
                     model_.FullStateUpdated();
                     output_saver_.Save(model_.GetState(),
                                        model_.GetTime(),
-                                       "state_analysis-" +
+                                       "analysis_state-" +
                                        to_str(m + global_member_number));
                 }
             model_.GetFullState() = mean_state_vector;

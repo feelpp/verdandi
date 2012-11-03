@@ -10,7 +10,7 @@ output_directory = "result/"
 output_mode = "binary"
 output_mode_scalar = "text"
 
-observation_file = output_directory .. "truth-state_forecast.bin"
+observation_file = output_directory .. "truth-forecast_state.bin"
 
 
 ----------------------------------- MODEL ------------------------------------
@@ -60,7 +60,7 @@ optimal_interpolation = {
 
    output_saver = {
 
-      variable_list = {"state_forecast", "state_analysis"},
+      variable_list = {"forecast_state", "analysis_state"},
       file = output_directory .. "oi-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,
@@ -101,7 +101,7 @@ ensemble_kalman_filter = {
 
    output_saver = {
 
-      variable_list = {"state_forecast", "state_analysis"},
+      variable_list = {"forecast_state", "analysis_state"},
       file = output_directory .. "enkf-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
 
@@ -117,9 +117,9 @@ ensemble_kalman_filter = {
 
 for i = 0, ensemble_kalman_filter.Nmember do
    table.insert(ensemble_kalman_filter.output_saver.variable_list,
-                "state_forecast-" .. i)
+                "forecast_state-" .. i)
    table.insert(ensemble_kalman_filter.output_saver.variable_list,
-                "state_analysis-" .. i)
+                "analysis_state-" .. i)
 end
 
 
@@ -135,7 +135,7 @@ forward = {
 
    output_saver = {
 
-      variable_list = {"state_forecast"},
+      variable_list = {"forecast_state"},
       file = output_directory .. "forward-%{name}.%{extension}",
       time = "step " .. Delta_t_shallow_water * Nskip_save .. " 1.e-6",
       mode = output_mode,
