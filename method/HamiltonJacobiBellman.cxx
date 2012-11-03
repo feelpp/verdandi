@@ -335,7 +335,7 @@ namespace Verdandi
 
         /*** Initializations ***/
 
-        if (with_advection_term_)
+        if (with_advection_term_ || with_source_term_)
             model_.Initialize(model_configuration_file_);
         if (with_source_term_)
             observation_manager_.Initialize(model_,
@@ -443,7 +443,7 @@ namespace Verdandi
             Logger::Log<-3>(*this, "Iteration " + to_str(time_step_) + " -> "
                             + to_str(time_step_ + 1));
 
-        if (with_advection_term_)
+        if (with_advection_term_ || with_source_term_)
             model_.InitializeStep();
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
@@ -909,7 +909,8 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::FinalizeStep begin");
 
-        model_.FinalizeStep();
+        if (with_advection_term_ || with_source_term_)
+            model_.FinalizeStep();
 
         MessageHandler::Send(*this, "all", "::FinalizeStep end");
     }
@@ -921,7 +922,8 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Finalize begin");
 
-        model_.Finalize();
+        if (with_advection_term_ || with_source_term_)
+            model_.Finalize();
 
         MessageHandler::Send(*this, "all", "::Finalize end");
     }
