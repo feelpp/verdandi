@@ -201,7 +201,9 @@ namespace Verdandi
         configuration.SetPrefix("ensemble_kalman_filter.output_saver.");
         output_saver_.Initialize(configuration);
 
+        output_saver_.Empty("forecast_time");
         output_saver_.Empty("state_forecast");
+        output_saver_.Empty("analysis_time");
         output_saver_.Empty("state_analysis");
 
         for (int k = 0; k < Nlocal_member_; k++)
@@ -745,15 +747,23 @@ namespace Verdandi
         if (rank_ == 0)
 #endif
             if (message.find("initial condition") != string::npos)
+            {
+                output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                                   "forecast_time");
                 output_saver_.Save(model_.GetState(),
                                    double(model_.GetTime()),
                                    "state_forecast");
+            }
 #if defined(VERDANDI_WITH_MPI)
         if (rank_ == 0)
 #endif
             if (message.find("forecast") != string::npos)
+            {
+                output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                                   "forecast_time");
                 output_saver_.Save(model_.GetState(), model_.GetTime(),
                                    "state_forecast");
+            }
         int global_member_number = 0;
 
 #if defined(VERDANDI_WITH_MPI)
@@ -791,8 +801,12 @@ namespace Verdandi
         if (rank_ == 0)
 #endif
             if (message.find("analysis") != string::npos)
+            {
+                output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                                   "analysis_time");
                 output_saver_.Save(model_.GetState(), model_.GetTime(),
                                    "state_analysis");
+            }
 
         if (message.find("analysis") != string::npos)
         {

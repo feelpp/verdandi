@@ -143,7 +143,9 @@ namespace Verdandi
 
         configuration.SetPrefix("unscented_kalman_filter.output_saver.");
         output_saver_.Initialize(configuration);
+        output_saver_.Empty("forecast_time");
         output_saver_.Empty("state_forecast");
+        output_saver_.Empty("analysis_time");
         output_saver_.Empty("state_analysis");
 
         /*** Logger and read configuration ***/
@@ -600,14 +602,26 @@ namespace Verdandi
     ::Message(string message)
     {
         if (message.find("initial condition") != string::npos)
+        {
+            output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                               "forecast_time");
             output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
+        }
         if (message.find("forecast") != string::npos)
+        {
+            output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                               "forecast_time");
             output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
+        }
         if (message.find("analysis") != string::npos)
+        {
+            output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                               "analysis_time");
             output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_analysis");
+        }
     }
 
 

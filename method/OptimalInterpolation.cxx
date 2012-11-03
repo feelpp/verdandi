@@ -168,7 +168,9 @@ namespace Verdandi
 	{
 #endif
             output_saver_.Initialize(configuration);
+            output_saver_.Empty("forecast_time");
             output_saver_.Empty("state_forecast");
+            output_saver_.Empty("analysis_time");
             output_saver_.Empty("state_analysis");
             output_saver_.Empty("analysis_variance_diagonal");
 
@@ -407,14 +409,26 @@ namespace Verdandi
 	{
 #endif
             if (message.find("initial condition") != string::npos)
+            {
+                output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                                   "forecast_time");
                 output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                    "state_forecast");
+            }
             if (message.find("forecast") != string::npos)
+            {
+                output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                                   "forecast_time");
                 output_saver_.Save(model_.GetState(), model_.GetTime(),
                                    "state_forecast");
+            }
             if (message.find("analysis") != string::npos)
+            {
+                output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                                   "analysis_time");
                 output_saver_.Save(model_.GetState(), model_.GetTime(),
                                    "state_analysis");
+            }
             if (message.find("analysis_variance_diagonal") != string::npos)
                 output_saver_.Save(analysis_variance_diagonal_,
                                    model_.GetTime(),

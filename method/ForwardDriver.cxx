@@ -177,6 +177,7 @@ namespace Verdandi
 
         configuration.SetPrefix("forward.output_saver.");
         output_saver_.Initialize(configuration);
+        output_saver_.Empty("forecast_time");
         output_saver_.Empty("state_forecast");
         configuration.SetPrefix("forward.");
 
@@ -327,11 +328,19 @@ namespace Verdandi
     void  ForwardDriver<Model>::Message(string message)
     {
         if (message.find("initial condition") != string::npos)
-            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
-                               "state_forecast");
-        if (message.find("forecast") != string::npos)
+        {
+            output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                               "forecast_time");
             output_saver_.Save(model_.GetState(), model_.GetTime(),
                                "state_forecast");
+        }
+        if (message.find("forecast") != string::npos)
+        {
+            output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                               "forecast_time");
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
+                               "state_forecast");
+        }
     }
 
 

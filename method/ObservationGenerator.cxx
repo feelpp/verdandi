@@ -200,6 +200,7 @@ namespace Verdandi
         configuration.SetPrefix("observation_generator.output_saver.");
         output_saver_.Initialize(configuration);
         output_saver_.Empty("state_forecast");
+        output_saver_.Empty("observation_time");
         output_saver_.Empty("observation");
         configuration.SetPrefix("observation_generator.");
 
@@ -359,6 +360,8 @@ namespace Verdandi
     {
         if (message.find("initial condition") != string::npos)
         {
+            output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                               "observation_time");
             output_saver_.Save(model_.GetState(), double(model_.GetTime()),
                                "state_forecast");
             observation y(observation_manager_.GetNobservation());
@@ -367,6 +370,8 @@ namespace Verdandi
         }
         if (message.find("forecast") != string::npos)
         {
+            output_saver_.Save(model_.GetTime(), model_.GetTime(),
+                               "observation_time");
             output_saver_.Save(model_.GetState(), model_.GetTime(),
                                "state_forecast");
             observation y(observation_manager_.GetNobservation());
