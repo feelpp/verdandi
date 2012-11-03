@@ -29,7 +29,8 @@ quadratic_model = {
 
    uncertainty = {
 
-      uncertain_parameter_list = {"quadratic_term", "linear_term", "constant"},
+      uncertain_parameter_list = {"quadratic_term", "linear_term",
+                                  "constant"},
 
       quadratic_term = {
 
