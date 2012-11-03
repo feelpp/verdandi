@@ -362,11 +362,11 @@ namespace Verdandi
         {
             output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                "observation_time");
-            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
                                "forecast_state");
             observation y(observation_manager_.GetNobservation());
             observation_manager_.ApplyOperator(model_.GetState(), y);
-            output_saver_.Save(y, double(model_.GetTime()), "observation");
+            output_saver_.Save(y, model_.GetTime(), "observation");
         }
         if (message.find("forecast") != string::npos)
         {
@@ -376,7 +376,7 @@ namespace Verdandi
                                "forecast_state");
             observation y(observation_manager_.GetNobservation());
             observation_manager_.ApplyOperator(model_.GetState(), y);
-            output_saver_.Save(y, double(model_.GetTime()), "observation");
+            output_saver_.Save(y, model_.GetTime(), "observation");
         }
     }
 

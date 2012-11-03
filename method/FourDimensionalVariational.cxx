@@ -402,21 +402,21 @@ namespace Verdandi
         {
             output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                "forecast_time");
-            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
                                "forecast_state");
         }
         if (message.find("forecast") != string::npos)
         {
             output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                "forecast_time");
-            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
                                "forecast_state");
         }
         if (message.find("analysis") != string::npos)
         {
             output_saver_.Save(model_.GetTime(), model_.GetTime(),
                                "analysis_time");
-            output_saver_.Save(model_.GetState(), double(model_.GetTime()),
+            output_saver_.Save(model_.GetState(), model_.GetTime(),
                                "analysis_state");
         }
     }
