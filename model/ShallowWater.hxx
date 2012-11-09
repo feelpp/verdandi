@@ -70,6 +70,8 @@ namespace Verdandi
 
         //! State vector.
         Vector<T> state_;
+        //! Full state vector.
+        Vector<T> full_state_;
 
         //! Water height.
         Matrix<T> h_;

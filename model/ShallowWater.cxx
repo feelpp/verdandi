@@ -692,15 +692,15 @@ namespace Verdandi
     typename ShallowWater<T>::state& ShallowWater<T>
     ::GetFullState()
     {
-        state_.Reallocate(3 * Nx_ * Ny_);
+        full_state_.Reallocate(3 * Nx_ * Ny_);
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
             {
-                state_(i * Ny_ + j) = h_(i, j);
-                state_(Nx_ * Ny_ + i * Ny_ + j) = u_(i, j);
-                state_(2 * Nx_ * Ny_ + i * Ny_ + j) = v_(i, j);
+                full_state_(i * Ny_ + j) = h_(i, j);
+                full_state_(Nx_ * Ny_ + i * Ny_ + j) = u_(i, j);
+                full_state_(2 * Nx_ * Ny_ + i * Ny_ + j) = v_(i, j);
             }
-        return state_;
+        return full_state_;
     }
 
 
@@ -712,9 +712,9 @@ namespace Verdandi
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
             {
-                h_(i, j) = state_(i * Ny_ + j);
-                u_(i, j) = state_(Nx_ * Ny_ + i * Ny_ + j);
-                v_(i, j) = state_(2 * Nx_ * Ny_ + i * Ny_ + j);
+                h_(i, j) = full_state_(i * Ny_ + j);
+                u_(i, j) = full_state_(Nx_ * Ny_ + i * Ny_ + j);
+                v_(i, j) = full_state_(2 * Nx_ * Ny_ + i * Ny_ + j);
             }
     }
 
