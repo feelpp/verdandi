@@ -539,19 +539,19 @@ namespace Verdandi
                 SetCol(Hx, m, innovation_matrix);
             }
 
-            // Constructs state ensemble perturbation matrix L.
-            Matrix<Ts> ensemble_perturbation(Nstate_, Nlocal_member_);
+            // Constructs the square root of the empirical variance.
+            Matrix<Ts> L(Nstate_, Nlocal_member_);
             for (int l = 0; l < Nlocal_member_; l++)
                 for (int k = 0; k < Nstate_; k++)
-                    ensemble_perturbation(k, l) =
-                        ensemble_[l](k) - mean_state_vector(k);
+                    L(k, l) = Ts(1) / sqrt(Ts(Nmember_ - 1))
+                        * (ensemble_[l](k) - mean_state_vector(k));
 
             // Computes H times L.
             Matrix<To> HL(Nobservation_, Nlocal_member_);
 
             if (observation_tangent_linear_operator_access_ == "matrix")
                 MltAdd(To(1), observation_manager_.GetTangentLinearOperator(),
-                       ensemble_perturbation, To(0), HL);
+                       L, To(0), HL);
             else // "element".
             {
                 HL.Fill(To(0));
@@ -561,7 +561,7 @@ namespace Verdandi
                             HL(i, j) +=
                                 observation_manager_.
                                 GetTangentLinearOperator(i, k) *
-                                ensemble_perturbation(k, j);
+                                L(k, j);
             }
 
             // Reads R.
@@ -580,8 +580,7 @@ namespace Verdandi
 
             // Computes LL'H'
             Matrix<Ts> LLH(Nstate_, Nobservation_);
-            MltAdd(Ts(1), SeldonNoTrans, ensemble_perturbation, SeldonTrans,
-                   HL, Ts(0), LLH);
+            MltAdd(Ts(1), SeldonNoTrans, L, SeldonTrans, HL, Ts(0), LLH);
 
             // Computes LL'H' (HLL'H' + R)^{-1} d.
             Matrix<Ts> Kd(Nstate_, Nlocal_member_);
