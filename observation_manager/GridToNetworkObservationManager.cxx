@@ -1188,7 +1188,7 @@ namespace Verdandi
             Matrix<T> input_data(Nx_model_, Ny_model_);
             int iteration;
 
-            iteration = int(time / (Delta_t_ * Nskip_));
+            iteration = int(time / Delta_t_);
 
             ifstream file_stream;
             file_stream.open(observation_file_.c_str());
@@ -1214,8 +1214,7 @@ namespace Verdandi
         {
             observation_vector input_data;
 
-            streampos position = (floor((time / (Delta_t_ * Nskip_) + 0.5))
-                                        + variable)
+            streampos position = (floor((time / Delta_t_ + 0.5)) + variable)
                 * (Nbyte_observation_ + sizeof(int));
 
             ifstream file_stream;

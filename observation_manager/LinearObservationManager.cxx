@@ -1508,7 +1508,7 @@ namespace Verdandi
 
         if (is_delta_t_constant_)
             position = (floor((time - initial_time_)
-                              / (Delta_t_ * Nskip_) + 0.5) + variable)
+                              / Delta_t_ + 0.5) + variable)
                 * Nbyte_observation_;
         else
         {
@@ -1590,7 +1590,7 @@ namespace Verdandi
 
         if (is_delta_t_constant_)
             position = (floor((time - initial_time_)
-                              / (Delta_t_ * Nskip_) + 0.5) + variable);
+                              / Delta_t_ + 0.5) + variable);
         else
         {
 

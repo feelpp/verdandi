@@ -122,7 +122,7 @@ class LinearObservationManager:
     def ReadObservation(self, time):
         f = open(self.observation_file_, "rb")
         position = int(floor((time - self.initial_time_)
-                             / (self.Delta_t_ * self.Nskip_) + 0.5)
+                             / self.Delta_t_ + 0.5)
                        * self.Nbyte_observation_)
         f.seek(position)
         a = array.array('i')

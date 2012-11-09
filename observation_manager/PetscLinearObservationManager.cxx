@@ -1363,8 +1363,7 @@ namespace Verdandi
         if (!rank_)
         {
             streampos position;
-            position = (floor((time - initial_time_)
-                              / (Delta_t_ * Nskip_) + 0.5)
+            position = (floor((time - initial_time_) / Delta_t_ + 0.5)
                         + variable) * Nbyte_observation_;
             file_stream.seekg(position);
             observation.Read(file_stream);
