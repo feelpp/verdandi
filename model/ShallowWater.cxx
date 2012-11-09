@@ -646,7 +646,7 @@ namespace Verdandi
     template <class T>
     int ShallowWater<T>::GetNfull_state() const
     {
-        return 2 * Nx_ * Ny_ + 2 * Nx_ + Ny_;
+        return 3 * Nx_ * Ny_;
     }
 
 
@@ -692,7 +692,7 @@ namespace Verdandi
     typename ShallowWater<T>::state& ShallowWater<T>
     ::GetFullState()
     {
-        state_.Reallocate(2 * Nx_ * Ny_ + 2 * Nx_ + Ny_);
+        state_.Reallocate(3 * Nx_ * Ny_);
         for (int i = 0; i < Nx_; i++)
             for (int j = 0; j < Ny_; j++)
             {
