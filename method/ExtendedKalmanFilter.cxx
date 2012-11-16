@@ -319,7 +319,8 @@ namespace Verdandi
 
         model_tangent_linear_operator& A = model_.GetTangentLinearOperator();
 
-        MltAdd(Ts(1.), A, state_error_variance_, Ts(0.), state_error_variance_);
+        MltAdd(Ts(1.), A, state_error_variance_, Ts(0.),
+               state_error_variance_);
 
         MltAdd(Ts(1.), SeldonNoTrans, state_error_variance_,
                SeldonTrans, A, Ts(0.), state_error_variance_);
