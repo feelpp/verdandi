@@ -25,7 +25,6 @@
 
 #define SELDON_WITH_BLAS
 #define SELDON_WITH_LAPACK
-#define SELDON_WITH_SUPERLU
 #include "Verdandi.hxx"
 #include "seldon/SeldonSolver.hxx"
 #include "method/BLUE.cxx"

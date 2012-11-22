@@ -7,7 +7,6 @@
 
 #define SELDON_WITH_BLAS
 #define SELDON_WITH_LAPACK
-#define SELDON_WITH_SUPERLU
 
 #define VERDANDI_DENSE
 
