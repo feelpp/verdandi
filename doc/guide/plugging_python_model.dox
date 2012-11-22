@@ -9,6 +9,19 @@
 Start from the \link PythonModelTemplate::PythonModelTemplate PythonModelTemplate\endlink. The complete interface of the model class is described \link PythonModelTemplate::PythonModelTemplate here\endlink. With a complete interface, one can apply any data assimilation method in Verdandi. But for a given data assimilation method, not all methods are required. Use the \link model_requirements Model requirements page\endlink, or the Python script <code>bin/methods_requirements</code> to know precisely which methods you will need to implement in your model.
 
 <ul>
+
+<li>
+The Python model interface requires the use of <a href="http://numpy.scipy.org/">Numpy</a>, a package for scientific computing in Python. You will need to install it (and its headers).
+
+Under Windows, you may need to include manually the path to Numpy headers. You would then add the following line in the SConstruct file:
+
+\precode
+include_path = "numpy_path"
+\endprecode
+
+where <code>numpy_path</code> should be replaced with the directory containing Numpy headers. This line must be inserted before the <code>execfile</code> statement.
+</li>
+
 <li>
 In the model directory, copy the \link PythonModelTemplate::PythonModelTemplate PythonModelTemplate\endlink and rename it to \"MyModel\". E.g., under Linux or MacOS, in command line:
 
