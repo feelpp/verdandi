@@ -24,7 +24,7 @@ If the model error is a random vector, then \f$\bar e^m_h\f$ is its expectation:
 
 A tangent linear model is denoted \f$M_h\f$.
 
-In the course of a simulation with data assimilation, one distinguishes the forecast state vector \f$x^f_h\f$ and the analysis state vector \f$x^a_h\f$. The later is the result of the assimilation, while the former is often defined as
+In the course of a simulation with data assimilation, one distinguishes the forecast state vector \f$x^f_h\f$ and the analysis state vector \f$x^a_h\f$. The latter is the result of the assimilation, while the former is often defined as
 \f[x^f_{h+1} = \mathcal{M}_h(x^a_h, p_h)\,.\f]
 
 The forecast and analysis errors are defined as
