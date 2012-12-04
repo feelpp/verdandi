@@ -238,7 +238,7 @@ namespace Verdandi
                                        module_);
 
         if (!PyArray_ISCONTIGUOUS(pyInnovation))
-            throw ErrorProcessing("PythonModel::GetObservation",
+            throw ErrorProcessing("PythonModel::GetInnovation",
                                   ErrorMessageNotContiguous(function_name));
 
         PyArrayObject *innovationArray =
