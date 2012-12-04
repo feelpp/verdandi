@@ -160,8 +160,8 @@ class QuadraticModel:
                     * dot(self.S_[i].transpose(), self.state_)
                 x[i] += dot(S_state_, input)
 
-        if self.with_linear_term_:
-            x += self.Delta_t_ * dot(self.L_, input)
+            if self.with_linear_term_:
+                x += self.Delta_t_ * dot(self.L_, input)
 
         elif self.with_linear_term_:
             x += self.Delta_t_ * dot(self.L_, input)
