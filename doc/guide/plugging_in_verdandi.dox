@@ -123,7 +123,7 @@ see section \ref notation "mathematical notation".
 
 \subsection Notes
 
-In the assimilation algorithms, the same <code>typedef</code>s are defined with <code>model_</code> or <code>observation_</code> prepended. There are two exceptions: nothing is not prepended to <code>matrix_state_observation</code> and <code>observation</code> (\f$y\f$).
+In the assimilation algorithms, the same <code>typedef</code>s are defined with <code>model_</code> or <code>observation_</code> prepended. There are two exceptions: nothing is prepended to <code>matrix_state_observation</code> and <code>observation</code> (\f$y\f$).
 
 The <code>typedef</code>s should be public in the model class and the observation class, so that the assimilation method may access to them.
 
