@@ -99,7 +99,9 @@ class LinearObservationManager:
     def HasObservation(self, time = None):
         if time is not None:
             self.SetTime(time)
-        return self.time_ < self.final_time_
+        no_skip = (self.time_ - self.initial_time_) / self.Delta_t_ + 0.5
+        no_skip = int(no_skip) % self.Nskip_ == 0
+        return no_skip and self.time_ < self.final_time_
 
 
     ## Returns the number of available observations.
