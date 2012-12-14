@@ -494,7 +494,8 @@ namespace Verdandi
         }
 
         if (!with_gradient)
-            return Ts(0.5) * (cost_background + cost_observation);
+            return Ts(0.5) * (cost_background + cost_observation
+                              + model_.GetAdditionalCostTerm());
 
         /*** Backward loop ***/
 
@@ -543,10 +544,12 @@ namespace Verdandi
         }
 
         Copy(model_.GetAdjointState(), gradient);
+        Add(Ts(1), model_.GetAdditionalAdjointTerm(), gradient)
         Mlt(Ts(-1), gradient);
         Add(Ts(1), x_b, gradient);
 
-        return Ts(0.5) * (cost_background + cost_observation);
+        return Ts(0.5) * (cost_background + cost_observation +
+                          model_.GetAdditionalCostTerm());
 
 #else
 
@@ -578,7 +581,8 @@ namespace Verdandi
         }
 
         if (!with_gradient)
-            return Ts(0.5) * (cost_background + cost_observation);
+            return Ts(0.5) * (cost_background + cost_observation +
+                              model_.GetAdditionalCostTerm());
 
         /*** Backward loop ***/
 
@@ -628,11 +632,13 @@ namespace Verdandi
         }
 
         Copy(model_.GetAdjointState(), gradient);
+        Add(Ts(1), model_.GetAdditionalAdjointTerm(), gradient);
         Mlt(Ts(-1), gradient);
         Add(Ts(1), x_b, gradient);
         trajectory_manager_.Deallocate();
 
-        return Ts(0.5) * (cost_background + cost_observation);
+        return Ts(0.5) * (cost_background + cost_observation +
+                          model_.GetAdditionalCostTerm());
 
 #endif
     }

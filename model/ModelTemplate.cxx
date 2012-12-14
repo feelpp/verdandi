@@ -307,6 +307,26 @@ namespace Verdandi
     }
 
 
+    //! Returns a term that will be added to the adjoint state.
+    /*!
+      \return The additional adjoint term.
+    */
+    ModelTemplate::state& ModelTemplate::GetAdditionalAdjointTerm()
+    {
+        throw ErrorUndefined("ModelTemplate::GetAdditionalAdjointTerm()");
+    }
+
+
+    //! Returns a term that will be added to the cost function.
+    /*!
+      \return The additional cost term.
+    */
+    double ModelTemplate::GetAdditionalCostTerm()
+    {
+        throw ErrorUndefined("ModelTemplate::GetAdditionalCostTerm()");
+    }
+
+
     //! Returns the number of parameters to be perturbed.
     /*!
       \return The number of parameters to be perturbed.

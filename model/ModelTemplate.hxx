@@ -114,6 +114,8 @@ namespace Verdandi
         state& GetStateUpperBound();
         state& GetAdjointState();
         void AdjointStateUpdated();
+        state& GetAdditionalAdjointTerm();
+        double GetAdditionalCostTerm();
 
         // Uncertainty.
         int GetNparameter();

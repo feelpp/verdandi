@@ -227,6 +227,9 @@ namespace Verdandi
         //! Adjoint state.
         state state_adjoint_;
 
+        //! Additional term for adjoint state.
+        state additional_adjoint_term_;
+
     public:
         // Constructor and destructor.
         ClampedBar();
@@ -264,6 +267,8 @@ namespace Verdandi
         void FullStateUpdated();
         state& GetAdjointState();
         void AdjointStateUpdated();
+        state& GetAdditionalAdjointTerm();
+        double GetAdditionalCostTerm();
 
         state_error_variance_row& GetStateErrorVarianceRow(int row);
         state_error_variance& GetStateErrorVariance();

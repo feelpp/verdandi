@@ -964,6 +964,31 @@ namespace Verdandi
     }
 
 
+    //! Returns a term that will be added to the adjoint state.
+    /*!
+      \return The additional adjoint term.
+    */
+    template <class T>
+    typename ClampedBar<T>::state& ClampedBar<T>::GetAdditionalAdjointTerm()
+    {
+        additional_adjoint_term_.Reallocate(state_adjoint_.GetM());
+        additional_adjoint_term_.Fill(T(0));
+        return additional_adjoint_term_;
+    }
+
+
+    //! Returns a term that will be added to the cost function.
+    /*!
+      \return The additional cost term.
+    */
+    template <class T>
+    double ClampedBar<T>::GetAdditionalCostTerm()
+    {
+        return 0;
+    }
+
+
+
     //! Computes a row of the background error covariance matrix B.
     /*!
       \param[in] row row index.
