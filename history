@@ -169,11 +169,11 @@ Version 1.2 (2012-03-30)
 - Modified the interface to 'MonteCarlo' so that it is consistent with the
   interface to 'EnsembleKalmanFilter'.
 - Made 'MonteCarlo' template of the perturbation manager.
-- Added methods 'GetModel', "GetObservationManager', 'GetPerturbationManager',
+- Added methods 'GetModel', 'GetObservationManager', 'GetPerturbationManager',
   'GetOuputSaver', 'FinalizeStep' and 'Finalize' in all appropriate
   assimilation methods.
 - Removed the references to 'VERDANDI_DENSE' and 'VERDANDI_SPARSE' in
-  'OptimalInterpolation".
+  'OptimalInterpolation'.
 - Added consistency checks for the dimensions of the arguments of
   'ComputeBLUE_matrix'.
 
