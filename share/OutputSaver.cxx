@@ -175,6 +175,18 @@ namespace Verdandi
     /////////////
 
 
+    //! Checks whether a variable is saved by the output saver.
+    /*!
+      \param[in] variable_name name of the variable to be saved.
+      \return True if the variable is saved by the output saver, and false if
+      the variable is unknown.
+    */
+    bool OutputSaver::IsSaved(string variable_name) const
+    {
+        return variable_list_.find(variable_name) != variable_list_.end();
+    }
+
+
     //! Writes the variable in the file with the chosen format.
     /*! The variable \a variable_name is saved in its dedicated file with its
       saving mode, providing \a time satisfies the proper conditions.
@@ -190,7 +202,7 @@ namespace Verdandi
         {
             Save(x, variable_name);
 #ifdef VERDANDI_WITH_HDF5
-            if (mode_ == "HDF")
+            if (mode_ == "HDF" && IsSaved(variable_name))
             {
                 map<string, Variable>::iterator im;
 
@@ -216,7 +228,7 @@ namespace Verdandi
     template <class S>
     void OutputSaver::Save(const S& x, string variable_name)
     {
-        if (!is_active_)
+        if (!is_active_ || !IsSaved(variable_name))
             return;
 
 #ifdef VERDANDI_WITH_PETSC
@@ -231,12 +243,7 @@ namespace Verdandi
 #endif
 
         map<string, Variable>::iterator im;
-
         im = variable_list_.find(variable_name);
-
-        if (im == variable_list_.end())
-            return;
-
         Variable& variable = im->second;
 
         // In case the mode has not been set yet.
@@ -267,16 +274,11 @@ namespace Verdandi
     void OutputSaver::Save(const Vector<T, PETScPar, Allocator>& x,
                            string variable_name)
     {
-        if (!is_active_)
+        if (!is_active_ || !IsSaved(variable_name))
             return;
 
         map<string, Variable>::iterator im;
-
         im = variable_list_.find(variable_name);
-
-        if (im == variable_list_.end())
-            return;
-
         Variable& variable = im->second;
 
         // In case the mode has not been set yet.
@@ -470,6 +472,9 @@ namespace Verdandi
     template <class S>
     void OutputSaver::Empty(string variable_name)
     {
+        if (!is_active_ || !IsSaved(variable_name))
+            return;
+
         map<string, Variable>::iterator im;
         im = variable_list_.find(variable_name);
 
@@ -492,11 +497,11 @@ namespace Verdandi
     */
     void OutputSaver::Empty(string variable_name)
     {
+        if (!is_active_ || !IsSaved(variable_name))
+            return;
+
         map<string, Variable>::iterator im;
         im = variable_list_.find(variable_name);
-
-        if (im == variable_list_.end())
-            return;
 
         if (im->second.GetMode().empty())
         {

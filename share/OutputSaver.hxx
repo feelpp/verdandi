@@ -86,6 +86,8 @@ namespace Verdandi
 
         /*** Methods ***/
 
+        bool IsSaved(string variable_name) const;
+
         template <class S>
         void Save(const S& x, double time, string variable_name);
 
