@@ -144,4 +144,3 @@ namespace Verdandi
 
 #define VERDANDI_FILE_OUTPUTSAVER_OUTPUTSAVER_HXX
 #endif
-
