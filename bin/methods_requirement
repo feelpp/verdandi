@@ -89,6 +89,8 @@ if not args:
 if os.path.isdir(args[0]):
     args = glob.glob(args[0] + "/*.cxx")
 
+# Assuming this file is in directory "bin/" of Verdandi.
+verdandi_include_path = os.path.abspath("../include")
 
 def preprocessing(filename, no_gcc):
     if no_gcc:
@@ -96,10 +98,12 @@ def preprocessing(filename, no_gcc):
     else:
         fnull = open(os.devnull, "w")
         subprocess.call("g++ -E -DVERDANDI_WITH_DIRECT_SOLVER "
+                        + "-I" + verdandi_include_path + " "
                         + filename + "> output.txt" ,
                         shell = True, stdout = fnull, stderr = fnull)
         subprocess.call("g++ -E -DVERDANDI_WITH_DIRECT_SOLVER "
                         + "-DVERDANDI_WITH_TRAJECTORY_MANAGER "
+                        + "-I" + verdandi_include_path + " "
                         + filename + "> output2.txt" ,
                         shell = True, stdout = fnull, stderr = fnull)
         fnull.close()
