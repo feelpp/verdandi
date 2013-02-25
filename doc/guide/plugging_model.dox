@@ -9,7 +9,7 @@
 \section own_model Create your own model
 
 
-Start from the \link Verdandi::ModelTemplate ModelTemplate\endlink. The complete interface of the model class is described \link Verdandi::ModelTemplate here\endlink. With a complete interface, one can apply any data assimilation method in Verdandi. But for a given data assimilation method, not all methods are required. Use the \link model_requirements Model requirements page\endlink, or the Python script <code>bin/methods_requirement</code> to know precisely which methods you will need to implement in your model.
+Start from the \link Verdandi::ModelTemplate ModelTemplate\endlink. The complete interface of the model class is described \link Verdandi::ModelTemplate here\endlink. With a complete interface, one can apply any data assimilation method in %Verdandi. But for a given data assimilation method, not all methods are required. Use the \link model_requirements Model requirements page\endlink, or the Python script <code>bin/methods_requirement</code> to know precisely which methods you will need to implement in your model.
 
 <ul>
 <li>
@@ -87,7 +87,7 @@ Usually, one wants to create an interface for an existing model and to rely on e
 
 We recommend the following procedure:
 <ol>
-    <li> Create a class which <b>encapsulates</b> the existing model and which implements the Verdandi model interface (follow the same steps as in the previous section, \ref own_model "Create your own model").
+    <li> Create a class which <b>encapsulates</b> the existing model and which implements the %Verdandi model interface (follow the same steps as in the previous section, \ref own_model "Create your own model").
 
 <b> Example </b>    
 
@@ -262,7 +262,7 @@ For the \link Verdandi::ModelTemplate::StateUpdated StateUpdated\endlink, calcul
 
     </li>
     <li> Create an object file from this class using your own compilation tools.</li>
-    <li> Add this object file to the Verdandi SConstruct <code>dependency_list</code> variable.
+    <li> Add this object file to the %Verdandi SConstruct <code>dependency_list</code> variable.
     Edit <code>SConstruct</code> file from the current project directory so that it looks like this:
 \precode
 import os
@@ -279,7 +279,7 @@ execfile(os.path.join(verdandi_path, "share/SConstruct"))
 
     </li>
     <li>
-        In the same way, update the Verdandi SConstruct <code>include_path</code> variable.
+        In the same way, update the %Verdandi SConstruct <code>include_path</code> variable.
     </li>
     <li>
         If your model has other dependencies, add the required include paths and library paths to the <code>include_path</code> and <code>library_path</code> variables.

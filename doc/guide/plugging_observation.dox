@@ -5,11 +5,11 @@
 /*!
 \page plugging_observation Plugging the Observation Manager
 
-If you have already \link plugging_model plugged your own model\endlink in Verdandi, you can now work on the observations. Start from the \link Verdandi::ObservationManagerTemplate ObservationManagerTemplate\endlink. The complete interface of the observation manager class is described \link Verdandi::ObservationManagerTemplate here\endlink. With a complete interface, one can apply any data assimilation method in Verdandi. But for a given data assimilation method, the full interface may not be required. Use the \link observation_requirements Observation managers requirements page\endlink, or the Python script <code>bin/methods_requirement</code> to know precisely which interface you will need to implement for your observation manager.
+If you have already \link plugging_model plugged your own model\endlink in %Verdandi, you can now work on the observations. Start from the \link Verdandi::ObservationManagerTemplate ObservationManagerTemplate\endlink. The complete interface of the observation manager class is described \link Verdandi::ObservationManagerTemplate here\endlink. With a complete interface, one can apply any data assimilation method in %Verdandi. But for a given data assimilation method, the full interface may not be required. Use the \link observation_requirements Observation managers requirements page\endlink, or the Python script <code>bin/methods_requirement</code> to know precisely which interface you will need to implement for your observation manager.
 
 <ul>
 <li>
-In the directory <code>observation_manager</code>, copy the \link Verdandi:ObservationManagerTemplate ObservationManagerTemplate\endlink and rename it to \"MyObservationManager\". E.g., under Linux or MacOS, in command line:
+In the directory <code>observation_manager</code>, copy the \link Verdandi::ObservationManagerTemplate ObservationManagerTemplate\endlink and rename it to \"MyObservationManager\". E.g., under Linux or MacOS, in command line:
 
 \precode
 $ cd verdandi/observation_manager/
