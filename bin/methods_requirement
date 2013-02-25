@@ -24,54 +24,56 @@
 import os, sys, glob, subprocess
 from optparse import OptionParser
 
-usage = "%prog [options] [assimilation method file or assimilation \
-method directory] \n\n\
-This program lists the required functions for a specified\n\
-assimilation method, or for all methods in a specified directory."
+usage = \
+"""%prog [options] [assimilation method file or assimilation method directory]
 
-dox_contents_model = '''/*! \\file model_requirements.dox
-    \\brief Model Requirements.
-*/\n
-/*!
-\\page model_requirements Methods requirements for models\n
-Here is listed for each assimilation method in Verdandi, the required methods
-to be implemented in a model. Note that each method also requires the
-functions \\link Verdandi::ObservationManagerTemplate::GetName
-GetName\\endlink and \\link Verdandi::ObservationManagerTemplate::Message
-Message\\endlink to be implemented, even if they are not listed here. \n\n'''
 
-dox_contents_obs = '''/*! \\file observation_manager_requirements.dox
-    \\brief Observation Managers Requirements.
-*/\n
-/*!
-\\page observation_requirements Methods requirements for observation managers\n
-Here is listed for each assimilation method in Verdandi, the required methods
-to be implemented in an observation manager. Note that each method also
-requires the functions \\link Verdandi::ObservationManagerTemplate::GetName
-GetName\\endlink and \\link Verdandi::ObservationManagerTemplate::Message
-Message\\endlink to be implemented, even if they are not listed here. \n\n'''
+This program lists the required member functions for a specified assimilation method, or for all methods in a specified directory.
+"""
 
-dox_assimilation_methods = '''\\link Verdandi::%s %s \\endlink\n'''
+dox_contents_model = \
+"""
+/*! \\file model_requirements.dox \\brief Model Requirements. */
 
-dox_model_methods = '''<li>\\link Verdandi::ModelTemplate::%s %s\\endlink</li>\n'''
+/*! \\page model_requirements Methods requirements for models
 
-dox_observation_methods = '''<li>\\link Verdandi::ObservationManagerTemplate::%s %s\\endlink</li>\n'''
+For each assimilation method in %Verdandi, one will find below the required member functions to be implemented in a model. Note that each method also requires the member functions \\link Verdandi::ModelTemplate::GetName GetName\\endlink and \\link Verdandi::ModelTemplate::Message Message\\endlink, even if they are not listed below.
+
+
+"""
+
+dox_contents_obs = \
+"""
+/*! \\file observation_requirements.dox \\brief Observation Managers Requirements. */
+
+/*! \\page observation_requirements Methods requirements for observation managers
+
+For each assimilation method in %Verdandi, one will find below the required member functions to be implemented in the observation manager. Note that each method also requires the member functions \\link Verdandi::ObservationManagerTemplate::GetName GetName\\endlink and \\link Verdandi::ObservationManagerTemplate::Message Message\\endlink, even if they are not listed below.
+
+
+"""
+
+dox_assimilation_methods = """\\link Verdandi::%s %s \\endlink\n"""
+
+dox_model_methods = """<li>\\link Verdandi::ModelTemplate::%s %s\\endlink</li>\n"""
+
+dox_observation_methods = """<li>\\link Verdandi::ObservationManagerTemplate::%s %s\\endlink</li>\n"""
 
 parser = OptionParser(usage = usage)
 
 ### Options.
 
-parser.add_option("-S", "--no-support-files", help = "Do not show classes"
-                  + " that have no call to model or observation manager"
-                  + " methods.", action = "store_true", dest = "no_support",
+parser.add_option("-s", "--skip-no-calls", help = "Do not show classes"
+                  + " that make no calls to the model or the observation "
+                  + "manager.", action = "store_true", dest = "no_call",
                   default = False)
 
-parser.add_option("-D", "--documentation", help = "Generate .dox files "
-                  + "for HTML documentation.",
+parser.add_option("-d", "--documentation", help = "Generate .dox files "
+                  + "for Doxygen documentation.",
                   action = "store_true", dest = "documentation",
                   default = False)
 
-parser.add_option("-G", "--no-gcc",
+parser.add_option("-g", "--no-gcc",
                   help = "Do not use gcc compiler to parse.",
                   action = "store_true", dest = "no_gcc",
                   default = False)
@@ -85,35 +87,35 @@ if not args:
     sys.exit(1)
 
 if os.path.isdir(args[0]):
-    args = glob.glob(args[0] + '/*.cxx')
+    args = glob.glob(args[0] + "/*.cxx")
 
 
 def preprocessing(filename, no_gcc):
     if no_gcc:
         return [filename]
     else:
-        fnull = open(os.devnull, 'w')
-        subprocess.call('g++ -E -DVERDANDI_WITH_DIRECT_SOLVER '
-                        + filename + '> output.txt' ,
+        fnull = open(os.devnull, "w")
+        subprocess.call("g++ -E -DVERDANDI_WITH_DIRECT_SOLVER "
+                        + filename + "> output.txt" ,
                         shell = True, stdout = fnull, stderr = fnull)
-        subprocess.call('g++ -E -DVERDANDI_WITH_DIRECT_SOLVER '
-                        + '-DVERDANDI_WITH_TRAJECTORY_MANAGER '
-                        + filename + '> output2.txt' ,
+        subprocess.call("g++ -E -DVERDANDI_WITH_DIRECT_SOLVER "
+                        + "-DVERDANDI_WITH_TRAJECTORY_MANAGER "
+                        + filename + "> output2.txt" ,
                         shell = True, stdout = fnull, stderr = fnull)
         fnull.close()
-        return ['output.txt', 'output2.txt']
+        return ["output.txt", "output2.txt"]
 
 
 def delete_preprocessing_file():
-    os.system('rm output.txt')
-    os.system('rm output2.txt')
+    os.system("rm output.txt")
+    os.system("rm output2.txt")
 
 
 def list_methods(filename, no_gcc, model_obs, model = ""):
     import fileinput
     file_list = preprocessing(filename, no_gcc)
     list_method = []
-    full_input = ''
+    full_input = ""
     for file_name in file_list:
         for line in fileinput.input(file_name):
             full_input += line
@@ -127,7 +129,7 @@ def list_methods(filename, no_gcc, model_obs, model = ""):
     if model_obs == "observation_manager_.":
         shift = 21
 
-    #parse file for model_obs
+    # Parses the file to find 'model_obs'.
     begin_model = full_input.find(model_obs)
     while begin_model != -1:
         full_method = full_input[begin_model:]
@@ -137,7 +139,7 @@ def list_methods(filename, no_gcc, model_obs, model = ""):
             list_method.append(method)
         begin_model = full_input.find(model_obs, begin_model + shift)
 
-    #parse file for model
+    # Parses the file to find 'model'.
     if model != "" and list_method:
         shift = 6
         begin_model = full_input.find(model)
@@ -154,40 +156,40 @@ def list_methods(filename, no_gcc, model_obs, model = ""):
     return list_method
 
 
-# Generate .dox files.
+# Generates .dox files.
 def generate_documentation(args, no_gcc, list_methods, model_obs):
-    file_path = '../doc/guide/' + model_obs + '.dox'
+    file_path = "../doc/guide/" + model_obs + ".dox"
     if os.path.isfile(file_path):
-        file = open('../doc/guide/'+ model_obs + '.dox', 'w')
+        file = open("../doc/guide/" + model_obs + ".dox", 'w')
     else:
-        file = open(model_obs + '.dox', 'w')
+        file = open(model_obs + ".dox", 'w')
 
     if model_obs == "model_requirements":
         file.write(dox_contents_model)
         for filename in sorted(args):
             if list_methods(filename, no_gcc, "model_.", "model."):
                 method_name = os.path.splitext(os.path.basename(filename))[0]
-                file.write(dox_assimilation_methods%(method_name,
-                                                     method_name))
-                file.write('<ul>')
+                file.write(dox_assimilation_methods % (method_name,
+                                                       method_name))
+                file.write("<ul>")
                 for method in sorted(list_methods(filename, no_gcc,
-                                                  "model_.","model.")):
-                    file.write(dox_model_methods%(method, method))
-                file.write('</ul>\n\n')
+                                                  "model_.", "model.")):
+                    file.write(dox_model_methods % (method, method))
+                file.write("</ul>\n\n")
     else:
         file.write(dox_contents_obs)
         for filename in sorted(args):
             if list_methods(filename, no_gcc, "observation_manager_."):
                 method_name = os.path.splitext(os.path.basename(filename))[0]
-                file.write(dox_assimilation_methods%(method_name,
-                                                     method_name))
-                file.write('<ul>')
+                file.write(dox_assimilation_methods % (method_name,
+                                                       method_name))
+                file.write("<ul>")
                 for method in sorted(list_methods(filename, no_gcc,
                                                   "observation_manager_.")):
-                    file.write(dox_observation_methods%(method, method))
-                file.write('</ul>\n\n')
+                    file.write(dox_observation_methods % (method, method))
+                file.write("</ul>\n\n")
 
-    file.write('*/')
+    file.write("*/")
 
 
 if options.documentation:
@@ -195,25 +197,19 @@ if options.documentation:
                            "model_requirements")
     generate_documentation(args, options.no_gcc, list_methods,
                            "observation_requirements")
-
 else:
     for filename in sorted(args):
-        if options.no_support:
-            list_model = list_methods(filename, options.no_gcc,
-                                       "model_.", "model.")
-            if list_method:
-                print os.path.splitext(os.path.basename(filename))[0]
-                print list_method
-            list_obs = list_methods(filename, options.no_gcc,
-                                    "observation_manager_.")
-            if list_obs:
-                print os.path.splitext(os.path.basename(filename))[0]
-                print list_obs
-        else:
-            print os.path.splitext(os.path.basename(filename))[0]
-            print "Model methods : "
-            print list_methods(filename, options.no_gcc, "model_.", "model.")
-            print "Observation manager methods : "
-            print list_methods(filename, options.no_gcc,
-                               "observation_manager_.")
+        list_model = list_methods(filename, options.no_gcc,
+                                  "model_.", "model.")
+        list_obs = list_methods(filename, options.no_gcc,
+                                "observation_manager_.")
 
+        if not options.no_call or list_model or list_obs:
+            print
+            print("* " + os.path.splitext(os.path.basename(filename))[0])
+        if not options.no_call or list_model:
+            print("** Model member functions")
+            print(list_model)
+        if not options.no_call or list_obs:
+            print("** Observation manager member functions")
+            print(list_obs)
