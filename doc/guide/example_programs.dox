@@ -37,6 +37,7 @@ In  [2]: truth = load_vector_list("result/truth-forecast_state.bin")
 In  [3]: plot(truth[0], label = "time t=0")
 In  [4]: plot(truth[10], label = "time t=10")
 In  [5]: legend()
+In  [6]: title("t = 10")
 
 \endprecode
 
@@ -48,9 +49,7 @@ The initial condition is a rectangular function in the center and the boundary c
 
 \subsection assimilation Data assimilation with optimal interpolation
 
-The observations are here managed by the \ref linear_observation_manager "linear observation manager". The parameters for the observations are stored in <code>example/shallow_water/configuration/observation.lua</code>. By default, the observation operator is a scaled identity matrix with diagonal values of 1, which means that the whole state is observed. For a more illustrative example, we can choose to restrain the observations to specific components of the state.
-
-In the file <code>example/shallow_water/configuration/observation.lua</code>, change the parameter <code>observation.operator.scaled_identity</code> from <code>true</code> to <code>false</code> and put the following code at the end of the file :
+The observations are here managed by the \ref linear_observation_manager "linear observation manager". The observation operator is defined by:
 \precode
 for i = 1, 100 do
    for j = 1, 3 do
@@ -62,7 +61,7 @@ observation.operator.value[80] = 1.
 observation.operator.value[100 + 81] = 1.
 observation.operator.value[200 + 82] = 1.
 \endprecode
-This will restrict the observations to three components of the water height vector with indexes 79, 80 and 81. See the \ref linear_observation_manager linear documentation about LinearObservationManager for further details. Note that the indexes in Lua structures start at 1 while the indexes in the rest of Verdandi (Python, C++, documentation, integers given in the configuration) start at 0.
+This restricts the observations to three components of the water height vector with indexes 79, 80 and 81. See the \ref linear_observation_manager linear documentation about LinearObservationManager for further details. Note that the indexes in Lua structures start at 1 while the indexes in the rest of Verdandi (Python, C++, documentation, integers given in the configuration) start at 0.
 
 To use the \ref optimal_interpolation "Optimal Interpolation" method, execute the following command.
 \precode
@@ -78,7 +77,8 @@ In  [1]: from verdandi import *
 In  [2]: truth = load_vector_list("result/truth-forecast_state.bin")
 In  [3]: oi_forecast_state = load_vector_list("result/oi-forecast_state.bin")
 In  [4]: oi_analysis_state = load_vector_list("result/oi-analysis_state.bin")
-In  [5]: x=10; plot(truth[x]); plot(oi_forecast_state[x]); plot(oi_analysis_state[x])
+In  [5]: x = 10; plot(truth[x]); plot(oi_forecast_state[x]); plot(oi_analysis_state[x])
+In  [6]: legend(["truth", "forecast", "analysis"]); title("t = 10")
 \endprecode
 
 This should plot:
@@ -90,8 +90,9 @@ Since we have restricted the observations to the points x = 79, 80 and 81, and s
 Let us take a look at a later time step. In the same ipython console, type:
 
 \precode
-In  [6]: clf()
-In  [7]: x=20; plot(truth[x]); plot(oi_forecast_state[x]); plot(oi_analysis_state[x])
+In  [7]: clf()
+In  [8]: x = 20; plot(truth[x]); plot(oi_forecast_state[x]); plot(oi_analysis_state[x])
+In  [9]: legend(["truth", "forecast", "analysis"]); title("t = 20")
 \endprecode
 
 for the following result:
@@ -102,8 +103,9 @@ Here, the observed wave originating from the rectangular initial condition has r
 More pronounced at t=30:
 
 \precode
-In  [8]: clf()
-In  [9]: x=30; plot(truth[x]); plot(oi_forecast_state[x]); plot(oi_analysis_state[x])
+In  [10]: clf()
+In  [11]: x = 30; plot(truth[x]); plot(oi_forecast_state[x]); plot(oi_analysis_state[x])
+In  [12]: legend(["truth", "forecast", "analysis"]); title("t = 30")
 \endprecode
 
 \image html shallow_water_t30.png
@@ -120,7 +122,8 @@ In  [1]: from verdandi import *
 In  [2]: truth = load_vector_list("result/truth-forecast_state.bin")
 In  [3]: oi_forecast_state = load_vector_list("result/oi-forecast_state.bin")
 In  [4]: oi_analysis_state = load_vector_list("result/oi-analysis_state.bin")
-In  [5]: x=30; plot(truth[x]); plot(oi_forecast_state[x]); plot(oi_analysis_state[x])
+In  [5]: x = 30; plot(truth[x]); plot(oi_forecast_state[x]); plot(oi_analysis_state[x])
+In  [6]: legend(["truth", "forecast", "analysis"]); title("t = 30")
 \endprecode
 
 \image html shallow_water_t30_2.png
