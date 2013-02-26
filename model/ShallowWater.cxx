@@ -235,10 +235,10 @@ namespace Verdandi
 
         hf_x_.Reallocate(Nx_ + 1, Ny_);
         hf_y_.Reallocate(Nx_, Ny_ + 1);
-        uf_x_.Reallocate(Nx_ + 1, Ny_);
-        uf_y_.Reallocate(Nx_, Ny_ + 1);
-        vf_x_.Reallocate(Nx_ + 1, Ny_);
-        vf_y_.Reallocate(Nx_, Ny_ + 1);
+        huf_x_.Reallocate(Nx_ + 1, Ny_);
+        huf_y_.Reallocate(Nx_, Ny_ + 1);
+        hvf_x_.Reallocate(Nx_ + 1, Ny_);
+        hvf_y_.Reallocate(Nx_, Ny_ + 1);
 
         state_error_variance_row_.Reallocate(Nx_ * Ny_);
 
@@ -389,8 +389,8 @@ namespace Verdandi
                 ComputeFluxHLL(h_(i, j), h_(i + 1, j),
                                u_(i, j), u_(i + 1, j),
                                v_(i, j), v_(i + 1, j),
-                               hf_x_(i + 1, j), uf_x_(i + 1, j),
-                               vf_x_(i + 1, j));
+                               hf_x_(i + 1, j), huf_x_(i + 1, j),
+                               hvf_x_(i + 1, j));
             }
 
         // Fluxes along x, boundary conditions.
@@ -404,7 +404,7 @@ namespace Verdandi
             ComputeFluxHLL(h_ghost, h_(0, j),
                            -u_ghost, u_(0, j),
                            -v_ghost, v_(0, j),
-                           hf_x_(0, j), uf_x_(0, j), vf_x_(0, j));
+                           hf_x_(0, j), huf_x_(0, j), hvf_x_(0, j));
             ComputeGhostCellValue(boundary_condition_right_,
                                   value_right_ + model_error,
                                   amplitude_right_, frequency_right_,
@@ -414,7 +414,7 @@ namespace Verdandi
             ComputeFluxHLL(h_(Nx_ - 1, j), h_ghost,
                            u_(Nx_ - 1, j), u_ghost,
                            v_(Nx_ - 1, j), v_ghost,
-                           hf_x_(Nx_, j), uf_x_(Nx_, j), vf_x_(Nx_, j));
+                           hf_x_(Nx_, j), huf_x_(Nx_, j), hvf_x_(Nx_, j));
         }
 
         // Fluxes along y, inside the domain.
@@ -423,8 +423,8 @@ namespace Verdandi
                 ComputeFluxHLL(h_(i, j), h_(i, j + 1),
                                v_(i, j), v_(i, j + 1),
                                -u_(i, j), -u_(i, j + 1),
-                               hf_y_(i, j + 1), vf_y_(i, j + 1),
-                               uf_y_(i, j + 1));
+                               hf_y_(i, j + 1), hvf_y_(i, j + 1),
+                               huf_y_(i, j + 1));
 
         // Fluxes along y, boundary conditions.
         for (i = 0; i < Nx_; i++)
@@ -437,7 +437,7 @@ namespace Verdandi
             ComputeFluxHLL(h_ghost, h_(i, 0),
                            -v_ghost, v_(i, 0),
                            u_ghost, u_(i, 0),
-                           hf_y_(i, 0), vf_y_(i, 0), uf_y_(i, 0));
+                           hf_y_(i, 0), hvf_y_(i, 0), huf_y_(i, 0));
             ComputeGhostCellValue(boundary_condition_top_,
                                   value_top_ + model_error,
                                   amplitude_top_, frequency_top_,
@@ -447,21 +447,26 @@ namespace Verdandi
             ComputeFluxHLL(h_(i, Ny_ - 1), h_ghost,
                            v_(i, Ny_ - 1), v_ghost,
                            -u_(i, Ny_ - 1), u_ghost,
-                           hf_y_(i, Ny_), vf_y_(i, Ny_), uf_y_(i, Ny_));
+                           hf_y_(i, Ny_), hvf_y_(i, Ny_), huf_y_(i, Ny_));
         }
 
         /*** Updating the state ***/
 
-        double factor = Delta_x_ * Delta_y_ * Delta_t_;
+        double factor = Delta_t_ / (Delta_x_ * Delta_y_);
+        T h_ratio;
         for (i = 0; i < Nx_; i++)
             for (j = 0; j < Ny_; j++)
             {
+                h_ratio = h_(i, j);
                 h_(i, j) += factor * (hf_x_(i, j) - hf_x_(i + 1, j)
                                       + hf_y_(i, j) - hf_y_(i, j + 1));
-                u_(i, j) += factor * (uf_x_(i, j) - uf_x_(i + 1, j)
-                                      - uf_y_(i, j) + uf_y_(i, j + 1));
-                v_(i, j) += factor * (vf_x_(i, j) - vf_x_(i + 1, j)
-                                      + vf_y_(i, j) - vf_y_(i, j + 1));
+                h_ratio /= h_(i, j);
+                u_(i, j) = u_(i, j) * h_ratio
+                    + factor * (huf_x_(i, j) - huf_x_(i + 1, j)
+                                - huf_y_(i, j) + huf_y_(i, j + 1)) / h_(i, j);
+                v_(i, j) += v_(i, j) * h_ratio
+                    + factor * (hvf_x_(i, j) - hvf_x_(i + 1, j)
+                                + hvf_y_(i, j) - hvf_y_(i, j + 1)) / h_(i, j);
             }
 
         // Checking the CFL.
@@ -1102,7 +1107,7 @@ namespace Verdandi
     template <class T>
     void ShallowWater<T>
     ::ComputeFluxHLL(T h_l, T h_r, T u_l, T u_r, T v_l, T v_r,
-                     T& flux_h, T& flux_u, T& flux_v)
+                     T& flux_h, T& flux_hu, T& flux_hv)
     {
         T tmp;
 
@@ -1149,7 +1154,7 @@ namespace Verdandi
 
         if (s_l >= 0.)
         {
-            ComputeFlux(h_l, u_l, v_l, flux_h, flux_u, flux_v);
+            ComputeFlux(h_l, u_l, v_l, flux_h, flux_hu, flux_hv);
             return;
         }
 
@@ -1160,22 +1165,22 @@ namespace Verdandi
 
         if (s_r <= 0.)
         {
-            ComputeFlux(h_r, u_r, v_r, flux_h, flux_u, flux_v);
+            ComputeFlux(h_r, u_r, v_r, flux_h, flux_hu, flux_hv);
             return;
         }
 
         // Below, s_l < 0. and s_r > 0..
-        T flux_h_l, flux_u_l, flux_v_l, flux_h_r, flux_u_r, flux_v_r;
-        ComputeFlux(h_l, u_l, v_l, flux_h_l, flux_u_l, flux_v_l);
-        ComputeFlux(h_r, u_r, v_r, flux_h_r, flux_u_r, flux_v_r);
+        T flux_h_l, flux_hu_l, flux_hv_l, flux_h_r, flux_hu_r, flux_hv_r;
+        ComputeFlux(h_l, u_l, v_l, flux_h_l, flux_hu_l, flux_hv_l);
+        ComputeFlux(h_r, u_r, v_r, flux_h_r, flux_hu_r, flux_hv_r);
         tmp = 1. / (s_r - s_l);
         flux_h
             = (s_r * flux_h_l - s_l * flux_h_r + s_r * s_l * (h_r - h_l))
             * tmp;
-        flux_u
-            = (s_r * flux_u_l - s_l * flux_u_r - s_r * s_l * u_lr) * tmp;
-        flux_v
-            = (s_r * flux_v_l - s_l * flux_v_r + s_r * s_l * (v_r - v_l))
+        flux_hu
+            = (s_r * flux_hu_l - s_l * flux_hu_r - s_r * s_l * u_lr) * tmp;
+        flux_hv
+            = (s_r * flux_hv_l - s_l * flux_hv_r + s_r * s_l * (v_r - v_l))
             * tmp;
     }
 
@@ -1183,12 +1188,12 @@ namespace Verdandi
     //! Computes the flux.
     template <class T>
     void ShallowWater<T>
-    ::ComputeFlux(T h, T u, T v, T& flux_h, T& flux_u, T& flux_v)
+    ::ComputeFlux(T h, T u, T v, T& flux_h, T& flux_hu, T& flux_hv)
     {
         T tmp = h * u;
         flux_h = tmp;
-        flux_u = tmp * u + .5 * g_ * h * h;
-        flux_v = tmp * v;
+        flux_hu = tmp * u + .5 * g_ * h * h;
+        flux_hv = tmp * v;
     }
 
 

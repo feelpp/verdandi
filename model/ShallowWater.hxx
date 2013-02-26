@@ -84,14 +84,14 @@ namespace Verdandi
         Matrix<T> hf_x_;
         //! Water-height flux along y.
         Matrix<T> hf_y_;
-        //! Flux along x of the vertical velocity along x.
-        Matrix<T> uf_x_;
-        //! Flux along y of the vertical velocity along x.
-        Matrix<T> uf_y_;
-        //! Flux along x of the vertical velocity along y.
-        Matrix<T> vf_x_;
-        //! Flux along y of the vertical velocity along y.
-        Matrix<T> vf_y_;
+        //! Flux along x of the flow rate along x.
+        Matrix<T> huf_x_;
+        //! Flux along y of the flow rate along x.
+        Matrix<T> huf_y_;
+        //! Flux along x of the flow rate along y.
+        Matrix<T> hvf_x_;
+        //! Flux along y of the flow rate along y.
+        Matrix<T> hvf_y_;
 
         //! First abscissa.
         double x_min_;
