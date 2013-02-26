@@ -60,7 +60,7 @@ shallow_water = {
 
       -- Standard deviation of the white Gaussian noise on *boundary*
       -- conditions.
-      standard_deviation_bc = 0.1,
+      standard_deviation_bc = 0.,
       -- Standard deviation of the white Gaussian noise on *initial*
       -- conditions.
       standard_deviation_ic = 0.,
