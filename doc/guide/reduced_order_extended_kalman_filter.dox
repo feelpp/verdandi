@@ -46,7 +46,7 @@ while (!driver.HasFinished()) [6]
 \section algorithm16 Reduced Order Extended Kalman filter algorithm
 
 Assuming that P is of reduced rank p – typically much smaller than the dimension of the space n – the basic idea in
-reduced-order ﬁltering is, in essence, to be able to manipulate covariance matrices in the factorized form
+reduced-order filtering is, in essence, to be able to manipulate covariance matrices in the factorized form
     \f[ P = LU^{-1}L^{T}, \f]
 
 where U – in the group of invertible matrices \f$\mathcal{GL}_{p}\f$ – is of much smaller size than P \f$\in \mathcal{M}_{n}\f$ and represents the

@@ -81,7 +81,7 @@ Then, we introduce \f$ (p_h)_{1 \le h \le N_t}\f$ fulfilling the adjoint dynamic
 \begin{array}{l}
 p_h - M_{h+1}^T p_{h+1} = H_h^T R_h^{-1} (y_h - H_h x_h) \\
 p_{N_t} = 0
-\end{array} \right. \\ \f$
+\end{array} \right. \f$
 </center>
 And we can prove that
 <center>

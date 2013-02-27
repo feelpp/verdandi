@@ -46,7 +46,7 @@ while (!driver.HasFinished()) [6]
 \section algorithm5 Reduced Order Unscented Kalman filter algorithm
 
 Assuming that P is of reduced rank p – typically much smaller than the dimension of the space n – the basic idea in
-reduced-order ﬁltering is, in essence, to be able to manipulate covariance matrices in the factorized form
+reduced-order filtering is, in essence, to be able to manipulate covariance matrices in the factorized form
     \f[ P = LU^{-1}L^{T}, \f]
 
 where U – in the group of invertible matrices \f$\mathcal{GL}_{p}\f$ – is of much smaller size than P \f$\in \mathcal{M}_{n}\f$ and represents the
@@ -56,7 +56,7 @@ without needing to compute P.
 \section algorithm6 Simplex case
 
 In this section, we focus on the simplex distribution.
-Consider some simplex sigma-points \f$ (V^{(i)})_{1\leq i \leq r} \in \mathbb{R}^p \f$ associated with some coeﬃcients \f$ (\alpha) = ( \alpha_1 ... \alpha_r )^T \f$. Then, we deﬁne the matrix of
+Consider some simplex sigma-points \f$ (V^{(i)})_{1\leq i \leq r} \in \mathbb{R}^p \f$ associated with some coefficients \f$ (\alpha) = ( \alpha_1 ... \alpha_r )^T \f$. Then, we define the matrix of
 these sigma-points denoted by \f$ [V^{*}] \in \mathcal{M}_{r,p}\f$ and the matrix \f$ D_{\alpha} = diag( \alpha_1 ... \alpha_r ) \in \mathcal{M}_{r}\f$.
 
 <ol>
@@ -92,7 +92,7 @@ With: <br>
 \f$R_h\f$ observational error covariance matrix; <br>
 \f$\mathcal{M}_h\f$ model.
 
-It is worthwhile noting that the SEIK filter is equivalent to this reduced UKF algorithm. In fact, the SEIK procedure uses in the resampling and covariance factorization a matrix which is nothing but the transposed of [V ∗] with this particular choice of sigma-points.
+It is worthwhile noting that the SEIK filter is equivalent to this reduced UKF algorithm. In fact, the SEIK procedure uses in the resampling and covariance factorization a matrix which is nothing but the transposed of [V *] with this particular choice of sigma-points.
 
 
 \section algorithm7 Generalized case

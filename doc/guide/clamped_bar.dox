@@ -26,7 +26,7 @@ The clamped bar model is solved numerically using a Newmark scheme (middle point
 \begin{array}{l}
 \ddot Y_{h + \frac{1}{2}} = \frac{\ddot Y_{h+1} + \ddot Y_{h} }2 =  \frac{\dot Y_{h+1} - \dot Y_{h} } {\Delta t}\\
 \dot Y_{h + \frac{1}{2}} = \frac{\dot Y_{h+1} + \dot Y_{h} }2 =  \frac{Y_{h+1} - Y_{h} } {\Delta t}
-\end{array} \right. \\ \f$
+\end{array} \right. \f$
 </center>
 
 Algorithmically, it follows:
@@ -36,7 +36,7 @@ Algorithmically, it follows:
 \begin{array}{l}
 \dot Y_{h + 1} = \frac{2}{\Delta t}(Y_{h+1} - Y_{h}) - \dot Y_{h} \\
 (\frac{1}2K_{\theta_k} + \frac{1}{\Delta t}C_{\theta_c} + \frac{2}{\Delta t^2}M_{\theta_m})Y_{h+1} = (-\frac{1}2 K_{\theta_k} + \frac{1}{\Delta t}C_{\theta_c} + \frac{2}{\Delta t^2}M_{\theta_m})Y_{h} + \frac{2}{\Delta t}M_{\theta_m}\dot Y_{h} + F_{h + \frac{1}{2}}(\theta_f)
-\end{array} \right. \\ \f$
+\end{array} \right. \f$
 </center>
 
 
