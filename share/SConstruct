@@ -300,11 +300,10 @@ for library in library_list:
     conf.CheckLib(library)
 
 # Link to the appropriate version of Python.
-for python_version in ["2.7", "2.6", "2.5", ""]:
-    if conf.CheckLib("python" + python_version):
-        env.Append(LINKFLAGS = "-l" + "python" + python_version)
-        env.Append(CXXFLAGS = ["-DVERDANDI_PYTHON_VERSION=" + python_version])
-        break
+python_version = distutils.sysconfig.get_python_version()
+if conf.CheckLib("python" + python_version):
+    env.Append(LINKFLAGS = "-l" + "python" + python_version)
+    env.Append(CXXFLAGS = ["-DVERDANDI_PYTHON_VERSION=" + python_version])
 
 if ARGUMENTS["line"] == "no":
     env.Replace(CXXCOMSTR = "[C++] $SOURCE")
