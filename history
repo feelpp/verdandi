@@ -1,3 +1,37 @@
+Version 1.5 (2013-02-28)
+-----------
+
+* Methods
+
+- In 'FourDimensionalVariational', added the possibility to add a term to the
+  cost function and to the adjoint state by the use of two model functions:
+  'GetAdditionalAdjointTerm()' and 'GetAdditionalCostTerm()'.
+
+* Documentation
+
+- Added documentation about plugging an observation manager.
+- Added a PDF version of the documentation.
+- Improved the introduction to the Python interface.
+- Updated the documentation for the use of Numpy in 'PythonModel'.
+
+* Bug fixes
+
+- In 'LinearObservationManager.py', the parameter 'Nskip' was not used.
+- In the Python implementation of 'QuadraticModel', the function
+  'ApplyTangentLinearOperator' was erroneous when the model was defined with
+  both the quadratic term and the linear term.
+- The fluxes in the shallow-water model were not properly computed. The errors
+  had little consequences only in case the space steps and the height were
+  close to 1.
+- Verdandi directory "include/" was not given to g++ in
+  "bin/methods_requirement".
+
+* Miscellaneous
+
+- Added 'OutputSaver::IsSaved(string variable_name)'.
+- Cleaned up "bin/methods_requirement".
+
+
 Version 1.4 (2012-11-13)
 -----------
 
