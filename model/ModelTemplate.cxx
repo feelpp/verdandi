@@ -348,8 +348,8 @@ namespace Verdandi
     }
 
 
-    /*! Carries out some calculations when the i-th parameter
-      has been updated.
+    /*! \brief Carries out some calculations when the i-th parameter has been
+      updated.
     */
     /*!
       \param[in] i index of the parameter.
