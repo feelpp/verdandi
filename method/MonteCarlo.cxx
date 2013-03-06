@@ -285,7 +285,7 @@ namespace Verdandi
         {
             uncertain_parameter output;
             bool allocate;
-            uncertain_parameter parameter = model_.GetParameter(i);
+            uncertain_parameter& parameter = model_.GetParameter(i);
 
             if (model_.GetParameterPDF(i) == "Normal"
                 || model_.GetParameterPDF(i) == "LogNormal"
@@ -324,6 +324,7 @@ namespace Verdandi
             perturbation_.push_back(output);
 
             if (model_.GetParameterOption(i) == "init_step")
+            {
                 // Applies the perturbations.
                 if (model_.GetParameterPDF(i) == "Normal"
                     || model_.GetParameterPDF(i) == "BlockNormal"
@@ -339,8 +340,8 @@ namespace Verdandi
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
 
-            model_.GetParameter(i) =  parameter;
-            model_.ParameterUpdated(i);
+                model_.ParameterUpdated(i);
+            }
 
             output_saver_.Save(perturbation_[i], "perturbation");
         }
@@ -359,7 +360,7 @@ namespace Verdandi
         model_.InitializeStep();
         for (int i = 0; i < model_.GetNparameter(); i++)
         {
-            uncertain_parameter parameter = model_.GetParameter(i);
+            uncertain_parameter& parameter = model_.GetParameter(i);
             if (model_.GetParameterOption(i) == "every_step")
                 if (model_.GetParameterPDF(i) == "Normal"
                     || model_.GetParameterPDF(i) == "BlockNormal"
@@ -375,7 +376,6 @@ namespace Verdandi
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
 
-            model_.GetParameter(i) = parameter;
             model_.ParameterUpdated(i);
         }
 
