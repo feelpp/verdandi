@@ -281,6 +281,7 @@ namespace Verdandi
         iteration_ = 0;
 
         MessageHandler::Send(*this, "model", "initial condition");
+
         for (int i = 0; i < model_.GetNparameter(); i++)
         {
             uncertain_parameter output;
