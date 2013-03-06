@@ -235,6 +235,7 @@ namespace Verdandi
                 optional_parameters_.push_back(constant_parameter);
 
                 parameter_.push_back(&b_);
+                parameter_name_.push_back("constant_term");
             }
 
             if (is_linear_perturbed_)
@@ -294,6 +295,7 @@ namespace Verdandi
                     Vector<T> *row = new Vector<T>;
                     row->SetData(Nstate_, L_.GetMe()[i]);
                     parameter_.push_back(row);
+                    parameter_name_.push_back(Str() + "linear_term" + i);
                     variance_.push_back(linear_variance);
                     pdf_.push_back(linear_pdf);
                     optional_parameters_.push_back(linear_parameter);
@@ -359,6 +361,8 @@ namespace Verdandi
                         Vector<T> *row = new Vector<T>;
                         row->SetData(Nstate_, S_[i].GetMe()[j]);
                         parameter_.push_back(row);
+                        parameter_name_.push_back(Str() + "quadratic_term"
+                                                  + i + "_" + j);
                         variance_.push_back(quadratic_variance);
                         pdf_.push_back(quadratic_pdf);
                         optional_parameters_.push_back(quadratic_parameter);
@@ -744,6 +748,18 @@ namespace Verdandi
     template<class T>
     void QuadraticModel<T>::ParameterUpdated(int i)
     {
+    }
+
+
+    //! Returns the name of a parameter to be perturbed.
+    /*!
+      \param[in] i index of the parameter.
+      \return The name of the parameter.
+    */
+    template<class T>
+    string QuadraticModel<T>::GetParameterName(int i)
+    {
+        return parameter_name_[i];
     }
 
 

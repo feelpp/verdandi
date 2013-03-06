@@ -360,6 +360,17 @@ namespace Verdandi
     }
 
 
+    //! Returns the name of a parameter to be perturbed.
+    /*!
+      \param[in] i index of the parameter.
+      \return The name of the parameter.
+    */
+    string ModelTemplate::GetParameterName(int i)
+    {
+        throw ErrorUndefined("ModelTemplate::GetParameterName(int i)");
+    }
+
+
     //! Returns the correlation between the uncertain parameters.
     /*!
       \param[in] i parameter index.

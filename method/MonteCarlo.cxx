@@ -238,6 +238,14 @@ namespace Verdandi
         // Should the time be displayed on screen?
         configuration.Set("display.show_time", show_time_);
 
+        /*** Perturbation option ***/
+
+        configuration.SetPrefix("monte_carlo.perturbation.");
+        configuration.Set("source", "ops_in(v, {'file', 'random'})",
+                          perturbation_source_);
+        if (perturbation_source_ == "file")
+            configuration.Set("path", perturbation_file_);
+
         /*** Ouput saver ***/
 
         configuration.SetPrefix("monte_carlo.output_saver.");
@@ -288,10 +296,28 @@ namespace Verdandi
             bool allocate;
             uncertain_parameter& parameter = model_.GetParameter(i);
 
-            if (model_.GetParameterPDF(i) == "Normal"
-                || model_.GetParameterPDF(i) == "LogNormal"
-                || model_.GetParameterPDF(i) == "BlockNormal"
-                || model_.GetParameterPDF(i) == "BlockLogNormal")
+            if (perturbation_source_ == "file")
+            {
+                string perturbation_file
+                    = find_replace(perturbation_file_,
+                                   "&p", model_.GetParameterName(i));
+                output.Read(perturbation_file);
+                if (output.GetLength() != parameter.GetLength())
+                    throw ErrorConfiguration("MonteCarlo::Initialize"
+                                             "(VerdandiOps&, bool, bool)",
+                                             Str() + "Parameter \""
+                                             + model_.GetParameterName(i)
+                                             + "\" has "
+                                             + parameter.GetLength()
+                                             + " elements, but "
+                                             + output.GetLength()
+                                             + " elements were found in \""
+                                             + perturbation_file + "\".");
+            }
+            else if (model_.GetParameterPDF(i) == "Normal"
+                     || model_.GetParameterPDF(i) == "LogNormal"
+                     || model_.GetParameterPDF(i) == "BlockNormal"
+                     || model_.GetParameterPDF(i) == "BlockLogNormal")
             {
                 SetDimension(parameter, output);
                 Fill(output, model_.GetParameterPDF(i));

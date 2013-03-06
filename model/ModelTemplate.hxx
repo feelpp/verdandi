@@ -121,6 +121,7 @@ namespace Verdandi
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);
         void ParameterUpdated(int i);
+        string GetParameterName(int i);
         Vector<double>& GetParameterCorrelation(int i);
         string GetParameterPDF(int i);
         parameter_variance& GetParameterVariance(int i);

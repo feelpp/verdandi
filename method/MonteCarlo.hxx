@@ -77,6 +77,15 @@ namespace Verdandi
         //! Should the current time be displayed?
         bool show_time_;
 
+        /*** Perturbations ***/
+
+        //! Source of the perturbations: "file" or "random".
+        string perturbation_source_;
+        /*! \brief In case 'perturbation_source_' is "file", path to file
+          storing the perturbations. It should contain "&p" to be replaced
+          with the parameter name. */
+        string perturbation_file_;
+
         /*** Output saver ***/
 
         //! Output saver.

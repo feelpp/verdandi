@@ -184,6 +184,16 @@ monte_carlo = {
 
    },
 
+   perturbation = {
+
+      -- Source of the perturbations: "file" or "file".
+      source = "file",
+      -- In case of a perturbation file, provide below its path, with "&p" to
+      -- be replaced with the parameter name.
+      path = "/path/to/perturbation_for_&p.bin"
+
+   },
+
    output_saver = {
 
       file_string = output_file_string,

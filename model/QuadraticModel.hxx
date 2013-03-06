@@ -110,6 +110,9 @@ namespace Verdandi
         //! Number of parameters to be perturbed.
         int Nparameter_;
 
+        //! Name of the parameters to be perturbed.
+        vector<string> parameter_name_;
+
         //! Correlations between the constant term and the other terms.
         vector<Vector<T> > correlation_;
 
@@ -188,6 +191,7 @@ namespace Verdandi
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);
         void ParameterUpdated(int i);
+        string GetParameterName(int i);
         Vector<T>& GetParameterCorrelation(int i);
         string GetParameterPDF(int i);
         parameter_variance& GetParameterVariance(int i);
