@@ -186,7 +186,7 @@ monte_carlo = {
 
    perturbation = {
 
-      -- Source of the perturbations: "file" or "file".
+      -- Source of the perturbations: "random" or "file".
       source = "file",
       -- In case of a perturbation file, provide below its path, with "&p" to
       -- be replaced with the parameter name.
