@@ -386,9 +386,9 @@ namespace Verdandi
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
         model_.InitializeStep();
         for (int i = 0; i < model_.GetNparameter(); i++)
-        {
-            uncertain_parameter& parameter = model_.GetParameter(i);
             if (model_.GetParameterOption(i) == "every_step")
+            {
+                uncertain_parameter& parameter = model_.GetParameter(i);
                 if (model_.GetParameterPDF(i) == "Normal"
                     || model_.GetParameterPDF(i) == "BlockNormal"
                     || model_.GetParameterPDF(i) == "NormalHomogeneous"
@@ -402,9 +402,8 @@ namespace Verdandi
                          == "BlockLogNormalHomogeneous")
                     for (int k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
-
-            model_.ParameterUpdated(i);
-        }
+                model_.ParameterUpdated(i);
+            }
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
     }
