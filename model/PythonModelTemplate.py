@@ -186,7 +186,7 @@ class PythonModelTemplate:
 
     ## Returns the correlation between the uncertain parameters.
     # @param[in] parameter index.
-    # @return The correlation between the uncertain paraameters.
+    # @return The correlation between the uncertain parameters.
     def GetParameterCorrelation(self, i):
         return self.parameter_correlation_[i]
 
