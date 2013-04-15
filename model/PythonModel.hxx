@@ -118,9 +118,9 @@ namespace Verdandi
         //! Name of the probability distribution.
         string parameter_pdf_;
         //! Covariance matrix.
-        Matrix<double> parameter_variance_;
+        Matrix<double, Symmetric, Seldon::RowSymPacked> parameter_variance_;
         //! PDF parameters.
-        Vector<double> parameter_parameter_;
+        Vector<double> parameter_pdf_data_;
         //! Perturbation option.
         string parameter_option_;
 
@@ -164,11 +164,13 @@ namespace Verdandi
         // Uncertainty.
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);
-        void SetParameter(int i, uncertain_parameter& parameter);
+        void ParameterUpdated(int i);
+        string GetParameterName(int i);
         Vector<double>& GetParameterCorrelation(int i);
         string GetParameterPDF(int i);
-        Matrix<double>& GetParameterVariance(int i);
-        Vector<double>& GetParameterParameter(int i);
+        Matrix<double, Symmetric, Seldon::RowSymPacked>&
+        GetParameterVariance(int i);
+        Vector<double>& GetParameterPDFData(int i);
         string GetParameterOption(int i);
 
         // Errors.

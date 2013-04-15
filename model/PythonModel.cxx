@@ -72,7 +72,7 @@ namespace Verdandi
         state_error_variance_row_.Nullify();
         parameter_correlation_.Nullify();
         parameter_variance_.Nullify();
-        parameter_parameter_.Nullify();
+        parameter_pdf_data_.Nullify();
         state_error_variance_.Nullify();
         state_error_variance_inverse_.Nullify();
     }
@@ -672,27 +672,42 @@ namespace Verdandi
     }
 
 
-    //! Sets the i-th uncertain parameter.
+    /*! \brief Triggers the necessary actions after an uncertain parameter has
+      been updated. */
     /*!
       \param[in] i index of the parameter.
-      \param[in] parameter The new uncertain parameter.
     */
-    void PythonModel::SetParameter(int i, uncertain_parameter& parameter)
+    void PythonModel::ParameterUpdated(int i)
     {
-        char function_name[] = "SetParameter";
-        char format_unit[] = "iO";
-        npy_intp dim[1];
-        dim[0] = parameter.GetLength();
-
-        PyObject *pyParameter =
-            PyArray_SimpleNewFromData(1, dim, NPY_DOUBLE,
-                                      parameter.GetDataVoid());
+        char function_name[] = "ParameterUpdated";
+        char format_unit[] = "i";
 
         if (PyObject_CallMethod(pyModelInstance_, function_name,
-                                format_unit, i, pyParameter) != Py_None)
-            throw ErrorPythonUndefined("PythonModel::SetParameter",
+                                format_unit, i) != Py_None)
+            throw ErrorPythonUndefined("PythonModel::ParameterUpdated",
                                        string(function_name),
-                                       "(self, i, parameter)", module_);
+                                       "(self, i)", module_);
+    }
+
+
+    //! Returns the name of a parameter to be perturbed.
+    /*!
+      \param[in] i index of the parameter.
+      \return The name of the parameter.
+    */
+    string PythonModel::GetParameterName(int i)
+    {
+        char function_name[] = "GetParameterName";
+        char format_unit[] = "i";
+        PyObject *pyOption = PyObject_CallMethod(pyModelInstance_,
+                                                 function_name,
+                                                 format_unit, i);
+        if (pyOption == NULL)
+            throw ErrorPythonUndefined("PythonModel::GetParameterName",
+                                       string(function_name), "(self, i)",
+                                       module_);
+
+        return PyString_AsString(pyOption);
     }
 
 
@@ -762,7 +777,8 @@ namespace Verdandi
       \param[in] i parameter index.
       \return The covariance matrix associated with the i-th parameter.
     */
-    Matrix<double>& PythonModel::GetParameterVariance(int i)
+    Matrix<double, Symmetric, Seldon::RowSymPacked>&
+    PythonModel::GetParameterVariance(int i)
     {
         parameter_variance_.Nullify();
 
@@ -787,6 +803,15 @@ namespace Verdandi
         int size_X = (varianceArray->dimensions)[0];
         int size_Y = (varianceArray->dimensions)[1];
 
+        // This restriction is due to the packed storage in C++, which
+        // coincides with the dense storage in Python only for 1x1 matrices.
+        if (size_X != 1 || size_Y != 1)
+            throw ErrorProcessing("PythonModel::GetParameterVariance",
+                                  Str() + "For uncertain parameters, only "
+                                  "variances of size 1x1 are supported, but "
+                                  + "a " + size_X + "x" + size_Y + " variance"
+                                  " was given.");
+
         parameter_variance_.SetData(size_X, size_Y,
                                     reinterpret_cast<double*>
                                     (varianceArray->data));
@@ -801,25 +826,25 @@ namespace Verdandi
       \param[in] i model parameter index.
       \return The parameters associated with the i-th parameter.
     */
-    Vector<double>& PythonModel::GetParameterParameter(int i)
+    Vector<double>& PythonModel::GetParameterPDFData(int i)
     {
-        parameter_parameter_.Nullify();
+        parameter_pdf_data_.Nullify();
 
-        char function_name[] = "GetParameterParameter";
+        char function_name[] = "GetParameterPDFData";
         char format_unit[] = "i";
         PyObject *pyParameter = PyObject_CallMethod(pyModelInstance_,
                                                     function_name,
                                                     format_unit, i);
 
         if (pyParameter == NULL)
-            throw ErrorPythonUndefined("PythonModel::GetParameterParameter",
+            throw ErrorPythonUndefined("PythonModel::GetParameterPDFData",
                                        string(function_name), "(self, i)",
                                        module_);
 
-        if (pyParameter == Py_None) return parameter_parameter_;
+        if (pyParameter == Py_None) return parameter_pdf_data_;
 
         if (!PyArray_ISCONTIGUOUS(pyParameter))
-            throw ErrorProcessing("PythonModel::GetParameterParameter",
+            throw ErrorProcessing("PythonModel::GetParameterPDFData",
                                   ErrorMessageNotContiguous(function_name));
 
         PyArrayObject *parameterArray =
@@ -827,11 +852,11 @@ namespace Verdandi
 
         int size = (parameterArray->dimensions)[0];
 
-        parameter_parameter_.SetData(size,
+        parameter_pdf_data_.SetData(size,
                                      reinterpret_cast<double*>
                                      (parameterArray->data));
 
-        return parameter_parameter_;
+        return parameter_pdf_data_;
     }
 
 

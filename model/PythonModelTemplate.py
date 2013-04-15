@@ -177,11 +177,17 @@ class PythonModelTemplate:
         return self.parameter_[i]
 
 
-    ## Sets the i-th parameter.
+    ## Triggers the actions after an uncertain parameter has been updated.
     # @param[in] i parameter index.
-    # @param[in] parameter the new parameter vector.
-    def SetParameter(self, i, parameter):
-        self.parameter_[i] = parameter.copy()
+    def ParameterUpdated(self, i):
+        return
+
+
+    ## Returns the name of a parameter to be perturbed.
+    # @param[in] i parameter index.
+    # @return The name of the parameter.
+    def GetParameterName(self, i):
+        return self.parameter_name_[i]
 
 
     ## Returns the correlation between the uncertain parameters.
@@ -194,8 +200,8 @@ class PythonModelTemplate:
     ## Returns parameters associated with the PDF of some model parameter.
     # @param[in] i parameter index.
     # @return The parameters associated with the i-th parameter.
-    def GetParameterParameter(self, i):
-        return self.parameter_parameter_[i]
+    def GetParameterPDFData(self, i):
+        return self.parameter_pdf_data_[i]
 
 
     ## Returns the covariance matrix associated with the i-th parameter.
