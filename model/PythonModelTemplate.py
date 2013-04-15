@@ -23,7 +23,7 @@
 ## This class is a template model in Python.
 class PythonModelTemplate:
     ## Initializes the model.
-    # @param[in] path The path to the python file
+    # @param[in] path The path to the configuration file.
     def __init__(self, path):
         return
 
@@ -167,7 +167,7 @@ class PythonModelTemplate:
     # @param[in] i parameter index.
     # @return The PDF of the i-th parameter.
     def GetParameterPDF(self, i):
-        return self.parmeter_pdf_[i]
+        return self.parameter_pdf_[i]
 
 
     ## Gets the i-th uncertain parameter.
