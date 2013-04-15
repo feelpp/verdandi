@@ -8,7 +8,6 @@
 #include "Verdandi.hxx"
 
 #include "model/QuadraticModel.cxx"
-#include "observation_manager/LinearObservationManager.cxx"
 #include "method/MonteCarlo.cxx"
 #include "method/TR1PerturbationManager.cxx"
 
