@@ -1128,6 +1128,21 @@ namespace Verdandi
     }
 
 
+    ////////////
+    // PYTHON //
+    ////////////
+
+
+    //! Returns a pointer to the instance of the Python model.
+    /*
+      \return The instance of the Python model.
+    */
+    PyObject* PythonModel::GetModelInstance()
+    {
+        return pyModelInstance_;
+    }
+
+
     /////////////////////
     // PRIVATE METHODS //
     /////////////////////

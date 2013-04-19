@@ -184,6 +184,9 @@ namespace Verdandi
         string GetName() const;
         void Message(string message);
 
+        // Python.
+        PyObject* GetModelInstance();
+
     private:
         string ErrorMessageNotContiguous(string function_name) const;
 
