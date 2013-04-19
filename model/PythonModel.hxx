@@ -131,7 +131,8 @@ namespace Verdandi
         PythonModel(string configuration_file);
         ~PythonModel();
         // Initializations.
-        void Initialize(string configuration_file);
+        void Initialize(string configuration_file,
+                        bool call_initialize = true);
         void InitializeStep();
 
         // Processing.

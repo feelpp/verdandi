@@ -86,8 +86,11 @@ namespace Verdandi
     //! Initializes the model.
     /*! It reads the initial condition and the time settings.
       \param[in] configuration_file configuration file.
+      \param[in] call_initialize should the 'Initialize' method of the Python
+      object be called?
     */
-    void PythonModel::Initialize(string configuration_file)
+    void PythonModel::Initialize(string configuration_file,
+                                 bool call_initialize)
     {
         VerdandiOps configuration(configuration_file);
 
@@ -111,18 +114,31 @@ namespace Verdandi
         pyModelClass_ = PyDict_GetItemString(pyModelDict_,
                                              class_name_.c_str());
 
-        PyObject *file_path =
-            PyString_FromString(configuration.GetFilePath().c_str());
-        PyObject *args = PyTuple_New(1);
-        PyTuple_SetItem(args, 0, file_path);
-
         if (!PyCallable_Check(pyModelClass_))
             throw ErrorConfiguration("PythonModel::PythonModel",
                                      "The class \"" + class_name_
                                      + "\" is not defined in the module \""
                                      + module_ + "\".");
 
-        pyModelInstance_ = PyObject_CallObject(pyModelClass_, args);
+        pyModelInstance_ = PyObject_CallObject(pyModelClass_, NULL);
+
+        PyObject *file_path =
+            PyString_FromString(configuration.GetFilePath().c_str());
+        PyObject *args = PyTuple_New(1);
+        PyTuple_SetItem(args, 0, file_path);
+
+        if (call_initialize)
+        {
+            char function_name[] = "Initialize";
+            char format_unit[] = "s";
+            if (PyObject_CallMethod(pyModelInstance_, function_name,
+                                    format_unit,
+                                    configuration.GetFilePath().c_str())
+                != Py_None)
+                throw ErrorPythonUndefined("PythonModel::Initialize",
+                                           string(function_name),
+                                           "(self, string)", module_);
+        }
 
         is_module_initialized_ = true;
 

@@ -24,9 +24,14 @@ import ops
 
 ## This class is a quadratic model written in Python.
 class QuadraticModel:
+    ## Constructs the model.
+    def __init__(self):
+        return
+
+
     ## Initializes the model.
-    # @param[in] path The path to the python file
-    def __init__(self, path):
+    # @param[in] path The path to the configuration file.
+    def Initialize(self, path):
         configuration = ops.Ops(path)
 
         configuration.SetPrefix("quadratic_model.")

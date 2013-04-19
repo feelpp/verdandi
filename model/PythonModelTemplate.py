@@ -22,9 +22,14 @@
 
 ## This class is a template model in Python.
 class PythonModelTemplate:
+    ## Constructs the model.
+    def __init__(self):
+        return
+
+
     ## Initializes the model.
     # @param[in] path The path to the configuration file.
-    def __init__(self, path):
+    def Initialize(self, path):
         return
 
 
