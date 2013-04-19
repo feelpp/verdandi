@@ -186,7 +186,8 @@ namespace Verdandi
                  bool initialize_perturbation_manager)
     {
         VerdandiOps configuration(configuration_file);
-        Initialize(configuration);
+        Initialize(configuration, initialize_model,
+                   initialize_perturbation_manager);
     }
 
 
