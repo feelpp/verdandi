@@ -26,6 +26,10 @@
 #include <string>
 #include <iostream>
 
+#ifdef VERDANDI_WITH_MPI
+#include <mpi.h>
+#endif
+
 namespace Verdandi
 {
 
