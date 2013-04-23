@@ -113,7 +113,8 @@ namespace Verdandi
 
         if (Nprocess_ != Nrow_ * Ncol_)
             throw ErrorConfiguration("ForwardDriver<Model>::Initialize",
-                                     "Wrong number of processes: " + to_str(Nprocess_)
+                                     "Wrong number of processes: "
+                                     + to_str(Nprocess_)
                                      + ". The dimension of the MPI grid ("
                                      + to_str(Nrow_) + ", " + to_str(Ncol_) +
                                      ") requires " + to_str(Nrow_ * Ncol_)
