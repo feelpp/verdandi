@@ -41,6 +41,8 @@ namespace Verdandi
         T gamma_;
         //! Parameter of the sequence of discount factors.
         T p_;
+        //! Initial weights.
+        Vector<T> initial_weight_;
 
     public:
         DiscountedRidgeRegression();
@@ -51,6 +53,8 @@ namespace Verdandi
         T GetPenalization() const;
         void SetPenalization(T penalization);
         void SetGamma(T gamma);
+        const Vector<T>& GetInitialWeight() const;
+        void SetInitialWeight(const Vector<T>& initial_weight_);
 
         using BaseForecaster<T>::Aggregate;
         virtual void Init(const Vector3<T>& ensemble,

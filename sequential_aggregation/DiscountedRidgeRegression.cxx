@@ -132,6 +132,29 @@ namespace Verdandi
     }
 
 
+    //! Returns the initial weight vector.
+    /*!
+      \return The initial weight vector.
+    */
+    template <class T>
+    const Vector<T>& DiscountedRidgeRegression<T>::GetInitialWeight() const
+    {
+        return initial_weight_;
+    }
+
+
+    //! Sets the initial weight vector.
+    /*!
+      \param[in] initial_weight the new initial weight vector.
+    */
+    template <class T>
+    void DiscountedRidgeRegression<T>
+    ::SetInitialWeight(const Vector<T>& initial_weight) const
+    {
+        initial_weight_ = initial_weight;
+    }
+
+
     //! Prepares the aggregation.
     /*! This method should be called before an aggregation method is
       called.
@@ -174,7 +197,14 @@ namespace Verdandi
                             Matrix<T>& weight,
                             Vector2<T>& aggregated)
     {
-        AggregateZero(t, ensemble, weight, aggregated);
+        if (initial_weight_.GetLength() == 0)
+            AggregateZero(t, ensemble, weight, aggregated);
+        else
+        {
+            SetRow(initial_weight_, t, weight);
+            // Aggregation.
+            ComputeAggregatedValue(t, ensemble, initial_weight_, aggregated);
+        }
     }
 
 
@@ -253,6 +283,8 @@ namespace Verdandi
 
         Vector<int> permutation;
         GetLU(A, permutation);
+        if (initial_weight_.GetLength() != 0)
+            Add(penalization_, initial_weight_, weight_vector);
         SolveLU(A, permutation, weight_vector);
     }
 
