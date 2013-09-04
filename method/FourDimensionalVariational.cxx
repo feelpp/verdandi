@@ -544,7 +544,7 @@ namespace Verdandi
         }
 
         Copy(model_.GetAdjointState(), gradient);
-        Add(Ts(1), model_.GetAdditionalAdjointTerm(), gradient)
+        Add(Ts(1), model_.GetAdditionalAdjointTerm(), gradient);
         Mlt(Ts(-1), gradient);
         Add(Ts(1), x_b, gradient);
 
