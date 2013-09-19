@@ -270,11 +270,6 @@ namespace Verdandi
             configuration.WriteLuaDefinition(output_configuration);
         }
 
-        if (show_iteration_)
-            Logger::StdOut(*this, "Initialization");
-        else
-            Logger::Log<-3>(*this, "Initialization");
-
         if (initialize_model)
             model_.Initialize(model_configuration_file_);
 
@@ -282,6 +277,10 @@ namespace Verdandi
             perturbation_manager_
                 .Initialize(perturbation_manager_configuration_file_);
 
+        if (show_iteration_)
+            Logger::StdOut(*this, "Initialization");
+        else
+            Logger::Log<-3>(*this, "Initialization");
         if (show_time_)
             Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else

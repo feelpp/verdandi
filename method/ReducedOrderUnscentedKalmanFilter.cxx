@@ -208,30 +208,6 @@ namespace Verdandi
         if (configuration.Exists("output.log"))
             Logger::SetFileName(configuration.Get<string>("output.log"));
 
-#ifdef VERDANDI_WITH_MPI
-        if (world_rank_ == 0)
-        {
-            if (option_display_["show_mpi_grid"])
-                Logger::StdOut(*this, "world rank\tmodel task\tmodel rank");
-            else
-                Logger::Log<-3>(*this,
-                                "world rank\tmodel task\tmodel rank");
-        }
-
-        MPI_Barrier(MPI_COMM_WORLD);
-        int model_rank;
-        MPI_Comm_rank(col_communicator_, &model_rank);
-        if (option_display_["show_mpi_grid"])
-            Logger::StdOut(*this, to_str(world_rank_) + "\t\t"
-                           + to_str(model_task_) + "\t\t" +
-                           to_str(model_rank));
-        else
-            Logger::Log<-3>(*this, to_str(world_rank_) + "\t\t"
-                            + to_str(model_task_) + "\t\t" +
-                            to_str(model_rank));
-#endif
-
-
         /*** Initializations ***/
 
         if (initialize_model)
@@ -259,6 +235,29 @@ namespace Verdandi
         GetInverse(U_inv_);
 
         Nreduced_ = U_.GetN();
+
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+            if (option_display_["show_mpi_grid"])
+                Logger::StdOut(*this, "world rank\tmodel task\tmodel rank");
+            else
+                Logger::Log<-3>(*this,
+                                "world rank\tmodel task\tmodel rank");
+        }
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        int model_rank;
+        MPI_Comm_rank(col_communicator_, &model_rank);
+        if (option_display_["show_mpi_grid"])
+            Logger::StdOut(*this, to_str(world_rank_) + "\t\t"
+                           + to_str(model_task_) + "\t\t" +
+                           to_str(model_rank));
+        else
+            Logger::Log<-3>(*this, to_str(world_rank_) + "\t\t"
+                            + to_str(model_task_) + "\t\t" +
+                            to_str(model_rank));
+#endif
 
         /*** Sigma-points ***/
 
