@@ -1,9 +1,6 @@
 ----------------------------------- GLOBAL -----------------------------------
 
 
-Delta_t_model = 0.0015
-Nskip_save = 100
-
 output_directory = "result/"
 
 
@@ -39,10 +36,6 @@ forward = {
 
       variable_list = {"forecast_time", "forecast_state"},
       file = output_directory .. "truth-%{name}.%{extension}",
-      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6",
-      -- mode = "HDF",
-      -- group = "observation",
-      -- dataset = "forecast"
 
    },
 

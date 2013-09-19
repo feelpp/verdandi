@@ -14,10 +14,13 @@ observation_file = output_directory .. "truth-forecast_state.bin"
 
 dofile("configuration/quadratic_model.lua")
 
--- In order to demonstrate the assimilation, errors are introduced in the
--- model.
-quadratic_model.definition.initial_state = {0., 0.}
+-- In order to demonstrate the assimilation, we remove the linear term from
+-- the model (compared to the model generating the truth/observations).
 quadratic_model.definition.with_linear_term = false
+-- We also put an erroneous initial condition.
+quadratic_model.definition.initial_state = {0.}
+-- In 2D case, uncomment this line.
+-- quadratic_model.definition.initial_state = {0., 0.}
 
 
 python_model = {
@@ -78,8 +81,7 @@ optimal_interpolation = {
 
       variable_list = {"forecast_time", "forecast_state",
                        "analysis_time", "analysis_state"},
-      file = output_directory .. "oi-%{name}.%{extension}",
-      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
+      file = output_directory .. "oi-%{name}.%{extension}"
 
    },
 
@@ -118,8 +120,7 @@ extended_kalman_filter = {
 
       variable_list = {"forecast_time", "forecast_state",
                        "analysis_time", "analysis_state"},
-      file = output_directory .. "ekf-%{name}.%{extension}",
-      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
+      file = output_directory .. "ekf-%{name}.%{extension}"
 
    },
 
@@ -160,8 +161,7 @@ unscented_kalman_filter = {
 
       variable_list = {"forecast_time", "forecast_state",
                        "analysis_time", "analysis_state"},
-      file = output_directory .. "ukf-%{name}.%{extension}",
-      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
+      file = output_directory .. "ukf-%{name}.%{extension}"
 
    },
 
@@ -188,7 +188,7 @@ monte_carlo = {
    perturbation = {
 
       -- Source of the perturbations: "random" or "file".
-      source = "file",
+      source = "random",
       -- In case of a perturbation file, provide below its path, with "&p" to
       -- be replaced with the parameter name.
       path = "/path/to/perturbation_for_&p.bin"
@@ -200,8 +200,7 @@ monte_carlo = {
       file_string = output_file_string,
       variable_list = {"perturbation", "forecast_time", "forecast_state"},
       file = output_directory  .. output_file_string
-         .. "mc-%{name}.%{extension}",
-      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
+         .. "mc-%{name}.%{extension}"
 
    },
 
@@ -231,8 +230,8 @@ ensemble_kalman_filter = {
 
    display = {
 
-      show_iteration = true,
-      show_time = false
+      show_iteration = false,
+      show_time = true
 
    },
 
@@ -240,8 +239,7 @@ ensemble_kalman_filter = {
 
       variable_list = {"forecast_time", "forecast_state",
                        "analysis_time", "analysis_state"},
-      file = output_directory .. "enkf-%{name}.%{extension}",
-      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6",
+      file = output_directory .. "enkf-%{name}.%{extension}"
 
    },
 
@@ -275,8 +273,7 @@ forward = {
    output_saver = {
 
       variable_list = {"forecast_time", "forecast_state"},
-      file = output_directory .. "forward-%{name}.%{extension}",
-      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6"
+      file = output_directory .. "forward-%{name}.%{extension}"
 
    },
 
@@ -298,8 +295,7 @@ hjb = {
 
    domain = {
 
-      discretization = {-1., 0.01, 201,
-                        -1., 0.01, 201},
+      discretization = {-1., 0.01, 201},
       initial_time = 0.,
       Delta_t = Delta_t_hjb,
       Nt = math.floor(0.1 / Delta_t_hjb)
@@ -315,17 +311,14 @@ hjb = {
       -- Is the model time-dependent?
       model_time_dependent = false,
 
-      Q_0 = {1., 0.,
-             0., 1.},
+      Q_0 = {1.},
 
       -- Position of the minimum of the initial parabola.
-      x_0 = {0., 0.},
+      x_0 = {0.},
 
-      Q = {1., 0.,
-           0., 1.},
+      Q = {1.},
 
-      R = {10., 0.,
-           0., 10.}
+      R = {10.}
 
    },
 
@@ -352,7 +345,7 @@ hjb = {
       model_time_dependent = false,
       -- Upper bound on the absolute value of the model operator, in every
       -- direction.
-      Upper_bound_model = {150., 150.}
+      Upper_bound_model = {150.}
 
    },
 
@@ -372,3 +365,15 @@ hjb = {
    }
 
 }
+
+-- For the 2D version.
+-- hjb.domain.discretization = {-1., 0.01, 201,
+--                              -1., 0.01, 201}
+-- hjb.equation_coefficient.Q_0 = {1., 0.,
+--                                 0., 1.}
+-- hjb.equation_coefficient.x_0 = {0., 0.}
+-- hjb.equation_coefficient.Q = {1., 0.,
+--                               0., 1.}
+-- hjb.equation_coefficient.R = {10., 0.,
+--                               0., 10.}
+-- hjb.lax_friedrich.Upper_bound_model = {150., 150.}
