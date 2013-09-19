@@ -156,12 +156,12 @@ namespace Verdandi
         configuration.Set("display.show_mpi_grid", show_mpi_grid_);
 #endif
 
+        iteration_ = 0;
+
         if (show_iteration_)
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
-
-        iteration_ = 0;
 
 #ifdef VERDANDI_WITH_MPI
         if (world_rank_ == 0)
