@@ -41,7 +41,7 @@ namespace Verdandi
      */
     template <class Model, class ObservationManager>
     ExtendedKalmanFilter<Model, ObservationManager>
-    ::ExtendedKalmanFilter()
+    ::ExtendedKalmanFilter(): iteration_(-1)
     {
 
         /*** Initializations ***/
@@ -101,6 +101,8 @@ namespace Verdandi
          *********************************/
 
 
+        iteration_ = 0;
+
         configuration.Set("model.configuration_file", "",
                           configuration_file_,
                           model_configuration_file_);
@@ -132,6 +134,20 @@ namespace Verdandi
                           option_display_["show_iteration"]);
         // Should current time be displayed on screen?
         configuration.Set("display.show_time", option_display_["show_time"]);
+        // Should the analysis times be displayed on screen?
+        configuration.Set("display.analysis_time",
+                          option_display_["analysis_time"]);
+
+        if (option_display_["show_iteration"])
+            Logger::StdOut(*this, "Initialization");
+        else
+            Logger::Log<-3>(*this, "Initialization");
+        if (option_display_["show_time"])
+            Logger::StdOut(*this, "Initial time: "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,
+                            "Initial time: " + to_str(model_.GetTime()));
 
         /*** Assimilation options ***/
 
@@ -189,6 +205,29 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
+            if (option_display_["show_iteration"])
+                Logger::StdOut(*this, "Starting iteration "
+                               + to_str(iteration_)
+                               + " -> " + to_str(iteration_ + 1));
+            else
+                Logger::Log<-3>(*this, "Starting iteration "
+                                + to_str(iteration_)
+                                + " -> " + to_str(iteration_ + 1));
+            if (option_display_["show_time"])
+                Logger::StdOut(*this, "Starting iteration at time "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Starting iteration at time "
+                                + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
+
         model_.InitializeStep();
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
@@ -206,6 +245,8 @@ namespace Verdandi
         model_.Forward();
 
         PropagateCovarianceMatrix();
+
+        ++iteration_;
 
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
@@ -228,9 +269,12 @@ namespace Verdandi
 
         if (observation_manager_.HasObservation())
         {
-            if (option_display_["show_time"])
-                cout << "Performing EKF at time step ["
-                     << model_.GetTime() << "]..." << endl;
+            if (option_display_["analysis_time"])
+                Logger::StdOut(*this, "Computing an analysis at time "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,"Computing an analysis at time "
+                               + to_str(model_.GetTime()));
 
             Nstate_ = model_.GetNstate();
             model_state& x = model_.GetState();
@@ -240,9 +284,6 @@ namespace Verdandi
             ComputeBLUE(innovation, x);
 
             model_.StateUpdated();
-
-            if (option_display_["show_time"])
-                cout << " done." << endl;
 
             MessageHandler::Send(*this, "model", "analysis");
             MessageHandler::Send(*this, "observation_manager", "analysis");

@@ -90,7 +90,8 @@ extended_kalman_filter = {
    display = {
 
       show_iteration = false,
-      show_time = true
+      show_time = true,
+      analysis_time = true
    },
 
    output_saver = {

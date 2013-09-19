@@ -77,6 +77,9 @@ namespace Verdandi
         //! Background error covariance matrix (B).
         model_state_error_variance state_error_variance_;
 
+        //! Iteration.
+        int iteration_;
+
         /*** Configuration ***/
 
         //! Path to the configuration file.
