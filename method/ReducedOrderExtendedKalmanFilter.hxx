@@ -86,6 +86,9 @@ namespace Verdandi
         //! Matrix U in the P SVD decomposition.
         dense_matrix U_;
 
+        //! Iteration.
+        int iteration_;
+
         /*** Configuration ***/
 
         //! Path to the configuration file.

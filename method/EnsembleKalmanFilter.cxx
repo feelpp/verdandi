@@ -39,7 +39,7 @@ namespace Verdandi
     template <class Model, class ObservationManager,
               class PerturbationManager>
     EnsembleKalmanFilter<Model, ObservationManager, PerturbationManager>
-    ::EnsembleKalmanFilter()
+    ::EnsembleKalmanFilter(): iteration_(-1)
     {
 
         /*** Initializations ***/
@@ -142,6 +142,7 @@ namespace Verdandi
         configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("ensemble_kalman_filter.");
 
+        iteration_ = 0;
 
         /*******************************************************
          * Model, perturbation manager and observation manager *
@@ -171,6 +172,9 @@ namespace Verdandi
         configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
         configuration.Set("display.time", option_display_["time"]);
+        // Should the analysis times be displayed on screen?
+        configuration.Set("display.analysis_time",
+                          option_display_["analysis_time"]);
 
         /*** Assimilation options ***/
 
@@ -251,6 +255,24 @@ namespace Verdandi
         configuration.Set("observation_tangent_linear_operator_access",
                           "ops_in(v, {'element', 'matrix'})",
                           observation_tangent_linear_operator_access_);
+
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Initialization");
+            else
+                Logger::Log<-3>(*this, "Initialization");
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Initial time: "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Initial time: " + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
 
         /*** Ensemble initialization ***/
 
@@ -363,6 +385,29 @@ namespace Verdandi
                               PerturbationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
+
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Starting iteration "
+                               + to_str(iteration_)
+                               + " -> " + to_str(iteration_ + 1));
+            else
+                Logger::Log<-3>(*this, "Starting iteration "
+                                + to_str(iteration_)
+                                + " -> " + to_str(iteration_ + 1));
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Starting iteration at time "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Starting iteration at time "
+                                + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
 
         model_.InitializeStep();
 
@@ -494,6 +539,8 @@ namespace Verdandi
             model_.ParameterUpdated(i);
         }
 
+        ++iteration_;
+
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
         MessageHandler::Send(*this, "driver", "forecast");
@@ -512,9 +559,19 @@ namespace Verdandi
         observation_manager_.SetTime(model_, model_.GetTime());
         if (observation_manager_.HasObservation())
         {
-            if (option_display_["show_time"])
-                cout << "Performing EnKF at time step ["
-                     << model_.GetTime() << "]..." << endl;
+#ifdef VERDANDI_WITH_MPI
+            if (world_rank_ == 0)
+            {
+#endif
+                if (option_display_["analysis_time"])
+                    Logger::StdOut(*this, "Computing an analysis at time "
+                                   + to_str(model_.GetTime()));
+                else
+                    Logger::Log<-3>(*this,"Computing an analysis at time "
+                                    + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+            }
+#endif
 
             observation& obs = observation_manager_.GetObservation();
             Nobservation_ = obs.GetLength();

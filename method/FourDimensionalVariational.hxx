@@ -77,6 +77,9 @@ namespace Verdandi
         //! Observation manager.
         ObservationManager observation_manager_;
 
+        //! Iteration.
+        int iteration_;
+
         /*** Configuration ***/
 
         //! Path to the configuration file.

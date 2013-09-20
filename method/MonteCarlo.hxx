@@ -72,10 +72,8 @@ namespace Verdandi
         //! Path to the configuration file for the perturbation manager.
         string perturbation_manager_configuration_file_;
 
-        //! Should the iterations be displayed?
-        bool display_iteration_;
-        //! Should the current time be displayed?
-        bool display_time_;
+        //! Display options.
+        map<string, bool> option_display_;
 
         /*** Perturbations ***/
 

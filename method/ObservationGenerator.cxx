@@ -156,25 +156,38 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should the iteration be displayed on screen?
-        configuration.Set("display.iteration", display_iteration_);
+        configuration.Set("display.iteration", option_display_["iteration"]);
         // Should the time be displayed on screen?
-        configuration.Set("display.time", display_time_);
+        configuration.Set("display.time", option_display_["time"]);
 #ifdef VERDANDI_WITH_MPI
         // Should the MPI grid be displayed on screen?
-        configuration.Set("display.mpi_grid", display_mpi_grid_);
+        configuration.Set("display.mpi_grid", option_display_["mpi_grid"]);
 #endif
 
-        if (display_iteration_)
-            Logger::StdOut(*this, "Initialization");
-        else
-            Logger::Log<-3>(*this, "Initialization");
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Initialization");
+            else
+                Logger::Log<-3>(*this, "Initialization");
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Initial time: "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Initial time: " + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
 
         iteration_ = 0;
 
 #ifdef VERDANDI_WITH_MPI
         if (world_rank_ == 0)
         {
-            if (display_mpi_grid_)
+            if (option_display_["mpi_grid"])
                 Logger::StdOut(*this, "world rank\tmodel task\tmodel rank");
             else
                 Logger::Log<-3>(*this,
@@ -184,7 +197,7 @@ namespace Verdandi
         MPI_Barrier(MPI_COMM_WORLD);
         int model_rank;
         MPI_Comm_rank(col_communicator_, &model_rank);
-        if (display_mpi_grid_)
+        if (option_display_["mpi_grid"])
             Logger::StdOut(*this, to_str(world_rank_) + "\t\t"
                            + to_str(model_task_) + "\t\t" +
                            to_str(model_rank));
@@ -232,6 +245,29 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Starting iteration "
+                               + to_str(iteration_)
+                               + " -> " + to_str(iteration_ + 1));
+            else
+                Logger::Log<-3>(*this, "Starting iteration "
+                                + to_str(iteration_)
+                                + " -> " + to_str(iteration_ + 1));
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Starting iteration at time "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Starting iteration at time "
+                                + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
+
         model_.InitializeStep();
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
@@ -245,25 +281,6 @@ namespace Verdandi
         time_.PushBack(model_.GetTime());
 
         MessageHandler::Send(*this, "all", "::Forward begin");
-
-#ifdef VERDANDI_WITH_MPI
-        if (world_rank_ == 0)
-        {
-#endif
-            if (display_time_)
-                Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
-            else
-                Logger::Log<-3>(*this,
-                                "Time: " + to_str(model_.GetTime()));
-            if (display_iteration_)
-                Logger::StdOut(*this, "Iteration " + to_str(iteration_)
-                               + " -> " + to_str(iteration_ + 1));
-            else
-                Logger::Log<-3>(*this, "Iteration " + to_str(iteration_)
-                                + " -> " + to_str(iteration_ + 1));
-#ifdef VERDANDI_WITH_MPI
-        }
-#endif
 
         model_.Forward();
         iteration_++;

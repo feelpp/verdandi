@@ -45,7 +45,7 @@ namespace Verdandi
     template <class Model, class ObservationManager,
               class Optimization>
     FourDimensionalVariational<Model, ObservationManager,  Optimization>
-    ::FourDimensionalVariational()
+    ::FourDimensionalVariational(): iteration_(-1)
     {
 
         /*** Initializations ***/
@@ -111,6 +111,8 @@ namespace Verdandi
         configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("four_dimensional_variational.");
 
+        iteration_ = 0;
+
         /*** Model ***/
 
         configuration.Set("model.configuration_file", "", configuration_file_,
@@ -135,6 +137,10 @@ namespace Verdandi
                           option_display_["iteration"]);
         // Should current time be displayed on screen?
         configuration.Set("display.time", option_display_["time"]);
+        // Should the analysis times be displayed on screen?
+        configuration.Set("display.analysis_time",
+                          option_display_["analysis_time"]);
+
 
         /*** Ouput saver ***/
 
@@ -234,6 +240,17 @@ namespace Verdandi
         configuration.Set("observation_tangent_linear_operator_access",
                           "ops_in(v, {'element', 'matrix'})",
                           observation_tangent_linear_operator_access_);
+
+        if (option_display_["iteration"])
+            Logger::StdOut(*this, "Initialization");
+        else
+            Logger::Log<-3>(*this, "Initialization");
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Initial time: "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,
+                            "Initial time: " + to_str(model_.GetTime()));
     }
 
 
@@ -245,6 +262,22 @@ namespace Verdandi
     void FourDimensionalVariational<Model, ObservationManager,
                                     Optimization>::InitializeStep()
     {
+        if (option_display_["iteration"])
+            Logger::StdOut(*this, "Starting iteration "
+                           + to_str(iteration_)
+                           + " -> " + to_str(iteration_ + 1));
+        else
+            Logger::Log<-3>(*this, "Starting iteration "
+                            + to_str(iteration_)
+                            + " -> " + to_str(iteration_ + 1));
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Starting iteration at time "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,
+                            "Starting iteration at time "
+                            + to_str(model_.GetTime()));
+
         model_.InitializeStep();
     }
 
@@ -258,6 +291,8 @@ namespace Verdandi
         MessageHandler::Send(*this, "all", "::Forward begin");
 
         model_.Forward();
+
+        ++iteration_;
 
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
@@ -275,7 +310,14 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Analyze begin");
 
-        model_state& x = model_.GetState();;
+        if (option_display_["analysis_time"])
+            Logger::StdOut(*this, "Computing an analysis at time "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,"Computing an analysis at time "
+                            + to_str(model_.GetTime()));
+
+        model_state& x = model_.GetState();
         optimization_.SetParameter(x);
         Ncall_cost_ = 0;
         optimization_.Optimize(StaticCost,

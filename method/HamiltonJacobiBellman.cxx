@@ -42,7 +42,7 @@ namespace Verdandi
     template <class T, class Model, class ObservationManager>
     HamiltonJacobiBellman<T, Model, ObservationManager>
     ::HamiltonJacobiBellman():
-        time_step_(0)
+        iteration_(0)
     {
 
         /*** Initializations ***/
@@ -97,19 +97,6 @@ namespace Verdandi
 
         configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("hjb.");
-
-        if (option_display_["time"])
-            Logger::StdOut(*this, "Time: "
-                           + to_str(T(time_step_) * Delta_t_));
-        else
-            Logger::Log<-3>(*this, "Time: "
-                            + to_str(T(time_step_) * Delta_t_));
-        if (option_display_["iteration"])
-            Logger::StdOut(*this, "Iteration " + to_str(time_step_) + " -> "
-                           + to_str(time_step_ + 1));
-        else
-            Logger::Log<-3>(*this, "Iteration " + to_str(time_step_) + " -> "
-                            + to_str(time_step_ + 1));
 
 
         /***************************
@@ -416,6 +403,15 @@ namespace Verdandi
                 a_Delta_x_ = a / Delta_x_(d);
         }
 
+        if (option_display_["iteration"])
+            Logger::StdOut(*this, "Initialization");
+        else
+            Logger::Log<-3>(*this, "Initialization");
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Initial time: " + to_str(initial_time_));
+        else
+            Logger::Log<-3>(*this, "Initial time: " + to_str(initial_time_));
+
         MessageHandler::Send(*this, "all", "initial value");
 
         MessageHandler::Send(*this, "all", "::Initialize end");
@@ -430,18 +426,23 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
-        if (option_display_["time"])
-            Logger::StdOut(*this, "Time: "
-                           + to_str(T(time_step_) * Delta_t_));
-        else
-            Logger::Log<-3>(*this, "Time: "
-                            + to_str(T(time_step_) * Delta_t_));
         if (option_display_["iteration"])
-            Logger::StdOut(*this, "Iteration " + to_str(time_step_) + " -> "
-                           + to_str(time_step_ + 1));
+            Logger::StdOut(*this, "Starting iteration "
+                           + to_str(iteration_)
+                           + " -> " + to_str(iteration_ + 1));
         else
-            Logger::Log<-3>(*this, "Iteration " + to_str(time_step_) + " -> "
-                            + to_str(time_step_ + 1));
+            Logger::Log<-3>(*this, "Starting iteration "
+                            + to_str(iteration_)
+                            + " -> " + to_str(iteration_ + 1));
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Starting iteration at time "
+                           + to_str(initial_time_
+                                    + T(iteration_) * Delta_t_));
+        else
+            Logger::Log<-3>(*this,
+                            "Starting iteration at time "
+                            + to_str(initial_time_
+                                     + model_.GetTime()));
 
         if (with_advection_term_ || with_source_term_)
             model_.InitializeStep();
@@ -466,7 +467,7 @@ namespace Verdandi
 
         /*** Source term (norm of the innovation) ***/
 
-        double time = initial_time_ + T(time_step_) * Delta_t_;
+        double time = initial_time_ + T(iteration_) * Delta_t_;
         if (with_source_term_)
         {
             model_.SetTime(time);
@@ -503,7 +504,7 @@ namespace Verdandi
             }
         }
 
-        time_step_++;
+        iteration_++;
 
         MessageHandler::Send(*this, "all", "forecast value");
 
@@ -538,7 +539,7 @@ namespace Verdandi
                 * upper_bound_model_(d);
 
         // Model times.
-        double initial_time = initial_time_ + T(time_step_) * Delta_t_;
+        double initial_time = initial_time_ + T(iteration_) * Delta_t_;
         double time, time_step;
 
         model_.SetTime(initial_time_);
@@ -688,7 +689,7 @@ namespace Verdandi
         /*** Advection term ***/
 
         // Model times.
-        double initial_time = initial_time_ + T(time_step_) * Delta_t_;
+        double initial_time = initial_time_ + T(iteration_) * Delta_t_;
         double time, time_step;
 
         model_.SetTime(initial_time);
@@ -809,7 +810,7 @@ namespace Verdandi
         /*** Advection term ***/
 
         // Model times.
-        double initial_time = initial_time_ + T(time_step_) * Delta_t_;
+        double initial_time = initial_time_ + T(iteration_) * Delta_t_;
         double time, time_step;
 
         model_.SetTime(initial_time);
@@ -972,7 +973,7 @@ namespace Verdandi
     template <class T, class Model, class ObservationManager>
     bool HamiltonJacobiBellman<T, Model, ObservationManager>::HasFinished()
     {
-        return time_step_ == Nt_;
+        return iteration_ == Nt_;
     }
 
 
@@ -1037,9 +1038,9 @@ namespace Verdandi
         if (message.find("initial value") != string::npos
             || message.find("forecast value") != string::npos)
         {
-            double time = T(time_step_) * Delta_t_;
+            double time = T(iteration_) * Delta_t_;
             output_saver_.Save(time, time, "time");
-            output_saver_.Save(double(time_step_), time, "time_step");
+            output_saver_.Save(double(iteration_), time, "time_step");
             output_saver_.Save(V_, time, "value_function");
         }
     }

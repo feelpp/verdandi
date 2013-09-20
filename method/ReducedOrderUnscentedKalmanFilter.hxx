@@ -101,6 +101,9 @@ namespace Verdandi
         //! Innovation covariance.
         sigma_point_matrix C_;
 
+        //! Iteration.
+        int iteration_;
+
         /*** Configuration ***/
 
         //! Path to the configuration file.

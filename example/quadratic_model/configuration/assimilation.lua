@@ -73,7 +73,8 @@ optimal_interpolation = {
    display = {
 
       iteration = false,
-      time = true
+      time = true,
+      analysis_time = true
 
    },
 
@@ -153,7 +154,8 @@ unscented_kalman_filter = {
    display = {
 
       iteration = false,
-      time = true
+      time = true,
+      analysis_time = true
 
    },
 
@@ -181,7 +183,7 @@ monte_carlo = {
    display = {
 
       iteration = false,
-      time = false
+      time = true
 
    },
 
@@ -231,7 +233,8 @@ ensemble_kalman_filter = {
    display = {
 
       iteration = false,
-      time = true
+      time = true,
+      analysis_time = true
 
    },
 

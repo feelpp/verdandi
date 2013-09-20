@@ -235,9 +235,9 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should the iteration be displayed on screen?
-        configuration.Set("display.iteration", display_iteration_);
+        configuration.Set("display.iteration", option_display_["iteration"]);
         // Should the time be displayed on screen?
-        configuration.Set("display.time", display_time_);
+        configuration.Set("display.time", option_display_["time"]);
 
         /*** Perturbation option ***/
 
@@ -277,14 +277,16 @@ namespace Verdandi
             perturbation_manager_
                 .Initialize(perturbation_manager_configuration_file_);
 
-        if (display_iteration_)
+        if (option_display_["iteration"])
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
-        if (display_time_)
-            Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Initial time: "
+                           + to_str(model_.GetTime()));
         else
-            Logger::Log<-3>(*this, "Time: " + to_str(model_.GetTime()));
+            Logger::Log<-3>(*this,
+                            "Initial time: " + to_str(model_.GetTime()));
 
         iteration_ = 0;
 
@@ -384,6 +386,23 @@ namespace Verdandi
     void MonteCarlo<Model, PerturbationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
+
+        if (option_display_["iteration"])
+            Logger::StdOut(*this, "Starting iteration "
+                           + to_str(iteration_)
+                           + " -> " + to_str(iteration_ + 1));
+        else
+            Logger::Log<-3>(*this, "Starting iteration "
+                            + to_str(iteration_)
+                            + " -> " + to_str(iteration_ + 1));
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Starting iteration at time "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,
+                            "Starting iteration at time "
+                            + to_str(model_.GetTime()));
+
         model_.InitializeStep();
         for (int i = 0; i < model_.GetNparameter(); i++)
             if (model_.GetParameterOption(i) == "every_step")
@@ -416,17 +435,6 @@ namespace Verdandi
         MessageHandler::Send(*this, "all", "::Forward begin");
 
         time_.PushBack(model_.GetTime());
-
-        if (display_time_)
-            Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
-        else
-            Logger::Log<-3>(*this, "Time: " + to_str(model_.GetTime()));
-        if (display_iteration_)
-            Logger::StdOut(*this, "Iteration " + to_str(iteration_) + " -> "
-                           + to_str(iteration_ + 1));
-        else
-            Logger::Log<-3>(*this, "Iteration " + to_str(iteration_) + " -> "
-                            + to_str(iteration_ + 1));
 
         model_.Forward();
         iteration_++;

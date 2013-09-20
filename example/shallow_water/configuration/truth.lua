@@ -25,7 +25,7 @@ forward = {
    display = {
 
       iteration = false,
-      time = false
+      time = true
 
    },
 

@@ -42,7 +42,7 @@ namespace Verdandi
     */
     template <class Model, class ObservationManager>
     OptimalInterpolation<Model, ObservationManager>
-    ::OptimalInterpolation()
+    ::OptimalInterpolation(): iteration_(-1)
     {
 
         /*** Initializations ***/
@@ -107,6 +107,8 @@ namespace Verdandi
         MessageHandler::Send(*this, "all", "::Initialize begin");
         configuration_file_ = configuration.GetFilePath();
 
+        iteration_ = 0;
+
 
         /***************************
          * Reads the configuration *
@@ -134,6 +136,8 @@ namespace Verdandi
         configuration.Set("iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
         configuration.Set("time", option_display_["time"]);
+        // Should the analysis times be displayed on screen?
+        configuration.Set("analysis_time", option_display_["analysis_time"]);
 
         /*** Assimilation options ***/
 
@@ -198,6 +202,24 @@ namespace Verdandi
             observation_manager_.Initialize(model_,
                                             observation_configuration_file_);
 
+#ifdef VERDANDI_WITH_MPI
+        if (rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Initialization");
+            else
+                Logger::Log<-3>(*this, "Initialization");
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Initial time: "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Initial time: " + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
+
         /*** Assimilation ***/
 
         if (analyze_first_step_)
@@ -221,9 +243,29 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
-        if (option_display_["time"])
-            cout << "Current step: "
-                 << model_.GetTime() << endl;
+#ifdef VERDANDI_WITH_MPI
+        if (rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Starting iteration "
+                               + to_str(iteration_)
+                               + " -> " + to_str(iteration_ + 1));
+            else
+                Logger::Log<-3>(*this, "Starting iteration "
+                                + to_str(iteration_)
+                                + " -> " + to_str(iteration_ + 1));
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Starting iteration at time "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Starting iteration at time "
+                                + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
+
         model_.InitializeStep();
 
         MessageHandler::Send(*this, "all", "::InitializeStep end");
@@ -237,6 +279,8 @@ namespace Verdandi
         MessageHandler::Send(*this, "all", "::Forward begin");
 
         model_.Forward();
+
+        ++iteration_;
 
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
@@ -259,9 +303,19 @@ namespace Verdandi
 
         if (observation_manager_.HasObservation())
         {
-            if (option_display_["time"])
-                cout << "Performing optimal interpolation at time step ["
-                     << model_.GetTime() << "]..." << endl;
+#ifdef VERDANDI_WITH_MPI
+            if (rank_ == 0)
+            {
+#endif
+                if (option_display_["analysis_time"])
+                    Logger::StdOut(*this, "Computing an analysis at time "
+                                   + to_str(model_.GetTime()));
+                else
+                    Logger::Log<-3>(*this,"Computing an analysis at time "
+                                    + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+            }
+#endif
 
             model_state& state = model_.GetState();
             Nstate_ = model_.GetNstate();
@@ -292,9 +346,6 @@ namespace Verdandi
 #endif
 
             model_.StateUpdated();
-
-            if (option_display_["time"])
-                cout << " done." << endl;
 
             MessageHandler::Send(*this, "model", "analysis");
             MessageHandler::Send(*this, "observation_manager", "analysis");

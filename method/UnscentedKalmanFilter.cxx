@@ -47,7 +47,7 @@ namespace Verdandi
     */
     template <class Model, class ObservationManager>
     UnscentedKalmanFilter<Model, ObservationManager>
-    ::UnscentedKalmanFilter()
+    ::UnscentedKalmanFilter(): iteration_(-1)
     {
 
         /*** Initializations ***/
@@ -100,6 +100,7 @@ namespace Verdandi
         MessageHandler::Send(*this, "all", "::Initialize begin");
         configuration_file_ = configuration.GetFilePath();
 
+        iteration_ = 0;
 
         /***************************
          * Reads the configuration *
@@ -126,6 +127,9 @@ namespace Verdandi
         configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
         configuration.Set("display.time", option_display_["time"]);
+        // Should the analysis times be displayed on screen?
+        configuration.Set("display.analysis_time",
+                          option_display_["analysis_time"]);
 
         /*** Assimilation options ***/
 
@@ -174,6 +178,17 @@ namespace Verdandi
 
         Copy(model_.GetStateErrorVariance(), background_error_variance_);
 
+        if (option_display_["iteration"])
+            Logger::StdOut(*this, "Initialization");
+        else
+            Logger::Log<-3>(*this, "Initialization");
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Initial time: "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,
+                            "Initial time: " + to_str(model_.GetTime()));
+
         /*** Sigma-points ***/
 
         if (sigma_point_type_ == "canonical")
@@ -213,6 +228,22 @@ namespace Verdandi
     void UnscentedKalmanFilter<Model, ObservationManager>::InitializeStep()
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
+
+        if (option_display_["iteration"])
+            Logger::StdOut(*this, "Starting iteration "
+                           + to_str(iteration_)
+                           + " -> " + to_str(iteration_ + 1));
+        else
+            Logger::Log<-3>(*this, "Starting iteration "
+                            + to_str(iteration_)
+                            + " -> " + to_str(iteration_ + 1));
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Starting iteration at time "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,
+                            "Starting iteration at time "
+                            + to_str(model_.GetTime()));
 
         model_.InitializeStep();
 
@@ -305,6 +336,8 @@ namespace Verdandi
             }
         }
 
+        ++iteration_;
+
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
         MessageHandler::Send(*this, "driver", "forecast");
@@ -329,9 +362,12 @@ namespace Verdandi
             return;
         }
 
-        if (option_display_["time"])
-            cout << "Performing UKF at time step ["
-                 << model_.GetTime() << "]..." << endl;
+        if (option_display_["analysis_time"])
+            Logger::StdOut(*this, "Computing an analysis at time "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,"Computing an analysis at time "
+                            + to_str(model_.GetTime()));
 
         // Computes background error variance Cholesky factorization.
         model_state_error_variance background_error_variance_sqrt;
@@ -495,9 +531,6 @@ namespace Verdandi
             MltAdd(Ts(-1), SeldonNoTrans, K, SeldonTrans, P_xz, Ts(1),
                    background_error_variance_);
         }
-
-        if (option_display_["time"])
-            cout << " done." << endl;
 
         MessageHandler::Send(*this, "model", "analysis");
         MessageHandler::Send(*this, "observation_manager", "analysis");

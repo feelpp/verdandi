@@ -112,7 +112,7 @@ namespace Verdandi
         //! Time step.
         T Delta_t_;
         //! Current iteration.
-        int time_step_;
+        int iteration_;
 
         //! Value function V(t, x).
         Vector<T> V_;

@@ -204,28 +204,21 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
-#ifdef VERDANDI_WITH_MPI
-        if (world_rank_ == 0)
-        {
-#endif
-            if (option_display_["iteration"])
-                Logger::StdOut(*this, "Starting iteration "
-                               + to_str(iteration_)
-                               + " -> " + to_str(iteration_ + 1));
-            else
-                Logger::Log<-3>(*this, "Starting iteration "
-                                + to_str(iteration_)
-                                + " -> " + to_str(iteration_ + 1));
-            if (option_display_["time"])
-                Logger::StdOut(*this, "Starting iteration at time "
-                               + to_str(model_.GetTime()));
-            else
-                Logger::Log<-3>(*this,
-                                "Starting iteration at time "
-                                + to_str(model_.GetTime()));
-#ifdef VERDANDI_WITH_MPI
-        }
-#endif
+        if (option_display_["iteration"])
+            Logger::StdOut(*this, "Starting iteration "
+                           + to_str(iteration_)
+                           + " -> " + to_str(iteration_ + 1));
+        else
+            Logger::Log<-3>(*this, "Starting iteration "
+                            + to_str(iteration_)
+                            + " -> " + to_str(iteration_ + 1));
+        if (option_display_["time"])
+            Logger::StdOut(*this, "Starting iteration at time "
+                           + to_str(model_.GetTime()));
+        else
+            Logger::Log<-3>(*this,
+                            "Starting iteration at time "
+                            + to_str(model_.GetTime()));
 
         model_.InitializeStep();
 
@@ -273,7 +266,7 @@ namespace Verdandi
                                + to_str(model_.GetTime()));
             else
                 Logger::Log<-3>(*this,"Computing an analysis at time "
-                               + to_str(model_.GetTime()));
+                                + to_str(model_.GetTime()));
 
             Nstate_ = model_.GetNstate();
             model_state& x = model_.GetState();

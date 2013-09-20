@@ -42,7 +42,7 @@ namespace Verdandi
     */
     template <class Model, class ObservationManager>
     ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
-    ::ReducedOrderExtendedKalmanFilter()
+    ::ReducedOrderExtendedKalmanFilter(): iteration_(-1)
     {
 
         /*** Initializations ***/
@@ -118,6 +118,8 @@ namespace Verdandi
         configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("reduced_order_extended_kalman_filter.");
 
+        iteration_ = 0;
+
         /*** Model ***/
 
         configuration.Set("model.configuration_file", "", configuration_file_,
@@ -135,6 +137,9 @@ namespace Verdandi
         configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
         configuration.Set("display.time", option_display_["time"]);
+        // Should the analysis times be displayed on screen?
+        configuration.Set("display.analysis_time",
+                          option_display_["analysis_time"]);
 
         /*** Assimilation options ***/
 
@@ -381,6 +386,29 @@ namespace Verdandi
     void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::InitializeStep()
     {
+#ifdef VERDANDI_WITH_MPI
+        if (rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Starting iteration "
+                               + to_str(iteration_)
+                               + " -> " + to_str(iteration_ + 1));
+            else
+                Logger::Log<-3>(*this, "Starting iteration "
+                                + to_str(iteration_)
+                                + " -> " + to_str(iteration_ + 1));
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Starting iteration at time "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Starting iteration at time "
+                                + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
+
         model_.InitializeStep();
     }
 
@@ -400,6 +428,8 @@ namespace Verdandi
         model_.Forward();
 
         PropagateCovarianceMatrix();
+
+        ++iteration_;
 
 #if defined(VERDANDI_WITH_MPI)
         if (rank_ == 0)
@@ -431,9 +461,12 @@ namespace Verdandi
         if (observation_manager_.HasObservation())
         {
             if (rank_ == 0)
-                if (option_display_["time"])
-                    cout << "Performing Reduced Order EKF at time step ["
-                         << model_.GetTime() << "]..." << endl;
+                if (option_display_["analysis_time"])
+                    Logger::StdOut(*this, "Computing an analysis at time "
+                                   + to_str(model_.GetTime()));
+                else
+                    Logger::Log<-3>(*this,"Computing an analysis at time "
+                                    + to_str(model_.GetTime()));
 
             model_state& x = model_.GetState();
             Nstate_ = model_.GetNstate();
@@ -500,9 +533,6 @@ namespace Verdandi
 
             if (rank_ == 0)
             {
-                if (option_display_["time"])
-                    cout << " done." << endl;
-
                 MessageHandler::Send(*this, "model", "analysis");
                 MessageHandler::Send(*this, "observation_manager",
                                      "analysis");
@@ -518,9 +548,12 @@ namespace Verdandi
 
         if (observation_manager_.HasObservation())
         {
-            if (option_display_["time"])
-                cout << "Performing Reduced Order EKF at time step ["
-                     << model_.GetTime() << "]..." << endl;
+            if (option_display_["analysis_time"])
+                Logger::StdOut(*this, "Computing an analysis at time "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,"Computing an analysis at time "
+                                + to_str(model_.GetTime()));
 
             model_state& x = model_.GetState();
             Nstate_ = model_.GetNstate();
@@ -555,9 +588,6 @@ namespace Verdandi
             MltAdd(Ts(1), L_, correction, Ts(1), x);
 
             model_.StateUpdated();
-
-            if (option_display_["time"])
-                cout << " done." << endl;
 
             MessageHandler::Send(*this, "model", "analysis");
             MessageHandler::Send(*this, "observation_manager", "analysis");

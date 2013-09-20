@@ -58,10 +58,8 @@ namespace Verdandi
         //! Path to the model configuration file.
         string model_configuration_file_;
 
-        //! Should the iterations be displayed?
-        bool display_iteration_;
-        //! Should the current time be displayed?
-        bool display_time_;
+        //! Display options.
+        map<string, bool> option_display_;
 
 #ifdef VERDANDI_WITH_MPI
         //! The rank in MPI_COMM_WORLD.
@@ -78,9 +76,6 @@ namespace Verdandi
         MPI_Comm row_communicator_;
         //! The MPI grid column communicator of the current process.
         MPI_Comm col_communicator_;
-
-        //! Should the grid be displayed?
-        bool display_mpi_grid_;
 #endif
 
         /*** Output saver ***/

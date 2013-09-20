@@ -46,7 +46,7 @@ namespace Verdandi
     */
     template <class Model, class ObservationManager>
     ReducedOrderUnscentedKalmanFilter<Model, ObservationManager>
-    ::ReducedOrderUnscentedKalmanFilter()
+    ::ReducedOrderUnscentedKalmanFilter(): iteration_(-1)
     {
 #ifndef VERDANDI_WITH_MPI
         MessageHandler::AddRecipient("model", model_, Model::StaticMessage);
@@ -134,6 +134,9 @@ namespace Verdandi
         configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
         configuration.Set("display.time", option_display_["time"]);
+        // Should the analysis times be displayed on screen?
+        configuration.Set("display.analysis_time",
+                          option_display_["analysis_time"]);
 #ifdef VERDANDI_WITH_MPI
         // Should the MPI grid be displayed on screen?
         configuration.Set("display.mpi_grid", option_display_["mpi_grid"]);
@@ -226,6 +229,24 @@ namespace Verdandi
         }
         Nstate_ = model_.GetNstate();
         Nobservation_ = observation_manager_.GetNobservation();
+
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Initialization");
+            else
+                Logger::Log<-3>(*this, "Initialization");
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Initial time: "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Initial time: " + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
 
         Copy(model_.GetStateErrorVarianceReduced(), U_);
         U_inv_.Copy(U_);
@@ -367,6 +388,29 @@ namespace Verdandi
         if (model_task_ == 0)
 #endif
             MessageHandler::Send(*this, "all", "::InitializeStep begin");
+
+#ifdef VERDANDI_WITH_MPI
+        if (world_rank_ == 0)
+        {
+#endif
+            if (option_display_["iteration"])
+                Logger::StdOut(*this, "Starting iteration "
+                               + to_str(iteration_)
+                               + " -> " + to_str(iteration_ + 1));
+            else
+                Logger::Log<-3>(*this, "Starting iteration "
+                                + to_str(iteration_)
+                                + " -> " + to_str(iteration_ + 1));
+            if (option_display_["time"])
+                Logger::StdOut(*this, "Starting iteration at time "
+                               + to_str(model_.GetTime()));
+            else
+                Logger::Log<-3>(*this,
+                                "Starting iteration at time "
+                                + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
 
         model_.InitializeStep();
 
@@ -643,6 +687,8 @@ namespace Verdandi
 #endif
         }
 
+        ++iteration_;
+
 #ifndef VERDANDI_WITH_MPI
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
@@ -684,15 +730,18 @@ namespace Verdandi
 
         Nobservation_  = observation_manager_.GetNobservation();
 
-#if defined(VERDANDI_WITH_MPI)
-        if (world_rank_ == 0)
-        {
+#ifdef VERDANDI_WITH_MPI
+            if (world_rank_ == 0)
+            {
 #endif
-            if (option_display_["time"])
-                cout << "Performing Reduced Order UKF at time step ["
-                     << model_.GetTime() << "]..." << endl;
-#if defined(VERDANDI_WITH_MPI)
-        }
+                if (option_display_["analysis_time"])
+                    Logger::StdOut(*this, "Computing an analysis at time "
+                                   + to_str(model_.GetTime()));
+                else
+                    Logger::Log<-3>(*this,"Computing an analysis at time "
+                                    + to_str(model_.GetTime()));
+#ifdef VERDANDI_WITH_MPI
+            }
 #endif
 
         if (sigma_point_type_ == "simplex")

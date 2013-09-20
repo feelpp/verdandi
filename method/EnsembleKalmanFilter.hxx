@@ -66,6 +66,9 @@ namespace Verdandi
         //! Pertubation managers.
         PerturbationManager perturbation_manager_;
 
+        //! Iteration.
+        int iteration_;
+
         //! The number of members in the ensemble.
         int Nmember_;
 
