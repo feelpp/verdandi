@@ -16,7 +16,7 @@ observation_file = output_directory .. "truth-observation.bin"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/petsc_clamped_bar.lua")
+dofile("configuration/model.lua")
 
 
 -------------------------------- OBSERVATION ---------------------------------

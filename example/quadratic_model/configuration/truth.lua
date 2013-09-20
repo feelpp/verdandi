@@ -7,7 +7,7 @@ output_directory = "result/"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/quadratic_model.lua")
+dofile("configuration/model.lua")
 
 
 python_model = {

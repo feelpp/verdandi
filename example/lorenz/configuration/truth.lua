@@ -7,7 +7,7 @@ output_directory = "result/"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/lorenz.lua")
+dofile("configuration/model.lua")
 
 
 ----------------------------------- METHOD -----------------------------------

@@ -12,7 +12,7 @@ observation_file = output_directory .. "truth-forecast_state.bin"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/quadratic_model.lua")
+dofile("configuration/model.lua")
 
 -- In order to demonstrate the assimilation, we remove the linear term from
 -- the model (compared to the model generating the truth/observations).

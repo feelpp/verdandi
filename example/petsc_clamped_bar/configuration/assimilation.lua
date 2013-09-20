@@ -16,7 +16,7 @@ observation_file = output_directory .. "truth-forecast_state.bin"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/petsc_clamped_bar.lua")
+dofile("configuration/model.lua")
 
 -- In order to demonstrate the assimilation, errors are introduced in the
 -- model.

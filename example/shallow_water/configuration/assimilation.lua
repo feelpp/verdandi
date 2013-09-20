@@ -16,7 +16,7 @@ observation_file = output_directory .. "truth-forecast_state.bin"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/shallow_water.lua")
+dofile("configuration/model.lua")
 
 -- The configuration of the model is modified.
 shallow_water.initial_condition.value = 1.

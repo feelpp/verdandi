@@ -14,7 +14,7 @@ output_mode_scalar = "text"
 ----------------------------------- MODEL ------------------------------------
 
 
-dofile("configuration/shallow_water.lua")
+dofile("configuration/model.lua")
 
 
 ----------------------------------- METHOD -----------------------------------
