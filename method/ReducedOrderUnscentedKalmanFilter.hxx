@@ -182,7 +182,7 @@ namespace Verdandi
         MPI_Comm col_communicator_;
 
         //! Should the grid be displayed?
-        bool show_mpi_grid_;
+        bool display_mpi_grid_;
 
         //! Number of local sigma-points.
         int Nlocal_sigma_point_;

@@ -44,9 +44,9 @@ forward = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true,
-      show_mpi_grid = true
+      iteration = false,
+      time = true,
+      mpi_grid = true
 
    },
 

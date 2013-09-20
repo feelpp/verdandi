@@ -131,10 +131,9 @@ namespace Verdandi
 
         configuration.SetPrefix("optimal_interpolation.display.");
         // Should iterations be displayed on screen?
-        configuration.Set("show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("show_time", option_display_["show_time"]);
+        configuration.Set("time", option_display_["time"]);
 
         /*** Assimilation options ***/
 
@@ -222,7 +221,7 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
-        if (option_display_["show_time"])
+        if (option_display_["time"])
             cout << "Current step: "
                  << model_.GetTime() << endl;
         model_.InitializeStep();
@@ -260,7 +259,7 @@ namespace Verdandi
 
         if (observation_manager_.HasObservation())
         {
-            if (option_display_["show_time"])
+            if (option_display_["time"])
                 cout << "Performing optimal interpolation at time step ["
                      << model_.GetTime() << "]..." << endl;
 
@@ -294,7 +293,7 @@ namespace Verdandi
 
             model_.StateUpdated();
 
-            if (option_display_["show_time"])
+            if (option_display_["time"])
                 cout << " done." << endl;
 
             MessageHandler::Send(*this, "model", "analysis");

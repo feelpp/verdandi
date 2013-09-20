@@ -130,19 +130,18 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should iterations be displayed on screen?
-        configuration.Set("display.show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("display.show_time", option_display_["show_time"]);
+        configuration.Set("display.time", option_display_["time"]);
         // Should the analysis times be displayed on screen?
         configuration.Set("display.analysis_time",
                           option_display_["analysis_time"]);
 
-        if (option_display_["show_iteration"])
+        if (option_display_["iteration"])
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
-        if (option_display_["show_time"])
+        if (option_display_["time"])
             Logger::StdOut(*this, "Initial time: "
                            + to_str(model_.GetTime()));
         else
@@ -209,7 +208,7 @@ namespace Verdandi
         if (world_rank_ == 0)
         {
 #endif
-            if (option_display_["show_iteration"])
+            if (option_display_["iteration"])
                 Logger::StdOut(*this, "Starting iteration "
                                + to_str(iteration_)
                                + " -> " + to_str(iteration_ + 1));
@@ -217,7 +216,7 @@ namespace Verdandi
                 Logger::Log<-3>(*this, "Starting iteration "
                                 + to_str(iteration_)
                                 + " -> " + to_str(iteration_ + 1));
-            if (option_display_["show_time"])
+            if (option_display_["time"])
                 Logger::StdOut(*this, "Starting iteration at time "
                                + to_str(model_.GetTime()));
             else

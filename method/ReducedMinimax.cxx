@@ -115,9 +115,9 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should iterations be displayed on screen?
-        configuration.Set("display.show_iteration", show_iteration_);
+        configuration.Set("display.iteration", display_iteration_);
         // Should current time be displayed on screen?
-        configuration.Set("display.show_time", show_time_);
+        configuration.Set("display.time", display_time_);
 
         iteration_ = 0;
 
@@ -241,13 +241,13 @@ namespace Verdandi
 
         /*** Filter ***/
 
-        if (show_time_)
+        if (display_time_)
             Logger::StdOut(*this,
                            "Starting time: " + to_str(model_.GetTime()));
         else
             Logger::Log<-3>(*this,
                             "Starting time: " + to_str(model_.GetTime()));
-        if (show_iteration_)
+        if (display_iteration_)
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
@@ -266,7 +266,7 @@ namespace Verdandi
 
         if (mode_ == 1 && inner_iteration_ == 0)
         {
-            if (show_time_ || show_iteration_)
+            if (display_time_ || show_iteration_)
                 Logger::StdOut(*this, "Starting filtering sequence");
             else
                 Logger::Log<-3>(*this, "Starting filtering sequence");
@@ -315,7 +315,7 @@ namespace Verdandi
             Nsnapshot_ = 1;
             inner_iteration_++;
 
-            if (show_time_ || show_iteration_)
+            if (display_time_ || show_iteration_)
                 Logger::StdOut(*this, "Starting POD sequence");
             else
                 Logger::Log<-3>(*this, "Starting POD sequence");
@@ -331,12 +331,12 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
-        if (show_time_)
+        if (display_time_)
             Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
             Logger::Log<-3>(*this,
                             "Time: " + to_str(model_.GetTime()));
-        if (show_iteration_)
+        if (display_iteration_)
             Logger::StdOut(*this, "Iteration " + to_str(iteration_) + " -> "
                            + to_str(iteration_ + 1));
         else

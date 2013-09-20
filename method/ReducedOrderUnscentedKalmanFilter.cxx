@@ -131,14 +131,12 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should iterations be displayed on screen?
-        configuration.Set("display.show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("display.show_time", option_display_["show_time"]);
+        configuration.Set("display.time", option_display_["time"]);
 #ifdef VERDANDI_WITH_MPI
         // Should the MPI grid be displayed on screen?
-        configuration.Set("display.show_mpi_grid",
-                          option_display_["show_mpi_grid"]);
+        configuration.Set("display.mpi_grid", option_display_["mpi_grid"]);
 #endif
 
         /*** Assimilation options ***/
@@ -239,7 +237,7 @@ namespace Verdandi
 #ifdef VERDANDI_WITH_MPI
         if (world_rank_ == 0)
         {
-            if (option_display_["show_mpi_grid"])
+            if (option_display_["mpi_grid"])
                 Logger::StdOut(*this, "world rank\tmodel task\tmodel rank");
             else
                 Logger::Log<-3>(*this,
@@ -249,7 +247,7 @@ namespace Verdandi
         MPI_Barrier(MPI_COMM_WORLD);
         int model_rank;
         MPI_Comm_rank(col_communicator_, &model_rank);
-        if (option_display_["show_mpi_grid"])
+        if (option_display_["mpi_grid"])
             Logger::StdOut(*this, to_str(world_rank_) + "\t\t"
                            + to_str(model_task_) + "\t\t" +
                            to_str(model_rank));
@@ -690,7 +688,7 @@ namespace Verdandi
         if (world_rank_ == 0)
         {
 #endif
-            if (option_display_["show_time"])
+            if (option_display_["time"])
                 cout << "Performing Reduced Order UKF at time step ["
                      << model_.GetTime() << "]..." << endl;
 #if defined(VERDANDI_WITH_MPI)

@@ -123,10 +123,9 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should iterations be displayed on screen?
-        configuration.Set("display.show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("display.show_time", option_display_["show_time"]);
+        configuration.Set("display.time", option_display_["time"]);
 
         /*** Assimilation options ***/
 
@@ -330,7 +329,7 @@ namespace Verdandi
             return;
         }
 
-        if (option_display_["show_time"])
+        if (option_display_["time"])
             cout << "Performing UKF at time step ["
                  << model_.GetTime() << "]..." << endl;
 
@@ -497,7 +496,7 @@ namespace Verdandi
                    background_error_variance_);
         }
 
-        if (option_display_["show_time"])
+        if (option_display_["time"])
             cout << " done." << endl;
 
         MessageHandler::Send(*this, "model", "analysis");

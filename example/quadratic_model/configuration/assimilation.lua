@@ -72,8 +72,8 @@ optimal_interpolation = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 
@@ -111,8 +111,8 @@ extended_kalman_filter = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true,
+      iteration = false,
+      time = true,
       analysis_time = true
    },
 
@@ -152,8 +152,8 @@ unscented_kalman_filter = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 
@@ -180,8 +180,8 @@ monte_carlo = {
 
    display = {
 
-      show_iteration = false,
-      show_time = false
+      iteration = false,
+      time = false
 
    },
 
@@ -230,8 +230,8 @@ ensemble_kalman_filter = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 
@@ -265,8 +265,8 @@ forward = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 
@@ -351,8 +351,8 @@ hjb = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 

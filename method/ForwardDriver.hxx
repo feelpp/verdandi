@@ -59,9 +59,9 @@ namespace Verdandi
         string model_configuration_file_;
 
         //! Should the iterations be displayed?
-        bool show_iteration_;
+        bool display_iteration_;
         //! Should the current time be displayed?
-        bool show_time_;
+        bool display_time_;
 
 #ifdef VERDANDI_WITH_MPI
         //! The rank in MPI_COMM_WORLD.
@@ -80,7 +80,7 @@ namespace Verdandi
         MPI_Comm col_communicator_;
 
         //! Should the grid be displayed?
-        bool show_mpi_grid_;
+        bool display_mpi_grid_;
 #endif
 
         /*** Output saver ***/

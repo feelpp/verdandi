@@ -98,13 +98,13 @@ namespace Verdandi
         configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("hjb.");
 
-        if (option_display_["show_time"])
+        if (option_display_["time"])
             Logger::StdOut(*this, "Time: "
                            + to_str(T(time_step_) * Delta_t_));
         else
             Logger::Log<-3>(*this, "Time: "
                             + to_str(T(time_step_) * Delta_t_));
-        if (option_display_["show_iteration"])
+        if (option_display_["iteration"])
             Logger::StdOut(*this, "Iteration " + to_str(time_step_) + " -> "
                            + to_str(time_step_ + 1));
         else
@@ -133,10 +133,9 @@ namespace Verdandi
 
         configuration.SetPrefix("hjb.display.");
         // Should iterations be displayed on screen?
-        configuration.Set("show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("show_time", option_display_["show_time"]);
+        configuration.Set("time", option_display_["time"]);
 
         /*** Domain definition ***/
 
@@ -431,13 +430,13 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
-        if (option_display_["show_time"])
+        if (option_display_["time"])
             Logger::StdOut(*this, "Time: "
                            + to_str(T(time_step_) * Delta_t_));
         else
             Logger::Log<-3>(*this, "Time: "
                             + to_str(T(time_step_) * Delta_t_));
-        if (option_display_["show_iteration"])
+        if (option_display_["iteration"])
             Logger::StdOut(*this, "Iteration " + to_str(time_step_) + " -> "
                            + to_str(time_step_ + 1));
         else

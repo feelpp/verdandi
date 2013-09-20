@@ -73,9 +73,9 @@ namespace Verdandi
         string perturbation_manager_configuration_file_;
 
         //! Should the iterations be displayed?
-        bool show_iteration_;
+        bool display_iteration_;
         //! Should the current time be displayed?
-        bool show_time_;
+        bool display_time_;
 
         /*** Perturbations ***/
 

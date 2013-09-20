@@ -54,8 +54,8 @@ optimal_interpolation = {
 
    display = {
 
-      show_iteration = false,
-      show_time = false
+      iteration = false,
+      time = false
    },
 
    output_saver = {
@@ -95,8 +95,8 @@ ensemble_kalman_filter = {
 
    display = {
 
-      show_iteration = true,
-      show_time = false
+      iteration = true,
+      time = false
 
    },
 
@@ -130,8 +130,8 @@ forward = {
 
    display = {
 
-      show_iteration = false,
-      show_time = false
+      iteration = false,
+      time = false
 
    },
 

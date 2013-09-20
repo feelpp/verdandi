@@ -168,10 +168,9 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should iterations be displayed on screen?
-        configuration.Set("display.show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("display.show_time", option_display_["show_time"]);
+        configuration.Set("display.time", option_display_["time"]);
 
         /*** Assimilation options ***/
 

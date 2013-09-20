@@ -48,8 +48,8 @@ optimal_interpolation = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
    },
 
    output_saver = {
@@ -89,8 +89,8 @@ extended_kalman_filter = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true,
+      iteration = false,
+      time = true,
       analysis_time = true
    },
 
@@ -133,8 +133,8 @@ unscented_kalman_filter = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 
@@ -180,8 +180,8 @@ reduced_order_unscented_kalman_filter = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 
@@ -223,8 +223,8 @@ reduced_order_extended_kalman_filter = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 
@@ -291,10 +291,10 @@ four_dimensional_variational = {
 
    display = {
 
-      show_optimization_iteration = true,
-      show_optimized_parameter = false,
-      show_iteration = false,
-      show_time = true
+      optimization_iteration = true,
+      optimized_parameter = false,
+      iteration = false,
+      time = true
 
    },
 
@@ -324,8 +324,8 @@ forward = {
 
    display = {
 
-      show_iteration = false,
-      show_time = true
+      iteration = false,
+      time = true
 
    },
 

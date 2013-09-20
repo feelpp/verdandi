@@ -235,9 +235,9 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should the iteration be displayed on screen?
-        configuration.Set("display.show_iteration", show_iteration_);
+        configuration.Set("display.iteration", display_iteration_);
         // Should the time be displayed on screen?
-        configuration.Set("display.show_time", show_time_);
+        configuration.Set("display.time", display_time_);
 
         /*** Perturbation option ***/
 
@@ -277,11 +277,11 @@ namespace Verdandi
             perturbation_manager_
                 .Initialize(perturbation_manager_configuration_file_);
 
-        if (show_iteration_)
+        if (display_iteration_)
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
-        if (show_time_)
+        if (display_time_)
             Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
             Logger::Log<-3>(*this, "Time: " + to_str(model_.GetTime()));
@@ -417,11 +417,11 @@ namespace Verdandi
 
         time_.PushBack(model_.GetTime());
 
-        if (show_time_)
+        if (display_time_)
             Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
         else
             Logger::Log<-3>(*this, "Time: " + to_str(model_.GetTime()));
-        if (show_iteration_)
+        if (display_iteration_)
             Logger::StdOut(*this, "Iteration " + to_str(iteration_) + " -> "
                            + to_str(iteration_ + 1));
         else

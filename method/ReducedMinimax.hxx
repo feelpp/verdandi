@@ -63,9 +63,9 @@ namespace Verdandi
         string configuration_file_;
 
         //! Should the iterations be displayed?
-        bool show_iteration_;
+        bool display_iteration_;
         //! Should the current time be displayed?
-        bool show_time_;
+        bool display_time_;
 
         //! Should the filter be applied?
         bool with_filtering_;

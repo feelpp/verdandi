@@ -132,10 +132,9 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should iterations be displayed on screen?
-        configuration.Set("display.show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("display.show_time", option_display_["show_time"]);
+        configuration.Set("display.time", option_display_["time"]);
 
         /*** Assimilation options ***/
 
@@ -311,10 +310,9 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should iterations be displayed on screen?
-        configuration.Set("display.show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("display.iteration", option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("display.show_time", option_display_["show_time"]);
+        configuration.Set("display.time", option_display_["time"]);
 
         /*** Assimilation options ***/
 
@@ -433,7 +431,7 @@ namespace Verdandi
         if (observation_manager_.HasObservation())
         {
             if (rank_ == 0)
-                if (option_display_["show_time"])
+                if (option_display_["time"])
                     cout << "Performing Reduced Order EKF at time step ["
                          << model_.GetTime() << "]..." << endl;
 
@@ -502,7 +500,7 @@ namespace Verdandi
 
             if (rank_ == 0)
             {
-                if (option_display_["show_time"])
+                if (option_display_["time"])
                     cout << " done." << endl;
 
                 MessageHandler::Send(*this, "model", "analysis");
@@ -520,7 +518,7 @@ namespace Verdandi
 
         if (observation_manager_.HasObservation())
         {
-            if (option_display_["show_time"])
+            if (option_display_["time"])
                 cout << "Performing Reduced Order EKF at time step ["
                      << model_.GetTime() << "]..." << endl;
 
@@ -558,7 +556,7 @@ namespace Verdandi
 
             model_.StateUpdated();
 
-            if (option_display_["show_time"])
+            if (option_display_["time"])
                 cout << " done." << endl;
 
             MessageHandler::Send(*this, "model", "analysis");

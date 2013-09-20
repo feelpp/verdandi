@@ -148,17 +148,17 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should the iteration be displayed on screen?
-        configuration.Set("display.show_iteration", show_iteration_);
+        configuration.Set("display.iteration", display_iteration_);
         // Should the time be displayed on screen?
-        configuration.Set("display.show_time", show_time_);
+        configuration.Set("display.time", display_time_);
 #ifdef VERDANDI_WITH_MPI
         // Should the MPI grid be displayed on screen?
-        configuration.Set("display.show_mpi_grid", show_mpi_grid_);
+        configuration.Set("display.mpi_grid", display_mpi_grid_);
 #endif
 
         iteration_ = 0;
 
-        if (show_iteration_)
+        if (display_iteration_)
             Logger::StdOut(*this, "Initialization");
         else
             Logger::Log<-3>(*this, "Initialization");
@@ -166,7 +166,7 @@ namespace Verdandi
 #ifdef VERDANDI_WITH_MPI
         if (world_rank_ == 0)
         {
-            if (show_mpi_grid_)
+            if (display_mpi_grid_)
                 Logger::StdOut(*this, "world rank\tmodel task\tmodel rank");
             else
                 Logger::Log<-3>(*this,
@@ -176,7 +176,7 @@ namespace Verdandi
         MPI_Barrier(MPI_COMM_WORLD);
         int model_rank;
         MPI_Comm_rank(col_communicator_, &model_rank);
-        if (show_mpi_grid_)
+        if (display_mpi_grid_)
             Logger::StdOut(*this, to_str(world_rank_) + "\t\t"
                            + to_str(model_task_) + "\t\t" +
                            to_str(model_rank));
@@ -239,12 +239,12 @@ namespace Verdandi
         if (world_rank_ == 0)
         {
 #endif
-            if (show_time_)
+            if (display_time_)
                 Logger::StdOut(*this, "Time: " + to_str(model_.GetTime()));
             else
                 Logger::Log<-3>(*this,
                                 "Time: " + to_str(model_.GetTime()));
-            if (show_iteration_)
+            if (display_iteration_)
                 Logger::StdOut(*this, "Iteration " + to_str(iteration_)
                                + " -> " + to_str(iteration_ + 1));
             else

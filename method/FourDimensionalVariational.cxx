@@ -125,16 +125,16 @@ namespace Verdandi
         /*** Display options ***/
 
         // Should optimization iterations be displayed on screen?
-        configuration.Set("display.show_optimization_iteration",
-                          option_display_["show_optimization_iteration"]);
+        configuration.Set("display.optimization_iteration",
+                          option_display_["optimization_iteration"]);
         // Should optimized parameters be displayed on screen?
-        configuration.Set("display.show_optimized_parameter",
-                          option_display_["show_optimized_parameter"]);
+        configuration.Set("display.optimized_parameter",
+                          option_display_["optimized_parameter"]);
         // Should iterations be displayed on screen?
-        configuration.Set("display.show_iteration",
-                          option_display_["show_iteration"]);
+        configuration.Set("display.iteration",
+                          option_display_["iteration"]);
         // Should current time be displayed on screen?
-        configuration.Set("display.show_time", option_display_["show_time"]);
+        configuration.Set("display.time", option_display_["time"]);
 
         /*** Ouput saver ***/
 
@@ -437,10 +437,10 @@ namespace Verdandi
     ::Cost(const model_state& x, model_state& gradient)
     {
         Vector<double> time;
-        if (option_display_["show_optimization_iteration"])
+        if (option_display_["optimization_iteration"])
             Logger::StdOut(*this,
                            "Optimization iteration: " + to_str(Ncall_cost_));
-        if (option_display_["show_optimized_parameter"])
+        if (option_display_["optimized_parameter"])
             Logger::StdOut(*this,
                            "Optimized parameter: " + to_str(x));
         Ncall_cost_++;

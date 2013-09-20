@@ -18,8 +18,8 @@ forward = {
 
    display = {
 
-      show_iteration = false,
-      show_time = false
+      iteration = false,
+      time = false
 
    },
 
