@@ -338,6 +338,10 @@ namespace Verdandi
             SetCol(error_covariance_column, j, state_error_variance_);
         }
 
+        if (model_.GetErrorVariance().GetM() != 0
+            && model_.GetErrorVariance().GetN() != 0)
+            Add(Ts(1.), model_.GetErrorVariance(), state_error_variance_);
+
         model_.SetTime(saved_time);
     }
 
@@ -357,6 +361,10 @@ namespace Verdandi
 
         MltAdd(Ts(1.), SeldonNoTrans, state_error_variance_,
                SeldonTrans, A, Ts(0.), state_error_variance_);
+
+        if (model_.GetErrorVariance().GetM() != 0
+            && model_.GetErrorVariance().GetN() != 0)
+            Add(Ts(1.), model_.GetErrorVariance(), state_error_variance_);
 
         model_.SetTime(saved_time);
     }

@@ -511,6 +511,18 @@ namespace Verdandi
     }
 
 
+    //! Returns the model error variance.
+    /*!
+      \return The model error variance.
+      \note If the matrix is empty, it is then assumed there is no model
+      error.
+    */
+    ModelTemplate::error_variance& ModelTemplate::GetErrorVariance()
+    {
+        throw ErrorUndefined("ModelTemplate::GetErrorVariance()");
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.

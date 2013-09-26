@@ -47,6 +47,8 @@ namespace Verdandi
         state_error_variance_reduced;
         //! Type of a row of the state error variance.
         typedef Vector<double, VectSparse> state_error_variance_row;
+        //! Type of the model error variance.
+        typedef Matrix<double, General, RowSparse> error_variance;
         //! Type of the state/observation crossed matrix.
         typedef Matrix<double, General, RowSparse> matrix_state_observation;
         //! Type of the tangent linear model.
@@ -59,12 +61,12 @@ namespace Verdandi
         typedef Matrix<double> state_error_variance_reduced;
         //! Type of a row of the state error variance.
         typedef Vector<double> state_error_variance_row;
+        //! Type of the model error variance.
+        typedef Matrix<double> error_variance;
         //! Type of the state/observation crossed matrix.
         typedef Matrix<double> matrix_state_observation;
         //! Type of the tangent linear model.
         typedef Matrix<double> tangent_linear_operator;
-        //! Type of the model error variance.
-        typedef Matrix<double> error_variance;
 #endif
         //! Type of the state vector.
         typedef Vector<double> state;
@@ -131,6 +133,7 @@ namespace Verdandi
         // Errors.
         state_error_variance_row& GetStateErrorVarianceRow(int row);
         state_error_variance& GetStateErrorVariance();
+        error_variance& GetErrorVariance();
         error_variance& GetErrorVarianceSqrt();
         state_error_variance& GetStateErrorVarianceProjector();
         state_error_variance_reduced& GetStateErrorVarianceReduced();

@@ -536,6 +536,20 @@ namespace Verdandi
     }
 
 
+    //! Returns the model error variance.
+    /*!
+      \return The model error variance.
+      \note If the matrix is empty, it is then assumed there is no model
+      error.
+    */
+    template <class Model>
+    typename CheckingModel<Model>::error_variance&
+    CheckingModel<Model>::GetErrorVariance()
+    {
+        return model_.GetErrorVariance();
+    }
+
+
     //! Returns the name of the class.
     /*!
       \return The name of the class.

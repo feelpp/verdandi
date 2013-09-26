@@ -835,6 +835,8 @@ namespace Verdandi
     //! Returns the model error variance.
     /*!
       \return The model error variance.
+      \note If the matrix is empty, it is then assumed there is no model
+      error.
     */
     template <class T>
     typename QuadraticModel<T>::error_variance&
@@ -847,6 +849,8 @@ namespace Verdandi
     //! Returns the model error variance.
     /*!
       \return The model error variance.
+      \note If the matrix is empty, it is then assumed there is no model
+      error.
     */
     template <class T>
     const typename QuadraticModel<T>::error_variance&

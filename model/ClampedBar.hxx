@@ -76,6 +76,8 @@ namespace Verdandi
         typedef Matrix<T> state_error_variance_reduced;
         //! Type of a row of the background error variance.
         typedef Vector<T> state_error_variance_row;
+        //! Type of the model error variance.
+        typedef Matrix<double> error_variance;
         //! Type of the model/observation crossed matrix.
         typedef Matrix<T> matrix_state_observation;
         //! Type of the tangent linear operator.
@@ -200,6 +202,9 @@ namespace Verdandi
         //! Is reduced state error variance allocated?
         bool variance_reduced_allocated_;
 
+        //! Variance of the model error.
+        error_variance Q_;
+
         //! Index of the row of B currently stored.
         int current_row_;
         //! Index of the column of Q currently stored.
@@ -278,6 +283,7 @@ namespace Verdandi
         state_error_variance& GetStateErrorVarianceProjector();
         state_error_variance_reduced& GetStateErrorVarianceReduced();
         const state_error_variance& GetStateErrorVarianceInverse() const;
+        error_variance& GetErrorVariance();
 
         string GetName() const;
         void Message(string message);

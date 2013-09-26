@@ -45,6 +45,8 @@ namespace Verdandi
         //! Type of the background error variance.
         typedef typename Model::state_error_variance
         state_error_variance;
+        //! Type of the model error variance.
+        typedef typename Model::error_variance error_variance;
         //! Type of the tangent linear model.
         typedef typename Model::tangent_linear_operator
         tangent_linear_operator;
@@ -102,6 +104,7 @@ namespace Verdandi
         state_error_variance& GetStateErrorVarianceProjector();
         state_error_variance_reduced& GetStateErrorVarianceReduced();
         const state_error_variance& GetStateErrorVarianceInverse() const;
+        error_variance& GetErrorVariance();
 
         string GetName() const;
         void Message(string message);

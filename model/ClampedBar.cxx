@@ -1120,6 +1120,20 @@ namespace Verdandi
     }
 
 
+    //! Returns the model error variance.
+    /*!
+      \return The model error variance.
+      \note If the matrix is empty, it is then assumed there is no model
+      error.
+    */
+    template <class T>
+    typename ClampedBar<T>::error_variance&
+    ClampedBar<T>::GetErrorVariance()
+    {
+        return Q_;
+    }
+
+
     //! Returns the name of the class.
     template <class T>
     string ClampedBar<T>::GetName() const
