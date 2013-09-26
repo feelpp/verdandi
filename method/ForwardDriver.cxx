@@ -158,6 +158,26 @@ namespace Verdandi
 
         iteration_ = 0;
 
+        /*** Ouput saver ***/
+
+        configuration.SetPrefix("forward.output_saver.");
+        output_saver_.Initialize(configuration);
+        output_saver_.Empty("forecast_time");
+        output_saver_.Empty("forecast_state");
+        configuration.SetPrefix("forward.");
+
+        /*** Logger and read configuration ***/
+
+        if (configuration.Exists("output.log"))
+            Logger::SetFileName(configuration.Get<string>("output.log"));
+
+        if (configuration.Exists("output.configuration"))
+        {
+            string output_configuration;
+            configuration.Set("output.configuration", output_configuration);
+            configuration.WriteLuaDefinition(output_configuration);
+        }
+
 #ifdef VERDANDI_WITH_MPI
         if (world_rank_ == 0)
         {
@@ -198,26 +218,6 @@ namespace Verdandi
                             + to_str(model_task_) + "\t\t" +
                             to_str(model_rank));
 #endif
-
-        /*** Ouput saver ***/
-
-        configuration.SetPrefix("forward.output_saver.");
-        output_saver_.Initialize(configuration);
-        output_saver_.Empty("forecast_time");
-        output_saver_.Empty("forecast_state");
-        configuration.SetPrefix("forward.");
-
-        /*** Logger and read configuration ***/
-
-        if (configuration.Exists("output.log"))
-            Logger::SetFileName(configuration.Get<string>("output.log"));
-
-        if (configuration.Exists("output.configuration"))
-        {
-            string output_configuration;
-            configuration.Set("output.configuration", output_configuration);
-            configuration.WriteLuaDefinition(output_configuration);
-        }
 
         if (initialize_model)
         {
