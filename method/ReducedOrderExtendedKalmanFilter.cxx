@@ -290,19 +290,18 @@ namespace Verdandi
 
         /*** Assimilation ***/
 
+        // To save the initial condition before assimilation.
+        if (rank_ == 0)
+        {
+            MessageHandler::Send(*this, "model", "initial condition");
+            MessageHandler::Send(*this, "driver", "initial condition");
+        }
+
         if (analyze_first_step_)
             Analyze();
 
         if (rank_ == 0)
-        {
-            if (initialize_model)
-            {
-                MessageHandler::Send(*this, "model", "initial condition");
-                MessageHandler::Send(*this, "driver", "initial condition");
-            }
-
             MessageHandler::Send(*this, "all", "::Initialize end");
-        }
 #else
         MessageHandler::Send(*this, "all", "::Initialize begin");
 
@@ -387,14 +386,12 @@ namespace Verdandi
 
         /*** Assimilation ***/
 
+        // To save the initial condition before assimilation.
+        MessageHandler::Send(*this, "model", "initial condition");
+        MessageHandler::Send(*this, "driver", "initial condition");
+
         if (analyze_first_step_)
             Analyze();
-
-        if (initialize_model)
-        {
-            MessageHandler::Send(*this, "model", "initial condition");
-            MessageHandler::Send(*this, "driver", "initial condition");
-        }
 
         MessageHandler::Send(*this, "all", "::Initialize end");
 

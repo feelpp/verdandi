@@ -236,11 +236,10 @@ namespace Verdandi
              manager ***/
 
         if (initialize_model)
-        {
             model_.Initialize(model_configuration_file_);
-            MessageHandler::Send(*this, "model", "initial condition");
-            MessageHandler::Send(*this, "driver", "initial condition");
-        }
+
+        MessageHandler::Send(*this, "model", "initial condition");
+        MessageHandler::Send(*this, "driver", "initial condition");
 
         if (initialize_perturbation_manager)
             perturbation_manager_

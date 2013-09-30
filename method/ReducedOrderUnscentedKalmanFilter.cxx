@@ -358,21 +358,20 @@ namespace Verdandi
 
         /*** Assimilation ***/
 
+        // To save the initial condition before assimilation.
+#ifndef VERDANDI_WITH_MPI
+        MessageHandler::Send(*this, "model", "initial condition");
+        MessageHandler::Send(*this, "driver", "initial condition");
+#else
+        MessageHandler::Send(*this, "model" + to_str(world_rank_),
+                             "initial condition");
+        MessageHandler::Send(*this, "driver" + to_str(world_rank_),
+                             "initial condition");
+#endif
+
         if (analyze_first_step_)
             Analyze();
 
-        if (initialize_model)
-        {
-#ifndef VERDANDI_WITH_MPI
-            MessageHandler::Send(*this, "model", "initial condition");
-            MessageHandler::Send(*this, "driver", "initial condition");
-#else
-            MessageHandler::Send(*this, "model" + to_str(world_rank_),
-                                 "initial condition");
-            MessageHandler::Send(*this, "driver" + to_str(world_rank_),
-                                 "initial condition");
-#endif
-        }
         MessageHandler::Send(*this, "all", "::Initialize end");
     }
 

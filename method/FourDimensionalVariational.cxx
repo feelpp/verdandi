@@ -229,11 +229,8 @@ namespace Verdandi
         state_first_guess_.Reallocate(model_.GetNstate());
         Copy(model_.GetState(), state_first_guess_);
 
-        if (initialize_model)
-        {
-            MessageHandler::Send(*this, "model", "initial condition");
-            MessageHandler::Send(*this, "driver", "initial condition");
-        }
+        MessageHandler::Send(*this, "model", "initial condition");
+        MessageHandler::Send(*this, "driver", "initial condition");
 
         configuration.SetPrefix("four_dimensional_variational.");
 

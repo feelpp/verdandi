@@ -222,14 +222,12 @@ namespace Verdandi
 
         /*** Assimilation ***/
 
+        // To save the initial condition before assimilation.
+        MessageHandler::Send(*this, "model", "initial condition");
+        MessageHandler::Send(*this, "driver", "initial condition");
+
         if (analyze_first_step_)
             Analyze();
-
-        if (initialize_model && initialize_observation_manager)
-        {
-            MessageHandler::Send(*this, "model", "initial condition");
-            MessageHandler::Send(*this, "driver", "initial condition");
-        }
 
         MessageHandler::Send(*this, "all", "::Initialize end");
     }

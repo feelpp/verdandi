@@ -219,11 +219,8 @@ namespace Verdandi
                             to_str(model_rank));
 #endif
 
-        if (initialize_model)
-        {
-            MessageHandler::Send(*this, "model", "initial condition");
-            MessageHandler::Send(*this, "driver", "initial condition");
-        }
+        MessageHandler::Send(*this, "model", "initial condition");
+        MessageHandler::Send(*this, "driver", "initial condition");
 
         MessageHandler::Send(*this, "all", "::Initialize end");
     }
