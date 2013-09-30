@@ -57,7 +57,7 @@ quadratic_model = {
       -- Is the model error variance a scaled identity matrix?
       scaled_identity = true,
       -- If so, put the diagonal value:
-      diagonal_value = 1.,
+      diagonal_value = 0.1,
       -- Otherwise, the operator value (file name or table):
       value = {}
 

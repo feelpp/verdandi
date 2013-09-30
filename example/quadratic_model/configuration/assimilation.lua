@@ -2,7 +2,6 @@
 
 
 Delta_t_model = 0.0015
-Nskip_save = 100
 
 output_directory = "result/"
 output_file_string = ""
@@ -106,7 +105,7 @@ extended_kalman_filter = {
 
    data_assimilation = {
 
-      analyze_first_step = false,
+      analyze_first_step = true,
 
    },
 

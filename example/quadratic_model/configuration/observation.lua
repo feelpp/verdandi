@@ -19,17 +19,17 @@ observation = {
    -- one should define the observation time file.
    observation_time_file = "result/time.dat",
    -- Period with which observations are available.
-   Delta_t = Delta_t_model * Nskip_save,
+   Delta_t = 0.0015,
    -- Period with which available observations are actually assimilated.
-   Nskip = 1,
+   Nskip = 100,
    -- Duration during which observations are assimilated.
    final_time = 2.3,
 
    aggregator = {
 
       type = "step",
-      width_left = Delta_t_model * Nskip_save / 2.,
-      width_right = Delta_t_model * Nskip_save / 2.,
+      width_left = 0.0015 / 2.,
+      width_right = 0.0015 / 2.,
 
       -- If the type is "triangle", the triangles widths may be the same for
       -- all observations ("constant") or not ("per-observation").
