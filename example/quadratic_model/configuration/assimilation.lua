@@ -263,6 +263,42 @@ for i = 0, 1 do
 end
 
 
+-- Simulation with assimilation using EMF.
+extended_minimax_filter = {
+
+   data_assimilation = {
+
+      analyze_first_step = true,
+
+   },
+
+   display = {
+
+      iteration = false,
+      time = true,
+      analysis_time = true
+
+   },
+
+   output_saver = {
+
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state",
+                       "analysis_gain", "forecast_gain"},
+      file = output_directory .. "emf-%{name}.%{extension}"
+
+   },
+
+   output = {
+
+     configuration = output_directory .. "emf.lua",
+     log = output_directory .. "emf.log"
+
+  }
+
+}
+
+
 -- Forward simulation.
 forward = {
 
