@@ -970,9 +970,9 @@ namespace Verdandi
         }
 
 #ifndef VERDANDI_WITH_MPI
-        MessageHandler::Send(*this, "model", "forecast");
-        MessageHandler::Send(*this, "observation_manager", "forecast");
-        MessageHandler::Send(*this, "driver", "forecast");
+        MessageHandler::Send(*this, "model", "analysis");
+        MessageHandler::Send(*this, "observation_manager", "analysis");
+        MessageHandler::Send(*this, "driver", "analysis");
 #else
         MessageHandler::Send(*this, "model" +
                              to_str(world_rank_), "analysis");
