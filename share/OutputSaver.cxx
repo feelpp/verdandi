@@ -316,7 +316,7 @@ namespace Verdandi
             throw ErrorIO("WriteText(const double& x , string file_name)",
                           "Cannot open file \"" + file_name + "\"." );
 #endif
-        file << x << '\n';
+        file << x << endl;
         file.close();
     }
 
@@ -336,6 +336,7 @@ namespace Verdandi
                           "Cannot open file \"" + file_name + "\"." );
 #endif
         x.WriteText(file);
+        file << endl;
         file.close();
     }
 
