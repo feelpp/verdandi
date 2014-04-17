@@ -23,9 +23,9 @@
 
 #include "ClampedBar.hxx"
 
-#include "OutputSaver.cxx"
+#include "share/OutputSaver.cxx"
 
-#include "seldon/vector/VectorCollection.cxx"
+#include "include/seldon/vector/VectorCollection.cxx"
 
 namespace Verdandi
 {

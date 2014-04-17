@@ -1,0 +1,34 @@
+import os, glob
+
+# Path where "Verdandi.hxx" may be found.
+verdandi_path = "../../.."
+
+test_list = [
+    "VERDANDI_TEST_TIME"
+    ]
+
+verdandi_cppunit_model = "Verdandi::QuadraticModel\<real\>"
+
+execfile(os.path.join(verdandi_path, "share/SConstruct"))
+
+
+################
+# TEST DEFINES #
+################
+
+
+for define in test_list:
+    env.Append(CPPDEFINES = define)
+
+env.Append(CPPDEFINES = {"VERDANDI_CPPUNIT_MODEL": verdandi_cppunit_model})
+env.Append(CPPDEFINES = {"VERDANDI_CPPUNIT_MODEL_CONFIG":
+                             "\'\"configuration.lua\"\'"})
+
+AddOption("--define", dest = "define", type = "string", nargs = 1,
+          action = "store", metavar = "DIR",
+          help = "defines a preprocessor directive")
+
+DEFINE = GetOption("define")
+define_list = Split(DEFINE);
+for define in define_list:
+    env.Append(CPPDEFINES = define)
