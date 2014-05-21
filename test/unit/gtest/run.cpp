@@ -34,7 +34,11 @@
 #include "gtest/gtest.h"
 
 #include "test_time.hpp"
+#include "test_initialization.hpp"
 
+#ifdef VERDANDI_TEST_ADJOINT
+#include "test_adjoint.hpp"
+#endif
 
 // Main function used to launch the gtest framework.
 int main(int argc, char **argv)

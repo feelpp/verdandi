@@ -36,10 +36,10 @@ using namespace Verdandi;
 */
 class TestTime: public testing::Test
 {
+protected:
     typedef double real;
     typedef Verdandi::Vector<double> state;
 
-protected:
     //! The accuracy of the test.
     double accuracy_;
     //! The size of the state.
