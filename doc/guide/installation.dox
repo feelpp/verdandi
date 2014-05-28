@@ -14,6 +14,13 @@
   <li> Python for both SCons and the optional Python interface (see page \ref python) to the C++ code; the generation of the interface also requires <a href="http://www.swig.org/">SWIG</a>. </li>
 </ul>
 
+%Verdandi may require other dependencies:
+<ul>
+        <li> The Fortran libraries <a href="http://www.netlib.org/blas/">Blas</a> and <a href="http://www.netlib.org/lapack/">Lapack</a> for linear algebra. </li>
+        <li> The <a href="http://www.robertnz.net/nr02doc.htm">Newran</a> library for random number generation. </li>
+        <li> The <a href="http://ab-initio.mit.edu/wiki/index.php/NLopt">NLopt</a> library as optimization solver. </li>
+</ul>
+
 Note that in %Verdandi tarball, you will also find:
 <ul>
   <li> the linear algebra library <a href="http://seldon.sourceforge.net/">Seldon</a>. </li>
@@ -26,6 +33,49 @@ Note that in %Verdandi tarball, you will also find:
 \subsection installation_linux Installation
 
 Download the source code (<a href="http://verdandi.gforge.inria.fr/">Verdandi homepage</a>), usually available in a compressed file, e.g., verdandi-[version].tar.bz2. Uncompress the file, e.g., in command line: <code>tar -xvjf verdandi-[version].tar.bz2</code>. This will create the directory <code>verdandi-[version]/</code> in which you will find %Verdandi.
+
+\subsection installation_dependencies Installation of dependencies
+
+Installations with APT (Advanced Package Tool from Debian and Ubuntu):
+<ul>
+        <li> Blas and Lapack (highly recommended) can be installed using the command-line:
+        \precode
+        $ sudo apt-get install libblas-dev liblapack-dev
+        \endprecode
+        </li>
+        <li> If you want to use the Python interface, install the following packages:
+        \precode
+        $ sudo apt-get install python-dev python-numpy swig
+        \endprecode
+        </li>
+</ul>
+Manuals installations:
+<ul>
+        <li> If you want to use NLopt (for example in the clamped bar example), you will need to dowload and install it:
+        \precode
+        $ wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.1.tar.gz
+        $ tar xvzf nlopt-2.4.1.tar.gz
+        $ cd nlopt-2.4.1
+        $ ./configure
+        $ make
+        $ sudo make install
+        \endprecode
+        </li>
+        <li> If you want to use Newran (for example in the shallow water model), you will need to download and install it:
+        \precode
+        $ wget http://www.robertnz.net/ftp/newran03.tar.gz
+        $ tar zxvf newran03.tar.gz
+        \endprecode
+        If everything is fine, you should have a file called include/newran/newran.h. Next, you have to edit include/newran/include.h in order to uncomment the line:
+        \precode
+        //#define use_namespace
+        \endprecode
+        Then you can compile the library using:
+        \precode
+        $ make -f nr_gnu.mak libnewran.a
+        \endprecode
+        </li>
+</ul>
 
 \subsection tests_linux Testing the installation
 
