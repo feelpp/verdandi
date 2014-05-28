@@ -23,8 +23,11 @@
 #ifndef VERDANDI_FILE_MODEL_SHALLOWWATER_HXX
 
 
+#ifdef VERDANDI_USE_NEWRAN
 #include "newran/newran.h"
-
+#else
+#include <tr1/random>
+#endif
 
 namespace Verdandi
 {
@@ -171,11 +174,17 @@ namespace Verdandi
         double model_error_std_ic_;
         //! Determining the random seed.
         string seed_;
+
+
+#ifdef VERDANDI_USE_NEWRAN
         //! The base uniform random number generator.
         NEWRAN::MotherOfAll* urng_;
         //! Normal random generator.
         NEWRAN::Normal normal_;
-
+#else
+        //! Generates random numbers, using Mersenne twister.
+        std::tr1::mt19937 generator_;
+#endif
         //! Balgovind scale for background covariance.
         double Balgovind_scale_background_;
         //! Background error variance.

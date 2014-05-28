@@ -24,6 +24,7 @@
 
 
 #include "ShallowWater.hxx"
+#include <iostream>
 
 
 namespace Verdandi
@@ -38,9 +39,14 @@ namespace Verdandi
     //! Constructor.
     template <class T>
     ShallowWater<T>::ShallowWater():
-        time_(0.), g_(9.81), urng_(0), current_row_(-1),
+        time_(0.), g_(9.81), current_row_(-1),
         current_column_(-1)
     {
+#ifdef VERDANDI_USE_NEWRAN
+        urng_ = 0;
+#else
+        generator_.seed(0);
+#endif
     }
 
 
@@ -50,9 +56,14 @@ namespace Verdandi
     */
     template <class T>
     ShallowWater<T>::ShallowWater(string configuration_file):
-        time_(0.), g_(9.81), urng_(0), current_row_(-1),
+        time_(0.), g_(9.81), current_row_(-1),
         current_column_(-1)
     {
+#ifdef VERDANDI_USE_NEWRAN
+        urng_ = 0;
+#else
+        generator_.seed(0);
+#endif
         Initialize(configuration_file);
     }
 
@@ -61,11 +72,13 @@ namespace Verdandi
     template <class T>
     ShallowWater<T>::~ShallowWater()
     {
+#ifdef VERDANDI_USE_NEWRAN
         if (urng_ != 0)
         {
             delete urng_;
             urng_ = 0;
         }
+#endif
 
         for (int i = 0; i < Nparameter_; i++)
             parameter_[i].Nullify();
@@ -120,6 +133,7 @@ namespace Verdandi
 
         configuration.Set("random_seed", seed_);
 
+#ifdef VERDANDI_USE_NEWRAN
         if (is_num(seed_) && urng_ == 0)
         {
             double seed_number;
@@ -144,6 +158,26 @@ namespace Verdandi
             NEWRAN::Random::Set(*urng_);
             NEWRAN::Random::CopySeedFromDisk(true);
         }
+#else
+        if (is_num(seed_))
+        {
+            double seed_number;
+            to_num(seed_, seed_number);
+            if (seed_number <= 0. || seed_number >= 1.)
+                throw "Error: the seed number must be in ]0, 1[.";
+            generator_.seed(seed_number);
+        }
+        else if (seed_ == "current_time")
+        {
+            srand(static_cast<unsigned long>(time(0)));
+            double seed_number = rand() / double(RAND_MAX);
+            generator_.seed(seed_number);
+        }
+        else
+        {
+            generator_.seed(0);
+        }
+#endif
 
         // Error statistics.
         configuration.SetPrefix("shallow_water.state_error.");
@@ -202,8 +236,17 @@ namespace Verdandi
 
         // Initial conditions.
         h_.Fill(1.);
+
+#ifdef VERDANDI_USE_NEWRAN
         NEWRAN::Random::Set(*urng_);
         value_ += max(-2., min(2., normal_.Next())) * model_error_std_ic_;
+#else
+        tr1::variate_generator<tr1::mt19937,
+                               tr1::normal_distribution<double> >
+            randn(generator_, tr1::normal_distribution<double>(0., 1.));
+        double randomized = randn();
+        value_ += max(-2., min(2., randomized)) * model_error_std_ic_;
+#endif
         configuration.SetPrefix("shallow_water.initial_condition.");
         configuration.Set("center", source_center_);
 
@@ -376,10 +419,18 @@ namespace Verdandi
         // Clipped Gaussian.
         if (model_error_std_bc_ != 0.)
         {
+#ifdef VERDANDI_USE_NEWRAN
             NEWRAN::Random::Set(*urng_);
             model_error
                 = max(-2., min(2., normal_.Next())) * model_error_std_bc_;
-
+#else
+            tr1::variate_generator<tr1::mt19937,
+                                   tr1::normal_distribution<double> >
+                randn(generator_, tr1::normal_distribution<double>(0,1));
+            double randomized = randn();
+            model_error
+                = max(-2., min(2., randomized)) * model_error_std_bc_;
+#endif
         }
 
         // Fluxes along x, inside the domain.
