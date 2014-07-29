@@ -35,6 +35,7 @@
 
 #include "test_time.hpp"
 #include "test_initialization.hpp"
+#include "test_perf.hpp"
 
 #ifdef VERDANDI_TEST_ADJOINT
 #include "test_adjoint.hpp"
