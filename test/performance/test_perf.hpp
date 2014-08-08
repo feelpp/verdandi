@@ -20,11 +20,11 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#include "perf/perf_timer.cxx"
+#include "module_performance/perf_timer.cxx"
 #include "method/UnscentedKalmanFilter.cxx"
 #include "method/ExtendedKalmanFilter.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
-
+#include "method/ForwardDriver.cxx"
 using namespace Verdandi;
 
 
@@ -42,6 +42,15 @@ protected:
 public:
     void SetUp()
     {
+        ForwardDriver<VERDANDI_GTEST_MODEL> driver;
+        driver.Initialize("configuration/truth.lua");
+        while (!driver.HasFinished())
+        {
+            driver.InitializeStep();
+            driver.Forward();
+            driver.FinalizeStep();
+        }
+        driver.Finalize();
         // For each test a timer called "main" is started at the beginning.
         TIMER("main");
     }

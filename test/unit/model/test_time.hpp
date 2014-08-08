@@ -19,50 +19,55 @@
 // For more information, visit the Verdandi web site:
 //      http://verdandi.gforge.inria.fr/
 
-
-#include <cppunit/extensions/HelperMacros.h>
 #include <iostream>
+#include <tr1/random>
 
-using namespace std;
+using namespace Verdandi;
 
 
-class TestTimeUnit: public CppUnit::TestFixture
+//! This class allows to perform two time-based tests.
+/*!
+  This class uses the gtest framework to perform 2 tests:
+  1. tries to apply the model from time h-1 to h with h=0..Nstep_time
+  2. randomly samples two points in time, and applies the model from the first
+     time to the second.
+
+  Each test will succeed if the stored state equals the computed one.
+*/
+class TestTime: public testing::Test
 {
-    CPPUNIT_TEST_SUITE(TestTimeUnit);
-    CPPUNIT_TEST(TestTimeBackward);
-    CPPUNIT_TEST(TestTimeRandom);
-    CPPUNIT_TEST_SUITE_END();
+protected:
     typedef double real;
     typedef Verdandi::Vector<double> state;
 
-protected:
-    // The accuracy of the test.
+    //! The accuracy of the test.
     double accuracy_;
-    // The size of the state.
+    //! The size of the state.
     unsigned int Nstate_;
-    // Generates random numbers, using Mersenne Twister.
-    tr1::mt19937 generator_;
-    // Tested model.
-    VERDANDI_CPPUNIT_MODEL model_;
-    // Stores the states to check the consistency of the model.
+    //! Generates random numbers, using Mersenne twister.
+    std::tr1::mt19937 generator_;
+    //! Tested model.
+    VERDANDI_GTEST_MODEL model_;
+    //! Stores the states to check the consistency of the model.
     vector<state> state_storage_;
-    // Stores the times to check the consistency of the model.
+    //! Times corresponding to the stored states.
     vector<double> time_storage_;
-    // Span of the storage.
+    //! Span of the storage.
     int Nstep_;
 
 public:
-    // This method initializes the model, reads the configuration for the
-    // tests and stores all the states and times needed for the tests.
-    void setUp()
+    // This method initializes the model and reads the configuration for the
+    // tests, then stores all the states and times needed for the tests.
+    virtual  void SetUp()
     {
         // Initializes the random generator.
         generator_.seed(time(NULL));
-        // Intializes the model, reads the configuration, initializes
+        // Initializes the model, reads the configuration, initializes
         // variables.
-        model_.Initialize(VERDANDI_CPPUNIT_MODEL_CONFIG);
-        Verdandi::VerdandiOps configuration(VERDANDI_CPPUNIT_MODEL_CONFIG);
+        model_.Initialize(VERDANDI_GTEST_CONFIG_PATH);
+        VerdandiOps configuration(VERDANDI_GTEST_CONFIG_PATH);
         configuration.Set("Nstep_time", Nstep_);
+        configuration.Set("accuracy", accuracy_);
         Nstate_ = model_.GetNstate();
 
         // Computes and stores the states and times.
@@ -73,65 +78,54 @@ public:
             model_.Forward();
         }
     }
-
-
-    void tearDown()
-    {
-    }
-
-
-    // This test checks that the model will give the correct state, given the
-    // previous state.
-    void TestTimeBackward()
-    {
-        cout << "Test time backward: ";
-        // For each time step, asks the model to go forward in time once and
-        // checks if the given state is correct.
-        for (int i = 0; i < Nstep_ - 1; i++)
-        {
-            model_.GetState() = state_storage_[Nstep_ - i - 2];
-            model_.StateUpdated();
-            model_.SetTime(time_storage_[Nstep_ - i - 2]);
-            model_.Forward();
-            for(unsigned int j = 0; j < Nstate_; j++)
-                CPPUNIT_ASSERT(model_.GetState()(j) ==
-                               state_storage_[Nstep_ - i - 1](j));
-        }
-        cout << " OK" << endl << endl;
-    }
-
-
-    // This test takes two random points in time and tries to pull the model
-    // from the first to the second.
-    void TestTimeRandom()
-    {
-        cout << "Test time random: ";
-        // Randomizes two steps.
-        unsigned int step1 = 0;
-        unsigned int step2 = 0;
-        while (step1 == step2 || step2 < step1)
-        {
-            step1 = generator_() % Nstep_;
-            step2 = generator_() % Nstep_;
-        }
-
-        // Inserts the state at starting time into the model.
-        model_.GetState() = state_storage_[step1];
-        model_.StateUpdated();
-
-        // Inserts the correct time into the model.
-        model_.SetTime(time_storage_[step1]);
-
-        // Pulls the model forward in time.
-        for(unsigned int i = step1; i < step2; i++)
-            model_.Forward();
-
-        // Checks if the computed state is correct.
-        for(unsigned int j = 0; j < Nstate_; j++)
-            CPPUNIT_ASSERT_MESSAGE("Discrepancy detected",
-                                   model_.GetState()(j)
-                                   == state_storage_[step2](j));
-
-        cout << " OK" << endl << endl;
-    }
 };
+
+
+// This test checks that the model will give the correct state,
+// given the state N-1.
+TEST_F(TestTime, TestTimeBackward)
+{
+    // For each time step, asks the model to go forward in time once and
+    // checks if the given state is correct.
+    for (int i = 0; i < Nstep_ - 1; i++)
+    {
+        model_.GetState() = state_storage_[Nstep_ - i - 2];
+        model_.StateUpdated();
+        model_.SetTime(time_storage_[Nstep_ - i - 2]);
+        model_.Forward();
+        for (unsigned int j = 0; j < Nstate_; j++)
+            ASSERT_NEAR(model_.GetState()(j),
+                        state_storage_[Nstep_ - i - 1](j), accuracy_);
+    }
+}
+
+
+// This test takes two random points in time and tries to apply the model from
+// the first to the second.
+TEST_F(TestTime, TestTimeRandom)
+{
+    // Randomly samples two steps.
+    unsigned int step1 = 0;
+    unsigned int step2 = 0;
+    while (step1 == step2 || step2 < step1)
+    {
+        step1 = generator_() % Nstep_;
+        step2 = generator_() % Nstep_;
+    }
+
+    // Inserts the state at 'step1' into the model.
+    model_.GetState() = state_storage_[step1];
+    model_.StateUpdated();
+
+    // Inserts the corresponding time into the model.
+    model_.SetTime(time_storage_[step1]);
+
+    // Applies the model forward in time.
+    for (unsigned int i = step1; i < step2; i++)
+        model_.Forward();
+
+    // Checks if the computed state is correct.
+    for (unsigned int j = 0; j < Nstate_; j++)
+        ASSERT_NEAR(model_.GetState()(j), state_storage_[step2](j),
+                    accuracy_);
+}

@@ -27,7 +27,7 @@ test_list_define = [
 
 
 # Path where "Verdandi.hxx" may be found.
-verdandi_path = "../../.."
+verdandi_path = "../.."
 
 # Call to the main SConstruct.
 execfile(os.path.join(verdandi_path, "share/SConstruct"))

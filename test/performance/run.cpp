@@ -1,5 +1,5 @@
-// Copyright (C) 2010 INRIA
-// Author(s): Vivien Mallet
+// Copyright (C) 2014 INRIA
+// Author(s): Nicolas Claude
 //
 // This file is part of the data assimilation library Verdandi.
 //
@@ -19,36 +19,24 @@
 // For more information, visit the Verdandi web site:
 //      http://verdandi.gforge.inria.fr/
 
-
 #define VERDANDI_DEBUG_LEVEL_4
 #define VERDANDI_WITH_ABORT
+#define SELDON_WITH_BLAS
+#define SELDON_WITH_LAPACK
+#define VERDANDI_DENSE
+#define VERDANDI_WITH_TRAJECTORY_MANAGER
 
-#include "blue.hpp"
-#include "chi_2.hpp"
-#include "cholesky.hpp"
-#include "useful_function.hpp"
+#include "Verdandi.hxx"
+#include VERDANDI_GTEST_MODEL_PATH
+#include "seldon/computation/optimization/NLoptSolver.cxx"
+#include "seldon/SeldonSolver.hxx"
+#include "gtest/gtest.h"
 
-#include <cppunit/TestResult.h>
-#include <cppunit/ui/text/TestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
-using namespace CppUnit;
+#include "test_perf.hpp"
 
-CPPUNIT_TEST_SUITE_REGISTRATION(BLUETest);
-CPPUNIT_TEST_SUITE_REGISTRATION(Chi2Test);
-CPPUNIT_TEST_SUITE_REGISTRATION(CholeskyTest);
-CPPUNIT_TEST_SUITE_REGISTRATION(UsefulFunctionTest);
-
-int main()
+// Main function used to launch the gtest framework.
+int main(int argc, char **argv)
 {
-  VERDANDI_TRY;
-
-  TextUi::TestRunner runner;
-
-  TestFactoryRegistry &registry = TestFactoryRegistry::getRegistry();
-
-  runner.addTest(registry.makeTest());
-
-  return runner.run("", false);
-
-  VERDANDI_END;
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
