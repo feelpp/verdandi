@@ -44,7 +44,15 @@ namespace Verdandi
     ::TR1PerturbationManager():
         BasePerturbationManager<TR1PerturbationManager>(), urng_(NULL)
     {
-        urng_ = new tr1::mt19937(time(NULL));
+        urng_ = new engine(time(NULL));
+        distribution_uniform_ = new distribution_uniform(0.0, 1.0);
+        variate_generator_uniform_ =
+            new generator_uniform(*urng_, *distribution_uniform_);
+
+        distribution_normal_ = new distribution_normal(0.0, 1.0);
+        variate_generator_normal_ =
+            new generator_normal(*urng_, *distribution_normal_);
+
     }
 
 
@@ -56,7 +64,14 @@ namespace Verdandi
     ::TR1PerturbationManager(string configuration_file):
         BasePerturbationManager<TR1PerturbationManager>(), urng_(NULL)
     {
+        urng_ = new engine(time(NULL));
+        distribution_uniform_ = new distribution_uniform(0.0, 1.0);
+        variate_generator_uniform_ =
+            new generator_uniform(*urng_, *distribution_uniform_);
         Initialize(configuration_file);
+        distribution_normal_ = new distribution_normal(0.0, 1.0);
+        variate_generator_normal_ =
+            new generator_normal(*urng_, *distribution_normal_);
     }
 
 
@@ -118,15 +133,12 @@ namespace Verdandi
     ::Normal(double mean, double variance,
              Vector<double, VectFull>& parameter)
     {
-        double value = 0;
-        tr1::variate_generator<tr1::mt19937,
-            tr1::normal_distribution<double> >
-            randn(*urng_, tr1::normal_distribution<double>(mean, variance));
 
-        value = randn();
+        double value = mean + (*variate_generator_normal_)() * sqrt(variance);
         if (parameter.GetLength() == 2)
             while (value < parameter(0) || value > parameter(1))
-                value = randn();
+                value = mean + (*variate_generator_normal_)()
+                    * sqrt(variance);
         else if (parameter.GetLength() != 0)
             throw ErrorArgument("TR1PerturbationManager"
                                 "::Normal(double, double, Vector)",
@@ -163,6 +175,36 @@ namespace Verdandi
                                 + to_str(parameter.GetLength())
                                 + " element(s).");
         return exp(Normal(mean, variance, parameter));
+    }
+
+
+    //! Generates a random number from a uniform distribution.
+    /*!
+      \param[in] min lower bound of the distribution.
+      \param[in] max upper bound of the distribution.
+      \return A random number sampled from the uniform distribution U(\a min,
+      \a max).
+    */
+    double TR1PerturbationManager::Uniform(double min, double max)
+    {
+        double span = (max > min)? max - min: min - max;
+        double value = (*variate_generator_uniform_)() * span + min;
+
+        return value;
+    }
+
+
+    //! Generates a random number from a uniform distribution on integers.
+    /*!
+      \param[in] min lower bound of the distribution.
+      \param[in] max upper bound of the distribution.
+      \return A random integer sampled from the uniform distribution U(\a min,
+      \a max).
+    */
+    int TR1PerturbationManager::UniformInt(int min, int max)
+    {
+         std::tr1::uniform_int<int> unif(min, max);
+        return unif(*urng_);
     }
 
 
@@ -208,10 +250,6 @@ namespace Verdandi
 
         bool satisfy_constraint = false;
 
-        tr1::variate_generator<tr1::mt19937,
-            tr1::normal_distribution<double> >
-            randn(*urng_, tr1::normal_distribution<double>(T0(0), T1(1)));
-
         Vector<T1, VectFull, Allocator0> perturbation(output.GetSize());
 
         while(!satisfy_constraint)
@@ -221,10 +259,10 @@ namespace Verdandi
             int size = sample.GetSize();
             for (int i = 0; i < size; i++)
             {
-                value = randn();
+                value = (*variate_generator_normal_)();
                 if (parameter.GetLength() == 2)
                     while (value < parameter(0) || value > parameter(1))
-                        value = randn();
+                        value = (*variate_generator_normal_)();
                 sample(i) = value;
             }
 

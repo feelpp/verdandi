@@ -41,8 +41,25 @@ namespace Verdandi
         public BasePerturbationManager<TR1PerturbationManager>
     {
     protected:
+        typedef tr1::mt19937 engine;
+        typedef tr1::uniform_real<double> distribution_uniform;
+        typedef tr1::variate_generator<engine, distribution_uniform>
+        generator_uniform;
+        typedef tr1::normal_distribution<double> distribution_normal;
+        typedef tr1::variate_generator<engine, distribution_normal>
+        generator_normal;
+
         //! Mersenne Twister random number generator.
-        tr1::mt19937* urng_;
+        engine* urng_;
+
+        //! Uniform distribution.
+        distribution_uniform* distribution_uniform_;
+        //! Uniform variate generator.
+        generator_uniform* variate_generator_uniform_;
+        //! Uniform distribution.
+        distribution_normal* distribution_normal_;
+        //! Uniform variate generator.
+        generator_normal* variate_generator_normal_;
 
     public:
 
@@ -62,6 +79,10 @@ namespace Verdandi
                       Vector<double, VectFull>& parameter);
         double LogNormal(double mean, double variance,
                          Vector<double, VectFull>& parameter);
+
+        double Uniform(double min, double max);
+
+        int UniformInt(int min, int max);
 
         template <class T0, class T1,
                   class Prop0, class Allocator0>
