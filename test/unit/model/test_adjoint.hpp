@@ -20,7 +20,6 @@
 //      http://verdandi.gforge.inria.fr/
 
 #include <cmath>
-#include <tr1/random>
 
 using namespace Verdandi;
 
@@ -50,7 +49,7 @@ protected:
     //! Restricts the values of the states above a bound.
     double  state_lower_bound_;
     //! Generates random numbers.
-    std::tr1::mt19937 generator_;
+    PerturbationManager rng_;
     //! The working state, randomly generated.
     state crafted_state_;
     //! Tested model.
@@ -77,16 +76,11 @@ public:
         // Creates a random generator.
         generator_.seed(time(NULL));
         crafted_state_.Reallocate(Nstate_);
-        tr1::variate_generator<tr1::mt19937,
-                               tr1::uniform_real<double> >
-            randn(generator_, tr1::uniform_real<double>(state_lower_bound_,
-                                                        state_upper_bound_));
-
         // Creates a randomized state: 'crafted_state_'. This state's values
         // are between 'state_lower_bound_' and 'state_upper_bound_'.
         model_.GetState().Reallocate(Nstate_);
         for (unsigned int i = 0; i < Nstate_; i++)
-            crafted_state_(i) = randn();
+            crafted_state_(i) = rng_.Uniform();
 
         model_.GetState() = crafted_state_;
     }
@@ -140,8 +134,8 @@ TEST_F(AdjointTest, TestLinearTangent)
 
     // Randomizes i and j. j determines the perturbation direction. i is the
     // index of the model output under consideration.
-    int j = generator_() % Nstate_;
-    int i = generator_() % Nstate_;
+    int j = rng_.UniformInt(0, Nstate_);
+    int i = rng_.UniformInt(0, Nstate_);
 
     // Denominator: (Model(c + Epsilon * v)_i - Model(c)_i) / Epsilon, where
     // Model(c)_i is the i-th component of the model output Model(c).

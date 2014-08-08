@@ -20,7 +20,6 @@
 //      http://verdandi.gforge.inria.fr/
 
 #include <cmath>
-#include <tr1/random>
 
 using namespace Verdandi;
 
@@ -42,7 +41,7 @@ protected:
     //! Tested model.
     VERDANDI_GTEST_MODEL model_;
     //! Generates random numbers, using Mersenne twister.
-    std::tr1::mt19937 generator_;
+    PerturbationManager rng_;
     //! Restricts the values of the states below a bound.
     double  state_upper_bound_;
     //! Restricts the values of the states above a bound.
@@ -59,7 +58,6 @@ public:
         configuration.Set("state_lower_bound", state_lower_bound_);
         configuration.Set("Nstep_init", Nstep_);
         model_.Initialize(VERDANDI_GTEST_CONFIG_PATH);
-        generator_.seed(time(NULL));
     }
 };
 
@@ -82,16 +80,13 @@ TEST_F(BasicModelTest, CheckIfStateSizeIsCorrect)
 // previously modified state.
 TEST_F(BasicModelTest, CheckSetStateCorrectness)
 {
-    tr1::variate_generator<tr1::mt19937,
-                           tr1::uniform_real<double> >
-        randn(generator_, tr1::uniform_real<double>(state_lower_bound_,
-                                                    state_upper_bound_));
+
 
     // Generates an integer lower than Nstate at which we insert a random
     // value.
-    int position = generator_() % model_.GetNstate();
+    int position = rng_.UniformInt(0, model_.GetNstate()-1);
     // Generates a random value.
-    double value = randn();
+    double value = rng_.Uniform(state_lower_bound_, state_upper_bound_);
     // Sets the generated value into the model.
     model_.GetState()(position) = value;
     model_.StateUpdated();

@@ -31,14 +31,24 @@
 #include "seldon/computation/optimization/NLoptSolver.cxx"
 #include "seldon/SeldonSolver.hxx"
 
+#ifdef STD2011
+#include "RandomPerturbationManager.cxx"
+#define PerturbationManager RandomPerturbationManager
+#else
+#include "TR1PerturbationManager.cxx"
+#define PerturbationManager TR1PerturbationManager
+#endif
+
 #include "gtest/gtest.h"
 
 #include "test_time.hpp"
 #include "test_initialization.hpp"
 
+
 #ifdef VERDANDI_TEST_ADJOINT
 #include "test_adjoint.hpp"
 #endif
+
 
 // Main function used to launch the gtest framework.
 int main(int argc, char **argv)

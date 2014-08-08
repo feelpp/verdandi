@@ -20,7 +20,6 @@
 //      http://verdandi.gforge.inria.fr/
 
 #include <iostream>
-#include <tr1/random>
 
 using namespace Verdandi;
 
@@ -45,7 +44,7 @@ protected:
     //! The size of the state.
     unsigned int Nstate_;
     //! Generates random numbers, using Mersenne twister.
-    std::tr1::mt19937 generator_;
+    PerturbationManager rng_;
     //! Tested model.
     VERDANDI_GTEST_MODEL model_;
     //! Stores the states to check the consistency of the model.
@@ -60,8 +59,6 @@ public:
     // tests, then stores all the states and times needed for the tests.
     virtual  void SetUp()
     {
-        // Initializes the random generator.
-        generator_.seed(time(NULL));
         // Initializes the model, reads the configuration, initializes
         // variables.
         model_.Initialize(VERDANDI_GTEST_CONFIG_PATH);
@@ -109,8 +106,8 @@ TEST_F(TestTime, TestTimeRandom)
     unsigned int step2 = 0;
     while (step1 == step2 || step2 < step1)
     {
-        step1 = generator_() % Nstep_;
-        step2 = generator_() % Nstep_;
+        step1 = rng_.UniformInt(0, Nstep_);
+        step2 = rng_.UniformInt(0, Nstep_ - 1);
     }
 
     // Inserts the state at 'step1' into the model.
