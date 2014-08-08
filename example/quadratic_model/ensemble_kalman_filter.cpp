@@ -16,7 +16,14 @@
 #include "model/QuadraticModel.cxx"
 #include "observation_manager/LinearObservationManager.cxx"
 #include "method/EnsembleKalmanFilter.cxx"
+
+#ifdef STD2011
+#include "method/RandomPerturbationManager.cxx"
+#define RNG RandomPerturbationManager
+#else
 #include "method/TR1PerturbationManager.cxx"
+#define RNG TR1PerturbationManager
+#endif
 
 int main(int argc, char** argv)
 {
@@ -34,8 +41,7 @@ int main(int argc, char** argv)
     typedef double real;
 
     Verdandi::EnsembleKalmanFilter<Verdandi::QuadraticModel<real>,
-        Verdandi::LinearObservationManager<real>,
-        Verdandi::TR1PerturbationManager> driver;
+        Verdandi::LinearObservationManager<real>, Verdandi::RNG> driver;
 
     driver.Initialize(argv[1]);
 
