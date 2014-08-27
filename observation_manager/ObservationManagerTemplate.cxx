@@ -163,17 +163,6 @@ namespace Verdandi
     ////////////
 
 
-    //! Indicates if some observations are available at a given time.
-    /*!
-      \param[in] time a given time.
-    */
-    bool ObservationManagerTemplate::HasObservation(double time)
-    {
-        throw ErrorUndefined(
-            "bool ObservationManagerTemplate::HasObservation(double time)");
-    }
-
-
     //! Indicates if some observations are available at current time.
     bool ObservationManagerTemplate::HasObservation() const
     {

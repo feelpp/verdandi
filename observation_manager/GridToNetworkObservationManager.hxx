@@ -374,7 +374,6 @@ namespace Verdandi
 
 
         bool HasObservation() const;
-        bool HasObservation(double time);
         int GetNobservation() const;
         bool IsOperatorSparse() const;
         bool IsErrorSparse() const;

@@ -256,27 +256,6 @@ namespace Verdandi
     ////////////
 
 
-    //! Indicates if some observations are available at a given time.
-    /*!
-      \param[in] time a given time.
-    */
-    bool PythonObservationManager::HasObservation(double time)
-    {
-        char function_name[] = "HasObservation";
-        char format_unit[] = "d";
-        PyObject *has_observation =
-            PyObject_CallMethod(pyObservationManagerInstance_,
-                                function_name, format_unit, time);
-
-        if (has_observation == NULL)
-            throw ErrorPythonUndefined("PythonModel::HasObservation",
-                                       string(function_name), "(self, time)",
-                                       module_);
-
-        return PyInt_AsLong(has_observation) != 0;
-    }
-
-
     //! Indicates if some observations are available at current time.
     bool PythonObservationManager::HasObservation() const
     {

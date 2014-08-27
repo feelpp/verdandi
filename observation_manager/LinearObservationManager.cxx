@@ -1855,19 +1855,6 @@ namespace Verdandi
     ////////////
 
 
-    //! Indicates if some observations are available at a given time.
-    /*!
-      \param[in] time a given time.
-    */
-    template <class T>
-    bool LinearObservationManager<T>::HasObservation(double time)
-    {
-        SetTime(time);
-        return available_time_.GetSize() != 0
-            && !is_equal(Norm1(contribution_), 0.);
-    }
-
-
     //! Indicates if some observations are available at current time.
     template <class T>
     bool LinearObservationManager<T>::HasObservation() const
