@@ -99,9 +99,8 @@ namespace Verdandi
 #ifndef VERDANDI_TRY
 #define VERDANDI_TRY try {
 #endif
-#ifndef VERDANDI_END
-#define VERDANDI_END                                            \
-  }                                                             \
+#ifndef VERDANDI_CATCH
+#define VERDANDI_CATCH                                          \
     catch(Verdandi::Error& Err)                                 \
       {                                                         \
         Err.CoutWhat();                                         \
@@ -132,12 +131,21 @@ namespace Verdandi
       {                                                         \
         std::cout << str << std::endl;                          \
         return 1;                                               \
-      }                                                         \
+      }
+#endif
+#ifndef VERDANDI_CATCH_ANY
+#define VERDANDI_CATCH_ANY                                      \
     catch(...)                                                  \
       {                                                         \
         std::cout << "Unknown exception..." << std::endl;       \
         return 1;                                               \
       }
+#endif
+#ifndef VERDANDI_END
+#define VERDANDI_END                                            \
+  }                                                             \
+      VERDANDI_CATCH                                            \
+      VERDANDI_CATCH_ANY
 #endif
 
 
