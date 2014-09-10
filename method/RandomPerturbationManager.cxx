@@ -195,7 +195,7 @@ namespace Verdandi
     */
     int RandomPerturbationManager::UniformInt(int min, int max)
     {
-        std::uniform_int_distribution<int> distribution(min, max);
+        std::uniform_int_distribution<int> distribution(min, max - 1);
         return distribution(generator_);
     }
 

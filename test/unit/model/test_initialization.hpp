@@ -84,7 +84,7 @@ TEST_F(BasicModelTest, CheckSetStateCorrectness)
 
     // Generates an integer lower than Nstate at which we insert a random
     // value.
-    int position = rng_.UniformInt(0, model_.GetNstate()-1);
+    int position = rng_.UniformInt(0, model_.GetNstate());
     // Generates a random value.
     double value = rng_.Uniform(state_lower_bound_, state_upper_bound_);
     // Sets the generated value into the model.

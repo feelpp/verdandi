@@ -52,7 +52,6 @@ namespace Verdandi
         distribution_normal_ = new distribution_normal(0.0, 1.0);
         variate_generator_normal_ =
             new generator_normal(*urng_, *distribution_normal_);
-
     }
 
 
@@ -224,7 +223,7 @@ namespace Verdandi
     */
     int TR1PerturbationManager::UniformInt(int min, int max)
     {
-         std::tr1::uniform_int<int> unif(min, max);
+         std::tr1::uniform_int<int> unif(min, max - 1);
         return unif(*urng_);
     }
 
