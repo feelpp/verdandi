@@ -40,7 +40,7 @@ namespace Verdandi
     {
     protected:
         //! Uniform random number generator.
-        std::default_random_engine generator_;
+        std::mt19937 generator_;
         /*! String that defines how the seed is initialized: "time" or
           "number". */
         string seed_type_;

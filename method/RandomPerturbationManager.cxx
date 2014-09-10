@@ -26,6 +26,7 @@
 #include "RandomPerturbationManager.hxx"
 #include "BasePerturbationManager.cxx"
 #include "share/LockFile.cxx"
+#include <chrono>
 
 
 namespace Verdandi
@@ -44,9 +45,10 @@ namespace Verdandi
     ::RandomPerturbationManager():
         BasePerturbationManager<RandomPerturbationManager>()
     {
-        srand(time(NULL));
-        double seed = rand() / (double(RAND_MAX) + 1.);
-        generator_.seed(seed);
+
+        unsigned seed
+            = std::chrono::system_clock::now().time_since_epoch().count();
+        generator_ = std::mt19937(seed);
     }
 
 
