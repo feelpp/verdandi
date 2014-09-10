@@ -31,11 +31,10 @@
 #include "seldon/SeldonSolver.hxx"
 
 #include "gtest/gtest.h"
-
-#include "chi_2.hpp"
-#include "blue.hpp"
-#include "cholesky.hpp"
-
+#include "test_helper.hpp"
+#include "test_TR1.hpp"
+#include "test_random.hpp"
+#include "test_function_inverse.hpp"
 
 // Main function used to launch the Google Test framework.
 int main(int argc, char **argv)

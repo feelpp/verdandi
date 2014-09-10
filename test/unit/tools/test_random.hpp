@@ -19,27 +19,51 @@
 // For more information, visit the Verdandi web site:
 //      http://verdandi.gforge.inria.fr/
 
-#define VERDANDI_DEBUG_LEVEL_4
-#define VERDANDI_WITH_ABORT
-#define SELDON_WITH_BLAS
-#define SELDON_WITH_LAPACK
-#define VERDANDI_DENSE
-#define VERDANDI_WITH_TRAJECTORY_MANAGER
+#include <iostream>
+#include "RandomPerturbationManager.cxx"
 
-#include "Verdandi.hxx"
-#include "seldon/computation/optimization/NLoptSolver.cxx"
-#include "seldon/SeldonSolver.hxx"
-
-#include "gtest/gtest.h"
-
-#include "chi_2.hpp"
-#include "blue.hpp"
-#include "cholesky.hpp"
+using namespace Verdandi;
 
 
-// Main function used to launch the Google Test framework.
-int main(int argc, char **argv)
+class TestRandom: public testing::Test
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+protected:
+    RandomPerturbationManager rng_;
+public:
+    void SetUp()
+    {
+    }
+    void TearDown()
+    {
+    }
+};
+
+
+TEST_F(TestRandom, TestUniformRange)
+{
+    TestRange(rng_);
+}
+
+
+TEST_F(TestRandom, TestUniformRangeInt)
+{
+    TestRangeInt(rng_);
+}
+
+
+TEST_F(TestRandom, TestDiversityOfNumbers)
+{
+    TestDiversity(rng_);
+}
+
+
+TEST_F(TestRandom, TestNormalDistribution)
+{
+    TestMean(rng_);
+}
+
+
+TEST_F(TestRandom, TestChi2)
+{
+    TestChiSquared(rng_);
 }
