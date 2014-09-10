@@ -35,6 +35,7 @@
 #include "chi_2.hpp"
 #include "blue.hpp"
 #include "cholesky.hpp"
+#include "test_compare.hpp"
 
 
 // Main function used to launch the Google Test framework.
