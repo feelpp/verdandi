@@ -75,11 +75,32 @@ namespace Verdandi
     }
 
 
+    //! Constructor by copy.
+    /*! The seed is initialized from the system clock.
+     */
+    TR1PerturbationManager
+    ::TR1PerturbationManager(const TR1PerturbationManager &unUsed):
+        BasePerturbationManager<TR1PerturbationManager>(), urng_(NULL)
+    {
+        urng_ = new engine(time(NULL));
+        distribution_uniform_ = new distribution_uniform(0.0, 1.0);
+        variate_generator_uniform_ =
+            new generator_uniform(*urng_, *distribution_uniform_);
+
+        distribution_normal_ = new distribution_normal(0.0, 1.0);
+        variate_generator_normal_ =
+            new generator_normal(*urng_, *distribution_normal_);
+    }
+
+
     //! Destructor.
     TR1PerturbationManager::~TR1PerturbationManager()
     {
-        if (urng_ != NULL)
-            delete urng_;
+        delete variate_generator_uniform_;
+        delete variate_generator_normal_;
+        delete urng_;
+        delete distribution_normal_;
+        delete distribution_uniform_;
     }
 
 

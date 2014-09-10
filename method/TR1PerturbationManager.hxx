@@ -67,6 +67,7 @@ namespace Verdandi
 
         TR1PerturbationManager();
         TR1PerturbationManager(string configuration_file);
+        TR1PerturbationManager(const TR1PerturbationManager &);
         ~TR1PerturbationManager();
 
         /*** Methods ***/
