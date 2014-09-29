@@ -32,9 +32,16 @@
 
 #include "gtest/gtest.h"
 #include "test_helper.hpp"
+
+#ifndef __clang__
 #include "test_TR1.hpp"
-#include "test_random.hpp"
+#endif
+
 #include "test_function_inverse.hpp"
+
+#ifdef VERDANDI_HAS_CXX11
+#include "test_random.hpp"
+#endif
 
 // Main function used to launch the Google Test framework.
 int main(int argc, char **argv)

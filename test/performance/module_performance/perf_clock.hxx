@@ -28,7 +28,7 @@
 
 using namespace std;
 
-#ifdef STD2011
+#ifdef VERDANDI_HAS_CXX11
 #include <chrono>
 using namespace chrono;
 #endif
@@ -39,15 +39,15 @@ using namespace chrono;
   <chrono>. The aim of this class is to be as simple as possible, in order to
   reduce the time spent here and to improve the accuracy of the measure. If
   C++11 is not available, the accuracy of this class is reduced but can still
-  be used, thanks to <ctime> library. The directive 'STD2011' should be set
-  for C++11 to be used. */
+  be used, thanks to <ctime> library. The directive 'VERDANDI_HAS_CXX11'
+  should be set for C++11 to be used. */
 class Clock
 {
 private:
     //! Is the clock running?
     bool is_running_;
 
-#ifdef STD2011
+#ifdef VERDANDI_HAS_CXX11
     //! Point in time which helps to compute elapsed time.
     high_resolution_clock::time_point first_point_;
     //! Time lapse during which this chrono was running.

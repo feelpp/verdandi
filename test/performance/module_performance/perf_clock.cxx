@@ -23,7 +23,7 @@
 #include "perf_clock.hxx"
 
 
-#ifdef STD2011
+#ifdef VERDANDI_HAS_CXX11
 
 
 //////////////

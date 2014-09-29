@@ -277,7 +277,6 @@ if env["FORTRAN"] in ["g77", "gfortran"] \
 add_argument("std", ["1988", "2011"])
 if ARGUMENTS["std"] == "2011":
     cpp_compilation_option += " -std=c++0x"
-    env.Append(CPPDEFINES = "STD2011")
 
 # Compilation options.
 env.Replace(CCFLAGS = cpp_compilation_option)

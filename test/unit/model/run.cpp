@@ -31,7 +31,7 @@
 #include "seldon/computation/optimization/NLoptSolver.cxx"
 #include "seldon/SeldonSolver.hxx"
 
-#ifdef STD2011
+#ifdef VERDANDI_HAS_CXX11
 #include "RandomPerturbationManager.cxx"
 #define PerturbationManager RandomPerturbationManager
 #else

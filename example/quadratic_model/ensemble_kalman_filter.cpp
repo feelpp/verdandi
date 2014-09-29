@@ -17,7 +17,7 @@
 #include "observation_manager/LinearObservationManager.cxx"
 #include "method/EnsembleKalmanFilter.cxx"
 
-#ifdef STD2011
+#ifdef VERDANDI_HAS_CXX11
 #include "method/RandomPerturbationManager.cxx"
 #define RNG RandomPerturbationManager
 #else

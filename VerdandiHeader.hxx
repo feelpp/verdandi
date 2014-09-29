@@ -184,5 +184,14 @@ namespace Verdandi
 #define VERDANDI_STATE_ERROR_DENSE
 #endif
 
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#define VERDANDI_HAS_CXX11
+#elif defined __clang__
+#define VERDANDI_HAS_CXX11
+#elif __cplusplus > 199711L
+#define VERDANDI_HAS_CXX11
+#endif
+
+
 #define VERDANDI_FILE_VERDANDIHEADER_HXX
 #endif
