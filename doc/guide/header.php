@@ -197,6 +197,25 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "optimization_solver")
 
 </li>
 
+<li class="jelly"> <?php HL($file, "test_user_guide", "Test");?>
+
+<?php if (basename($_SERVER['REQUEST_URI'], ".php") == "test_user_guide"
+or basename($_SERVER['REQUEST_URI'], ".php") == "perf_user_guide"
+or basename($_SERVER['REQUEST_URI'], ".php") == "test_list")
+
+{
+  echo '<ul class="navsubul"> <li class="jelly">';
+  HL($file, "test_list", "Test list"); 
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "perf_user_guide", "Performance module");
+  echo '</li> </ul>';
+} ?>
+
+</li>
+
+
+
 <li class="jelly"> <?php HL($file, "plugging_in_verdandi", "Plugging in Verdandi");?>
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "plugging_in_verdandi"

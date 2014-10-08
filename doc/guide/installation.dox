@@ -132,237 +132,42 @@ Installation instructions for MacOS and Linux are nearly identical, except for a
 
 </ul>
 
-\section windows Windows, 32-bit computer
 
-\subsection dependencies Install the dependencies
-<ul> 
+\section windows_install Windows
 
-<li> <b>SCons</b> <br>
-First install a 2.x version of <a href="http://www.python.org/download/">Python</a> (preferably the latest 2.x version, but any version from 2.4 should be fine). Then install <a href="http://www.scons.org/">SCons</a>. Add the path of the SCons program to the environment variable <code>PATH</code> (right-click on My Computer -> Properties -> Advanced -> Environment Variables).</li>
-
+\subsection depinstall Installation of the dependencies
 <li> <b>Download precompiled libraries</b> <br>
+Not all the libraries are needed for all the methods, select and install the ones you will want to use.
 
-Not all the libraries are needed for all the methods, select and install the ones you will want to use in your assimilation.
+- Lua (always required). On <a href="https://code.google.com/p/luaforwindows/">this website</a>, download the latest executable for version 5.1 which will install Lua on your computer. Alternatively, you may want to compile Lua yourself: in this case, you will need to install make and to compile the library which can be found in "verdandi/include/lua" inside Verdandi tarball.
 
-- Lua (always required). On <a href="http://luabinaries.sourceforge.net/download.html">the Lua Binaries webpage</a>, download the archive containing the Windows x86 DLL and Includes (at the time this page is written: <code>lua5_1_4_Win32_dll8_lib.zip</code>). Extract the archive and put the extracted directory in your PATH environment variable. In this directory, rename <code>lua51.lib</code> in <code>lua.lib</code>.
+- Blas and Lapack (highly recommended):<ul><li> On <a href="http://icl.cs.utk.edu/lapack-for-windows/clapack/#libraries">this webpage</a>, download the prebuilt librairies and extract the archive to some directory.</li>
+<li> Add the path to this directory to the environment variable "path": "Computer" -> "Properties" -> "Advanced System Properties" -> "Environment variables".</li></ul>
 
-- Blas and Lapack (highly recommended). Download on <a href="http://www.fi.muni.cz/~xsvobod2/misc/lapack/">this webpage</a> the archive for the shared version, statically-linked. Extract the archive to some directory. Add this directory to your <code>PATH</code> environment variable. Inside the directory, rename <code>blas_win32_MT.lib</code> in <code>blas.lib</code> and <code>lapack_win32_MT.lib</code> in <code>lapack.lib</code>. <br>
-
-- Atlas (highly recommended). Download on <a href="http://www.netlib.org/atlas/archives/windows/">this webpage</a> the file <code>atlas330_WinNT_P4SSE2.zip</code>. Extract the archive and put the extracted directory <code>WinNT_P4SSE2</code> in your <code>PATH</code> environment variable. Inside this directory, rename the <code>libcblas.a</code> in <code>cblas.lib</code> and <code>libatlas.a</code> in <code>atlas.lib</code>. <br>
+- Atlas and Cblas (highly recommended): On <a href="http://www.netlib.org/atlas/archives/windows/">this webpage</a> download the file <code>atlas330_WinNT_P4SSE2.zip</code>. Extract the archive to a directory.
 
 </li>
 
-- If you need SuperLU (needed only if one uses sparse matrices), see the section below.
-
-<li> <b>Create SuperLU library</b> (optional) <br>
-
-Download the SuperLU archive at <a href="http://crd.lbl.gov/~xiaoye/SuperLU/">SuperLU</a>. Take the sequential version 4.1 and expand it. <br>
-
-Within Microsoft Visual Studio, create a new Win32 Console Application. Start with an empty project. Then add to the project all the <code>.c</code> and <code>.h</code> files from <code>SuperLU_4.1\\SRC</code> directory (Project -> Add existing item). Change the configuration to build a release version (Build -> Configuration Manager -> Configuration -> Release). <br>
-
-Specify the <code>SuperLU\\SRC</code> location in <code>Additional Include Directories</code> (Project -> Properties -> Configuration Properties -> C/C++ -> General). Change the property of the project to make the output as Library file <code>.lib</code> (neither <code>.exe</code> nor <code>.dll</code> file), in Project -> Properties -> Configuration Properties -> General -> Configuration Type. <br>
-
-Compile the project to produce the library file <code>superlu.lib</code> (Build -> Build Solution).
-</li>
-
-
-</ul>
-
-\subsection project Create a Verdandi project
+\subsection VSproject Creation of a Visual Studio project (tested with Visual Studio 9 2008)
 <ul>
-<li> Download %Verdandi and expand it to the directory of your choice. </li>
-
-<li>Create a "New project from existing code file" in Visual. Select Visual C++ for the entry "Type of project". Specify then the location of an example model directory in your version of Verdandi, e.g., <code>Verdandi-[version]\\example\\quadratic_model</code>, and give a name to the project. On the "Project Settings" page, select "Use external build system". Then put <code>scons</code> as the generic build command line and <code>scons -c</code> as the clean command line. Click on OK.
-</li>
+<li> Download and expand the Verdandi tarball.</li>
+<li> Create a new Visual Studio project from existing code: "File" -> "New" -> "Project From Existing Code".</li>
+<li> Select "Visual C++" in the drop-down menu then click "next".</li>
+<li> Set the project file location (for example "example/quadratic_model"), and give a name to the project, then click "next".</li>
+<li> In the drop-down menu select "Console application project" then click "finish".</li>
 </ul>
 
-\subsection test Run a test
+\subsection VSdependencies Setting the dependencies in the Visual Studio project
 <ul>
-
-<li> You now have to configure the dependencies to the different libraries. In "Project -> Properties -> Configuration Properties -> VC++ Directories", add in the "Library Directories" the path to the different directories where your ".lib" files are. For example, if your Lua library is stored in the directory <code>C:\\Program Files\\Lua\\5.1\\lib</code>, add a new line with this path.
-
-If you want to run the quadratic model, you have to link to the Lua, Blas, Lapack and Cblas libraries. Other models can require other libraries.
-
-</li>
-
-<li> In "Project -> Properties -> Configuration Properties -> NMake", set the build command line to <code>scons forward.exe</code> and the rebuild command line to <code>scons -c && scons forward.exe</code>. Set the output to <code>forward.exe</code>. </li>
-
-<li> Compile with "Build -> Build solution". Specify the argument for <code>forward.exe</code>; i.e., put <code>configuration\truth.lua</code> in "Configuration Properties -> Debugging -> Command Arguments". To run the example, launch "Debug -> Start Without Debugging". If you are told that the executable is out of date, check the box so that you will not be asked again and click on <code>No</code> (do not rebuild the project). </li>
+<li> In "Project" -> "Properties" -> "Configuration Properties" -> "Additional Include Directories" add "../../", "../../include" and the path to the headers of your Lua installation.</li>
+<li> Still in "Configuration Properties" go to "linker" -> "General" in the menu on the left. Add the paths to lua, cblas and Blas/Lapack into "Additional Librairies Directories".</li>
+<li> Under "linker" in the "Input File" menu, add the librairies to the "Additional Dependencies" menu. (At this time the names are "cbia.lib.blas.dyn.rel.x86.12.lib", "cbia.lib.lapack.dyn.rel.x86.12.lib", "cblas.a", "lua51.lib")</li>
 </ul>
 
-\subsection alternative Alternative method to run the tests
-
-Note that you can use the command prompt with the Visual command-line tools, in order to obtain the same results with an approach similar to that of Linux.
+\subsection buildnrun Building the project and running a test
 <ul>
-<li>
-Open the command prompt, either in Visual (in "Tools -> Command prompt"), or from your computer "Start menu": "All Programs -> Microsoft Visual Studio -> Visual Studio Command Prompt". Then set the current directory to the example directory of Verdandi with the <code>cd</code> command. For instance, <code>cd C:\\Verdandi-[version]\\example\\quadratic_model</code>.
-
-You will then have to edit the <code>SConstruct</code> file to "manually" add the links to the libraries needed to compile. Edit the <code>SConstruct</code> file from the current directory, so that it looks like this:
-
-\precode
-import os
-
-# Put the path to Verdandi.
-# Also editable from command line with option "verdandi".
-verdandi_path = "C:\\verdandi-[version]"
-
-flag_cpp = "/nologo /EHsc /MD"
-linker = "LINK"
-# Put here the list of directories containing the library files to be included.
-include_path = [""]
-# Put here the list of directories containing the .lib files.
-library_path = ["C:\\Program Files\\Lua\\5.1\\lib", "C:\\Program Files\\Blas_Lapack","C:\\Program Files\\WinNT_P4SSE2"]
-
-execfile(os.path.join(verdandi_path, "share\\SConstruct"))
-\endprecode
-</li>
-
-<li>
-If you want to run the quadratic model, you have to add the Lua, Blas, Lapack and Cblas directories (containing lua.lib, blas.lib, lapack.lib and cblas.lib) in the "library_path" variable. Other models can require other libraries to be added in this variable.
-
-Then type <code>scons</code> in the command prompt. It should create all the executables for the quadratic model. To launch them, type the name of the executable followed by the appropriated configuration file. For example, <code>forward.exe configuration\truth.lua</code> will apply the forward method using the configuration file "truth.lua", and generate some result files in the <code>result</code> directory.
-</li>
+<li> At this point you can build the project using the build command of visual Studio.</li>
 </ul>
 
-\section windows64 Windows, 64-bit computer
 
-\subsection compiler 64-bit compiler for Visual Studio
-
-Depending on your version of Visual, a 64-bit compiler may or may not be available by default. Refer to <a href="http://msdn.microsoft.com/en-us/library/hs24szh9.aspx">this table.</a> If not available, you can add one by installing the latest version of the Windows SDK, which contains 64-bit compilers for Visual Studio. At this time, the latest version is the 7.1, <a href="http://www.microsoft.com/downloads/en/details.aspx?FamilyID=6b6c21d2-2006-4afa-9702-529fa782d63b&displaylang=en">available here</a>.
-
-\subsection dependencies Install the dependencies
-<ul> 
-
-<li> <b>SCons</b> <br>
-First install a 2.x version of <a href="http://www.python.org/download/">Python</a> (preferably the latest 2.x version, but any version from 2.4 should be fine). Then install <a href="http://www.scons.org/">SCons</a>. Add the path of the SCons program to the environment variable <code>PATH</code> (right-click on My Computer -> Properties -> Advanced -> Environment Variables).</li>
-
-
-<li> <b>Download precompiled libraries</b> <br>
-
-Not all the libraries are needed for all the methods, select and install the ones you will want to use in your assimilation.
-
-- Lua (always required). On <a href="http://luabinaries.sourceforge.net/download.html">the Lua Binaries webpage</a>, download the archive containing the Windows x64 DLL and Includes (at the time this page is written: <code>lua5_1_4_Win64_dll8_lib.zip</code>). Extract the archive and put the extracted directory in your PATH environment variable. In this directory, rename <code>lua51.lib</code> in <code>lua.lib</code>.
-
-- Atlas (highly recommended). Download on <a href="http://www.netlib.org/atlas/archives/windows/">this webpage</a> the file <code>atlas330_WinNT_P4SSE2.zip</code>. Extract the archive and put the extracted directory <code>WinNT_P4SSE2</code> in your <code>PATH</code> environment variable. Inside this directory, rename the <code>libatlas.a</code> file in <code>atlas.lib</code>. <br>
-
-<li>
-<b>Create Blas and Lapack</b> (highly recommended) <br>
-
-You will have to build a 64-bit version of these two libraries with Visual C++. Follow the instructions given in section "Easy Windows Build" on the <a href="http://icl.cs.utk.edu/lapack-for-windows/clapack/#build">CLAPACK for Windows</a> page.
-
-<!-- Download the archive containing CLapack-CMake (at this time : <code>clapack-3.2.1-CMAKE.tgz</code>) and extract it. CMake is required to generate the Visual source files and project. <a href="http://www.cmake.org/cmake/resources/software.html">Download</a> (use the Win32 Installer) and install it.
-In CMAKE, in "Where is the source code:", point to the CLapack-Cmake you extracted earlier. In "Where to build the binaries", point to the desired folder of destination. In Configure, specify your version of Visual Studio with the Win64 compiler (example : Visual Studio 10 Win64). Click on configure again until the new lines become white. A click on Generate will create the Visual Studio project for Lapack. -->
-
-Open the ALL_BUILD Visual project in the new directory you created with CMake. Then in Visual, change the solution configuration from the default Debug to Release, and build the solution. This will create the three libraries we need : <code>blas.lib</code> (by default in the sub-directory <code>BLAS\\SRC\\Release\\</code>), <code>lapack.lib</code> (in <code>SRC\\Release\\</code>) and <code>libf2c.lib</code> (in <code>F2CLIBS\\libf2c\\Release\\</code>. For convenience, take these three files and put them in the same directory of your choice, for instance <code>C:\\Program Files\\Blas_Lapack</code>.
-
-At last, you will need the GNU Scientific Library. The latest version is at this time the GSL-1.14 <a href ="http://www.gnu.org/software/gsl/">available here</a>. Extract it to the directory of your choice, for example <code>C:\\gsl\\</code>. Then move the files <code>C:\\gsl\\gsl\\blas\\gsl_cblas.h</code> and <code>C:\\gsl\\gsl\\sys\\gsl_sys.h</code> to <code>C:\\gsl\\gsl\\</code>. Finally, rename the file <code>C:\\gsl\\gsl\\config.h.in</code> to <code>C:\\gsl\\gsl\\config.h</code>.
-
-
-</li>
-
-If you need SuperLU (needed only if one uses sparse matrices), see the section below.
-
-<li> <b>Create SuperLU library</b> (optional) <br>
-
-Download the SuperLU archive at <a href="http://crd.lbl.gov/~xiaoye/SuperLU/">SuperLU</a>. Take the sequential version 4.1 and expand it. <br>
-
-Within Microsoft Visual Studio, create a new Win32 Console Application. Start with an empty project. Then add to the project all the <code>.c</code> and <code>.h</code> files from <code>SuperLU_4.1\\SRC</code> directory (Project -> Add existing item). Change the configuration to build a release version (Build -> Configuration Manager -> Configuration -> Release). <br>
-
-Specify the <code>SuperLU\\SRC</code> location in <code>Additional Include Directories</code> (Project -> Properties -> Configuration Properties -> C/C++ -> General). Change the property of the project to make the output as Library file <code>.lib</code> (neither <code>.exe</code> nor <code>.dll</code> file), in Project -> Properties -> Configuration Properties -> General -> Configuration Type. <br>
-
-Compile the project to produce the library file <code>superlu.lib</code> (Build -> Build Solution).
-</li>
-
-</ul>
-
-\subsection project Create a Verdandi project
-<ul>
-<li> Download %Verdandi and expand it to the directory of your choice. </li>
-
-<li>Create a "New project from existing code file" in Visual. Select Visual C++ for the entry "Type of project". Specify then the location of an example model directory in your version of Verdandi, e.g., <code>Verdandi-[version]\\example\\quadratic_model</code>, and give a name to the project. On the "Project Settings" page, select "Use external build system". Then put <code>scons</code> as the generic build command line and <code>scons -c</code> as the clean command line. Click on OK.
-</li>
-</ul>
-
-\subsection test Run a test
-<ul>
-
-<li> Edit <code>SConstruct</code> file from the current project directory so that it looks like this:
-
-\precode
-import os
-
-# Put the path to Verdandi.
-# Also editable from command line with option "verdandi".
-verdandi_path = "C:\\verdandi-[version]"
-
-flag_cpp = "/nologo /EHsc /MD"
-linker = "LINK"
-# Put here the list of directories containing the GSL headers.
-# One must include the top GSL directory and its subdirectory "gsl".
-include_path = ["C:\\gsl", "C:\\gsl\\gsl"]
-# Put here the list of directories containing lua.lib, blas.lib, lapack.lib and libf2c.lib.
-library_path = ["C:\\Program Files\\lua64", "C:\\Program Files\\Blas_Lapack"]
-
-import glob
-
-# Replace also here "C:\\gsl\\" with the path to your GSL top directory.
-dependency_list = [x for x in glob.glob('C:\\gsl\\gsl\\cblas\\*.c') if "test" not in x];
-
-library_list = ["libf2c.lib"] 
-
-execfile(os.path.join(verdandi_path, "share\\SConstruct"))
-\endprecode
-</li>
-
-The quadratic model has dependencies to the Lua, Blas, Lapack and Cblas libraries, but other models can require to add some more paths to the <code>include_path</code> and <code>library_path</code> variables. As in 32-bit, you can add the library and include paths directly in the Visual configuration instead of adding them to the "include_path" and "library_path" variables in <code>SConstruct</code>. To do this, go to "Project -> Properties -> Configuration Properties -> VC++ Directories", and add your include paths in the "Include Directories" entry, and add your library paths in the "Library Directories" entry.
-
-<li> Edit the Project -> Properties. In Configuration Properties -> NMake, set the build command line to <code>scons forward.exe</code> and the rebuild command line to <code>scons -c && scons forward.exe</code>. Set the output to <code>forward.exe</code>. In Configuration Properties, set "Platform Tools" to the appropriate 64-bit kit ("Windows 7.1 SDK", for example if you are using Visual C++ Express). If "Platform Tools" is not a visible entry, you may need to temporarily set the "Configuration type" to another type than Makefile ("Application (.exe)", for example). Be sure to switch back the "Configuration type" to Makefile, right after selecting the platform tool.</li>
-
-<li> Compile with Build -> Build solution. Specify the argument for <code>forward.exe</code>; i.e., put <code>configuration\truth.lua</code> in Configuration Properties -> Debugging -> Command Arguments. To run the example, launch Debug -> Start Without Debugging. If you are told that the executable is out of date, check the box so that you will not be asked again and click on <code>No</code> (do not rebuild the project). </li>
-
-</ul>
-
-\subsection alternative Alternative method to run the tests
-
-Note that you can use the command prompt with the Visual command-line tools, in order to obtain the same results with an approach similar to that of Linux.
-<ul>
-<li>
-Open the command prompt, either in Visual (in "Tools -> Command prompt"), or from your computer "Start menu": "All Programs -> Microsoft Visual Studio -> Visual Studio Command Prompt". Then set the current directory to the example directory of Verdandi with the <code>cd</code> command. For instance, <code>cd C:\\Verdandi-[version]\\example\\quadratic_model</code>.
-
-You will then have to edit the <code>SConstruct</code> file to "manually" add the links to the libraries needed to compile. Edit the <code>SConstruct</code> file from the current directory, so that it looks like this:
-
-\precode
-import os
-
-# Put the path to Verdandi.
-# Also editable from command line with option "verdandi".
-verdandi_path = "C:\\verdandi-[version]"
-
-flag_cpp = "/nologo /EHsc /MD"
-linker = "LINK"
-# Put here the list of directories containing the GSL headers.
-# One must include the top GSL directory and its subdirectory "gsl".
-include_path = ["C:\\gsl", "C:\\gsl\\gsl"]
-# Put here the list of directories containing lua.lib, blas.lib, lapack.lib and libf2c.lib.
-library_path = ["C:\\Program Files\\lua64", "C:\\Program Files\\Blas_Lapack"]
-
-import glob
-
-# Replace also here "C:\\gsl\\" with the path to your GSL top directory.
-dependency_list = [x for x in glob.glob('C:\\gsl\\gsl\\cblas\\*.c') if "test" not in x];
-
-library_list = ["libf2c.lib"] 
-
-execfile(os.path.join(verdandi_path, "share\\SConstruct"))
-\endprecode
-</li>
-
-<li>
-If you want to run the quadratic model, you have to add the Lua, Blas, Lapack and Cblas directories (containing lua.lib, blas.lib, lapack.lib and cblas.lib) in the "library_path" variable. Other models can require other libraries to be added in this variable.
-
-Then type <code>scons</code> in the command prompt. It should create all the executables for the quadratic model. To launch them, type the name of the executable followed by the appropriated configuration file. For example, <code>forward.exe configuration\truth.lua</code> will apply the forward method using the configuration file "truth.lua", and generate some result files in the <code>result</code> directory.
-</li>
-</ul>
-
-</ul>
 */
