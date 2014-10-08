@@ -1,3 +1,86 @@
+Version 1.6 (2014-10-29)
+-----------
+
+* Methods
+
+- Added support for model error in 'ExtendedKalmanFilter'.
+- Improved the display options of 'ExtendedKalmanFilter'.
+- Added the option to read the perturbations of 'MonteCarlo' in files instead
+  of generating them randomly.
+- Removed useless copies in 'MonteCarlo'.
+- Added the option to change the initial weight in
+  'DiscountedRidgeRegression'.
+- In all methods, the initial condition is now saved before assimilation and
+  even in the case the model is not initialized by the method.
+- Initial import of 'ExtendedMinimaxFilter'.
+
+* Tools
+
+- Added a new perturbation manager: 'RandomPerturbationManager', using the
+  C++11 library <random>.
+- Newran is now optional everywhere.
+- Rewrote CPPUnit tests into the framework of Google Test.
+- Added tests for 'Model::SetTime', the adjoint model and the tangent linear
+  operator of the model.
+- Added a test to check that the unscented Kalman filter and the extended
+  Kalman filter give the same results with a linear model and the same
+  observations.
+- Added the directory "test/unit/tool/", primarily with tests on the
+  perturbation managers.
+- Added the new module "module_performance" aiming at keeping track of the
+  time inside tests.
+- Made use of the perturbation managers in the unit tests.
+
+* Interface
+
+- Updated the Python interface to be consistent with the expected description
+  of uncertain parameters.
+- Added the option not to call the Python method 'Initialize' from
+  'PythonModel::Initialize'.
+- Added 'PythonModel::GetModelInstance()'.
+
+* Documentation
+
+- Improved the documentation about the installation under Linux and Windows.
+- Added documentation about unit tests.
+
+* Bug fixes
+
+- In 'MonteCarlo::InitializeStep', the model method 'ParameterUpdated' was
+  called for parameters with option "init_step".
+- In 'TR1PerturbationManager', the normal sampling could generate the same
+  values when the corresponding calls were too close (in time).
+- The arguments 'initialize_model' and 'initialize_perturbation_manager' were
+  not transferred from 'MonteCarlo::Initialize(string, bool, bool)' to
+  'MonteCarlo::Initialize(VerdandiOps&, bool, bool)'.
+- In sequential mode, 'ReducedOrderUnscentedKalmanFilter' saved the analyses
+  with the forecasts.
+- The name of the logger output file was set after the first strings were sent
+  to the logger.
+- The output saver did not append a new line after the data are written in
+  'WriteText'.
+- The initialization and finalization of MPI were missing in
+  'ForwardDriver.cxx'.
+- Moved a call to the logger that was made before the model was initialized.
+- Moved the definitions of the default parameters from "Error.cxx" to
+  "Error.hxx", which avoids compilation failure with given compilers
+  (including Clang).
+- 'FourDimensionalVariational' could not compile without the trajectory
+  manager.
+- The copy constructor of 'TR1PerturbationManager' did not duplicate the
+  underlying random number generators.
+
+* Miscellaneous
+
+- Renamed "display.show_iteration" and "display.show_time" to
+  "display.iteration" and "display.time" in the configurations.
+- Improved the log messages and made them consistent across methods.
+- Improved the detection of C++11.
+- Added the option to use either TR1 or Newran in the shallow water model.
+- Removed an unused function in observation managers: 'bool
+  HasObservation(double time)'.
+
+
 Version 1.5 (2013-02-28)
 -----------
 
