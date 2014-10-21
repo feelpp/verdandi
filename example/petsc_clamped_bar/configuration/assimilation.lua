@@ -10,7 +10,7 @@ output_mode = "text"
 output_directory = "result/"
 output_mode_scalar = "text"
 
-observation_file = output_directory .. "truth-forecast_state.bin"
+observation_file = output_directory .. "truth-observation.bin"
 
 
 ----------------------------------- MODEL ------------------------------------
