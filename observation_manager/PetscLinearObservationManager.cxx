@@ -102,7 +102,8 @@ namespace Verdandi
             return;
 
         configuration.Set("file", observation_file_);
-        configuration.Set("type", "", "state", observation_type_);
+        configuration.Set("type","ops_in(v, {'observation', 'state'})"
+                          , observation_type_);
         configuration.Set("Delta_t", "v > 0", Delta_t_);
         configuration.Set("Nskip", "v > 0", Nskip_);
         configuration.Set("initial_time", "", 0., initial_time_);
@@ -115,10 +116,8 @@ namespace Verdandi
         if (observation_type_ == "state")
             Nbyte_observation_ = Nlocal_state_model_ * sizeof(T)
                 + sizeof(int);
-
         if (observation_type_ == "observation")
             Nbyte_observation_ = Nobservation_ * sizeof(T) + sizeof(int);
-
 
         int expected_file_size;
         expected_file_size = Nbyte_observation_ *
