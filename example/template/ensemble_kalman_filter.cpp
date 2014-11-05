@@ -14,7 +14,14 @@
 #include "model/ModelTemplate.cxx"
 #include "observation_manager/ObservationManagerTemplate.cxx"
 #include "method/EnsembleKalmanFilter.cxx"
+#ifdef VERDANDI_HAS_CXX11
+#include "method/RandomPerturbationManager.cxx"
+#define RNG RandomPerturbationManager
+#else
 #include "method/TR1PerturbationManager.cxx"
+#define RNG TR1PerturbationManager
+#endif
+
 
 int main(int argc, char** argv)
 {
@@ -30,8 +37,7 @@ int main(int argc, char** argv)
     }
 
     Verdandi::EnsembleKalmanFilter<Verdandi::ModelTemplate,
-        Verdandi::ObservationManagerTemplate,
-        Verdandi::TR1PerturbationManager> driver;
+        Verdandi::ObservationManagerTemplate, Verdandi::RNG> driver;
 
     driver.Initialize(argv[1]);
 
