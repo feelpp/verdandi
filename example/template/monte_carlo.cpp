@@ -10,7 +10,15 @@
 #include "model/ModelTemplate.cxx"
 #include "observation_manager/ObservationManagerTemplate.cxx"
 #include "method/MonteCarlo.cxx"
+
+#ifdef VERDANDI_HAS_CXX11
+#include "method/RandomPerturbationManager.cxx"
+#define RNG RandomPerturbationManager
+#else
 #include "method/TR1PerturbationManager.cxx"
+#define RNG TR1PerturbationManager
+#endif
+
 
 int main(int argc, char** argv)
 {
@@ -26,7 +34,7 @@ int main(int argc, char** argv)
     }
 
     Verdandi::MonteCarlo<Verdandi::ModelTemplate,
-        Verdandi::TR1PerturbationManager> driver;
+        Verdandi::RNG> driver;
 
     driver.Initialize(argv[1]);
 
