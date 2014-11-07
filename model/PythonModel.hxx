@@ -22,10 +22,10 @@
 
 #ifndef VERDANDI_FILE_MODEL_PYTHONMODEL_CXX
 
-#undef VERDANDI_PYTHON_INCLUDE
-#define VERDANDI_PYTHON_INCLUDE(v) <python v
+#define PYTHON_EVAL_HELPER <python
+#define EVAL(v) v
+#include EVAL(PYTHON_EVAL_HELPER)EVAL(VERDANDI_PYTHON_VERSION)/Python.h>
 
-#include VERDANDI_PYTHON_INCLUDE(VERDANDI_PYTHON_VERSION)/Python.h>
 #include <numpy/arrayobject.h>
 
 namespace Verdandi
