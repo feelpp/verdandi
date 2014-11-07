@@ -273,9 +273,13 @@ if env["FORTRAN"] in ["g77", "gfortran"] \
        and ARGUMENTS["mode_fortran"] == "strict":
     fortran_compilation_option += " -Wall -pedantic"
 
+
 # C++ Standard.
 add_argument("std", ["1988", "2011"])
 if ARGUMENTS["std"] == "2011":
+    cpp_compilation_option += " -std=c++0x"
+
+if "clang" in env["CXX"]:
     cpp_compilation_option += " -std=c++0x"
 
 # Compilation options.
