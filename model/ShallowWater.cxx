@@ -22,6 +22,9 @@
 
 #ifndef VERDANDI_FILE_MODEL_SHALLOWWATER_CXX
 
+#ifdef __clang__
+#define VERDANDI_USE_NEWRAN
+#endif
 
 #include "ShallowWater.hxx"
 #include <iostream>
