@@ -1,4 +1,4 @@
-Verdandi 1.6+
+Verdandi 1.6.1
 
 Required dependencies:
     - Seldon 5.2
@@ -12,3 +12,4 @@ Optional dependencies:
     - Python 2.5 or higher
     - Newran03 beta
     - TRNG 4.11
+    - Google Test

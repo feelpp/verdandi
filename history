@@ -1,3 +1,19 @@
+Version 1.6.1 (2014-11-21)
+-------------
+
+* Bug fixes
+
+- In "PythonModel.hxx" and "PythonObservationManager.hxx", the macro providing
+  the Python version was not working with Clang.
+- Various examples are now using the 'RandomPerturbationManager' by default
+  when compiling with Clang.
+- 'ShallowWater' uses 'Newran' by default when compiling with Clang.
+
+* Miscellaneous
+
+- When compiling with Clang, SCons will automatically add the C++0x option.
+
+
 Version 1.6 (2014-10-29)
 -----------
 
