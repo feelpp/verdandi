@@ -102,7 +102,8 @@ namespace Verdandi
             return;
 
         configuration.Set("file", observation_file_);
-        configuration.Set("type", "", "state", observation_type_);
+        configuration.Set("type", "ops_in(v, {'observation', 'state'})",
+                          observation_type_);
         configuration.Set("Delta_t", "v > 0", Delta_t_);
         configuration.Set("Nskip", "v > 0", Nskip_);
         configuration.Set("initial_time", "", 0., initial_time_);
