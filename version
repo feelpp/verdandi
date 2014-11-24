@@ -12,4 +12,4 @@ Optional dependencies:
     - Python 2.5 or higher
     - Newran03 beta
     - TRNG 4.11
-    - Google Test
+    - Google Test 1.7.0
