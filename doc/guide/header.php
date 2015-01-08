@@ -197,7 +197,7 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "optimization_solver")
 
 </li>
 
-<li class="jelly"> <?php HL($file, "test_user_guide", "Test");?>
+<li class="jelly"> <?php HL($file, "test_user_guide", "Testing");?>
 
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "test_user_guide"
 or basename($_SERVER['REQUEST_URI'], ".php") == "perf_user_guide"
