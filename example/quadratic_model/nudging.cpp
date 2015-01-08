@@ -14,7 +14,7 @@
 
 int main(int argc, char** argv)
 {
-  VERDANDI_TRY;
+    VERDANDI_TRY;
 
     if (argc != 2)
     {
