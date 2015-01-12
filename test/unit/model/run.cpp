@@ -28,7 +28,6 @@
 
 #include "Verdandi.hxx"
 #include VERDANDI_GTEST_MODEL_PATH
-#include "seldon/computation/optimization/NLoptSolver.cxx"
 #include "seldon/SeldonSolver.hxx"
 
 #ifdef VERDANDI_HAS_CXX11

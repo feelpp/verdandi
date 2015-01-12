@@ -27,7 +27,6 @@
 #define VERDANDI_WITH_TRAJECTORY_MANAGER
 
 #include "Verdandi.hxx"
-#include "seldon/computation/optimization/NLoptSolver.cxx"
 #include "seldon/SeldonSolver.hxx"
 
 #include "gtest/gtest.h"
