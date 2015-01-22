@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <cerrno>
 #include <cstdio>
+#include <unistd.h>
 
 namespace Verdandi
 {
