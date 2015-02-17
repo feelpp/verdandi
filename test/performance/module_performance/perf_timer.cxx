@@ -58,7 +58,7 @@ void Timer::ResetClock(string label)
 {
     if (Timer::clock_map_.count(label) > 0)
         Timer::clock_map_.at(label).Reset();
-else
+    else
         cout << "No clock named " << label << " found." << endl;
 }
 
