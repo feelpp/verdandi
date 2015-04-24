@@ -220,6 +220,7 @@ namespace Verdandi
 
         void Forward();
         void Analyze();
+        void Prediction();
 
         void FinalizeStep();
         void Finalize();

@@ -46,7 +46,6 @@ int main(int argc, char** argv)
     {
         driver.InitializeStep();
         driver.Forward();
-        driver.Analyze();
         driver.FinalizeStep();
     }
 

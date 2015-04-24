@@ -216,7 +216,7 @@ namespace Verdandi
 
     //! Performs a step forward with nudging.
     template <class Model, class ObservationManager>
-    void Nudging<Model, ObservationManager>::Forward()
+    void Nudging<Model, ObservationManager>::Prediction()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
@@ -236,8 +236,15 @@ namespace Verdandi
         MessageHandler::Send(*this, "model", "forecast");
         MessageHandler::Send(*this, "observation_manager", "forecast");
         MessageHandler::Send(*this, "driver", "forecast");
-
         MessageHandler::Send(*this, "all", "::Forward end");
+    }
+
+
+    template <class Model, class ObservationManager>
+    void Nudging<Model, ObservationManager>::Forward()
+    {
+        Prediction();
+        Analyze();
     }
 
 

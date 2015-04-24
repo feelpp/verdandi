@@ -484,6 +484,17 @@ namespace Verdandi
     void EnsembleKalmanFilter<Model, ObservationManager,
                               PerturbationManager>::Forward()
     {
+        Prediction();
+        Analyze();
+    }
+
+
+    //! Performs a forecast step for the ensemble.
+    template <class Model, class ObservationManager,
+              class PerturbationManager>
+    void EnsembleKalmanFilter<Model, ObservationManager,
+                              PerturbationManager>::Prediction()
+    {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
         time_ = model_.GetTime();

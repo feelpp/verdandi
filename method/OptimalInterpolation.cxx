@@ -274,6 +274,15 @@ namespace Verdandi
     template <class Model, class ObservationManager>
     void OptimalInterpolation<Model, ObservationManager>::Forward()
     {
+        Prediction();
+        Analyze();
+    }
+
+
+    //! Performs a forecast step.
+    template <class Model, class ObservationManager>
+    void OptimalInterpolation<Model, ObservationManager>::Prediction()
+    {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
         model_.Forward();

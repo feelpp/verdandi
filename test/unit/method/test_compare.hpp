@@ -74,7 +74,6 @@ public:
         {
             driver2.InitializeStep();
             driver2.Forward();
-            driver2.Analyze();
             driver2.FinalizeStep();
         }
         shared_state_ = driver2.GetModel().GetState();
@@ -112,7 +111,6 @@ TEST_F(MethodCompare, test_UKF)
     {
         driver.InitializeStep();
         driver.Forward();
-        driver.Analyze();
         driver.FinalizeStep();
      }
 
@@ -139,7 +137,6 @@ TEST_F(MethodCompare, test_ROEKF)
     {
         driver.InitializeStep();
         driver.Forward();
-        driver.Analyze();
         driver.FinalizeStep();
      }
 
@@ -164,7 +161,6 @@ TEST_F(MethodCompare, test_nudging)
     {
         driver.InitializeStep();
         driver.Forward();
-        driver.Analyze();
         driver.FinalizeStep();
      }
 

@@ -108,6 +108,8 @@ namespace Verdandi
         void InitializeStep();
         void Forward();
         void Analyze();
+        void Prediction();
+
         void FinalizeStep();
         void Finalize();
         bool HasFinished();

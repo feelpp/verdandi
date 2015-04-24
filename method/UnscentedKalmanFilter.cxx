@@ -249,9 +249,18 @@ namespace Verdandi
     }
 
 
-    //! Performs a step forward, with optimal interpolation at the end.
+    //! Performs a step forward with assimilation.
     template <class Model, class ObservationManager>
     void UnscentedKalmanFilter<Model, ObservationManager>::Forward()
+    {
+        Prediction();
+        Analyze();
+    }
+
+
+    //! Performs a forecast step.
+    template <class Model, class ObservationManager>
+    void UnscentedKalmanFilter<Model, ObservationManager>::Prediction()
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 

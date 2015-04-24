@@ -129,6 +129,7 @@ namespace Verdandi
 
         void InitializeStep();
 
+        void Prediction();
         void Forward();
         void Analyze();
 

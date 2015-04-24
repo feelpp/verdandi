@@ -433,10 +433,20 @@ namespace Verdandi
     }
 
 
-    //! Performs a step forward, with optimal interpolation at the end.
+    //! Performs a step forward with assimilation.
     template <class Model, class ObservationManager>
     void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
     ::Forward()
+    {
+        Prediction();
+        Analyze();
+    }
+
+
+    //! Performs a forecast step.
+    template <class Model, class ObservationManager>
+    void ReducedOrderExtendedKalmanFilter<Model, ObservationManager>
+    ::Prediction()
     {
 #if defined(VERDANDI_WITH_MPI)
         if (rank_ == 0)
