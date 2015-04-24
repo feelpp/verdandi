@@ -181,6 +181,21 @@ namespace Verdandi
             "int ObservationManagerTemplate::GetNobservation() const");
     }
 
+    //! Returns the nudging matrix.
+    /*!
+      \param[in] x a vector representing the state.
+      \param[out] output the nudging matrix at \a x.
+    */
+    template <class T>
+    template <class state>
+    Matrix<T> LinearObservationManager<T>
+    ::GetNudgingMatrix(const state& x) const
+    {
+        throw ErrorUndefined(
+            "Matrix<T> ObservationManagerTemplate::"
+            "GetNudgingMatrix(const state&) const");
+    }
+
 
     ///////////////
     // OPERATORS //

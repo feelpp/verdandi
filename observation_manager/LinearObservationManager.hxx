@@ -410,7 +410,8 @@ namespace Verdandi
         bool IsOperatorSparse() const;
         bool IsErrorSparse() const;
         bool HasErrorMatrix() const;
-
+        template <class state>
+        Matrix<T> GetNudgingMatrix(const state& x) const;
 
         ///////////////
         // OPERATORS //

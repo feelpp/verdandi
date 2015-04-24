@@ -1926,6 +1926,28 @@ namespace Verdandi
     }
 
 
+    //! Returns the nudging matrix.
+    /*!
+      \param[in] x a vector representing the state.
+      \param[out] output the nudging matrix at \a x.
+    */
+    template <class T>
+    template <class state>
+    Matrix<T> LinearObservationManager<T>
+    ::GetNudgingMatrix(const state& x) const
+    {
+        Matrix<T> output;
+        int state_size = x.GetSize();
+        output.Reallocate(Nobservation_, state_size);
+        output.Fill(T(0));
+        output.SetIdentity();
+        // Those values are made up for the nudging test.
+        output(0, 0) = 1.036;
+        output(1, 1) = 0.98;
+        return output;
+    }
+
+
     ///////////////
     // OPERATORS //
     ///////////////
