@@ -169,6 +169,11 @@ namespace Verdandi
         //! Output saver.
         OutputSaver output_saver_;
 
+#ifdef VERDANDI_WITH_MPI
+        //! Communicator used inside this model.
+        MPI_Comm mpi_communicator_;
+#endif
+
     public:
         // Constructors and destructor.
         QuadraticModel();
@@ -212,6 +217,11 @@ namespace Verdandi
         parameter_variance& GetParameterVariance(int i);
         Vector<T>& GetParameterPDFData(int i);
         string GetParameterOption(int i);
+
+#ifdef VERDANDI_WITH_MPI
+        // MPI specific methods.
+        void SetMPICommunicator(MPI_Comm);
+#endif
 
         // Errors.
         error_variance& GetErrorVariance();

@@ -40,6 +40,9 @@ namespace Verdandi
     QuadraticModel<T>::QuadraticModel():
         Delta_t_(1.), time_(0.), current_row_(-1)
     {
+#ifdef VERDANDI_WITH_MPI
+        mpi_communicator_initialized_ = false;
+#endif
     }
 
 
@@ -51,6 +54,10 @@ namespace Verdandi
     QuadraticModel<T>::QuadraticModel(string configuration_file):
         Delta_t_(1.), time_(0.), current_row_(-1)
     {
+
+#ifdef VERDANDI_WITH_MPI
+        mpi_communicator_initialized_ = false;
+#endif
         Initialize(configuration_file);
     }
 
@@ -82,6 +89,10 @@ namespace Verdandi
     template <class T>
     void QuadraticModel<T>::Initialize(string configuration_file)
     {
+#ifdef VERDANDI_WITH_MPI
+        if (!mpi_communicator_initialized_)
+            mpi_communicator_ = MPI_COMM_WORLD;
+#endif
 
         /*** Configuration ***/
 
@@ -841,6 +852,26 @@ namespace Verdandi
     {
         return "init_step";
     }
+
+
+    /////////
+    // MPI //
+    /////////
+
+
+#ifdef VERDANDI_WITH_MPI
+    //! Sets a MPI communicator.
+    /*!
+      \param[in] MPI_Comm the new communicator.
+      \note By default this communicator is MPI_COMM_WORLD.
+    */
+    template <class T>
+    void QuadraticModel<T>::SetMPICommunicator(MPI_Comm communicator)
+    {
+        mpi_communicator_ = communicator;
+        mpi_communicator_initialized_ = true;
+    }
+#endif
 
 
     ////////////
