@@ -28,6 +28,8 @@
 #include "method/ExtendedKalmanFilter.cxx"
 #include "method/OptimalInterpolation.cxx"
 #include "method/ForwardDriver.cxx"
+#include "method/ReducedOrderExtendedKalmanFilter.cxx"
+
 
 using namespace Verdandi;
 typedef Verdandi::Vector<double> state;
@@ -66,7 +68,7 @@ public:
         Verdandi::ExtendedKalmanFilter<Verdandi::QuadraticModel<real>,
                                        Verdandi::LinearObservationManager
                                        <real> > driver2;
-        driver2.Initialize("configuration/assimilation2.lua");
+        driver2.Initialize(VERDANDI_GTEST_CONFIG_PATH);
          while (!driver2.HasFinished())
         {
             driver2.InitializeStep();
@@ -103,7 +105,7 @@ TEST_F(MethodCompare, test_UKF)
                                     Verdandi::LinearObservationManager
                                     <real> > driver;
 
-    driver.Initialize("configuration/assimilation2.lua");
+    driver.Initialize(VERDANDI_GTEST_CONFIG_PATH);
 
     while (!driver.HasFinished())
     {
@@ -116,6 +118,33 @@ TEST_F(MethodCompare, test_UKF)
     state compared_state = driver.GetModel().GetState();
     // With the hypothesis of model linearity, we should obtain the same exact
     // state.
+    AssertStateEqual(compared_state, shared_state_);
+    driver.Finalize();
+}
+
+
+//! This test checks that the ROEKF produces the same output as EKF.
+TEST_F(MethodCompare, test_ROEKF)
+{
+    // The ROEKF method is run using the same configuration and observations
+    // as the EKF in the 'SetUp()' method.
+    Verdandi::ReducedOrderExtendedKalmanFilter<Verdandi::QuadraticModel<real>,
+                                    Verdandi::LinearObservationManager
+                                    <real> > driver;
+
+    driver.Initialize(VERDANDI_GTEST_CONFIG_PATH);
+
+    while (!driver.HasFinished())
+    {
+        driver.InitializeStep();
+        driver.Forward();
+        driver.Analyze();
+        driver.FinalizeStep();
+     }
+
+    state compared_state = driver.GetModel().GetState();
+    // With the hypothesis of model linearity and a non-reduced state, we
+    // should obtain the same exact state.
     AssertStateEqual(compared_state, shared_state_);
     driver.Finalize();
 }

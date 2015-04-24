@@ -2,6 +2,7 @@
 
 
 Delta_t_model = 0.0015
+Nskip_save = 1
 
 output_directory = "result/"
 output_file_string = ""
@@ -316,6 +317,45 @@ forward = {
       log = output_directory .. "forward.log"
 
    }
+
+}
+
+
+-- Simulation with assimilation using ROEKF.
+reduced_order_extended_kalman_filter = {
+
+   data_assimilation = {
+
+      analyze_first_step = false,
+
+   },
+
+   display = {
+
+      iteration = false,
+      time = false,
+      analysis_time = false
+
+   },
+
+   output_saver = {
+
+
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
+      file = output_directory .. "roekf-%{name}.%{extension}",
+      time = "step " .. Delta_t_model * Nskip_save .. " 1.e-6",
+      mode = output_mode,
+      mode_scalar = output_mode_scalar
+
+   },
+
+   output = {
+
+     configuration = output_directory .. "roekf.lua",
+     log = output_directory .. "roekf_%{rank}.log"
+
+   },
 
 }
 
