@@ -95,6 +95,45 @@ optimal_interpolation = {
 }
 
 
+-- Simulation with assimilation using nudging.
+nudging = {
+
+   data_assimilation = {
+
+      analyze_first_step = false,
+      -- Choice of nudging : "dt" or "standard".
+      nudging_type = "dt",
+      -- Choice of nudging gain.
+      nudging_gain = 18
+
+   },
+
+   display = {
+
+      iteration = false,
+      time = false,
+      analysis_time = true
+
+   },
+
+   output_saver = {
+
+      variable_list = {"forecast_time", "forecast_state",
+                       "analysis_time", "analysis_state"},
+      file = output_directory .. "nudging-%{name}.%{extension}"
+
+   },
+
+   output = {
+
+      configuration = output_directory .. "nudging.lua",
+      log = output_directory .. "nudging.log"
+
+   }
+
+}
+
+
 -- Simulation with assimilation using EKF.
 extended_kalman_filter = {
 

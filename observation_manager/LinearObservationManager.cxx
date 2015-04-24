@@ -1943,7 +1943,8 @@ namespace Verdandi
         output.SetIdentity();
         // Those values are made up for the nudging test.
         output(0, 0) = 1.036;
-        output(1, 1) = 0.98;
+        if (state_size > 1)
+            output(1, 1) = 0.98;
         return output;
     }
 
