@@ -938,15 +938,34 @@ namespace Verdandi
     }
 
 
-    //! Returns the square root of the state error variance.
+    //! Returns the reduced error state variance.
     /*!
-      \return The square root of the state error variance.
+      \return Returns the reduced error state variance.
+      \note This function is only implemented for the method test: it returns
+      a non-reduced state error variance.
     */
     template <class T>
-    const typename QuadraticModel<T>::state_error_variance&
-    QuadraticModel<T>::GetStateErrorVarianceSqrt() const
+    typename QuadraticModel<T>::state_error_variance_reduced&
+    QuadraticModel<T>::GetStateErrorVarianceReduced()
     {
-        return P_sqrt_;
+        return P_;
+    }
+
+
+    //! Returns the state error variance projector.
+    /*!
+      \return Returns the state error variance projector.
+      \note This function is only implemented for testing: it returns the
+      identity.
+    */
+    template <class T>
+    typename QuadraticModel<T>::state_error_variance&
+    QuadraticModel<T>::GetStateErrorVarianceProjector()
+    {
+        state_error_variance_projector_.Reallocate(Nstate_, Nstate_);
+        state_error_variance_projector_.Fill(T(0));
+        state_error_variance_projector_.SetIdentity();
+        return state_error_variance_projector_;
     }
 
 

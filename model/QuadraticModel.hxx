@@ -49,6 +49,7 @@ namespace Verdandi
         typedef const T& const_reference;
         typedef Matrix<T> tangent_linear_operator;
         typedef Matrix<T> state_error_variance;
+        typedef Matrix<T> state_error_variance_reduced;
         typedef Vector<T> state_error_variance_row;
         typedef Vector<T> state;
         typedef Matrix<T> matrix_state_observation;
@@ -140,6 +141,15 @@ namespace Verdandi
         //! Variance of the state error.
         state_error_variance P_;
 
+        /*! \brief Projector matrix L in the decomposition of the
+        background error covariance matrix (\f$B\f$) as a product LUL^T */
+        state_error_variance state_error_variance_projector_;
+
+        /*! \brief Reduced matrix U in the decomposition of the
+          background error covariance matrix (\f$B\f$) as a product LUL^T */
+        state_error_variance_reduced state_error_variance_reduced_;
+
+
         //! Variance of the state error in square root form.
         state_error_variance P_sqrt_;
 
@@ -161,6 +171,7 @@ namespace Verdandi
         QuadraticModel();
         QuadraticModel(string configuration_file);
         ~QuadraticModel();
+
         // Initializations.
         void Initialize(string configuration_file);
         void InitializeStep();
@@ -216,6 +227,8 @@ namespace Verdandi
 #ifndef SWIG
         const state_error_variance& GetStateErrorVarianceSqrt() const;
 #endif
+        state_error_variance& GetStateErrorVarianceProjector();
+        state_error_variance_reduced& GetStateErrorVarianceReduced();
 
         string GetName() const;
         void Message(string message);
