@@ -96,6 +96,9 @@ namespace Verdandi
         configuration.Set("with_linear_term", with_linear_term_);
         configuration.Set("with_constant_term", with_constant_term_);
 
+        source_.Resize(Nstate_);
+        source_.Fill(T(0));
+
         if (with_quadratic_term_)
         {
             S_state_.Reallocate(Nstate_);
@@ -459,6 +462,9 @@ namespace Verdandi
     template <class T>
     void QuadraticModel<T>::Forward()
     {
+        Add(Delta_t_, source_, state_);
+        source_.Fill(T(0));
+
         if (with_quadratic_term_)
         {
             state current_state = state_;
@@ -714,6 +720,16 @@ namespace Verdandi
     {
     }
 
+
+    //! Allows to set a source to the model.
+    /*!
+      \param[in] source The source to be added.
+    */
+    template <class T>
+    void QuadraticModel<T>::SetSource(state& source)
+    {
+        source_ = source;
+    }
 
     //! Returns the number of parameters to be perturbed.
     /*!

@@ -220,24 +220,6 @@ namespace Verdandi
     {
         MessageHandler::Send(*this, "all", "::Forward begin");
 
-        if (nudging_type_ == "source")
-        {
-            // In the "source" nudging, the discretization of the source is
-            // done inside the model.
-            throw ErrorProcessing("Nudging::Analyze()",
-                                  "Source type not implemented yet.");
-
-            observation_manager_.SetTime(model_, model_.GetTime());
-            if (observation_manager_.HasObservation())
-            {
-                model_state& state = model_.GetState();
-                observation& innovation =
-                    observation_manager_.GetInnovation(state);
-                nudging_matrix_ =
-                    observation_manager_.GetNudgingMatrix(state);
-            }
-        }
-
         model_.Forward();
 
         // If the nudging type is set to "dt", we compute the delta_t between
@@ -268,6 +250,25 @@ namespace Verdandi
 
         if (observation_manager_.HasObservation())
         {
+            model_state& state = model_.GetState();
+            observation& innovation =
+                observation_manager_.GetInnovation(state);
+
+            nudging_matrix_ =
+                observation_manager_.GetNudgingMatrix(state);
+            Ts gain = nudging_gain_;
+
+            if (nudging_type_ == "source")
+            {
+                // In the "source" nudging, the discretization of the source
+                // is done inside the model.
+                model_state source;
+                source.Resize(state.GetSize());
+                MltAdd(gain, nudging_matrix_, innovation, Ts(0), source);
+                model_.SetSource(source);
+                return;
+            }
+
             if (option_display_["analysis_time"])
                 Logger::StdOut(*this, "Computing an analysis at time "
                                + to_str(model_.GetTime()));
@@ -276,13 +277,6 @@ namespace Verdandi
                                 + to_str(model_.GetTime()));
 
 
-            model_state& state = model_.GetState();
-            observation& innovation =
-                observation_manager_.GetInnovation(state);
-
-            nudging_matrix_ =
-                observation_manager_.GetNudgingMatrix(state);
-            Ts gain = nudging_gain_;
             // If the 'nudging_type_' is "dt", we consider that the time
             // discretization for the source is done here, hence the nudging
             // gain is multiplied by 'dt'.

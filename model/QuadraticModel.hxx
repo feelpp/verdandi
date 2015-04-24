@@ -65,6 +65,9 @@ namespace Verdandi
         //! State vector.
         Vector<T> state_;
 
+        //! Source vector.
+        state source_;
+
         //! Should the quadratic term be applied?
         bool with_quadratic_term_;
         //! Should the linear term be applied?
@@ -198,6 +201,7 @@ namespace Verdandi
         void StateUpdated();
         state& GetFullState();
         void FullStateUpdated();
+        void SetSource(state& source);
 
         int GetNparameter();
         uncertain_parameter& GetParameter(int i);

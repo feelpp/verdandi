@@ -136,8 +136,8 @@ nudging = {
    data_assimilation = {
 
       analyze_first_step = false,
-      -- Choice of nudging : "dt", "standard" (source and BNF will follow)
-      nudging_type = "dt",
+      -- Choice of nudging : "dt", "standard" or "source" (BNF will follow)
+      nudging_type = "source",
       -- Choice of nudging gain.
       nudging_gain = 18
 
