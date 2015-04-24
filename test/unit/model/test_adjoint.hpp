@@ -74,13 +74,13 @@ public:
         Nstate_ = model_.GetNstate();
 
         // Creates a random generator.
-        generator_.seed(time(NULL));
         crafted_state_.Reallocate(Nstate_);
         // Creates a randomized state: 'crafted_state_'. This state's values
         // are between 'state_lower_bound_' and 'state_upper_bound_'.
         model_.GetState().Reallocate(Nstate_);
         for (unsigned int i = 0; i < Nstate_; i++)
-            crafted_state_(i) = rng_.Uniform();
+            crafted_state_(i) =
+                rng_.Uniform(state_lower_bound_, state_upper_bound_);
 
         model_.GetState() = crafted_state_;
     }
@@ -115,7 +115,7 @@ TEST_F(AdjointTest, TestModelAdjoint)
     // Computes <v; M^T M v>.
     for (int i = 0; i < crafted_state_.GetM(); i++)
         output_right += crafted_state_copy(i) *
-            model_.GetAdjointState()(i);
+            (model_.GetAdjointState()(i) - crafted_state_(i));
 
     // Computes <M v; M v>.
     for (int i = 0; i < crafted_state_.GetM(); i++)
@@ -189,4 +189,23 @@ TEST_F(AdjointTest, TestLinearTangent)
     }
     // This test succeeds if 'mvi' approaches 'denominator' (down 'accuracy_').
     while (std::abs((mvi / denominator) - 1) > accuracy_);
+}
+
+
+// This test checks the consistency between 'GetTangentLinearOperator()' and
+// 'ApplyTangentLinearOperator'.
+TEST_F(AdjointTest, TestTangentLinearOperator)
+{
+    state FromMatrixOperator = crafted_state_;
+    state FromApplyOperator = crafted_state_;
+    Matrix<double> TL_model = model_.GetTangentLinearOperator();
+
+    for(int i = 0 ; i < TL_model.GetM(); i++)
+        for (int j = 0 ; j < TL_model.GetN(); j++)
+            FromMatrixOperator(i) = TL_model(i,j) * crafted_state_(i);
+
+    model_.ApplyTangentLinearOperator(FromApplyOperator);
+
+    for (int i = 0; i < crafted_state_.GetM(); i++)
+        ASSERT_NEAR(FromApplyOperator(i), FromMatrixOperator(i), accuracy_);
 }
