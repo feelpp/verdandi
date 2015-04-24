@@ -29,6 +29,7 @@
 #include "method/OptimalInterpolation.cxx"
 #include "method/ForwardDriver.cxx"
 #include "method/ReducedOrderExtendedKalmanFilter.cxx"
+#include "method/Nudging.cxx"
 
 
 using namespace Verdandi;
@@ -145,6 +146,31 @@ TEST_F(MethodCompare, test_ROEKF)
     state compared_state = driver.GetModel().GetState();
     // With the hypothesis of model linearity and a non-reduced state, we
     // should obtain the same exact state.
+    AssertStateEqual(compared_state, shared_state_);
+    driver.Finalize();
+}
+
+
+TEST_F(MethodCompare, test_nudging)
+{
+    // The nudging method is run using the same configuration and observations
+    // as the EKF in the 'SetUp()' method.
+    Verdandi::Nudging<Verdandi::QuadraticModel<real>,
+                                    Verdandi::LinearObservationManager
+                                    <real> > driver;
+
+    driver.Initialize(VERDANDI_GTEST_CONFIG_PATH);
+    while (!driver.HasFinished())
+    {
+        driver.InitializeStep();
+        driver.Forward();
+        driver.Analyze();
+        driver.FinalizeStep();
+     }
+
+    state compared_state = driver.GetModel().GetState();
+    // With the hypothesis of model linearity we should obtain the same exact
+    // state.
     AssertStateEqual(compared_state, shared_state_);
     driver.Finalize();
 }
