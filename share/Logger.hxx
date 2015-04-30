@@ -166,6 +166,8 @@ namespace Verdandi
         template <class T>
         static void WriteMessage(const T& object, string message,
                                  int options);
+        static void WriteMessage(const string& object_name, string message,
+                                 int options);
         static void WriteMessage(const char* object, string message,
                                  int options);
         static void WriteMessage(string message, int options);

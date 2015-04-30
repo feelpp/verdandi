@@ -106,9 +106,13 @@ namespace Verdandi
         template <class S>
         void WriteHDF5(const S& x, string file_name,
                        string group_name, string dataset_name) const;
+        void WriteHDF5(const double& x, string file_name,
+                       string group_name, string dataset_name) const;
 #endif
         template <class S>
         void WriteBinary(const S& x, string file_name) const;
+
+        void WriteBinary(const double& x, string file_name) const;
         template <class T, class Prop, class Allocator>
         void WriteBinary(const Matrix<T, Prop, RowSparse, Allocator>& x,
                          string file_name) const;

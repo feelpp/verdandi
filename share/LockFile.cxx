@@ -21,9 +21,10 @@
 
 
 #ifndef VERDANDI_FILE_SHARE_LOCKFILE_CXX
+#define VERDANDI_FILE_SHARE_LOCKFILE_CXX
 
 
-#include "LockFile.hxx"
+#include "VerdandiHeader.hxx"
 
 #include <fcntl.h>
 #include <cerrno>
@@ -82,5 +83,4 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_SHARE_LOCKFILE_CXX
 #endif

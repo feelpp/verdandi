@@ -21,9 +21,10 @@
 
 
 #ifndef VERDANDI_FILE_SHARE_VERDANDIBASE_CXX
+#define VERDANDI_FILE_SHARE_VERDANDIBASE_CXX
 
 
-#include "VerdandiBase.hxx"
+#include "VerdandiHeader.hxx"
 
 
 namespace Verdandi
@@ -75,5 +76,4 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_SHARE_VERDANDIBASE_CXX
 #endif

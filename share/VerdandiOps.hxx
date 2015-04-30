@@ -68,6 +68,12 @@ namespace Verdandi
                       Seldon::Vector<T, VectFull, Allocator>& value);
         template<class T, class Allocator>
         void SetValue(string name, string constraint,
+                      const Seldon::Vector<T, PETScPar, Allocator>&
+                      default_value,
+                      bool with_default,
+                      Seldon::Vector<T, PETScPar, Allocator>& value);
+        template<class T, class Allocator>
+        void SetValue(string name, string constraint,
                       const vector<Seldon::Vector<T, VectFull, Allocator> >&
                       default_value,
                       bool with_default,
@@ -78,6 +84,20 @@ namespace Verdandi
                       default_value,
                       bool with_default,
                       Seldon::Matrix<T, Prop, Storage, Allocator>& value);
+        template<class T, class Prop, class Allocator>
+        void SetValue(string name, string constraint,
+                      const Seldon::Matrix<T, Prop, PETScMPIAIJ, Allocator>&
+                      default_value,
+                      bool with_default,
+                      Seldon::Matrix<T, Prop, PETScMPIAIJ, Allocator>& value);
+        template<class T, class Prop, class Allocator>
+        void SetValue(string name, string constraint,
+                      const
+                      vector<Seldon::Matrix<T, Prop, PETScMPIAIJ,
+                      Allocator> >& default_value,
+                      bool with_default,
+                      vector<Seldon::Matrix<T, Prop, PETScMPIAIJ,
+                      Allocator> >& value);
         template<class T, class Prop, class Storage, class Allocator>
         void SetValue(string name, string constraint,
                       const
@@ -86,6 +106,7 @@ namespace Verdandi
                       bool with_default,
                       vector<Seldon::Matrix<T, Prop, Storage, Allocator> >&
                       value);
+
 
         using ::Ops::Ops::IsParam;
         template<class T, class Allocator>

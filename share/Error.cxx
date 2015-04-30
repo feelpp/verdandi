@@ -21,9 +21,10 @@
 
 
 #ifndef VERDANDI_FILE_SHARE_ERROR_CXX
+#define VERDANDI_FILE_SHARE_ERROR_CXX
 
 
-#include "Error.hxx"
+#include "VerdandiHeader.hxx"
 
 
 namespace Verdandi
@@ -390,5 +391,4 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_SHARE_ERROR_CXX
 #endif

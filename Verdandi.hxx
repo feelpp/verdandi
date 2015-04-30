@@ -21,23 +21,33 @@
 
 
 #ifndef VERDANDI_FILE_VERDANDI_HXX
+#define VERDANDI_FILE_VERDANDI_HXX
 
 
 #include "VerdandiHeader.hxx"
 
-
 #include "seldon/Seldon.hxx"
 #include "seldon/vector/Vector2.cxx"
 #include "seldon/vector/Vector3.cxx"
+#include "share/VerdandiOps.txx"
+#include "share/Logger.txx"
+#include "share/Error.hxx"
+#include "share/UsefulFunction.txx"
+#include "share/MessageHandler.txx"
+#include "share/VerdandiBase.hxx"
+#include "share/OutputSaver.txx"
 
-#include "share/VerdandiOps.cxx"
-#include "share/Logger.cxx"
+#ifndef VERDANDI_LIB_COMPILATION
 #include "share/Error.cxx"
-#include "share/UsefulFunction.cxx"
+#include "share/LockFile.cxx"
+#include "share/Logger.cxx"
 #include "share/MessageHandler.cxx"
-#include "share/VerdandiBase.cxx"
 #include "share/OutputSaver.cxx"
+#include "share/UsefulFunction.cxx"
+#include "share/Variable.cxx"
+#include "share/VerdandiBase.cxx"
+#include "share/VerdandiOps.cxx"
+#endif
 
 
-#define VERDANDI_FILE_VERDANDI_HXX
 #endif

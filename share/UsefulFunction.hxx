@@ -79,13 +79,6 @@ namespace Verdandi
     template <class T, class Allocator>
     void GetInverse(Matrix<T, General, RowSparse, Allocator>& A);
 
-    template <class T, class Prop0, class Allocator0, class Allocator1>
-    void GetAndSolveLU(Matrix<T, Prop0, ColSparse, Allocator0>& M,
-                       Vector<T, VectFull, Allocator1>& Y);
-
-    template <class T, class Prop0, class Allocator0, class Allocator1>
-    void GetAndSolveLU(Matrix<T, Prop0, RowSparse, Allocator0>& M,
-                       Vector<T, VectFull, Allocator1>& Y);
 
     template <class T0, class Allocator0,
               class T1, class Allocator1>

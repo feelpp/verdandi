@@ -107,6 +107,8 @@ linker = create_variable("linker", "$CXX")
 # ARGUMENTS #
 #############
 
+# Verdandi as a library
+add_argument("lib", ["no", "yes", "compile"])
 
 # Parallelism.
 add_argument("mpi", ["no", "yes"])
@@ -120,7 +122,7 @@ linker = ARGUMENTS.get("link", linker)
 if ARGUMENTS["mpi"] == "yes":
     mpi_cxx_compiler = None
     # search for known good MPI C++ compilers
-    option_list = ['mpicxx','mpiCC','mpic++']
+    option_list = ['mpiCC','mpic++']
     for o in option_list:
         if WhereIs(o) != None:
             mpi_cxx_compiler = WhereIs(o)
@@ -233,6 +235,10 @@ if ARGUMENTS["umfpack"] == "yes":
     env.Append(LIBPATH = ["../../include/UMFPACK/Lib/"])
     env.Append(LIBPATH = ["../../include/AMD/Lib/"])
 
+for path in ["lib/", "include/lua/src/", "include/seldon/lib/",
+             "include/ops/lib/", "include/nlopt/lib/"]:
+    env.Append(LIBPATH = [os.path.join(verdandi_path, path)])
+
 # User shell configuration.
 if os.environ.has_key("LD_LIBRARY_PATH"):
     env.Append(LIBPATH = os.environ["LD_LIBRARY_PATH"].split(":"))
@@ -243,6 +249,8 @@ if os.environ.has_key("CPATH"):
 if os.environ.has_key("CPLUS_INCLUDE_PATH"):
     env.Append(CPPPATH = os.environ["CPLUS_INCLUDE_PATH"].split(":"))
 
+
+#env.Append(LIBPATH = [os.path.join(verdandi_path, "include/seldon/lib")])
 # Compiler.
 if ARGUMENTS["mpi"] == "no":
    if cpp_compiler is not None:
@@ -273,7 +281,6 @@ if env["FORTRAN"] in ["g77", "gfortran"] \
        and ARGUMENTS["mode_fortran"] == "strict":
     fortran_compilation_option += " -Wall -pedantic"
 
-
 # C++ Standard.
 add_argument("std", ["1988", "2011"])
 if ARGUMENTS["std"] == "2011":
@@ -296,8 +303,9 @@ for library in ["blas", "atlas", "lapack", "g2c", "gslcblas", "gfortran",
                 "newran", "superlu", "cblas", "pthread", "mpiseq",
                 "dmumps", "zmumps", "mumps_common", "pord", "metis", "m",
                 "umfpack", "amd", "cppunit", "nlopt", "trng4",
-                "scalapack", "blacs", "parmetis", "petsc", "mpi", "mpi_cxx",
-                "mesh5", "X11", "superlu_dist", "metis", "hdf5", "gtest"]:
+                "scalapack", "blacs", "parmetis", "petsc", "mpi",
+                "mesh5", "X11", "superlu_dist", "metis", "hdf5",
+                "gtest", "sz", "ops", "lua"]:
     if library not in library_list:
         library_list += [library]
 if env['PLATFORM'] in ['win32', 'win64'] and "lua" not in library_list:
@@ -307,6 +315,10 @@ for flag in to_string_list("link_flag"):
 conf = Configure(env)
 for library in library_list:
     conf.CheckLib(library)
+
+if ARGUMENTS["lib"] == "yes":
+    conf.CheckLib("verdandi")
+    conf.CheckLib("seldon")
 
 # Link to the appropriate version of Python.
 python_version = distutils.sysconfig.get_python_version()
@@ -382,3 +394,17 @@ for filename in target_list:
         env.Program(filename[:-4], [filename] + dependency_list)
     else:
         env.Program(filename[:-4], [filename, lua_library] + dependency_list)
+
+
+
+env_lib = env.Clone()
+
+if ARGUMENTS["lib"] == "compile":
+    env_lib.Append(CXXFLAGS = ["-DVERDANDI_LIB_COMPILATION"])
+    conf.CheckLib("seldon")
+    library_path = os.path.join(verdandi_path, "lib/libverdandi.a")
+    library_file_path = os.path.join(verdandi_path, "share/*.cxx")
+    library_file_path = glob.glob(library_file_path)
+    env_lib.Library(library_path, library_file_path)
+    env_lib.Alias("libverdandi.a", library_path)
+

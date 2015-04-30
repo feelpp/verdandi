@@ -21,9 +21,10 @@
 
 
 #ifndef VERDANDI_FILE_OUTPUTSAVER_VARIABLE_CXX
+#define VERDANDI_FILE_OUTPUTSAVER_VARIABLE_CXX
 
 
-#include "Variable.hxx"
+#include "VerdandiHeader.hxx"
 
 
 namespace Verdandi
@@ -148,6 +149,4 @@ namespace Verdandi
 }
 
 
-#define VERDANDI_FILE_OUTPUTSAVER_VARIABLE_CXX
 #endif
-

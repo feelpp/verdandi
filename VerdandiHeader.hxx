@@ -85,7 +85,6 @@ namespace Verdandi
 #endif
 #endif
 
-
 #ifdef VERDANDI_WITH_ABORT
 #define SELDON_WITH_ABORT
 #endif

@@ -23,6 +23,7 @@
 #ifndef VERDANDI_FILE_SHARE_MESSAGEHANDLER_HXX
 
 
+
 namespace Verdandi
 {
 
@@ -62,8 +63,11 @@ namespace Verdandi
     };
 
 
-} // namespace Verdandi.
+#ifndef VERDANDI_WITH_COMPILED_LIB
+    MessageHandler::recipient_map MessageHandler::recipient_map_;
+#endif
 
+} // namespace Verdandi.
 
 #define VERDANDI_FILE_SHARE_MESSAGEHANDLER_HXX
 #endif

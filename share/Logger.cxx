@@ -21,8 +21,10 @@
 
 
 #ifndef VERDANDI_FILE_SHARE_LOGGER_CXX
+#define VERDANDI_FILE_SHARE_LOGGER_CXX
 
-#include "Logger.hxx"
+
+#include "VerdandiHeader.hxx"
 
 
 namespace Verdandi
@@ -187,86 +189,6 @@ namespace Verdandi
     void Logger::Deactivate()
     {
         is_active_ = false;
-    }
-
-
-    //! Writes a message in the log file.
-    /*!
-      \tparam S type of the message, which must be convertible to a string
-      through 'ostringstream& operator << (ostringstream&, S& message)'.
-      \param[in] object the object that sends the message.
-      \param[in] message the message to be written.
-      \param[in] options options.
-    */
-    template <int LEVEL, class T, class S>
-    void Logger::Log(const T& object, const S& message, int options)
-    {
-        if (!CheckStatus(options))
-            return;
-        if (LEVEL >= logging_level_)
-            Log(object, to_str(message), options);
-    }
-
-
-    //! Writes a message in the log file.
-    /*!
-      \tparam S type of the message, which must be convertible to a string
-      through 'ostringstream& operator << (ostringstream&, S& message)'.
-      \param[in] object the object that sends the message.
-      \param[in] message the message to be written.
-      \param[in] options options.
-    */
-    template <class T, class S>
-    void Logger::Log(const T& object, const S& message, int options)
-    {
-        Log(object, to_str(message), options);
-    }
-
-
-    //! Writes a message in the log file.
-    /*!
-      \param[in] object the object that sends the message.
-      \param[in] message the message to be written.
-      \param[in] options options.
-    */
-    template <class T>
-    void Logger::Log(const T& object, string message, int options)
-    {
-        if (!CheckStatus(options))
-            return;
-        WriteMessage(object, message, options);
-    }
-
-
-    //! Writes a message in the standard output and in the log file.
-    /*! The message is always sent to the standard output, and it is possibly
-      written in a log file if the logging level is lower than or equal to
-      'VERDANDI_STDOUT_LOGGING_LEVEL'.
-      \tparam S type of the message, which must be convertible to a string
-      through 'ostringstream& operator << (ostringstream&, S& message)'.
-      \param[in] object the object that sends the message.
-      \param[in] message the message to be written.
-    */
-    template <class T, class S>
-    void Logger::StdOut(const T& object, const S& message)
-    {
-        StdOut(object, to_str(message));
-    }
-
-
-    //! Writes a message in the standard output and in the log file.
-    /*! The message is always sent to the standard output, and it is possibly
-      written in a log file if the logging level is lower than or equal to
-      'VERDANDI_STDOUT_LOGGING_LEVEL'.
-      \param[in] object the object that sends the message.
-      \param[in] message the message to be written.
-    */
-    template <class T>
-    void Logger::StdOut(const T& object, string message)
-    {
-        WriteMessage(object, message, stdout_);
-        if (VERDANDI_STDOUT_LOGGING_LEVEL >= logging_level_)
-            WriteMessage(object, message, options_ & ~stdout_);
     }
 
 
@@ -475,38 +397,7 @@ namespace Verdandi
     }
 
 
-    //! Writes a message in the log file.
-    /*!
-      \param[in] object the object that sends the message.
-      \param[in] message the message to be written.
-      \param[in] options options.
-    */
-    template <class T>
-    void Logger::WriteMessage(const T& object, string message, int options)
-    {
-        WriteMessage(object.GetName(), message, options);
-    }
 
-
-    //! Writes a message in the log file.
-    /*!
-      \param[in] object_name the name of the object that sends the message.
-      \param[in] message the message to be written.
-      \param[in] options options.
-    */
-    template <>
-    void Logger::WriteMessage<string>(const string& object_name,
-                                      string message, int options)
-    {
-        string object_name_parameter = object_name;
-
-        if (options & uppercase_)
-            object_name_parameter = upper_case(object_name_parameter);
-
-        string result = FormatMessage(object_name_parameter, message);
-
-        WriteMessage(result, options);
-    }
 
 
     //! Writes a message in the log file.
@@ -617,6 +508,27 @@ namespace Verdandi
     }
 
 
+    //! Writes a message in the log file.
+    /*!
+      \param[in] object_name the name of the object that sends the message.
+      \param[in] message the message to be written.
+      \param[in] options options.
+    */
+    void Logger::WriteMessage(const string& object_name,
+                              string message, int options)
+    {
+        string object_name_parameter = object_name;
+
+        if (options & uppercase_)
+            object_name_parameter = upper_case(object_name_parameter);
+
+        string result = FormatMessage(object_name_parameter, message);
+
+        WriteMessage(result, options);
+    }
+
+
+
     /////////////////////
     // COMMAND METHODS //
     /////////////////////
@@ -644,6 +556,4 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_SHARE_LOGGER_CXX
 #endif
-

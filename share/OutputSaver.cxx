@@ -21,10 +21,10 @@
 
 
 #ifndef VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_CXX
+#define VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_CXX
 
 
-#include "OutputSaver.hxx"
-#include "Variable.cxx"
+#include "VerdandiHeader.hxx"
 
 
 namespace Verdandi
@@ -87,8 +87,8 @@ namespace Verdandi
 
 
         configuration.Set("mode", "", "binary", mode_);
-        configuration.Set("group", "", "", group_);
-        configuration.Set("dataset", "", "binary", dataset_);
+        configuration.Set("group", "", "group", group_);
+        configuration.Set("dataset", "", "data", dataset_);
         configuration.Set("mode_scalar", "", "text", mode_scalar_);
 
         vector<string> variable_vector;
@@ -187,122 +187,6 @@ namespace Verdandi
     }
 
 
-    //! Writes the variable in the file with the chosen format.
-    /*! The variable \a variable_name is saved in its dedicated file with its
-      saving mode, providing \a time satisfies the proper conditions.
-      \param[in] x value of the variable.
-      \param[in] time time.
-      \param[in] variable_name name of the variable to be saved.
-    */
-    template <class S>
-    void OutputSaver::Save(const S& x, double time, string variable_name)
-    {
-        if (is_active_ && (save_period_ == 0.
-            || is_multiple(time, save_period_, time_tolerance_)))
-        {
-            Save(x, variable_name);
-#ifdef VERDANDI_WITH_HDF5
-            if (mode_ == "HDF" && IsSaved(variable_name))
-            {
-                map<string, Variable>::iterator im;
-
-                im = variable_list_.find(variable_name);
-                Variable& variable = im->second;
-                string dataset_time_name = dataset_ + "_time";
-                Vector<double> vector_time(1);
-                vector_time(0) = time;
-                WriteHDF5(vector_time, variable.GetFile(), group_,
-                          dataset_time_name);
-            }
-#endif
-        }
-    }
-
-
-    //! Writes the variable in the file with the chosen format.
-    /*! The variable \a variable_name is saved in its dedicated file with its
-      saving mode.
-      \param[in] x value of the variable.
-      \param[in] variable_name name of the variable to be saved.
-    */
-    template <class S>
-    void OutputSaver::Save(const S& x, string variable_name)
-    {
-        if (!is_active_ || !IsSaved(variable_name))
-            return;
-
-#ifdef VERDANDI_WITH_PETSC
-        /* In this case, the simulation is parallel, but x is sequential
-         (duplicated on each processes): only process 0 perform the saving. */
-        int rank;
-        int ierr;
-        ierr = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        CHKERRABORT(MPI_COMM_WORLD, ierr);
-        if (rank != 0)
-            return;
-#endif
-
-        map<string, Variable>::iterator im;
-        im = variable_list_.find(variable_name);
-        Variable& variable = im->second;
-
-        // In case the mode has not been set yet.
-        SetVariable<S>(variable);
-
-        if (variable.HasToEmptyFile())
-            Empty(variable_name);
-
-        if (variable.GetMode() == "text")
-            WriteText(x, variable.GetFile());
-        else if (variable.GetMode() == "binary")
-            WriteBinary(x, variable.GetFile());
-#ifdef VERDANDI_WITH_HDF5
-        else if (variable.GetMode() == "HDF")
-            WriteHDF5(x, variable.GetFile(), group_, dataset_);
-#endif
-    }
-
-
-#ifdef VERDANDI_WITH_PETSC
-    //! Writes the variable in the file with the chosen format.
-    /*! The variable \a variable_name is saved in its dedicated file with its
-      saving mode.
-      \param[in] x value of the variable.
-      \param[in] variable_name name of the variable to be saved.
-    */
-    template <class T, class Allocator>
-    void OutputSaver::Save(const Vector<T, PETScPar, Allocator>& x,
-                           string variable_name)
-    {
-        if (!is_active_ || !IsSaved(variable_name))
-            return;
-
-        map<string, Variable>::iterator im;
-        im = variable_list_.find(variable_name);
-        Variable& variable = im->second;
-
-        // In case the mode has not been set yet.
-        SetVariable<Vector<T, PETScPar, Allocator> >(variable);
-
-        if (variable.HasToEmptyFile())
-        {
-            int rank;
-            int ierr;
-            ierr = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-            CHKERRABORT(MPI_COMM_WORLD, ierr);
-            variable.SetFile(variable.GetFile()
-                             + "-processor_" + to_str(rank));
-            Empty(variable_name);
-        }
-
-        if (variable.GetMode() == "text")
-            WriteText(x, variable.GetFile());
-        else if (variable.GetMode() == "binary")
-            WriteBinary(x, variable.GetFile());
-    }
-#endif
-
-
     //! Writes \a x of type double in a text file.
     /*!
       \param[in] x double to be written.
@@ -321,25 +205,6 @@ namespace Verdandi
     }
 
 
-    //! Writes \a x in a text file.
-    /*!
-      \param[in] x variable to be written.
-      \param[in] file_name output filename.
-    */
-    template <class S>
-    void OutputSaver::WriteText(const S& x, string file_name) const
-    {
-        ofstream file(file_name.c_str(), ofstream::app);
-#ifdef VERDANDI_CHECK_IO
-        if (!file)
-            throw ErrorIO("WriteText(const S& x , string file_name)",
-                          "Cannot open file \"" + file_name + "\"." );
-#endif
-        x.WriteText(file);
-        file << endl;
-        file.close();
-    }
-
 #ifdef VERDANDI_WITH_HDF5
     //! Writes \a x in a HDF5 file.
     /*!
@@ -349,146 +214,15 @@ namespace Verdandi
       \param[in] dataset_name name of the dataset \a x must be stored in.
       \param[in] time corresponding time of the variable.
     */
-    template <class S>
-    void OutputSaver::WriteHDF5(const S& x, string file_name,
+    void OutputSaver::WriteHDF5(const double& x, string file_name,
                                 string group_name, string dataset_name) const
     {
-        x.WriteHDF5(file_name, group_name, dataset_name);
+        Vector<double> temp;
+        temp.Resize(1);
+        temp(1) = x;
+        temp.WriteHDF5(file_name, group_name, dataset_name);
     }
 #endif
-
-    //! Writes \a x in a binary file.
-    /*!
-      \param[in] x variable to be written.
-      \param[in] file_name output filename.
-    */
-    template <class S>
-    void OutputSaver::WriteBinary(const S& x, string file_name) const
-    {
-        ofstream file(file_name.c_str(), ofstream::app);
-#ifdef VERDANDI_CHECK_IO
-        if (!file)
-            throw ErrorIO("WriteBinary(const S& x , string file_name)",
-                          "Cannot open file \"" + file_name + "\"." );
-#endif
-        x.Write(file);
-        file.close();
-    }
-
-
-    //! Writes \a x in a binary file.
-    /*!
-      \param[in] x variable to be written.
-      \param[in] file_name output filename.
-    */
-    template <>
-    void OutputSaver::WriteBinary(const double& x, string file_name) const
-    {
-        ofstream file(file_name.c_str(), ofstream::app);
-#ifdef VERDANDI_CHECK_IO
-        if (!file)
-            throw ErrorIO("WriteBinary(const double& x , string file_name)",
-                          "Cannot open file \"" + file_name + "\"." );
-#endif
-        file.write(reinterpret_cast<const char*>(&x), sizeof(double));
-        file.close();
-    }
-
-
-    //! Writes \a x in a binary file.
-    /*!
-      \param[in] x variable to be written.
-      \param[in] file_name output filename.
-    */
-    template <>
-    void OutputSaver::WriteBinary(const float& x, string file_name) const
-    {
-        ofstream file(file_name.c_str(), ofstream::app);
-#ifdef VERDANDI_CHECK_IO
-        if (!file)
-            throw ErrorIO("WriteBinary(const float& x , string file_name)",
-                          "Cannot open file \"" + file_name + "\"." );
-#endif
-        file.write(reinterpret_cast<const char*>(&x), sizeof(float));
-        file.close();
-    }
-
-
-    //! Writes \a x in a binary file.
-    /*!
-      \param[in] x variable to be written.
-      \param[in] file_name output filename.
-    */
-    template <>
-    void OutputSaver::WriteBinary(const int& x, string file_name) const
-    {
-        ofstream file(file_name.c_str(), ofstream::app);
-#ifdef VERDANDI_CHECK_IO
-        if (!file)
-            throw ErrorIO("WriteBinary(const int& x , string file_name)",
-                          "Cannot open file \"" + file_name + "\"." );
-#endif
-        file.write(reinterpret_cast<const char*>(&x), sizeof(int));
-        file.close();
-    }
-
-
-    //! Writes \a x in a binary file.
-    /*!
-      \param[in] x variable to be written.
-      \param[in] file_name output filename.
-      \warning This method is undefined: it throws an exception in any case.
-    */
-    template <class T, class Prop, class Allocator>
-    void OutputSaver
-    ::WriteBinary(const Matrix<T, Prop, RowSparse, Allocator>& x,
-                  string file_name) const
-    {
-        throw ErrorUndefined("WriteBinary(const Matrix<T, Prop, RowSparse, "
-                             "Allocator>& x, string file_name)");
-    }
-
-
-    //! Writes \a x in a binary file.
-    /*!
-      \param[in] x variable to be written.
-      \param[in] file_name output filename.
-      \warning This method is undefined: it throws an exception in any case.
-    */
-    template <class T, class Prop, class Allocator>
-    void OutputSaver
-    ::WriteBinary(const Matrix<T, Prop, ColSparse, Allocator>& x,
-                  string file_name) const
-    {
-        throw ErrorUndefined("WriteBinary(const Matrix<T, Prop, ColSparse, "
-                             "Allocator>& x, string file_name)");
-    }
-
-
-    //! Empties the output file associated with a variable.
-    /*!
-      \param[in] variable_name the name of the variable whose file should be
-      emptied.
-    */
-    template <class S>
-    void OutputSaver::Empty(string variable_name)
-    {
-        if (!is_active_ || !IsSaved(variable_name))
-            return;
-
-        map<string, Variable>::iterator im;
-        im = variable_list_.find(variable_name);
-
-        if (im == variable_list_.end())
-            return;
-
-        if (im->second.GetMode().empty())
-            SetVariable<S>(im->second);
-
-        ofstream output_stream(im->second.GetFile().c_str());
-        output_stream.close();
-        im->second.HasToEmptyFile(false);
-    }
 
 
     //! Empties the output file associated with a variable.
@@ -561,61 +295,68 @@ namespace Verdandi
     }
 
 
+    //! Writes \a x in a binary file.
+    /*!
+      \param[in] x variable to be written.
+      \param[in] file_name output filename.
+    */
+    template <>
+    void OutputSaver::WriteBinary(const float& x, string file_name) const
+    {
+        ofstream file(file_name.c_str(), ofstream::app);
+#ifdef VERDANDI_CHECK_IO
+        if (!file)
+            throw ErrorIO("WriteBinary(const float& x , string file_name)",
+                          "Cannot open file \"" + file_name + "\"." );
+#endif
+        file.write(reinterpret_cast<const char*>(&x), sizeof(float));
+        file.close();
+    }
+
+
+    //! Writes \a x in a binary file.
+    /*!
+      \param[in] x variable to be written.
+      \param[in] file_name output filename.
+    */
+    template <>
+    void OutputSaver::WriteBinary(const int& x, string file_name) const
+    {
+        ofstream file(file_name.c_str(), ofstream::app);
+#ifdef VERDANDI_CHECK_IO
+        if (!file)
+            throw ErrorIO("WriteBinary(const int& x , string file_name)",
+                          "Cannot open file \"" + file_name + "\"." );
+#endif
+        file.write(reinterpret_cast<const char*>(&x), sizeof(int));
+        file.close();
+    }
+
+
+    //! Writes \a x in a binary file.
+    /*!
+      \param[in] x variable to be written.
+      \param[in] file_name output filename.
+    */
+    void OutputSaver::WriteBinary(const double& x, string file_name) const
+    {
+        ofstream file(file_name.c_str(), ofstream::app);
+#ifdef VERDANDI_CHECK_IO
+        if (!file)
+            throw ErrorIO("WriteBinary(const double& x , string file_name)",
+                          "Cannot open file \"" + file_name + "\"." );
+#endif
+        file.write(reinterpret_cast<const char*>(&x), sizeof(double));
+        file.close();
+    }
+
+
     ////////////////////
     // PRIVATE METHOD //
     ////////////////////
 
 
-    //! Reads the parameters of the variable in a configuration file.
-    /*!
-      \param[in] configuration VerdandiOps instance.
-      \param[in] generic_path default output file for all variables.
-      \param[in] default_mode default saving format.
-      \param[in] variable_name variable name.
-    */
-    void OutputSaver::SetVariable(VerdandiOps& configuration,
-                                  string generic_path,
-                                  string default_mode,
-                                  string variable_name)
-    {
-        string current_mode;
-        configuration.Set("mode_" + variable_name, "", "", current_mode);
-
-        string current_path;
-        configuration.Set("file_" + variable_name, "", generic_path,
-                          current_path);
-        current_path = find_replace(current_path, "%{name}", variable_name);
-
-        variable_list_[variable_name] = Variable(current_mode, current_path);
-        // If the mode is unknown, the markup "%{extension}" cannot be
-        // replaced yet. The markup can only be replaced later, when the type
-        // of the variable is known (then the default mode for the given type
-        // will be taken). If the mode is already known, the replacement is
-        // performed below.
-        if (!current_mode.empty())
-            SetVariableFile(variable_list_[variable_name]);
-    }
-
-
-    //! Sets the parameters of a variable.
-    /*!
-      \param[in,out] variable the variable whose parameters are to be
-      adjusted.
-    */
-    template <class S>
-    void OutputSaver::SetVariable(Variable& variable)
-    {
-        if (variable.GetMode().empty())
-            // In this case, the mode is not set yet, so the default mode
-            // 'mode_' is selected.
-        {
-            variable.SetMode(mode_);
-            SetVariableFile(variable);
-        }
-    }
-
-
-    //! Sets the parameters of a variable.
+//! Sets the parameters of a variable.
     /*!
       \param[in,out] variable the variable whose parameters are to be
       adjusted.
@@ -669,6 +410,37 @@ namespace Verdandi
     }
 
 
+    //! Reads the parameters of the variable in a configuration file.
+    /*!
+      \param[in] configuration VerdandiOps instance.
+      \param[in] generic_path default output file for all variables.
+      \param[in] default_mode default saving format.
+      \param[in] variable_name variable name.
+    */
+    void OutputSaver::SetVariable(VerdandiOps& configuration,
+                                  string generic_path,
+                                  string default_mode,
+                                  string variable_name)
+    {
+        string current_mode;
+        configuration.Set("mode_" + variable_name, "", "", current_mode);
+
+        string current_path;
+        configuration.Set("file_" + variable_name, "", generic_path,
+                          current_path);
+        current_path = find_replace(current_path, "%{name}", variable_name);
+
+        variable_list_[variable_name] = Variable(current_mode, current_path);
+        // If the mode is unknown, the markup "%{extension}" cannot be
+        // replaced yet. The markup can only be replaced later, when the type
+        // of the variable is known (then the default mode for the given type
+        // will be taken). If the mode is already known, the replacement is
+        // performed below.
+        if (!current_mode.empty())
+            SetVariableFile(variable_list_[variable_name]);
+    }
+
+
     //! Expands the extension in the path to the output file.
     /*! If the file path in \a variable contains the markup "%{extension}",
       this markup is replaced with the extension associated with the saving
@@ -693,5 +465,4 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_CXX
 #endif
