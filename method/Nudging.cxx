@@ -120,6 +120,15 @@ namespace Verdandi
         configuration.Set("nudging_type",
                           "ops_in(v, {'standard', 'dt', 'source', 'BNF'})",
                           nudging_type_);
+        configuration.Set("matrix_fixed", matrix_fixed_);
+        if (matrix_fixed_)
+        {
+            int m, n;
+            configuration.Set("nudging_matrix.m", m);
+            configuration.Set("nudging_matrix.n", n);
+            nudging_matrix_.Reallocate(m, n);
+            configuration.Set("nudging_matrix.matrix", nudging_matrix_);
+        }
 
         if (analyze_first_step_ && nudging_type_ == "dt")
             throw  ErrorProcessing("Nudging::Initialize(VerdandiOps&, bool,"
@@ -260,8 +269,8 @@ namespace Verdandi
             model_state& state = model_.GetState();
             observation& innovation =
                 observation_manager_.GetInnovation(state);
-
-            observation_manager_.GetNudgingMatrix(state,nudging_matrix_);
+            if (!matrix_fixed_)
+                observation_manager_.GetNudgingMatrix(state, nudging_matrix_);
             Ts gain = nudging_gain_;
 
             if (nudging_type_ == "source")

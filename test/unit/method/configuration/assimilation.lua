@@ -139,7 +139,15 @@ nudging = {
       -- Choice of nudging : "dt", "standard" or "source" (BNF will follow)
       nudging_type = "source",
       -- Choice of nudging gain.
-      nudging_gain = 18
+      nudging_gain = 18,
+      matrix_fixed = true,
+
+      nudging_matrix = {
+         m = 2,
+         n = 2,
+         matrix = { 1.036, 0,
+                    0, 0.98}
+      }
 
    },
 
