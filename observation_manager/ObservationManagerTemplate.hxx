@@ -104,7 +104,8 @@ namespace Verdandi
 
         bool HasObservation() const;
         int GetNobservation() const;
-        Matrix<T> GetNudgingMatrix(const state& x) const;
+        template <class state, class mat>
+        void GetNudgingMatrix(const state& x, mat& M) const;
 
         ///////////////
         // OPERATORS //

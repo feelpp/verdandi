@@ -261,8 +261,7 @@ namespace Verdandi
             observation& innovation =
                 observation_manager_.GetInnovation(state);
 
-            nudging_matrix_ =
-                observation_manager_.GetNudgingMatrix(state);
+            observation_manager_.GetNudgingMatrix(state,nudging_matrix_);
             Ts gain = nudging_gain_;
 
             if (nudging_type_ == "source")

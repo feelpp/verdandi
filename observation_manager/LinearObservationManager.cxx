@@ -1932,20 +1932,18 @@ namespace Verdandi
       \param[out] output the nudging matrix at \a x.
     */
     template <class T>
-    template <class state>
-    Matrix<T> LinearObservationManager<T>
-    ::GetNudgingMatrix(const state& x) const
+    template <class state, class mat>
+    void LinearObservationManager<T>
+    ::GetNudgingMatrix(const state& x, mat& M) const
     {
-        Matrix<T> output;
         int state_size = x.GetSize();
-        output.Reallocate(Nobservation_, state_size);
-        output.Fill(T(0));
-        output.SetIdentity();
-        // Those values are made up for the nudging test.
-        output(0, 0) = 1.036;
+        M.Reallocate(Nobservation_, state_size);
+        M.Fill(T(0));
+        M.SetIdentity();
+        //Those values are made up for the nudging test.
+        M(0,0) = 1.036;
         if (state_size > 1)
-            output(1, 1) = 0.98;
-        return output;
+            M(1,1) = 0.98;
     }
 
 

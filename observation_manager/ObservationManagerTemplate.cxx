@@ -187,13 +187,13 @@ namespace Verdandi
       \param[out] output the nudging matrix at \a x.
     */
     template <class T>
-    template <class state>
-    Matrix<T> LinearObservationManager<T>
-    ::GetNudgingMatrix(const state& x) const
+    template <class state, class mat>
+    void LinearObservationManager<T>
+    ::GetNudgingMatrix(const & x, mat& M) const
     {
         throw ErrorUndefined(
-            "Matrix<T> ObservationManagerTemplate::"
-            "GetNudgingMatrix(const state&) const");
+            "void ObservationManagerTemplate::"
+            "GetNudgingMatrix(const state&, mat& M) const");
     }
 
 
