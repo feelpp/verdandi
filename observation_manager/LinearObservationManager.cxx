@@ -1936,14 +1936,9 @@ namespace Verdandi
     void LinearObservationManager<T>
     ::GetNudgingMatrix(const state& x, mat& M) const
     {
-        int state_size = x.GetSize();
-        M.Reallocate(Nobservation_, state_size);
-        M.Fill(T(0));
-        M.SetIdentity();
-        //Those values are made up for the nudging test.
-        M(0,0) = 1.036;
-        if (state_size > 1)
-            M(1,1) = 0.98;
+        throw ErrorUndefined(
+            "void LinearObservationManager::"
+            "GetNudgingMatrix(const state&, mat& M) const");
     }
 
 
