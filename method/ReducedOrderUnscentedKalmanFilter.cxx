@@ -117,6 +117,8 @@ namespace Verdandi
         configuration_file_ = configuration.GetFilePath();
         configuration.SetPrefix("reduced_order_unscented_kalman_filter.");
 
+        iteration_ = 0;
+
         /*** Model ***/
 
         configuration.Set("model.configuration_file", "", configuration_file_,
@@ -800,6 +802,30 @@ namespace Verdandi
 
             observation z(Nobservation_);
             z.Fill(To(0));
+
+            model_state& x =  model_.GetState();
+
+            // Initialization of X_i_ if analyzed_first_step = true
+            if (iteration_ == 0)
+            {
+                /*** Sampling ***/
+
+                model_state_error_variance temp;
+                GetCholesky(U_inv_);
+
+                Copy(model_.GetStateErrorVarianceProjector(), temp);
+                MltAdd(Ts(1), temp, U_inv_, Ts(0),
+                       model_.GetStateErrorVarianceProjector());
+
+                // Computes X_n^{(i)+}.
+                X_i_.Reallocate(Nstate_, Nsigma_point_);
+                for (int i = 0; i < Nsigma_point_; i++)
+                    SetCol(x, i, X_i_);
+
+                MltAdd(Ts(1), model_.GetStateErrorVarianceProjector(),
+                       I_, Ts(1), X_i_);
+            }
+
             for (int i = 0; i < Nsigma_point_; i++)
             {
                 GetCol(X_i_, i, x_col);
@@ -822,7 +848,6 @@ namespace Verdandi
                     working_matrix_po);
             else
             {
-                observation_error_variance R_inv;
                 Copy(observation_manager_.GetErrorVariance(), R_inv);
                 GetInverse(R_inv);
                 Mlt(HL_trans, R_inv, working_matrix_po);
@@ -841,7 +866,6 @@ namespace Verdandi
             MltAdd(Ts(-1), tmp, z, Ts(0), reduced_innovation);
 
             // Updates.
-            model_state& x =  model_.GetState();
             MltAdd(Ts(1), model_.GetStateErrorVarianceProjector(),
                    reduced_innovation, Ts(1), x);
             model_.StateUpdated();
@@ -864,6 +888,29 @@ namespace Verdandi
                 throw ErrorUndefined("ReducedOrderUnscentedKalmanFilter::"
                                      "Analyse()", "Calculation not "
                                      "implemented for non constant alpha_i.");
+
+            model_state& x =  model_.GetState();
+
+            // Initialization of X_i_ if analyzed_first_step = true
+            if (iteration_ == 0)
+            {
+                /*** Sampling ***/
+
+                sigma_point_matrix tmp;
+                GetCholesky(U_inv_);
+                Copy(model_.GetStateErrorVarianceProjector(), tmp);
+                MltAdd(Ts(1), tmp, U_inv_, Ts(0),
+                       model_.GetStateErrorVarianceProjector());
+
+                // Computes X_n^{(i)+}.
+                X_i_trans_.Reallocate(Nsigma_point_, Nstate_);
+                for (int i = 0; i < Nsigma_point_; i++)
+                    SetRow(x, i, X_i_trans_);
+
+                MltAdd(Ts(1), Seldon::SeldonNoTrans, I_trans_, Seldon::SeldonTrans,
+                       model_.GetStateErrorVarianceProjector(),
+                       Ts(1), X_i_trans_);
+            }
 
             for (int i = 0; i < Nsigma_point_; i++)
             {
@@ -972,7 +1019,6 @@ namespace Verdandi
                 working_matrix_po2, K);
 
             // Updates.
-            model_state& x =  model_.GetState();
             MltAdd(Ts(-1), K, z, Ts(1), x);
             model_.StateUpdated();
 #endif
