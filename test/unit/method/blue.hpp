@@ -140,7 +140,8 @@ public:
             H.SetIdentity();
             R.SetIdentity();
             y.Fill();
-            Mlt(3., y);
+            T three = 3.;
+            Mlt(three, y);
             x.Fill();
 
             analysis_matrix = x;
@@ -150,7 +151,8 @@ public:
             IdentityObservationManager<T> observation_manager(Ny_, Nx_);
             ObservationVector innovation(Ny_);
             innovation.Fill();
-            Mlt(2., innovation);
+            T two = 2.;
+            Mlt(two, innovation);
             analysis_vector = x;
             ComputeBLUE_vector(model, observation_manager,
                                innovation, analysis_vector);
