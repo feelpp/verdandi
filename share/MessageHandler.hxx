@@ -39,10 +39,6 @@ namespace Verdandi
         //! Recipient map.
         typedef map<string, recipient_list> recipient_map;
 
-    protected:
-        //! Static recipient map.
-        static recipient_map recipient_map_;
-
     public:
         template <class R>
         static void AddRecipient(string recipient, R& object,
@@ -59,13 +55,10 @@ namespace Verdandi
         static void RemoveRecipient(R& object);
 
     private:
+        static recipient_map& Recipient_map();
         static void SendToList(recipient_list& my_list, string message);
     };
 
-
-#ifndef VERDANDI_WITH_COMPILED_LIB
-    MessageHandler::recipient_map MessageHandler::recipient_map_;
-#endif
 
 } // namespace Verdandi.
 

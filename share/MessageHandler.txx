@@ -50,8 +50,8 @@ namespace Verdandi
     {
         pair<void*, function_pointer>
             pointer_pair(reinterpret_cast<void*>(&object), pointer);
-        recipient_map_[recipient].push_back(pointer_pair);
-        recipient_map_["all"].push_back(pointer_pair);
+        Recipient_map()[recipient].push_back(pointer_pair);
+        Recipient_map()["all"].push_back(pointer_pair);
     }
 
 
@@ -71,12 +71,12 @@ namespace Verdandi
                          + message + "\" is sent to \"" + recipient
                          + "\" by \"" + sender.GetName() + "\".");
 
-        if (recipient_map_.count(recipient) == 0)
+        if (Recipient_map().count(recipient) == 0)
             throw ErrorArgument("MessageHandler::Send",
                                 string("The object \"") + recipient +
                                 "\" is not part of the recipient list.");
 
-        recipient_list my_list = recipient_map_[recipient];
+        recipient_list my_list = Recipient_map()[recipient];
         SendToList(my_list, string("[") + sender.GetName() + "] "
                    + message);
 #endif
@@ -92,8 +92,8 @@ namespace Verdandi
     void MessageHandler::RemoveRecipient(R& object)
     {
         recipient_map::iterator my_map_iterator;
-        for (my_map_iterator = recipient_map_.begin();
-             my_map_iterator != recipient_map_.end(); )
+        for (my_map_iterator = Recipient_map().begin();
+             my_map_iterator != Recipient_map().end(); )
         {
             recipient_list::iterator my_map_list_iterator;
             recipient_list my_list;
@@ -108,7 +108,7 @@ namespace Verdandi
             // entry in the map. If it is empty, the map entry should be
             // removed.
             if (my_list.empty())
-                recipient_map_.erase(my_map_iterator++);
+                Recipient_map().erase(my_map_iterator++);
             else
             {
                 my_map_iterator->second = my_list;

@@ -33,7 +33,6 @@ namespace Verdandi
     // MESSAGE HANDLER //
     /////////////////////
 
-
     //! Adds a new object in the recipient list.
     /*!
       \param[in] recipient the string describing the object to add.
@@ -45,8 +44,8 @@ namespace Verdandi
                    MessageHandler::function_pointer pointer)
     {
         pair<void*, function_pointer> pointer_pair(object, pointer);
-        recipient_map_[recipient].push_back(pointer_pair);
-        recipient_map_["all"].push_back(pointer_pair);
+        Recipient_map()[recipient].push_back(pointer_pair);
+        Recipient_map()["all"].push_back(pointer_pair);
     }
 
 
@@ -62,12 +61,12 @@ namespace Verdandi
         Logger::Log<-10>(MessageHandler::GetName(), string("Message \"")
                          + message + "\" is sent to \"" + recipient + "\".");
 
-        if (recipient_map_.count(recipient) == 0)
+        if (Recipient_map().count(recipient) == 0)
             throw ErrorArgument("MessageHandler::Send",
                                 string("The object \"") + recipient +
                                 "\" is not part of the recipient list.");
 
-        recipient_list my_list = recipient_map_[recipient];
+        recipient_list my_list = Recipient_map()[recipient];
         SendToList(my_list, message);
 #endif
     }
@@ -98,6 +97,15 @@ namespace Verdandi
 #endif
     }
 
+    //! Returns a reference to a recipient map
+    /*!
+      \return The recipient_map
+    */
+    MessageHandler::recipient_map& MessageHandler::Recipient_map()
+    {
+        static recipient_map* output = new recipient_map;
+        return *output;
+    }
 
 
 } // namespace Verdandi.
