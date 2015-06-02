@@ -20,9 +20,8 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#ifndef VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_TEMPLATE_CXX
-#define VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_TEMPLATE_CXX
-
+#ifndef VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_TXX
+#define VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_TXX
 
 #include "OutputSaver.hxx"
 #include "Variable.hxx"
@@ -293,6 +292,7 @@ namespace Verdandi
 
 
 } // namespace Verdandi.
+
 
 
 #endif

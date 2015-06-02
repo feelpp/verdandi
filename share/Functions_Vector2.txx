@@ -20,7 +20,8 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#ifndef VERDANDI_FILE_SHARE_FUNCTIONS_VECTOR2_CXX
+#ifndef VERDANDI_FILE_SHARE_FUNCTIONS_VECTOR2_TXX
+#define VERDANDI_FILE_SHARE_FUNCTIONS_VECTOR2_TXX
 
 
 #include "Functions_Vector2.hxx"
@@ -784,5 +785,4 @@ namespace Verdandi
 } // namespace Verdandi
 
 
-#define VERDANDI_FILE_SHARE_FUNCTIONS_VECTOR2_CXX
 #endif

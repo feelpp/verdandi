@@ -20,7 +20,9 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#ifndef VERDANDI_FILE_SHARE_MESSAGEHANDLER_TEMPLATE_CXX
+#ifndef VERDANDI_FILE_SHARE_MESSAGEHANDLER_TXX
+#define VERDANDI_FILE_SHARE_MESSAGEHANDLER_TXX
+
 
 #include "MessageHandler.hxx"
 
@@ -121,5 +123,4 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
-#define VERDANDI_FILE_SHARE_MESSAGEHANDLER_TEMPLATE_CXX
 #endif

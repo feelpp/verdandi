@@ -20,7 +20,9 @@
 //      http://verdandi.gforge.inria.fr/
 
 
-#ifndef VERDANDI_FILE_SHARE_LOGGER_TEMPLATE_CXX
+#ifndef VERDANDI_FILE_SHARE_LOGGER_TXX
+#define VERDANDI_FILE_SHARE_LOGGER_TXX
+
 
 namespace Verdandi
 {
@@ -122,5 +124,4 @@ namespace Verdandi
 }
 
 
-#define VERDANDI_FILE_SHARE_LOGGER_TEMPLATE_CXX
 #endif
