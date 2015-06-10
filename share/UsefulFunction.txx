@@ -28,7 +28,7 @@
 
 namespace Verdandi
 {
-
+ 
 
     //! Returns a value interpolated from a 2D field.
     /*! The output value is produced by bilinear interpolation of the field \a
@@ -352,6 +352,40 @@ namespace Verdandi
                 Y(i) += alpha_ * X(i);
         }
     }
+
+
+#ifdef VERDANDI_WITH_DEPRECATED_SELDON
+    //! Solves a sparse linear system using LU factorization.
+    /*! This function solves \f$ M X = Y \f$ where \f$ M \f$ is a matrix, and
+      \f$ X \f$ and \f$ Y \f$ are vectors.
+      \param[in] M the sparse matrix of the linear system, to be factorized in
+      LU form by UMFPACK, SuperLU or Mumps. On exit, \a M is cleared.
+      \param[in,out] Y on entry, the right-hand side \f$ Y \f$; on exit, the
+      solution \f$ X \f$ of the system.
+    */
+    template <class T, class Prop0, class Allocator0, class Allocator1>
+    void GetAndSolveLU(Matrix<T, Prop0, ColSparse, Allocator0>& M,
+                       Vector<T, VectFull, Allocator1>& Y)
+    {
+        Solve(M, Y);
+    }
+
+
+    //! Solves a sparse linear system using LU factorization.
+    /*! This function solves \f$ M X = Y \f$ where \f$ M \f$ is a matrix, and
+      \f$ X \f$ and \f$ Y \f$ are vectors.
+      \param[in] M the sparse matrix of the linear system, to be factorized in
+      LU form by UMFPACK, SuperLU or Mumps. On exit, \a M is cleared.
+      \param[in,out] Y on entry, the right-hand side \f$ Y \f$; on exit, the
+      solution \f$ X \f$ of the system.
+    */
+    template <class T, class Prop0, class Allocator0, class Allocator1>
+    void GetAndSolveLU(Matrix<T, Prop0, RowSparse, Allocator0>& M,
+                       Vector<T, VectFull, Allocator1>& Y)
+    {
+        Solve(M, Y);
+    }
+#endif
 
 
     //! Sets the column of a given matrix.

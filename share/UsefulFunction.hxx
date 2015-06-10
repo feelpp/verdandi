@@ -79,7 +79,6 @@ namespace Verdandi
     template <class T, class Allocator>
     void GetInverse(Matrix<T, General, RowSparse, Allocator>& A);
 
-
     template <class T0, class Allocator0,
               class T1, class Allocator1>
     void Copy(const Matrix<T0, General, RowMajor, Allocator0>& A,
@@ -87,6 +86,15 @@ namespace Verdandi
     template <class T, class Allocator>
     void Copy(const Matrix<T, General, RowSparse, Allocator>& A,
               Matrix<T, General, RowMajor, Allocator>& A_dense);
+
+#ifdef VERDANDI_WITH_DEPRECATED_SELDON
+    template <class T, class Prop0, class Allocator0, class Allocator1>
+    void GetAndSolveLU(Matrix<T, Prop0, ColSparse, Allocator0>& M,
+                       Vector<T, VectFull, Allocator1>& Y);
+    template <class T, class Prop0, class Allocator0, class Allocator1>
+    void GetAndSolveLU(Matrix<T, Prop0, RowSparse, Allocator0>& M,
+                       Vector<T, VectFull, Allocator1>& Y);
+#endif
 
     template <class T0,
               class T1, class Allocator1,
