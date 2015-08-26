@@ -267,7 +267,8 @@ if fortran_compiler is not None:
 # In case of GNU compilers, a few options may be added.
 if "g++" in env["CXX"] and ARGUMENTS["mode_cpp"] == "strict":
     cpp_compilation_option += " -Wall -ansi -pedantic -Wno-unused" \
-        + " -Wno-parentheses -Wno-variadic-macros -Wno-long-long"
+        + " -Wno-parentheses -Wno-variadic-macros -Wno-long-long" \
+        + " -Wno-sizeof-pointer-memaccess"
     # For latest GCC versions.
     import commands
     s, o = commands.getstatusoutput(env["CXX"] + " -dumpversion")
@@ -407,4 +408,3 @@ if ARGUMENTS["lib"] == "compile":
     library_file_path = glob.glob(library_file_path)
     env_lib.Library(library_path, library_file_path)
     env_lib.Alias("libverdandi.a", library_path)
-
