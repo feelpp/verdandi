@@ -322,7 +322,7 @@ namespace Verdandi
         int nb_max_iter = 1000;
         double tolerance = 1e-6;
         Iteration<double> iter(nb_max_iter, tolerance);
-        Preconditioner_Base precond;
+        Preconditioner_Base<double> precond;
         // No preconditioning.
         iter.SetRestart(5);
         iter.HideMessages();
@@ -504,7 +504,7 @@ namespace Verdandi
         int nb_max_iter = 1000;
         double tolerance = 1e-6;
         Iteration<double> iter(nb_max_iter, tolerance);
-        Preconditioner_Base precond;
+        Preconditioner_Base<double> precond;
         iter.SetRestart(5);
         iter.HideMessages();
         K_inv_Sd.Fill(T(0));
@@ -541,7 +541,7 @@ namespace Verdandi
         GetAndSolveLU(temporary_matrix, q_disp);
 #else
         Iteration<double> iter2(nb_max_iter, tolerance);
-        Preconditioner_Base precond2;
+        Preconditioner_Base<double> precond2;
         iter2.SetRestart(5);
         iter2.HideMessages();
         q_disp.Fill(T(0));
