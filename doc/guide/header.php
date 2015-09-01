@@ -106,6 +106,7 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_order_unscented_kalman_
 or basename($_SERVER['REQUEST_URI'], ".php") == "reduced_minimax_filter"
 or basename($_SERVER['REQUEST_URI'], ".php") == "monte_carlo"
 or basename($_SERVER['REQUEST_URI'], ".php") == "ensemble_kalman_filter"
+or basename($_SERVER['REQUEST_URI'], ".php") == "nudging"
 or basename($_SERVER['REQUEST_URI'], ".php") == "four_dimensional_variational")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
@@ -131,6 +132,9 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "four_dimensional_variational")
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "ensemble_kalman_filter", "Ensemble Kalman Filter");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "nudging", "Nudging");
   echo '</li>';
   HL($file, "four_dimensional_variational", "Four Dimensional Variational");
   echo '</li> </ul>';
