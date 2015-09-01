@@ -249,6 +249,7 @@ namespace Verdandi
     }
 
 
+    //! Performs a step forward then an analysis.
     template <class Model, class ObservationManager>
     void Nudging<Model, ObservationManager>::Forward()
     {
@@ -257,6 +258,7 @@ namespace Verdandi
     }
 
 
+    //! Computes an analysis.
     template <class Model, class ObservationManager>
     void Nudging<Model, ObservationManager>::Analyze()
     {
