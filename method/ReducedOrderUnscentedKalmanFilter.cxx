@@ -550,11 +550,12 @@ namespace Verdandi
 
             /*** Sampling ***/
 
-            model_state_error_variance tmp;
-            GetCholesky(U_inv_);
+            model_state_error_variance tmp_L, Ch;
+            Ch.Copy(U_inv_);
+            GetCholesky(Ch);
 
-            Copy(model_.GetStateErrorVarianceProjector(), tmp);
-            MltAdd(Ts(1), tmp, U_inv_, Ts(0),
+            Copy(model_.GetStateErrorVarianceProjector(), tmp_L);
+            MltAdd(Ts(1), tmp_L, Ch, Ts(0),
                    model_.GetStateErrorVarianceProjector());
 
             // Computes X_n^{(i)+}.
@@ -620,10 +621,11 @@ namespace Verdandi
 
             /*** Sampling ***/
 
-            sigma_point_matrix tmp;
-            GetCholesky(U_inv_);
-            Copy(model_.GetStateErrorVarianceProjector(), tmp);
-            MltAdd(Ts(1), tmp, U_inv_, Ts(0),
+            sigma_point_matrix tmp_L, Ch;
+            Ch.Copy(U_inv_);
+            GetCholesky(Ch);
+            Copy(model_.GetStateErrorVarianceProjector(), tmp_L);
+            MltAdd(Ts(1), tmp_L, Ch, Ts(0),
                    model_.GetStateErrorVarianceProjector());
 
             // Computes X_n^{(i)+}.
