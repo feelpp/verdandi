@@ -77,7 +77,7 @@ these sigma-points denoted by \f$ [V^{*}] \in \mathcal{M}_{r,p}\f$ and the matri
            <li>Update:
             - \f$ y_{h+1}^{(i)} = \mathcal{H}_{h+1}(x_{h+1}^{(i)f})\f$<br>
             - \f$ \{HL\}_{h+1} = [y_{h+1}^{*}]D_\alpha [V^*]^T\f$,<br>
-            - \f$ U_{h+1} = P_{\alpha}^V +  \{HL\}_{h+1}^T R_{h+1}^{-1} \{HL\}_{h+1} \in \mathcal{M}_{p}\f$<br>
+            - \f$ U_{h+1} = I +  \{HL\}_{h+1}^T R_{h+1}^{-1} \{HL\}_{h+1} \in \mathcal{M}_{p}\f$<br>
             - \f$ x_{h+1}^a = x_{h+1}^f + L_{h+1}U_{h+1}^{-1}\{HL\}_{h+1}^T R_{h+1}^{-1} (y_{h+1}-E_\alpha(y_{h+1}^{(*)}))\f$<br>
             - \f$ P_{h+1}^a =  L_{h+1} U_{h+1}^{-1} L_{h+1}^T\f$</li>
 </ol>
