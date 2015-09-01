@@ -433,6 +433,13 @@ namespace Verdandi
             configuration.Set("state_error_sqrt.value", P_sqrt_);
         }
 
+        // Those values are used to simulate a reduction without changing the
+        // problem.
+        state_error_variance_projector_.Reallocate(Nstate_, Nstate_);
+        state_error_variance_projector_.Fill(T(0));
+        state_error_variance_projector_.SetIdentity();
+        state_error_variance_reduced_ = P_;
+
         /*** Output saver ***/
 
         configuration.SetPrefix("quadratic_model.output_saver.");
@@ -988,30 +995,23 @@ namespace Verdandi
     //! Returns the reduced error state variance.
     /*!
       \return Returns the reduced error state variance.
-      \note This function is only implemented for the method test: it returns
-      a non-reduced state error variance.
     */
     template <class T>
     typename QuadraticModel<T>::state_error_variance_reduced&
     QuadraticModel<T>::GetStateErrorVarianceReduced()
     {
-        return P_;
+        return state_error_variance_reduced_;
     }
 
 
     //! Returns the state error variance projector.
     /*!
       \return Returns the state error variance projector.
-      \note This function is only implemented for testing: it returns the
-      identity.
     */
     template <class T>
     typename QuadraticModel<T>::state_error_variance&
     QuadraticModel<T>::GetStateErrorVarianceProjector()
     {
-        state_error_variance_projector_.Reallocate(Nstate_, Nstate_);
-        state_error_variance_projector_.Fill(T(0));
-        state_error_variance_projector_.SetIdentity();
         return state_error_variance_projector_;
     }
 
