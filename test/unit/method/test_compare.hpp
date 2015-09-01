@@ -50,7 +50,7 @@ public:
     static state shared_state_;
 
     //! This method allows to compute an output from EKF and to store it.
-    void SetUp()
+    static void SetUpTestCase()
     {
         // First we produce an output with a forward driver, which will be
         // used as observations.
