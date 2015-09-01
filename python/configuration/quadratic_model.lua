@@ -1,1 +1,1 @@
-dofile("../example/quadratic_model/configuration/quadratic_model.lua")
+dofile("../example/quadratic_model/configuration/model.lua")
