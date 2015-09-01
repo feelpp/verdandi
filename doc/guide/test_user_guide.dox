@@ -11,9 +11,17 @@
 \section install Installation
 
 <ul>
-     <li> Download Google Test on "https://code.google.com/p/googletest/downloads/list". </li>
-     <li> Compile Google Test; then put its installation location in your $PATH under Linux and MacOS or your "path" under Windows. </li>
-     <li> Modify the SConstruct: model name (templated) and model path </li>
+     <li> Download and compile Google test, e.g., under Linux:</li>
+     \precode
+     wget https://googletest.googlecode.com/files/gtest-1.7.0.zip
+     unzip gtest-1.7.0.zip
+     mkdir gtest
+     cd gtest
+     cmake ../gtest-1.7.0/
+     make
+     \endprecode
+     <li> Put the Google test location in your $PATH under Linux and MacOS or your "path" under Windows.</li>
+     <li> Modify the SConstruct found in the test directory: model name (templated) and model path.</li>
      <li> Build the project </li>
      <li> Set the configuration.lua file to match your needs </li>
      <li> run the test (./run) </li>
