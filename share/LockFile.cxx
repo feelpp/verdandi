@@ -29,7 +29,14 @@
 #include <fcntl.h>
 #include <cerrno>
 #include <cstdio>
+#ifndef WIN32
 #include <unistd.h>
+#else
+#define NOMINMAX
+#include <io.h>
+#include <windows.h>
+#endif
+
 
 namespace Verdandi
 {
