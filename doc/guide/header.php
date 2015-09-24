@@ -170,6 +170,7 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "lorenz_model")
 <?php if (basename($_SERVER['REQUEST_URI'], ".php") == "observations"
 or basename($_SERVER['REQUEST_URI'], ".php") == "linear_observation_manager"
 or basename($_SERVER['REQUEST_URI'], ".php") == "grid_to_network_observation_manager"
+or basename($_SERVER['REQUEST_URI'], ".php") == "level_set_observation_manager"
 or basename($_SERVER['REQUEST_URI'], ".php") == "observation_aggregator")
 {
   echo '<ul class="navsubul"> <li class="jelly">';
@@ -177,6 +178,9 @@ or basename($_SERVER['REQUEST_URI'], ".php") == "observation_aggregator")
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "grid_to_network_observation_manager", "Grid To Network Observation Manager");
+  echo '</li>';
+  echo '<li class="jelly">';
+  HL($file, "level_set_observation_manager", "LevelSet Observation Manager");
   echo '</li>';
   echo '<li class="jelly">';
   HL($file, "observation_aggregator", "Observation Aggregator");
