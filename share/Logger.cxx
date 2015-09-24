@@ -444,7 +444,7 @@ namespace Verdandi
       \param[in] message message to be written.
       \return The formatted string.
     */
-    string Logger::FormatMessage(string object_name, string message)
+    string Logger::MessageFormat(string object_name, string message)
     {
         string result = object_name + ": ";
 
@@ -522,7 +522,7 @@ namespace Verdandi
         if (options & uppercase_)
             object_name_parameter = upper_case(object_name_parameter);
 
-        string result = FormatMessage(object_name_parameter, message);
+        string result = MessageFormat(object_name_parameter, message);
 
         WriteMessage(result, options);
     }

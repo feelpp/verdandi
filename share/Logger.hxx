@@ -172,7 +172,7 @@ namespace Verdandi
                                  int options);
         static void WriteMessage(string message, int options);
 
-        static string FormatMessage(string object_name, string message);
+        static string MessageFormat(string object_name, string message);
         static string GenerateDate();
 
         /*** Logger specific commands ***/
