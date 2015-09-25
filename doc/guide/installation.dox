@@ -100,6 +100,29 @@ This should generate results in the form of .bin files found in the directory <c
         <li>This program applies the optimal interpolation, starting from erroneous initial conditions described in <code>assimilation.lua</code>. The observations are those generated above by <code>forward</code>.</li>
 \endcomment
 
+
+\subsection library_linux Compile Verdandi as a library
+
+Verdandi can be compiled as a library. In order to do so, you need to compile Seldon and Ops as libraries.
+To compile Seldon, you need to go in the Seldon directory, and then use the commands:
+\precode
+        cd lib
+        scons lib=yes libseldon.a
+\endprecode
+Ops can be compiled using this command in the root directory of Ops:
+\precode
+        scons lib=yes libops.a
+\endprecode
+If you include "share/SConstruct" from Verdandi, you can compile Verdandi with:
+\precode
+        scons lib=compile libverdandi.a
+\endprecode
+Now, you can compile using Verdandi as a library using:
+\precode
+        scons lib=yes
+\endprecode
+
+
 \section macos MacOS
 
 \subsection installation_macos Installation
@@ -164,9 +187,15 @@ Not all the libraries are needed for all the methods, select and install the one
 <li> Under "linker" in the "Input File" menu, add the librairies to the "Additional Dependencies" menu. (At this time the names are "cbia.lib.blas.dyn.rel.x86.12.lib", "cbia.lib.lapack.dyn.rel.x86.12.lib", "cblas.a", "lua51.lib")</li>
 </ul>
 
-\subsection buildnrun Building the project and running a test
+\subsection buildnrun Building the project and running a test - Quadratic model example.
 <ul>
-<li> At this point you can build the project using the build command of visual Studio.</li>
+<li> The first step is to select the "forward.cpp" file in the project file list. To do so, one can right click on all other .cpp file and "exclude from project".</li>
+<li> To run the project using Visual Studio, you need to define an output directory and a command line argument. The argument for "forward.cpp" is the path to the "configuration/truth.lua" in the quadratic example directory.</li>
+<li> At this point you can build the project using the build command of Visual Studio then run it.</li>
+<li> Forward will generate a set of observations which can be used in an assimilation method.</li>
+<li> Include the nudging "file.cpp" in the project, and exclude the "forward.cpp".</li>
+<li> The command line argument must now be set to "configuration\assimilation.lua". </li>
+<li> Rebuild and run this new build.</li>
 </ul>
 
 
