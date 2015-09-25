@@ -148,6 +148,11 @@ namespace Verdandi
 #endif
 
 
+#ifdef WIN32
+#define int64_t __int64
+#endif
+
+
 #include "seldon/SeldonHeader.hxx"
 #include "seldon/vector/Vector2.hxx"
 #include "seldon/vector/Vector3.hxx"
