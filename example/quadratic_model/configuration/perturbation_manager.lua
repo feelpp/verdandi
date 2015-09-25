@@ -13,7 +13,7 @@ perturbation_manager = {
 
       -- If 'seed_type' is set to "directory", put the path to the Newran
       -- directory. It must end with a slash.
-      seed_directory = os.getenv("HOME") .. "/.newran/"
+      -- seed_directory = os.getenv("HOME") .. "/.newran/"
 
    },
 
