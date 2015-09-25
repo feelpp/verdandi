@@ -160,5 +160,5 @@ quadratic_model_2D_uncertainty = {
 
 
 -- Uncomment the following lines to switch to the 2D version.
--- quadratic_model.definition = quadratic_model_2D_definition
--- quadratic_model.uncertainty = quadratic_model_2D_uncertainty
+ quadratic_model.definition = quadratic_model_2D_definition
+ quadratic_model.uncertainty = quadratic_model_2D_uncertainty
