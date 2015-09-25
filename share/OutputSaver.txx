@@ -97,7 +97,6 @@ namespace Verdandi
 
         // In case the mode has not been set yet.
         SetVariable<S>(variable);
-
         if (variable.HasToEmptyFile())
             Empty(variable_name);
         if (variable.GetMode() == "text")
@@ -199,7 +198,7 @@ namespace Verdandi
     template <class S>
     void OutputSaver::WriteBinary(const S& x, string file_name) const
     {
-        ofstream file(file_name.c_str(), ofstream::app);
+        ofstream file(file_name.c_str(), ofstream::app | ofstream::binary);
 #ifdef VERDANDI_CHECK_IO
         if (!file)
             throw ErrorIO("WriteBinary(const S& x , string file_name)",

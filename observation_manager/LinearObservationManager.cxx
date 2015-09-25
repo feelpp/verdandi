@@ -138,7 +138,7 @@ namespace Verdandi
 
             int file_size;
             ifstream file_stream;
-            file_stream.open(observation_file_.c_str());
+            file_stream.open(observation_file_.c_str(), ifstream::binary);
 
 #ifdef VERDANDI_CHECK_IO
             // Checks if the file was opened.
@@ -1421,7 +1421,7 @@ namespace Verdandi
         observation_vector3& observation3) const
     {
         ifstream file_stream;
-        file_stream.open(observation_file_.c_str());
+        file_stream.open(observation_file_.c_str(), ifstream::binary);
 #ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
@@ -1461,7 +1461,7 @@ namespace Verdandi
         observation_vector2& observation2) const
     {
         ifstream file_stream;
-        file_stream.open(observation_file_.c_str());
+        file_stream.open(observation_file_.c_str(), ifstream::binary);
 #ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
         if (!file_stream.is_open())
@@ -1769,7 +1769,7 @@ namespace Verdandi
         Vector<double> input_data;
 
         ifstream file_stream;
-        file_stream.open(width_file_.c_str());
+        file_stream.open(width_file_.c_str(), ifstream::binary);
         streampos position;
 #ifdef VERDANDI_CHECK_IO
         // Checks if the file was opened.
