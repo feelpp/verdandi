@@ -19,7 +19,7 @@ quadratic_model.definition.with_linear_term = false
 -- We also put an erroneous initial condition.
 quadratic_model.definition.initial_state = {0.}
 -- In 2D case, uncomment this line.
--- quadratic_model.definition.initial_state = {0., 0.}
+ quadratic_model.definition.initial_state = {0., 0.}
 
 
 python_model = {
@@ -104,7 +104,16 @@ nudging = {
       -- Choice of nudging : "dt" or "standard".
       nudging_type = "dt",
       -- Choice of nudging gain.
-      nudging_gain = 18
+      nudging_gain = 18,
+
+      matrix_fixed = true,
+
+      nudging_matrix = {
+         m = 2,
+         n = 2,
+         matrix = { 1.036, 0,
+                    0, 0.98}
+      }
 
    },
 
