@@ -29,13 +29,7 @@
 #include "seldon/Seldon.hxx"
 #include "seldon/vector/Vector2.cxx"
 #include "seldon/vector/Vector3.cxx"
-#include "share/VerdandiOps.txx"
-#include "share/Logger.txx"
-#include "share/Error.hxx"
-#include "share/UsefulFunction.txx"
-#include "share/MessageHandler.txx"
-#include "share/VerdandiBase.hxx"
-#include "share/OutputSaver.txx"
+
 
 #ifndef VERDANDI_LIB_COMPILATION
 #include "share/Error.cxx"

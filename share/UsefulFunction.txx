@@ -23,12 +23,10 @@
 #ifndef VERDANDI_FILE_SHARE_USEFULFUNCTION_TXX
 #define VERDANDI_FILE_SHARE_USEFULFUNCTION_TXX
 
-#include "UsefulFunction.hxx"
-
 
 namespace Verdandi
 {
- 
+
 
     //! Returns a value interpolated from a 2D field.
     /*! The output value is produced by bilinear interpolation of the field \a
@@ -268,7 +266,7 @@ namespace Verdandi
     }
 
 
-  
+
     //! This function overwrites a sparse matrix with its inverse.
     /*!
       \param[in,out] A the matrix to be inverted.

@@ -23,7 +23,6 @@
 #ifndef VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_TXX
 #define VERDANDI_FILE_OUTPUTSAVER_OUTPUT_SAVER_TXX
 
-#include "OutputSaver.hxx"
 #include "Variable.hxx"
 
 

@@ -146,5 +146,8 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
+#include "share/OutputSaver.txx"
+
+
 #define VERDANDI_FILE_OUTPUTSAVER_OUTPUTSAVER_HXX
 #endif

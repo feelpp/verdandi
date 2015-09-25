@@ -124,5 +124,8 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
+#include "share/VerdandiOps.txx"
+
+
 #define VERDANDI_FILE_SHARE_VERDANDIOPS_HXX
 #endif

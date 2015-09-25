@@ -62,5 +62,9 @@ namespace Verdandi
 
 } // namespace Verdandi.
 
+
+#include "share/MessageHandler.txx"
+
+
 #define VERDANDI_FILE_SHARE_MESSAGEHANDLER_HXX
 #endif

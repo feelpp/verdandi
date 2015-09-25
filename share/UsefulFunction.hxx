@@ -172,5 +172,8 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
+#include "share/UsefulFunction.txx"
+
+
 #define VERDANDI_FILE_SHARE_USEFULFUNCTION_HXX
 #endif

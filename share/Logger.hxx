@@ -185,5 +185,8 @@ namespace Verdandi
 } // namespace Verdandi.
 
 
+#include "share/Logger.txx"
+
+
 #define VERDANDI_FILE_SHARE_LOGGER_HXX
 #endif

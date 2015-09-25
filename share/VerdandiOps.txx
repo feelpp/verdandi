@@ -23,8 +23,6 @@
 #ifndef VERDANDI_FILE_SHARE_VERDANDIOPS_TXX
 #define VERDANDI_FILE_SHARE_VERDANDIOPS_TXX
 
-#include "ops/Ops.hxx"
-
 
 namespace Verdandi
 {

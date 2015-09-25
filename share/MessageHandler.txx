@@ -24,9 +24,6 @@
 #define VERDANDI_FILE_SHARE_MESSAGEHANDLER_TXX
 
 
-#include "MessageHandler.hxx"
-
-
 namespace Verdandi
 {
 
