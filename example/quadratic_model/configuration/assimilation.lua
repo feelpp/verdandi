@@ -195,7 +195,7 @@ unscented_kalman_filter = {
    sigma_point = {
 
       -- Choice of sigma-points: "canonical", "star" or "simplex".
-      type = "simplex"
+      type = "canonical"
 
    },
 
