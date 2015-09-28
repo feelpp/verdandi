@@ -1,3 +1,65 @@
+Version 1.7 (2015-09-28)
+-----------
+
+* Methods
+
+- Added the nudging method, implemented in 'Nudging'.
+- Added 'FrontPositionObserver', designed to work with
+  'LevelSetObservationManager'.
+
+* Models
+
+- Added two new methods to 'QuadraticModel': 'GetStateErrorVarianceProjector()'
+  and 'GetStateErrorVarianceReduced()'.
+- Added a new method to 'QuadraticModel': 'SetMPICommunicator()'.
+
+* Observation Manager
+
+- Added the level-set observation manager 'LevelSetObservationManager'.
+- Added a new method to 'LinearObservationManager' and
+  'ObservationManagerTemplate': 'GetNudgingMatrix'.
+
+* Tools
+
+- Added a test to check the consistency between reduced-order extended Kalman
+  filter and extended Kalman filter.
+- Added a test to check the consistency between the nudging and the extended
+  Kalman filter.
+- Added a new test to the adjoint model test case.
+
+* Interface
+
+- Renamed the 'Forward()' method to 'Prediction()'. Added a method 'Forward()'
+  which regroups 'Prediction()' and 'Analyze()'.
+- Modified the file structure of Verdandi to compile Verdandi as a
+  library. The non-template files have been separated from the template ones
+  in the "share" directory.
+
+* Documentation
+
+- Improved the documentation about the installation under Linux and Windows.
+- Added documentation about the nudging.
+- Added documentation about the level-set observation manager.
+- Improved the tutorial about the installation of Google test.
+
+* Bug fixes
+
+- In the reduced-order unscented Kalman filter, a matrix was updated at each
+  step while it should be updated only at analysis steps
+- ROUKF was unable to analyze the first step.
+- The binary flag mode was missing when opening input and output files.
+- An include was missing under MacOs.
+- A variable declaration in "blue.hpp" did not compile with gcc 5.2.
+- Changed the system includes for the compilation under Windows.
+- A template was not correctly instantiated in the 'ClampedBar' model.
+
+* Miscellaneous
+
+- Improved the tests: all comparisons between methods are using the same test set up.
+- Added 'MessageHandler::Recipient_map' to provide access to the static
+  variable 'recipient_map'.
+
+
 Version 1.6.1 (2014-11-21)
 -------------
 
