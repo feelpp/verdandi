@@ -113,7 +113,7 @@ namespace Verdandi
         //! How are stored the observations.
         string observation_type_;
         //! Total number of observations at current time.
-        int Nobservation_;
+        size_t Nobservation_;
         //! Size in bytes of an observation vector.
         size_t Nbyte_observation_;
         //! Is the time interval between two observations constant?
@@ -170,7 +170,7 @@ namespace Verdandi
         /*** Model domain ***/
 
         //! The size of a model state.
-        int Nstate_model_;
+        size_t Nstate_model_;
 
         //! Observation currently stored.
         observation observation_;

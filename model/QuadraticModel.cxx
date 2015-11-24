@@ -114,17 +114,17 @@ namespace Verdandi
         {
             S_state_.Reallocate(Nstate_);
             S_.resize(Nstate_);
-            for (int i = 0; i < Nstate_; i++)
+            for (size_t i = 0; i < Nstate_; i++)
                 S_[i].Reallocate(Nstate_, Nstate_);
             configuration.Set("quadratic_term", S_);
-            if (int(S_.size()) != Nstate_)
+            if (size_t(S_.size()) != Nstate_)
                 throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                          "The initial state has "
                                          + to_str(Nstate_) + " elements, but "
                                          "the entry \"quadratic_term\" has "
                                          + to_str(int(S_.size()))
                                          + " elements.");
-            for (int i = 0; i < Nstate_; i++)
+            for (size_t i = 0; i < Nstate_; i++)
                 if (S_[i].GetM() != Nstate_ || S_[i].GetN() != Nstate_)
                     throw ErrorConfiguration("QuadraticModel::QuadraticModel",
                                              "The initial state has "
@@ -296,7 +296,7 @@ namespace Verdandi
                 configuration.Set("linear_term.parameter",
                                   linear_parameter);
 
-                for (int i = 0; i < Nstate_; i++)
+                for (size_t i = 0; i < Nstate_; i++)
                 {
                     Vector<T> row;
                     GetRow(L_, i, row);
@@ -304,7 +304,7 @@ namespace Verdandi
                     SetRow(row, i, L_);
                 }
 
-                for (int i = 0; i < Nstate_; i++)
+                for (size_t i = 0; i < Nstate_; i++)
                 {
                     Vector<T> *row = new Vector<T>;
                     row->SetData(Nstate_, L_.GetMe()[i]);
@@ -361,16 +361,16 @@ namespace Verdandi
                                   quadratic_parameter);
 
                 Vector<T> row;
-                for (int i = 0; i < Nstate_; i++)
-                    for (int j = 0; j < Nstate_; j++)
+                for (size_t i = 0; i < Nstate_; i++)
+                    for (size_t j = 0; j < Nstate_; j++)
                     {
                         GetRow(S_[i], j, row);
                         Add(T(1), quadratic_mean, row);
                         SetRow(row, j, S_[i]);
                     }
 
-                for (int i = 0; i < Nstate_; i++)
-                    for (int j = 0; j < Nstate_; j++)
+                for (size_t i = 0; i < Nstate_; i++)
+                    for (size_t j = 0; j < Nstate_; j++)
                     {
                         Vector<T> *row = new Vector<T>;
                         row->SetData(Nstate_, S_[i].GetMe()[j]);
@@ -447,7 +447,7 @@ namespace Verdandi
         if (with_quadratic_term_)
         {
             output_saver_.Empty("S");
-            for (int i = 0; i < Nstate_; i++)
+            for (size_t i = 0; i < Nstate_; i++)
                 output_saver_.Save(S_[i], "S");
         }
         if (with_linear_term_)
@@ -486,7 +486,7 @@ namespace Verdandi
         if (with_quadratic_term_)
         {
             state current_state = state_;
-            for (int i = 0; i < Nstate_; i++)
+            for (size_t i = 0; i < Nstate_; i++)
             {
                 MltAdd(Delta_t_, S_[i], current_state, T(0), S_state_);
                 state_(i) += DotProd(S_state_, current_state);
@@ -552,7 +552,7 @@ namespace Verdandi
         state input = x;
         if (with_quadratic_term_)
         {
-            for (int i = 0; i < Nstate_; i++)
+            for (size_t i = 0; i < Nstate_; i++)
             {
                 MltAdd(Delta_t_, S_[i], state_, T(0), S_state_);
                 MltAdd(Delta_t_, SeldonTrans, S_[i], state_, T(1), S_state_);
@@ -580,7 +580,7 @@ namespace Verdandi
         if (with_quadratic_term_)
         {
             Vector<T> M_row(Nstate_);
-            for (int i = 0; i < Nstate_; i++)
+            for (size_t i = 0; i < Nstate_; i++)
             {
                 MltAdd(T(1), S_[i], state_, T(0), M_row);
                 MltAdd(T(Delta_t_), SeldonTrans, S_[i], state_,
@@ -595,7 +595,7 @@ namespace Verdandi
         {
             tangent_linear_operator_.Copy(L_);
             Mlt(Delta_t_, tangent_linear_operator_);
-            for (int i = 0; i < Nstate_; i++)
+            for (size_t i = 0; i < Nstate_; i++)
                 tangent_linear_operator_(i, i) += T(1);
         }
         else
@@ -683,7 +683,7 @@ namespace Verdandi
       \return The dimension of the state.
     */
     template <class T>
-    int QuadraticModel<T>::GetNstate() const
+    size_t QuadraticModel<T>::GetNstate() const
     {
         return Nstate_;
     }

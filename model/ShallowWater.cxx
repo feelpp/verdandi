@@ -692,7 +692,7 @@ namespace Verdandi
       \return The number of points in the grid.
     */
     template <class T>
-    int ShallowWater<T>::GetNstate() const
+    size_t ShallowWater<T>::GetNstate() const
     {
         return Nx_ * Ny_;
     }
@@ -703,7 +703,7 @@ namespace Verdandi
       \return The full state vector size.
     */
     template <class T>
-    int ShallowWater<T>::GetNfull_state() const
+    size_t ShallowWater<T>::GetNfull_state() const
     {
         return 3 * Nx_ * Ny_;
     }

@@ -98,7 +98,7 @@ namespace Verdandi
         //! Number of degrees of freedom (dofs).
         int Ndof_;
         //! Size of the state vector.
-        int Nstate_;
+        size_t Nstate_;
         //! Time step.
         double Delta_t_;
         //! Current time.
@@ -261,7 +261,7 @@ namespace Verdandi
         // Access methods.
         double GetTime() const;
         void SetTime(double time);
-        int GetNstate() const;
+        size_t GetNstate() const;
         void GetStateCopy(state& state);
         void SetStateCopy(state& state);
         state& GetState();

@@ -215,15 +215,15 @@ namespace Verdandi
     void GetCholesky(Matrix<T, General, RowMajor, Allocator>& A)
     {
         Matrix<T, General, RowSymPacked> A_sympacked(A.GetM(), A.GetN());
-        for (int i = 0; i < A.GetM(); i++)
-            for (int j = i; j < A.GetN(); j++)
+        for (size_t i = 0; i < A.GetM(); i++)
+            for (size_t j = i; j < A.GetN(); j++)
                 A_sympacked(i, j) = A(i, j);
 
         GetCholesky(A_sympacked);
 
         A.Zero();
-        for (int i = 0; i < A.GetM(); i++)
-            for (int j = 0; j <= i; j++)
+        for (size_t i = 0; i < A.GetM(); i++)
+            for (size_t j = 0; j <= i; j++)
                 A(i, j) = A_sympacked(i, j);
     }
 
@@ -557,8 +557,8 @@ namespace Verdandi
                                 to_str(A.GetN()) + " in matrix A is not"
                                 " enough to copy another "
                                 + to_str(B.GetN()) + " columns.");
-        for (int i = 0; i < B.GetM(); i++)
-            for (int j = i; j < B.GetN(); j++)
+        for (size_t i = 0; i < B.GetM(); i++)
+            for (size_t j = i; j < B.GetN(); j++)
                 A.Val(pi + i, pj + j) += c * B.Val(i, j);
     }
 
@@ -606,9 +606,9 @@ namespace Verdandi
     */
     template <class T, template <class U> class Allocator>
     void GetRowPointer(const Matrix<T, General, RowMajor, Allocator<T> >& M,
-                       int i, Vector<T, VectFull, Allocator<T> >& V)
+                       size_t i, Vector<T, VectFull, Allocator<T> >& V)
     {
-        if (i < 0 || i >= M.GetM())
+        if (i >= M.GetM())
             throw ErrorArgument("void GetLineVector(Matrix<T, General, "
                                 "RowMajor, Allocator<T> >& M, int i, "
                                 "Vector<T, VectFull, Allocator<T> >& V)",

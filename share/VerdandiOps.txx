@@ -168,7 +168,7 @@ namespace Verdandi
             value.Read(filename);
             if (constraint.empty())
                 return;
-            for (int i = 0; i < value.GetLength(); i++)
+            for (size_t i = 0; i < value.GetLength(); i++)
                 if (!CheckConstraintOnValue(to_str(value(i)), constraint))
                     throw Error("SetValue",
                                 "The entry "
@@ -179,7 +179,7 @@ namespace Verdandi
         else
         {
             std::vector<T> default_data(default_value.GetLength()), data;
-            for (int i = 0; i < default_value.GetLength(); i++)
+            for (size_t i = 0; i < default_value.GetLength(); i++)
                 default_data[i] = default_value(i);
             SetValue(name, constraint, default_data, with_default, data);
             value.Reallocate(int(data.size()));
@@ -383,8 +383,8 @@ namespace Verdandi
             value.Read(filename);
             if (constraint.empty())
                 return;
-            for (int i = 0; i < value.GetM(); i++)
-                for (int j = 0; j < value.GetN(); j++)
+            for (size_t i = 0; i < value.GetM(); i++)
+                for (size_t j = 0; j < value.GetN(); j++)
                     if (!CheckConstraintOnValue(to_str(value(i, j)),
                                                 constraint))
                         throw Error("SetValue",
@@ -399,9 +399,9 @@ namespace Verdandi
 
             std::vector<T> default_data(default_value.GetM()
                                         * default_value.GetN());
-            int index = 0;
-            for (int i = 0; i < default_value.GetM(); i++)
-                for (int j = 0; j < default_value.GetN(); j++)
+            size_t index = 0;
+            for (size_t i = 0; i < default_value.GetM(); i++)
+                for (size_t j = 0; j < default_value.GetN(); j++)
                     default_data[index++] = default_value(i, j);
 
             std::vector<T> data;
@@ -419,8 +419,8 @@ namespace Verdandi
                 value.Reallocate(value.GetM(),
                                  int(data.size()) / value.GetM());
             index = 0;
-            for (int i = 0; i < value.GetM(); i++)
-                for (int j = 0; j < value.GetN(); j++)
+            for (size_t i = 0; i < value.GetM(); i++)
+                for (size_t j = 0; j < value.GetN(); j++)
                     value(i, j) = data[index++];
         }
     }
@@ -578,8 +578,8 @@ namespace Verdandi
             if (constraint.empty())
                 return;
             for (size_t i = 0; i < value.size(); i++)
-                for (int j = 0; j < value[i].GetM(); j++)
-                    for (int k = 0; k < value[i].GetN(); k++)
+                for (size_t j = 0; j < value[i].GetM(); j++)
+                    for (size_t k = 0; k < value[i].GetN(); k++)
                         if (!CheckConstraintOnValue(to_str(value[i](j, k)),
                                                     constraint))
                             throw Error("SetValue",
@@ -592,20 +592,20 @@ namespace Verdandi
         }
         else
         {
-            int N = 1;
+            size_t N = 1;
             for (size_t i = 0; i < default_value.size(); i++)
                 N += default_value[i].GetM() * default_value[i].GetN();
             std::vector<T> default_data(N);
-            int index = 0;
+            size_t index = 0;
             for (size_t i = 0; i < default_value.size(); i++)
-                for (int j = 0; j < default_value[i].GetM(); j++)
-                    for (int k = 0; k < default_value[i].GetN(); k++)
+                for (size_t j = 0; j < default_value[i].GetM(); j++)
+                    for (size_t k = 0; k < default_value[i].GetN(); k++)
                         default_data[index++] = default_value[i](j, k);
 
             std::vector<T> data;
             SetValue(name, constraint, default_data, with_default, data);
 
-            int m = 1;
+            size_t m = 1;
             if (value.size() != 0 && value[0].GetM() != 0)
                 m = value[0].GetM();
             if (value.size() != 0 && data.size() % (m * value.size()) != 0)
@@ -622,8 +622,8 @@ namespace Verdandi
             for (size_t i = 0; i < value.size(); i++)
                 value[i].Reallocate(m, n);
             for (size_t i = 0; i < value.size(); i++)
-                for (int j = 0; j < value[i].GetM(); j++)
-                    for (int k = 0; k < value[i].GetN(); k++)
+                for (size_t j = 0; j < value[i].GetM(); j++)
+                    for (size_t k = 0; k < value[i].GetN(); k++)
                         value[i](j, k) = data[index++];
         }
     }

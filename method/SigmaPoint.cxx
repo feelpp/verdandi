@@ -152,7 +152,7 @@ namespace Verdandi
         ComputeCanonicalSigmaPoint(p, sigma_point, alpha, alpha_constant);
 
         value_type scal = sqrt(value_type(2 * p + 1) / value_type(2 * p));
-        for (int i = 0; i < sigma_point.GetNvector(); i++)
+        for (size_t i = 0; i < sigma_point.GetNvector(); i++)
             Mlt(scal, sigma_point.GetVector(i));
 
         SigmaPoint working_vector;

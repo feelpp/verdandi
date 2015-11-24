@@ -88,7 +88,6 @@ namespace Verdandi
     ::Initialize(Model& model, string configuration_file)
     {
         observation_aggregator_.Initialize(configuration_file);
-
         VerdandiOps configuration(configuration_file);
         InitializeOperator(model, configuration_file);
         configuration.SetPrefix("observation.");
@@ -123,10 +122,10 @@ namespace Verdandi
         configuration.Set("width_file", "", "", width_file_);
 
         if (observation_type_ == "state")
-            Nbyte_observation_ = Nstate_model_ * sizeof(T) + sizeof(int);
+            Nbyte_observation_ = Nstate_model_ * sizeof(T) + sizeof(size_t);
 
         if (observation_type_ == "observation")
-            Nbyte_observation_ = Nobservation_ * sizeof(T) + sizeof(int);
+            Nbyte_observation_ = Nobservation_ * sizeof(T) + sizeof(size_t);
 
         if (is_delta_t_constant_)
         {
@@ -451,7 +450,9 @@ namespace Verdandi
                        int selection_policy,
                        time_vector& available_time)
     {
+
         available_time.Clear();
+
         time_inf = time_inf > initial_time_ ? time_inf : initial_time_;
         time_sup = time_sup < final_time_ ? time_sup : final_time_;
 
@@ -468,10 +469,15 @@ namespace Verdandi
                     = initial_time_
                     + floor((time_inf - initial_time_) / period) * period;
                 if (available_time_0 == time_inf)
+                {
                     available_time.PushBack(available_time_0);
+
+                }
                 available_time_0 += period;
+
                 for (double t = available_time_0; t < time_sup; t += period)
                     available_time.PushBack(t);
+
                 observation_aggregator_.Contribution(time_, available_time_,
                                                      contribution_);
                 return;
@@ -568,7 +574,7 @@ namespace Verdandi
             // considered.
             if (selection_policy == 0)
             {
-                for (int i = 0; i < observation_time_.GetM(); i++)
+                for (size_t i = 0; i < observation_time_.GetM(); i++)
                     if (observation_time_(i) >= time_inf &&
                         observation_time_(i) <= time_sup)
                         available_time.PushBack(observation_time_(i));
@@ -582,7 +588,7 @@ namespace Verdandi
             {
                 if (observation_time_(0) > time)
                     return;
-                for (int i = 1; i < observation_time_.GetM(); i++)
+                for (size_t i = 1; i < observation_time_.GetM(); i++)
                     if (observation_time_(i) >= time)
                     {
                         available_time.PushBack(observation_time_(i - 1));
@@ -1512,7 +1518,7 @@ namespace Verdandi
                 * Nbyte_observation_;
         else
         {
-            int index;
+            size_t index;
             bool observation_available = false;
             for (index = 0; index < observation_time_.GetM(); index++)
                 if (observation_time_(index) == time)

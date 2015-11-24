@@ -261,7 +261,6 @@ namespace Verdandi
         }
 #endif
 
-
         /*** Ouput saver ***/
 
         configuration.SetPrefix("ensemble_kalman_filter.output_saver.");
@@ -385,12 +384,12 @@ namespace Verdandi
                                  "LogNormalHomogeneous"
                                  || model_.GetParameterPDF(0) ==
                                  "BlockLogNormalHomogeneous")
-                            for (int j = 0; j < sample.GetM(); j++)
+                            for (size_t j = 0; j < sample.GetM(); j++)
                                 model_.GetParameter(i)(j) *= sample(j);
 
                         parameter_[i][m]
                             .Reallocate(model_.GetParameter(i).GetLength());
-                        for (int j = 0;
+                        for (size_t j = 0;
                              j < model_.GetParameter(i).GetLength();
                              j++)
                             parameter_[i][m](j) = model_.GetParameter(i)(j);
@@ -513,12 +512,12 @@ namespace Verdandi
                                  "LogNormalHomogeneous"
                                  || model_.GetParameterPDF(0) ==
                                  "BlockLogNormalHomogeneous")
-                            for (int j = 0; j < sample.GetM(); j++)
+                            for (size_t j = 0; j < sample.GetM(); j++)
                                 model_.GetParameter(i)(j) *= sample(j);
 
                         parameter_[i][m]
                             .Reallocate(model_.GetParameter(i).GetLength());
-                        for (int j = 0;
+                        for (size_t j = 0;
                              j < model_.GetParameter(i).GetLength(); j++)
                             parameter_[i][m](j) = model_.GetParameter(i)(j);
                     }
@@ -632,7 +631,7 @@ namespace Verdandi
 #endif
             // Computes the average of the mean forecast.
             Ts sum = 0.;
-            for (int i = 0; i < model_.GetNstate(); i++)
+            for (size_t i = 0; i < model_.GetNstate(); i++)
                 sum += mean_state_vector(i);
             if (option_display_["state_average"])
                 Logger::StdOut(*this, "Forecast state average: "
@@ -643,7 +642,7 @@ namespace Verdandi
             // Computes the minimum and maximum of the mean forecast.
             Ts minimum = mean_state_vector(0);
             Ts maximum = mean_state_vector(0);
-            for (int i = 1; i < model_.GetNstate(); i++)
+            for (size_t i = 1; i < model_.GetNstate(); i++)
             {
                 minimum = min(minimum, mean_state_vector(i));
                 maximum = max(maximum, mean_state_vector(i));
@@ -692,15 +691,15 @@ namespace Verdandi
                     Logger::Log<-3>(*this,
                                     "*** *** Computing an analysis at time "
                                     + to_str(model_.GetTime()));
-                if (option_display_["analysis_time"])
+
+                if (option_display_["observation_number"])
                     Logger::StdOut(*this, "Number of observations: "
                                    + to_str(observation_manager_
                                             .GetNobservation()));
                 else
                     Logger::Log<-3>(*this, "Number of observations: "
-                                    + to_str(observation_manager_
-                                             .GetNobservation()));
-
+                                   + to_str(observation_manager_
+                                            .GetNobservation()));
 #ifdef VERDANDI_WITH_MPI
             }
 #endif
@@ -731,7 +730,7 @@ namespace Verdandi
             // Constructs the square root of the empirical variance.
             Matrix<Ts> L(Nstate_, Nlocal_member_);
             for (int l = 0; l < Nlocal_member_; l++)
-                for (int k = 0; k < Nstate_; k++)
+                for (size_t k = 0; k < Nstate_; k++)
                     L(k, l) = Ts(1) / sqrt(Ts(Nmember_ - 1))
                         * (ensemble_[l](k) - mean_state_vector(k));
 
@@ -744,9 +743,9 @@ namespace Verdandi
             else // "element".
             {
                 HL.Fill(To(0));
-                for (int i = 0; i < Nobservation_; i++)
+                for (size_t i = 0; i < Nobservation_; i++)
                     for (int j = 0; j < Nmember_; j++)
-                        for (int k = 0; k < Nstate_; k++)
+                        for (size_t k = 0; k < Nstate_; k++)
                             HL(i, j) +=
                                 observation_manager_.
                                 GetTangentLinearOperator(i, k) *
@@ -767,6 +766,7 @@ namespace Verdandi
             MltAdd(To(1), working_matrix, innovation_matrix,
                    To(0), correction);
 
+
             // Computes LL'H'
             Matrix<Ts> LLH(Nstate_, Nobservation_);
             MltAdd(Ts(1), SeldonNoTrans, L, SeldonTrans, HL, Ts(0), LLH);
@@ -777,7 +777,7 @@ namespace Verdandi
 
             // Updates the ensemble A += K * d.
             for (int m = 0; m < Nlocal_member_; m++)
-                for (int l = 0; l < Nstate_; l++)
+                for (size_t l = 0; l < Nstate_; l++)
                     ensemble_[m](l) += Kd(l, m);
 
             // Sets state to ensemble mean.
@@ -809,7 +809,7 @@ namespace Verdandi
 #endif
                 // Computes the average of the mean analysis.
                 Ts sum = 0.;
-                for (int i = 0; i < model_.GetNstate(); i++)
+                for (size_t i = 0; i < model_.GetNstate(); i++)
                     sum += mean_state_vector(i);
                 if (option_display_["state_average"])
                     Logger::StdOut(*this, "Analysis state average: "
@@ -820,7 +820,7 @@ namespace Verdandi
                 // Computes the minimum and maximum of the mean forecast.
                 Ts minimum = mean_state_vector(0);
                 Ts maximum = mean_state_vector(0);
-                for (int i = 1; i < model_.GetNstate(); i++)
+                for (size_t i = 1; i < model_.GetNstate(); i++)
                 {
                     minimum = min(minimum, mean_state_vector(i));
                     maximum = max(maximum, mean_state_vector(i));
@@ -1064,10 +1064,10 @@ namespace Verdandi
            string pdf)
     {
         if (pdf == "Normal" || pdf == "NormalHomogeneous")
-            for (int i = 0; i < in.GetNvector(); i++)
+            for (size_t i = 0; i < in.GetNvector(); i++)
                 in.GetVector(i).Fill(typename T0::value_type(0));
         else if (pdf == "LogNormal" || pdf == "LogNormalHomogeneous")
-            for (int i = 0; i < in.GetNvector(); i++)
+            for (size_t i = 0; i < in.GetNvector(); i++)
                 in.GetVector(i).Fill(typename T0::value_type(1));
     }
 
@@ -1125,7 +1125,7 @@ namespace Verdandi
                    Vector<T0, Collection, Allocator0>& out)
     {
         T0 suboutput;
-        for (int i = 0; i < in.GetNvector(); i++)
+        for (size_t i = 0; i < in.GetNvector(); i++)
         {
             suboutput.Reallocate(in.GetVector(i).GetLength());
             out.AddVector(suboutput);

@@ -106,11 +106,11 @@ namespace Verdandi
         map<string, bool> option_display_;
 
         //! Dimension of the reduced state.
-        int Nstate_;
+        size_t Nstate_;
         //! Dimension of the full state.
-        int Nfull_state_;
+        size_t Nfull_state_;
         //! Number of observations.
-        int Nobservation_;
+        size_t Nobservation_;
         //! Should an analysis be computed at the first step?
         bool analyze_first_step_;
         //! Current time.

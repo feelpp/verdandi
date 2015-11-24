@@ -63,9 +63,9 @@ namespace Verdandi
         string observation_configuration_file_;
 
         //! Dimension of the state.
-        int Nstate_;
+        size_t Nstate_;
         //! Number of observations.
-        int Nobservation_;
+        size_t Nobservation_;
 
         /*** Output saver ***/
 
@@ -93,10 +93,10 @@ namespace Verdandi
         /*** Value function ***/
 
         //! Number of dimensions.
-        int Ndimension_;
+        size_t Ndimension_;
 
         //! Total number of points in the domain.
-        int Npoint_;
+        size_t Npoint_;
 
         //! First coordinate along each dimension.
         Vector<T> x_min_;

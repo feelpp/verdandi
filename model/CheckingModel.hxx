@@ -87,7 +87,7 @@ namespace Verdandi
         // Access methods.
         double GetTime();
         void SetTime(double time);
-        int GetNstate();
+        size_t GetNstate();
         int GetNfull_state();
         state& GetState();
         void StateUpdated();

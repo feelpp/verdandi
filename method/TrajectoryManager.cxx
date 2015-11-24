@@ -157,7 +157,7 @@ namespace Verdandi
                 time < checkpoint_time_(checkpoint_index_ + 1)))
         {
             bool available_time;
-            for (int i = 0; i < loaded_time_.GetM(); i++)
+            for (size_t i = 0; i < loaded_time_.GetM(); i++)
             {
                 available_time = false;
                 if (loaded_time_(i) == time)

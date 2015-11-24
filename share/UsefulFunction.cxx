@@ -102,7 +102,7 @@ namespace Verdandi
             return 0;
 
         int index = position(0);
-        for (int d = 1; d < position.GetLength(); d++)
+        for (size_t d = 1; d < position.GetLength(); d++)
             index = shape(d) * index + position(d);
 
         return index;

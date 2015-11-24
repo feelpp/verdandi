@@ -144,7 +144,7 @@ namespace Verdandi
         Delta_x_.Reallocate(Ndimension_);
         Nx_.Reallocate(Ndimension_);
         Npoint_ = 1;
-        for (int i = 0; i < Ndimension_; i++)
+        for (size_t i = 0; i < Ndimension_; i++)
         {
             to_num(discretization_vector[3 * i], x_min_(i));
             to_num(discretization_vector[3 * i + 1], Delta_x_(i));
@@ -204,8 +204,8 @@ namespace Verdandi
                                          + " matrix was provided.");
             // Q must be diagonal, and its inverse is therefore trivial to
             // compute.
-            for (int i = 0; i <  Ndimension_; i++)
-                for (int j = 0; j <  Ndimension_; j++)
+            for (size_t i = 0; i <  Ndimension_; i++)
+                for (size_t j = 0; j <  Ndimension_; j++)
                     if (i != j && Q_inv_(i, j) != T(0))
                         throw ErrorConfiguration("HamiltonJacobiBellman::"
                                                  "HamiltonJacobiBellman",
@@ -213,7 +213,7 @@ namespace Verdandi
                                                  "a diagonal matrix. Non-"
                                                  "diagonal matrix is not"
                                                  " supported.");
-            for (int i = 0; i <  Ndimension_; i++)
+            for (size_t i = 0; i <  Ndimension_; i++)
                 if (Q_inv_(i, i) <= T(0))
                     throw ErrorConfiguration("HamiltonJacobiBellman::"
                                              "HamiltonJacobiBellman",
@@ -344,7 +344,7 @@ namespace Verdandi
 
         // Initial value function: V(0, x) = <Q_0 x, x>.
         Vector<T> x(Ndimension_), Qx(Ndimension_);
-        for (int i = 0; i < Npoint_; i++)
+        for (size_t i = 0; i < Npoint_; i++)
         {
             get_coordinate(i, x_min_, Delta_x_, Nx_, x);
             Add(T(-1.), x_0_, x);
@@ -363,7 +363,7 @@ namespace Verdandi
 
             courant_number_ = 0.;
             double time, time_step;
-            for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+            for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
                 Copy(x, Mx);
@@ -372,7 +372,7 @@ namespace Verdandi
                 time_step = time - initial_time_;
 
                 Add(-1., x, Mx);
-                for (int d = 0; d < Ndimension_; d++)
+                for (size_t d = 0; d < Ndimension_; d++)
                 {
                     Mx(d) *= Delta_t_ / (Delta_x_(d) * time_step);
                     courant_number_ = max(courant_number_, abs(Mx(d)));
@@ -390,16 +390,16 @@ namespace Verdandi
         {
             // Location of the evolution points: (a, a, a, ..., a).
             T a = 0;
-            for (int d = 0; d < Ndimension_; d++)
+            for (size_t d = 0; d < Ndimension_; d++)
                 a += 1. / (Delta_x_(d) * Delta_x_(d));
             a = sqrt(a);
-            for (int d = 0; d < Ndimension_; d++)
+            for (size_t d = 0; d < Ndimension_; d++)
                 a += 1. / Delta_x_(d);
             a = 1. / a;
 
             // 'a' over Delta_x.
             a_Delta_x_.Reallocate(Ndimension_);
-            for (int d = 0; d < Ndimension_; d++)
+            for (size_t d = 0; d < Ndimension_; d++)
                 a_Delta_x_ = a / Delta_x_(d);
         }
 
@@ -484,7 +484,7 @@ namespace Verdandi
             x = x_min_;
             Vector<int> position(Ndimension_);
             position.Fill(0);
-            for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+            for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 observation_manager_.ApplyOperator(x, innovation);
                 Mlt(T(-1), innovation);
@@ -492,7 +492,7 @@ namespace Verdandi
                 Mlt(R_, innovation, Rinnovation);
                 V_(i_cell) += Delta_t_ * DotProd(Rinnovation, innovation);
 
-                int d = Ndimension_ - 1;
+                size_t d = Ndimension_ - 1;
                 while (d != 0 && position(d) == Nx_(d) - 1)
                 {
                     position(d) = 0;
@@ -534,7 +534,7 @@ namespace Verdandi
         /*** Advection term ***/
 
         Vector<T> time_length_upper_bound(Ndimension_);
-        for (int d = 0; d < Ndimension_; d++)
+        for (size_t d = 0; d < Ndimension_; d++)
             time_length_upper_bound(d) = Delta_t_ / Delta_x_(d)
                 * upper_bound_model_(d);
 
@@ -550,7 +550,7 @@ namespace Verdandi
             if (model_time_dependent_)
             {
                 courant_number_ = 0.;
-                for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+                for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
                 {
                     get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
                     Copy(x, Mx);
@@ -559,7 +559,7 @@ namespace Verdandi
                     time_step = time - initial_time;
 
                     Add(-1., x, Mx);
-                    for (int d = 0; d < Ndimension_; d++)
+                    for (size_t d = 0; d < Ndimension_; d++)
                     {
                         Mx(d) *= Delta_t_ / (Delta_x_(d) * time_step);
                         courant_number_ = max(courant_number_, abs(Mx(d)));
@@ -569,13 +569,13 @@ namespace Verdandi
                 }
             }
 
-            for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+            for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 get_position(i_cell, Nx_, position);
 
                 GetRow(Mx_, i_cell, Mx);
 
-                for (int d = 0; d < Ndimension_; d++)
+                for (size_t d = 0; d < Ndimension_; d++)
                 {
                     if (position(d) == Nx_(d) - 1)
                     {
@@ -652,7 +652,7 @@ namespace Verdandi
                 else
                     time_delta += local_step;
                 local_step /= Delta_t_;
-                for (int i = 0; i < Npoint_; i++)
+                for (size_t i = 0; i < Npoint_; i++)
                     V_(i) = V_cur(i) + (V_(i) - V_cur(i)) * local_step;
                 Logger::Log(*this, "Local time step: " + to_str(local_step));
             }
@@ -697,7 +697,7 @@ namespace Verdandi
         if (model_time_dependent_)
         {
             courant_number_ = 0.;
-            for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+            for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
                 Copy(x, Mx);
@@ -706,7 +706,7 @@ namespace Verdandi
                 time_step = time - initial_time;
 
                 Add(-1., x, Mx);
-                for (int d = 0; d < Ndimension_; d++)
+                for (size_t d = 0; d < Ndimension_; d++)
                 {
                     Mx(d) *= Delta_t_ / (Delta_x_(d) * time_step);
                     courant_number_ = max(courant_number_, abs(Mx(d)));
@@ -718,11 +718,11 @@ namespace Verdandi
 
         /*** Computing the directional derivatives of V ***/
 
-        for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+        for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
         {
             get_position(i_cell, Nx_, position);
 
-            for (int d = 0; d < Ndimension_; d++)
+            for (size_t d = 0; d < Ndimension_; d++)
             {
                 if (position(d) == Nx_(d) - 1)
                 {
@@ -775,8 +775,8 @@ namespace Verdandi
         /*** Evolving the central values ***/
 
         int i_prev, i_next;
-        for (int i_cell = 0; i_cell < Npoint_; i_cell++)
-            for (int d = 0; d < Ndimension_; d++)
+        for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
+            for (size_t d = 0; d < Ndimension_; d++)
                 V_(i_cell) += .25 * a_Delta_x_(d)
                     * (V_x_p(i_cell, d) - V_x_m(i_cell, d))
                     - .5 * Mx_(i_cell, d)
@@ -819,7 +819,7 @@ namespace Verdandi
         if (with_advection_term_ && model_time_dependent_)
         {
             courant_number_ = 0.;
-            for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+            for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
             {
                 get_coordinate(i_cell, x_min_, Delta_x_, Nx_, x);
                 Copy(x, Mx);
@@ -828,7 +828,7 @@ namespace Verdandi
                 time_step = time - initial_time;
 
                 Add(-1., x, Mx);
-                for (int d = 0; d < Ndimension_; d++)
+                for (size_t d = 0; d < Ndimension_; d++)
                 {
                     Mx(d) *= Delta_t_ / (Delta_x_(d) * time_step);
                     courant_number_ = max(courant_number_, abs(Mx(d)));
@@ -838,14 +838,14 @@ namespace Verdandi
             }
         }
 
-        for (int i_cell = 0; i_cell < Npoint_; i_cell++)
+        for (size_t i_cell = 0; i_cell < Npoint_; i_cell++)
         {
             get_position(i_cell, Nx_, position);
 
             if (with_advection_term_)
                 GetRow(Mx_, i_cell, Mx);
 
-            for (int d = 0; d < Ndimension_; d++)
+            for (size_t d = 0; d < Ndimension_; d++)
             {
                 if (position(d) == Nx_(d) - 1)
                 {

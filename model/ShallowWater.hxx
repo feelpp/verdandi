@@ -284,8 +284,8 @@ namespace Verdandi
         int GetYMin() const;
         int GetDeltaX() const;
         int GetDeltaY() const;
-        int GetNstate() const;
-        int GetNfull_state() const;
+        size_t GetNstate() const;
+        size_t GetNfull_state() const;
         state& GetState();
         void StateUpdated();
         state& GetFullState();

@@ -72,7 +72,7 @@ public:
             working_matrice.Copy(A_dense);
             GetEigenvalues(working_matrice, wr, wi);
             bool is_inversible = true;
-            for (int i = 0; i < wr.GetLength(); i++)
+            for (size_t i = 0; i < wr.GetLength(); i++)
             {
                 if (wr(i) == real(0) && wi(i) == real(0))
                 {

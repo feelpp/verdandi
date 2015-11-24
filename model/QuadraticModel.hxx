@@ -60,7 +60,7 @@ namespace Verdandi
     protected:
 
         //! Dimension of the state.
-        int Nstate_;
+        size_t Nstate_;
 
         //! State vector.
         Vector<T> state_;
@@ -172,6 +172,7 @@ namespace Verdandi
 #ifdef VERDANDI_WITH_MPI
         //! Communicator used inside this model.
         MPI_Comm mpi_communicator_;
+        bool mpi_communicator_initialized_;
 #endif
 
     public:
@@ -200,7 +201,7 @@ namespace Verdandi
         T GetDelta_t() const;
         double GetTime() const;
         void SetTime(double time);
-        int GetNstate() const;
+        size_t GetNstate() const;
         int GetNfull_state() const;
         state& GetState();
         void StateUpdated();

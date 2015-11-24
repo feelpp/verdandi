@@ -127,8 +127,8 @@ namespace Verdandi
                                 + " x " + to_str(variance.GetN())
                                 + " matrix was provided.");
 
-        int N = variance.GetN();
-        int Nvector = output.GetLength() / N;
+        size_t N = variance.GetN();
+        size_t Nvector = output.GetLength() / N;
 
         if (output.GetLength() % N != 0)
             throw ErrorArgument("BasePerturbationManager::Sample(..., "
@@ -168,7 +168,7 @@ namespace Verdandi
             static_cast<Derived*>(this)->Normal(variance,
                                                 parameter, first_vector);
 
-            for (int i = 1; i < Nvector; i++)
+            for (size_t i = 1; i < Nvector; i++)
             {
                 Vector<T1, VectFull, Allocator1> vector_i;
                 vector_i.SetData(N, &output(i * N));
@@ -206,7 +206,7 @@ namespace Verdandi
             static_cast<Derived*>(this)->Normal(variance,
                                                 parameter, first_vector);
 
-            for (int i = 1; i < Nvector; i++)
+            for (size_t i = 1; i < Nvector; i++)
             {
                 Vector<T1, VectFull, Allocator1> vector_i;
                 vector_i.SetData(N, &perturbation(i * N));
@@ -230,7 +230,7 @@ namespace Verdandi
             }
             first_vector.Nullify();
 
-            for (int k = 0; k < perturbation.GetM(); k++)
+            for (size_t k = 0; k < perturbation.GetM(); k++)
                 output(k) *= exp(perturbation(k));
         }
     }
@@ -272,10 +272,10 @@ namespace Verdandi
                                 + " x " + to_str(variance.GetN())
                                 + " matrix was provided.");
 
-        int N = variance.GetN();
-        int Nvector = output.GetNvector();
+        size_t N = variance.GetN();
+        size_t Nvector = output.GetNvector();
 
-        for (int i = 0; i < Nvector; i++)
+        for (size_t i = 0; i < Nvector; i++)
             if (variance.GetN() != output.GetVector(i).GetLength())
                 throw ErrorArgument("BasePerturbationManager::Sample(..., "
                                     "Vector<Collection>)",
@@ -314,7 +314,7 @@ namespace Verdandi
             static_cast<Derived*>(this)->Normal(variance, parameter,
                                                 output.GetVector(0));
 
-            for (int i = 1; i < Nvector; i++)
+            for (size_t i = 1; i < Nvector; i++)
             {
                 if (correlation.GetLength() != 0 && correlation(i - 1) == 1.)
                     output.GetVector(i) = output.GetVector(0);
@@ -363,7 +363,7 @@ namespace Verdandi
                        parameter,
                        perturbation.GetVector(0));
 
-            for (int i = 1; i < Nvector; i++)
+            for (size_t i = 1; i < Nvector; i++)
             {
                 if (correlation.GetLength() != 0 && correlation(i - 1) == 1.)
                     perturbation.GetVector(i) = perturbation.GetVector(0);
@@ -386,7 +386,7 @@ namespace Verdandi
                 }
             }
 
-            for (int k = 0; k < perturbation.GetM(); k++)
+            for (size_t k = 0; k < perturbation.GetM(); k++)
                 output(k) *= exp(perturbation(k));
             perturbation.Deallocate();
         }
@@ -441,8 +441,8 @@ namespace Verdandi
                                 + "correlation vector ("
                                 + to_str(correlation.GetLength()) + ").");
 
-        int Nvector = correlation.GetLength() + 1;
-        int N = output.GetLength() / Nvector;
+        size_t Nvector = correlation.GetLength() + 1;
+        size_t N = output.GetLength() / Nvector;
 
         if(pdf != "NormalHomogeneous" && pdf != "LogNormalHomogeneous")
             throw ErrorArgument("BasePerturbationManager"
@@ -465,7 +465,7 @@ namespace Verdandi
                                                            parameter,
                                                            first_vector);
 
-            for (int i = 1; i < Nvector; i++)
+            for (size_t i = 1; i < Nvector; i++)
             {
                 vector_i.SetData(N, &output(i * N));
                 static_cast<Derived*>(this)->NormalHomogeneous(variance,
@@ -495,7 +495,7 @@ namespace Verdandi
                                                            parameter,
                                                            first_vector);
 
-            for (int i = 1; i < Nvector; i++)
+            for (size_t i = 1; i < Nvector; i++)
             {
                 vector_i.SetData(N, &perturbation(i * N));
                 static_cast<Derived*>(this)->NormalHomogeneous(variance,
@@ -508,7 +508,7 @@ namespace Verdandi
             }
             first_vector.Nullify();
 
-            for (int k = 0; k < perturbation.GetLength(); k++)
+            for (size_t k = 0; k < perturbation.GetLength(); k++)
                 output(k) *= exp(perturbation(k));
         }
     }
@@ -549,10 +549,10 @@ namespace Verdandi
              Vector<double, VectFull>& correlation,
              Vector<T1, Collection, Allocator1>& output)
     {
-        int Nvector = output.GetNvector();
-        int N = output.GetVector(0).GetLength();
+        size_t Nvector = output.GetNvector();
+        size_t N = output.GetVector(0).GetLength();
 
-        for (int i = 0; i < Nvector; i++)
+        for (size_t i = 0; i < Nvector; i++)
             if (output.GetVector(i).GetLength() != N)
                 throw ErrorArgument("BasePerturbationManager::Sample(..., "
                                     "Vector<Collection>)",
@@ -592,7 +592,7 @@ namespace Verdandi
                                   parameter,
                                   output.GetVector(0));
 
-            for (int i = 1; i < Nvector; i++)
+            for (size_t i = 1; i < Nvector; i++)
             {
                 static_cast<Derived*>(this)->
                     NormalHomogeneous(variance,
@@ -621,7 +621,7 @@ namespace Verdandi
         {
             Vector<T1, Collection, Allocator1> perturbation(Nvector);
             T1* tmp;
-            for (int i = 0; i < Nvector; i++)
+            for (size_t i = 0; i < Nvector; i++)
             {
                 tmp = new T1(N);
                 tmp->Fill(typename T1::value_type(0));
@@ -635,7 +635,7 @@ namespace Verdandi
                                   parameter,
                                   perturbation.GetVector(0));
 
-            for (int i = 1; i < Nvector; i++)
+            for (size_t i = 1; i < Nvector; i++)
             {
                 static_cast<Derived*>(this)->
                     NormalHomogeneous(variance,
@@ -651,7 +651,7 @@ namespace Verdandi
                 }
             }
 
-            for (int k = 0; k < perturbation.GetM(); k++)
+            for (size_t k = 0; k < perturbation.GetM(); k++)
                 output(k) *= exp(perturbation(k));
             perturbation.Deallocate();
         }

@@ -256,16 +256,16 @@ namespace Verdandi
 
         Vector<T1, VectFull, Allocator0> sample(output.GetSize());
 
-        int m = variance.GetM();
+        size_t m = variance.GetM();
         Vector<T0, VectFull> diagonal(m);
-        for (int i = 0; i < m; i++)
+        for (size_t i = 0; i < m; i++)
             diagonal(i) = sqrt(variance(i, i));
 
         GetCholesky(variance);
         Matrix<T1, General, RowMajor> standard_deviation(m, m);
         standard_deviation.Zero();
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j <= i; j++)
+        for (size_t i = 0; i < m; i++)
+            for (size_t j = 0; j <= i; j++)
                 standard_deviation(i, j) = variance(i, j);
 
         bool satisfy_constraint = false;
@@ -276,8 +276,8 @@ namespace Verdandi
         {
             perturbation.Zero();
             double value;
-            int size = sample.GetSize();
-            for (int i = 0; i < size; i++)
+            size_t size = sample.GetSize();
+            for (size_t i = 0; i < size; i++)
             {
                 value = (*variate_generator_normal_)();
                 if (parameter.GetLength() == 2)
@@ -314,11 +314,11 @@ namespace Verdandi
                 Vector<double, VectFull>& parameter,
                 Vector<T1, VectFull, Allocator1>& output)
     {
-        int m = variance.GetM();
-        for (int i = 0; i < m; i++)
+        size_t m = variance.GetM();
+        for (size_t i = 0; i < m; i++)
             output(i) = log(output(i));
         Normal(variance, parameter, output);
-        for (int i = 0; i < m; i++)
+        for (size_t i = 0; i < m; i++)
             output(i) = exp(output(i));
     }
 
@@ -343,7 +343,7 @@ namespace Verdandi
     {
         T1 value;
         value = Normal(T0(0), variance, parameter);
-        for (int i = 0; i < output.GetLength(); i++)
+        for (size_t i = 0; i < output.GetLength(); i++)
             output(i) += value;
     }
 
@@ -369,7 +369,7 @@ namespace Verdandi
     {
         T1 value;
         value = LogNormal(T0(0), variance, parameter);
-        for (int i = 0; i < output.GetLength(); i++)
+        for (size_t i = 0; i < output.GetLength(); i++)
             output(i) *= value;
     }
 
@@ -412,7 +412,7 @@ namespace Verdandi
                                 + "is incompatible with that of the output ("
                                 + to_str(output.GetLength()) + ").");
 
-        int i = 0;
+        size_t i = 0;
         T1 value;
         while (i < output.GetLength())
         {

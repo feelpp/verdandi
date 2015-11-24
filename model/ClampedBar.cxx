@@ -135,7 +135,7 @@ namespace Verdandi
                                 "(string configuration_file)", "The name of"
                                 " the underlying state vector (state) are "
                                 "not defined.");
-        for (unsigned int i = 0; i < stable.size(); i++)
+        for (size_t i = 0; i < stable.size(); i++)
             stable_.insert(stable[i]);
 
         configuration.Set("reduced_state", reduced_);
@@ -397,7 +397,7 @@ namespace Verdandi
         if (stable_.find("theta_force") != stable_.end())
         {
             state e_i(theta_force_.GetM());
-            for (int i = 0; i < theta_force_.GetM(); i++)
+            for (size_t i = 0; i < theta_force_.GetM(); i++)
             {
                 e_i.Fill(T(0));
                 e_i(i) = T(1);
@@ -757,7 +757,7 @@ namespace Verdandi
       \return The state vector size.
     */
     template <class T>
-    int ClampedBar<T>::GetNstate() const
+    size_t ClampedBar<T>::GetNstate() const
     {
         return Nstate_;
     }
@@ -773,7 +773,7 @@ namespace Verdandi
     ::GetStateCopy(state& x)
     {
         x.Reallocate(x_.GetM());
-        for (int i = 0; i < x_.GetM(); i++)
+        for (size_t i = 0; i < x_.GetM(); i++)
             x(i) = x_(i);
     }
 
@@ -794,7 +794,7 @@ namespace Verdandi
                                   " of length " + to_str(x_.GetM()) +
                                   ";\n x is a vector of length "
                                   + to_str(x.GetM()) + ".");
-        for (int i = 0; i < x_.GetM(); i++)
+        for (size_t i = 0; i < x_.GetM(); i++)
             x_(i) = x(i);
     }
 
@@ -808,7 +808,7 @@ namespace Verdandi
     ::GetState()
     {
         duplicated_state_.Reallocate(x_.GetM());
-        for (int i = 0; i < x_.GetM(); i++)
+        for (size_t i = 0; i < x_.GetM(); i++)
             duplicated_state_(i) = x_(i);
         return duplicated_state_;
     }
@@ -819,7 +819,7 @@ namespace Verdandi
     void ClampedBar<T>
     ::StateUpdated()
     {
-        for (int i = 0; i < x_.GetM(); i++)
+        for (size_t i = 0; i < x_.GetM(); i++)
             x_(i) = duplicated_state_(i);
     }
 
@@ -881,7 +881,7 @@ namespace Verdandi
 
         state_collection p;
         state_adjoint_.Reallocate(q_.GetM());
-        for (int i = 0; i < q_.GetM(); i++)
+        for (size_t i = 0; i < q_.GetM(); i++)
             state_adjoint_(i) = q_(i);
 
         SetShape(state_adjoint_, p);
@@ -959,7 +959,7 @@ namespace Verdandi
                                   ";\n  state_adjoint is a vector of length "
                                   + to_str(state_adjoint_.GetM()) + ".");
 
-        for (int i = 0; i < q_.GetM(); i++)
+        for (size_t i = 0; i < q_.GetM(); i++)
             q_(i) = state_adjoint_(i);
     }
 
@@ -1051,8 +1051,8 @@ namespace Verdandi
             // Initializes L.
             state_error_variance_projector_.Reallocate(Nstate_, Nreduced);
             state_error_variance_projector_.Fill(T(0));
-            for (unsigned int i = 0, l = 0; i < reduced_.size(); i++)
-                for(int k = x_.GetIndex(reduced_[i]);
+            for (size_t i = 0, l = 0; i < reduced_.size(); i++)
+                for(size_t k = x_.GetIndex(reduced_[i]);
                     k < x_.GetIndex(reduced_[i]) +
                         x_.GetVector(reduced_[i]).GetSize(); k++)
                     state_error_variance_projector_(k, l++) = 1;

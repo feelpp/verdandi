@@ -366,7 +366,7 @@ namespace Verdandi
                          == "LogNormalHomogeneous"
                          || model_.GetParameterPDF(i)
                          == "BlockLogNormalHomogeneous")
-                    for (int k = 0; k < perturbation_[i].GetM(); k++)
+                    for (size_t k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
 
                 model_.ParameterUpdated(i);
@@ -419,7 +419,7 @@ namespace Verdandi
                          == "LogNormalHomogeneous"
                          || model_.GetParameterPDF(i)
                          == "BlockLogNormalHomogeneous")
-                    for (int k = 0; k < perturbation_[i].GetM(); k++)
+                    for (size_t k = 0; k < perturbation_[i].GetM(); k++)
                         parameter(k) *= perturbation_[i](k);
                 model_.ParameterUpdated(i);
             }

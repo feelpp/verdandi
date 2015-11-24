@@ -377,8 +377,8 @@ namespace Verdandi
     {
         typedef typename State::value_type T;
 
-        int Ny = y.GetLength();
-        int Nx = x.GetLength();
+        size_t Ny = y.GetLength();
+        size_t Nx = x.GetLength();
 
         if (B.GetM() != Nx || B.GetN() != Nx)
             throw ErrorArgument("ComputeBLUE_matrix",

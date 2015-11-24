@@ -158,7 +158,7 @@ namespace Verdandi
             time2 = model_.GetTime();
             model_.ApplyOperator(x3, false);
             time3 = model_.GetTime();
-            for(int i = 0; i < x1.GetM(); i++)
+            for(size_t i = 0; i < x1.GetM(); i++)
                 if (x1(i) != x2(i))
                     throw ErrorProcessing("CheckingModel<" + model_.GetName()
                                           + ">::ApplyOperator"
@@ -172,7 +172,7 @@ namespace Verdandi
                                           + "\n ApplyOperator(x2)("
                                           + to_str(i) +
                                           ") = " + to_str(x2(i)) + ".");
-            for(int i = 0; i < x1.GetM(); i++)
+            for(size_t i = 0; i < x1.GetM(); i++)
                 if (x1(i) != x3(i))
                     throw ErrorProcessing("CheckingModel<" + model_.GetName()
                                           + ">::ApplyOperator"
@@ -211,7 +211,7 @@ namespace Verdandi
             Copy(model_.GetState(), previous_state);
             model_.ApplyTangentLinearOperator(x1);
             state& current_state = model_.GetState();
-            for(int i = 0; i < current_state.GetM(); i++)
+            for(size_t i = 0; i < current_state.GetM(); i++)
                 if (previous_state(i)!= current_state(i))
                     throw ErrorProcessing("CheckingModel<" + model_.GetName()
                                           + ">::ApplyTangentLinearOperator"
@@ -234,7 +234,7 @@ namespace Verdandi
             time2 = model_.GetTime();
             model_.ApplyTangentLinearOperator(x3);
             time3 = model_.GetTime();
-            for(int i = 0; i < x1.GetM(); i++)
+            for(size_t i = 0; i < x1.GetM(); i++)
                 if (x1(i) != x2(i))
                     throw ErrorProcessing("CheckingModel<" + model_.GetName()
                                           + ">::ApplyTangentLinearOperator"
@@ -247,7 +247,7 @@ namespace Verdandi
                                           "\n ApplyTangentLinearOperator(x2)("
                                           + to_str(i) +
                                           ") = " + to_str(x3(i)) + ".");
-            for(int i = 0; i < x1.GetM(); i++)
+            for(size_t i = 0; i < x1.GetM(); i++)
                 if (x1(i) != x3(i))
                     throw ErrorProcessing("CheckingModel<" + model_.GetName()
                                           + ">::ApplyTangentLinearOperator"
@@ -321,7 +321,7 @@ namespace Verdandi
       \return The state vector size.
     */
     template <class Model>
-    int CheckingModel<Model>::GetNstate()
+    size_t CheckingModel<Model>::GetNstate()
     {
         if (model_.GetNstate() != model_.GetState().GetM())
             throw ErrorProcessing("CheckingModel<" + model_.GetName() +

@@ -140,7 +140,7 @@ namespace Verdandi
 #ifndef SWIG
     template <class T, template <class U> class Allocator>
     void GetRowPointer(const Matrix<T, General, RowMajor, Allocator<T> >& M,
-                       int i, Vector<T, VectFull, Allocator<T> >& V);
+                       size_t i, Vector<T, VectFull, Allocator<T> >& V);
 #endif
 
 #ifdef VERDANDI_WITH_PETSC
