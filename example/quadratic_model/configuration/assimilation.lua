@@ -282,7 +282,9 @@ ensemble_kalman_filter = {
 
       iteration = false,
       time = true,
-      analysis_time = true
+      analysis_time = true,
+      state_average = true,
+      state_minimum_maximum = false
 
    },
 

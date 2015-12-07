@@ -175,6 +175,12 @@ namespace Verdandi
         // Should the analysis times be displayed on screen?
         configuration.Set("display.analysis_time",
                           option_display_["analysis_time"]);
+        // Should the state average be displayed on screen?
+        configuration.Set("display.state_average",
+                          option_display_["state_average"]);
+        // Should the state minimum and maximum be displayed on screen?
+        configuration.Set("display.state_minimum_maximum",
+                          option_display_["state_minimum_maximum"]);
 
         /*** Assimilation options ***/
 
@@ -264,11 +270,12 @@ namespace Verdandi
             else
                 Logger::Log<-3>(*this, "Initialization");
             if (option_display_["time"])
-                Logger::StdOut(*this, "Initial time: "
+                Logger::StdOut(*this, "*** Initial time: "
                                + to_str(model_.GetTime()));
             else
                 Logger::Log<-3>(*this,
-                                "Initial time: " + to_str(model_.GetTime()));
+                                "*** Initial time: "
+                                + to_str(model_.GetTime()));
 #ifdef VERDANDI_WITH_MPI
         }
 #endif
@@ -398,11 +405,10 @@ namespace Verdandi
                                 + to_str(iteration_)
                                 + " -> " + to_str(iteration_ + 1));
             if (option_display_["time"])
-                Logger::StdOut(*this, "Starting iteration at time "
+                Logger::StdOut(*this, "*** Starting iteration at time "
                                + to_str(model_.GetTime()));
             else
-                Logger::Log<-3>(*this,
-                                "Starting iteration at time "
+                Logger::Log<-3>(*this, "*** Starting iteration at time "
                                 + to_str(model_.GetTime()));
 #ifdef VERDANDI_WITH_MPI
         }
@@ -574,11 +580,22 @@ namespace Verdandi
             {
 #endif
                 if (option_display_["analysis_time"])
-                    Logger::StdOut(*this, "Computing an analysis at time "
+                    Logger::StdOut(*this,
+                                   "*** *** Computing an analysis at time "
                                    + to_str(model_.GetTime()));
                 else
-                    Logger::Log<-3>(*this,"Computing an analysis at time "
+                    Logger::Log<-3>(*this,
+                                    "*** *** Computing an analysis at time "
                                     + to_str(model_.GetTime()));
+                if (option_display_["analysis_time"])
+                    Logger::StdOut(*this, "Number of observations: "
+                                   + to_str(observation_manager_
+                                            .GetNobservation()));
+                else
+                    Logger::Log<-3>(*this, "Number of observations: "
+                                    + to_str(observation_manager_
+                                             .GetNobservation()));
+
 #ifdef VERDANDI_WITH_MPI
             }
 #endif
