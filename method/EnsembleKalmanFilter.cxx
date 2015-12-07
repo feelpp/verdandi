@@ -191,37 +191,18 @@ namespace Verdandi
 
         configuration.Set("Nmember", Nmember_);
         Nlocal_member_ = Nmember_;
-        int global_member_number = 0;
-
+        first_member_index_ = 0;
 #if defined(VERDANDI_WITH_MPI)
         Nlocal_member_ = Nmember_ / Nprocess_;
         if (rank_ < Nmember_ % Nprocess_)
             Nlocal_member_++;
         int div = Nmember_ % Nprocess_;
         if (rank_ < div)
-            global_member_number = rank_ * Nlocal_member_;
+            first_member_index_ = rank_ * Nlocal_member_;
         else
-            global_member_number = div * (Nlocal_member_ + 1)
+            first_member_index_ = div * (Nlocal_member_ + 1)
                 + (rank_ - div) * Nlocal_member_;
 #endif
-
-        /*** Ouput saver ***/
-
-        configuration.SetPrefix("ensemble_kalman_filter.output_saver.");
-        output_saver_.Initialize(configuration);
-
-        output_saver_.Empty("forecast_time");
-        output_saver_.Empty("forecast_state");
-        output_saver_.Empty("analysis_time");
-        output_saver_.Empty("analysis_state");
-
-        for (int k = 0; k < Nlocal_member_; k++)
-        {
-            output_saver_.Empty("forecast_state-"
-                                + to_str(k + global_member_number));
-            output_saver_.Empty("analysis_state-"
-                                + to_str(k + global_member_number));
-        }
 
         /*** Logger and read configuration ***/
 
@@ -280,20 +261,51 @@ namespace Verdandi
         }
 #endif
 
+
+        /*** Ouput saver ***/
+
+        configuration.SetPrefix("ensemble_kalman_filter.output_saver.");
+        output_saver_.Initialize(configuration);
+
+        output_saver_.Empty("forecast_time");
+        output_saver_.Empty("forecast_state");
+        output_saver_.Empty("analysis_time");
+        output_saver_.Empty("analysis_state");
+        for (int k = 0; k < Nlocal_member_; k++)
+            for (int p = 0; p < model_.GetNparameter(); p++)
+                output_saver_.Empty("perturbation-"
+                                    + to_str(k + first_member_index_)
+                                    + "-" + to_str(p));
+
+        for (int k = 0; k < Nlocal_member_; k++)
+        {
+            output_saver_.Empty("forecast_state-"
+                                + to_str(k + first_member_index_));
+            output_saver_.Empty("analysis_state-"
+                                + to_str(k + first_member_index_));
+        }
+
         /*** Ensemble initialization ***/
 
         model_state state;
         Nstate_ = model_.GetNstate();
         Nfull_state_ = model_.GetNfull_state();
         Nparameter_ = model_.GetNparameter();
+        ensemble_full_.resize(Nlocal_member_);
         ensemble_.resize(Nlocal_member_);
         parameter_.resize(Nparameter_);
-
         for (int p = 0; p < Nparameter_; p++)
-            parameter_[p].resize(Nlocal_member_);
+            parameter_[p].resize(Nmember_);
+
+        perturbation_.resize(Nparameter_);
+        for (int p = 0; p < Nparameter_; p++)
+            perturbation_[p].resize(Nmember_);
 
         for (int m = 0; m < Nlocal_member_; m++)
-            ensemble_[m] = model_.GetFullState();
+        {
+            ensemble_full_[m] = model_.GetFullState();
+            ensemble_[m] = model_.GetState();
+        }
 
         InitializeEnsemble();
 
@@ -324,9 +336,9 @@ namespace Verdandi
             if (model_.GetParameterOption(i) == "init_step")
             {
                 // Parameter to be perturbed.
-                reference_parameter = model_.GetParameter(i);
+                reference_parameter.Copy(model_.GetParameter(i));
 
-                for (int m = 0; m < Nlocal_member_ ; m++)
+                for (int m = 0; m < Nmember_ ; m++)
                 {
                     uncertain_parameter sample;
                     SetDimension(model_.GetParameter(i), sample);
@@ -356,26 +368,39 @@ namespace Verdandi
                                     model_.GetParameterCorrelation(i),
                                     sample);
 
-                    if (model_.GetParameterPDF(i) == "Normal"
-                        || model_.GetParameterPDF(i) == "BlockNormal"
-                        || model_.GetParameterPDF(i) == "NormalHomogeneous"
-                        || model_.GetParameterPDF(i) ==
-                        "BlockNormalHomogeneous")
-                        Add(1., sample, model_.GetParameter(i));
-                    else if (model_.GetParameterPDF(0) == "LogNormal"
-                             || model_.GetParameterPDF(0) ==
-                             "BlockLogNormal"
-                             || model_.GetParameterPDF(0) ==
-                             "LogNormalHomogeneous"
-                             || model_.GetParameterPDF(0) ==
-                             "BlockLogNormalHomogeneous")
-                        for (int j = 0; j < sample.GetM(); j++)
-                            model_.GetParameter(i)(j) *= sample(j);
+                    if (m >= first_member_index_
+                        && m < first_member_index_ + Nlocal_member_)
+                    {
+                        if (model_.GetParameterPDF(i) == "Normal"
+                            || model_.GetParameterPDF(i) == "BlockNormal"
+                            || model_.GetParameterPDF(i) ==
+                            "NormalHomogeneous"
+                            || model_.GetParameterPDF(i) ==
+                            "BlockNormalHomogeneous")
+                            Add(1., sample, model_.GetParameter(i));
+                        else if (model_.GetParameterPDF(0) == "LogNormal"
+                                 || model_.GetParameterPDF(0) ==
+                                 "BlockLogNormal"
+                                 || model_.GetParameterPDF(0) ==
+                                 "LogNormalHomogeneous"
+                                 || model_.GetParameterPDF(0) ==
+                                 "BlockLogNormalHomogeneous")
+                            for (int j = 0; j < sample.GetM(); j++)
+                                model_.GetParameter(i)(j) *= sample(j);
 
-                    parameter_[i][m] = model_.GetParameter(i);
-                    // Puts back the reference parameter into the model.
-                    model_.GetParameter(i) = reference_parameter;
-                    model_.ParameterUpdated(i);
+                        parameter_[i][m]
+                            .Reallocate(model_.GetParameter(i).GetLength());
+                        for (int j = 0;
+                             j < model_.GetParameter(i).GetLength();
+                             j++)
+                            parameter_[i][m](j) = model_.GetParameter(i)(j);
+                        // Puts back the reference parameter into the model.
+                        model_.GetParameter(i).Copy(reference_parameter);
+                        model_.ParameterUpdated(i);
+
+                        output_saver_.Save(sample, "perturbation-"
+                                           + to_str(m) + "-" + to_str(i));
+                    }
                 }
 
                 MessageHandler::Send(*this, "model", "perturbation");
@@ -420,60 +445,102 @@ namespace Verdandi
 
         for (int i = 0; i < Nparameter_; i++)
         {
-            if (model_.GetParameterOption(i) == "every_step")
+            if (model_.GetParameterOption(i) == "every_step"
+                || model_.GetParameterOption(i) == "every_step_same")
             {
                 // Parameter to be perturbed.
-                reference_parameter = model_.GetParameter(i);
+                reference_parameter.Copy(model_.GetParameter(i));
 
-                for (int m = 0; m < Nlocal_member_ ; m++)
+                // This operation is not parallelized, so that the
+                // perturbations are consistent across the parallel processes.
+                for (int m = 0; m < Nmember_ ; m++)
                 {
                     uncertain_parameter sample;
-                    SetDimension(model_.GetParameter(i), sample);
-                    Fill(sample, model_.GetParameterPDF(i));
+                    if (model_.GetParameterOption(i) == "every_step" ||
+                        perturbation_[i][m].GetLength() == 0)
+                    {
+                        SetDimension(model_.GetParameter(i), sample);
+                        Fill(sample, model_.GetParameterPDF(i));
 
-                    if (model_.GetParameterPDF(i) == "Normal"
-                        || model_.GetParameterPDF(i) == "LogNormal"
-                        || model_.GetParameterPDF(i) == "BlockNormal"
-                        || model_.GetParameterPDF(i) == "BlockLogNormal")
-                        perturbation_manager_
-                            .Sample(model_.GetParameterPDF(i),
-                                    model_.GetParameterVariance(i),
-                                    model_.GetParameterPDFData(i),
-                                    model_.GetParameterCorrelation(i),
-                                    sample);
-                    else if (model_.GetParameterPDF(i) == "NormalHomogeneous"
-                             || model_.GetParameterPDF(i) ==
-                             "LogNormalHomogeneous"
-                             || model_.GetParameterPDF(i) ==
-                             "BlockNormalHomogeneous"
-                             || model_.GetParameterPDF(i) ==
-                             "BlockLogNormalHomogeneous")
-                        perturbation_manager_
-                            .Sample(model_.GetParameterPDF(i),
-                                    model_.GetParameterVariance(i)(0, 0),
-                                    model_.GetParameterPDFData(i),
-                                    model_.GetParameterCorrelation(i),
-                                    sample);
-                    if (model_.GetParameterPDF(i) == "Normal"
-                        || model_.GetParameterPDF(i) == "BlockNormal"
-                        || model_.GetParameterPDF(i) == "NormalHomogeneous"
-                        || model_.GetParameterPDF(i) ==
-                        "BlockNormalHomogeneous")
-                        Add(1., sample, model_.GetParameter(i));
-                    else if (model_.GetParameterPDF(0) == "LogNormal"
-                             || model_.GetParameterPDF(0) ==
-                             "BlockLogNormal"
-                             || model_.GetParameterPDF(0) ==
-                             "LogNormalHomogeneous"
-                             || model_.GetParameterPDF(0) ==
-                             "BlockLogNormalHomogeneous")
-                        for (int j = 0; j < sample.GetM(); j++)
-                            model_.GetParameter(i)(j) *= sample(j);
+                        if (model_.GetParameterPDF(i) == "Normal"
+                            || model_.GetParameterPDF(i) == "LogNormal"
+                            || model_.GetParameterPDF(i) == "BlockNormal"
+                            || model_.GetParameterPDF(i) == "BlockLogNormal")
+                            perturbation_manager_
+                                .Sample(model_.GetParameterPDF(i),
+                                        model_.GetParameterVariance(i),
+                                        model_.GetParameterPDFData(i),
+                                        model_.GetParameterCorrelation(i),
+                                        sample);
+                        else if (model_.GetParameterPDF(i)
+                                 == "NormalHomogeneous"
+                                 || model_.GetParameterPDF(i) ==
+                                 "LogNormalHomogeneous"
+                                 || model_.GetParameterPDF(i) ==
+                                 "BlockNormalHomogeneous"
+                                 || model_.GetParameterPDF(i) ==
+                                 "BlockLogNormalHomogeneous")
+                            perturbation_manager_
+                                .Sample(model_.GetParameterPDF(i),
+                                        model_.GetParameterVariance(i)(0, 0),
+                                        model_.GetParameterPDFData(i),
+                                        model_.GetParameterCorrelation(i),
+                                        sample);
 
-                    parameter_[i][m] = model_.GetParameter(i);
-                    // Puts back the reference parameter into the model.
-                    model_.GetParameter(i) = reference_parameter;
-                    model_.ParameterUpdated(i);
+                        if (m >= first_member_index_
+                            && m < first_member_index_ + Nlocal_member_)
+                            output_saver_.Save(sample, "perturbation-"
+                                               + to_str(m) + "-" + to_str(i));
+                    }
+                    else if (m >= first_member_index_
+                             && m < first_member_index_ + Nlocal_member_)
+                        sample = perturbation_[i][m];
+
+                    if (m >= first_member_index_
+                        && m < first_member_index_ + Nlocal_member_)
+                    {
+                        if (model_.GetParameterPDF(i) == "Normal"
+                            || model_.GetParameterPDF(i) == "BlockNormal"
+                            || model_.GetParameterPDF(i)
+                            == "NormalHomogeneous"
+                            || model_.GetParameterPDF(i) ==
+                            "BlockNormalHomogeneous")
+                            Add(1., sample, model_.GetParameter(i));
+                        else if (model_.GetParameterPDF(0) == "LogNormal"
+                                 || model_.GetParameterPDF(0) ==
+                                 "BlockLogNormal"
+                                 || model_.GetParameterPDF(0) ==
+                                 "LogNormalHomogeneous"
+                                 || model_.GetParameterPDF(0) ==
+                                 "BlockLogNormalHomogeneous")
+                            for (int j = 0; j < sample.GetM(); j++)
+                                model_.GetParameter(i)(j) *= sample(j);
+
+                        parameter_[i][m]
+                            .Reallocate(model_.GetParameter(i).GetLength());
+                        for (int j = 0;
+                             j < model_.GetParameter(i).GetLength(); j++)
+                            parameter_[i][m](j) = model_.GetParameter(i)(j);
+                    }
+
+                    if (model_.GetParameterOption(i) == "every_step_same"
+                        && perturbation_[i][m].GetLength() == 0)
+                        if (m >= first_member_index_
+                            && m < first_member_index_ + Nlocal_member_)
+                            // Saves the perturbation for later use.
+                            perturbation_[i][m] = sample;
+                        else // Not the business of current process, but the
+                            // vector needs to be non-zero for the
+                            // perturbations not to be regenerated.
+                            perturbation_[i][m].Reallocate(1);
+
+                    if (m >= first_member_index_
+                        && m < first_member_index_ + Nlocal_member_)
+                    {
+                        // Puts back the reference parameter into the model.
+                        model_.GetParameter(i).Copy(reference_parameter);
+                        model_.ParameterUpdated(i);
+                    }
                 }
 
                 MessageHandler::Send(*this, "model", "perturbation");
@@ -512,18 +579,22 @@ namespace Verdandi
         {
             for (int i = 0; i < Nparameter_; i++)
             {
-                model_.GetParameter(i) = parameter_[i][m];
+                model_.GetParameter(i)
+                    .Copy(parameter_[i][m + first_member_index_]);
                 model_.ParameterUpdated(i);
             }
-            model_.GetFullState() = ensemble_[m];
+            model_.GetFullState() = ensemble_full_[m];
             model_.FullStateUpdated();
 
             model_.Forward();
 
-            ensemble_[m] = model_.GetFullState();
+            ensemble_full_[m] = model_.GetFullState();
 
             if (m < Nlocal_member_ - 1)
+            {
                 model_.SetTime(time_);
+                model_.InitializeStep();
+            }
         }
 
         model_state mean_state_vector(model_.GetNstate());
@@ -531,7 +602,7 @@ namespace Verdandi
         mean_state_vector = 0.;
         for (int m = 0; m < Nlocal_member_; m++)
         {
-            model_.GetFullState() = ensemble_[m];
+            model_.GetFullState() = ensemble_full_[m];
             model_.FullStateUpdated();
             Add(Ts(1), model_.GetState(), mean_state_vector);
         }
@@ -551,9 +622,43 @@ namespace Verdandi
         // Puts back the reference parameters.
         for (int i = 0; i < Nparameter_; i++)
         {
-            model_.GetParameter(i) = reference_parameter[i];
+            model_.GetParameter(i).Copy(reference_parameter[i]);
             model_.ParameterUpdated(i);
         }
+
+#ifdef VERDANDI_WITH_MPI
+        if (rank_ == 0)
+        {
+#endif
+            // Computes the average of the mean forecast.
+            Ts sum = 0.;
+            for (int i = 0; i < model_.GetNstate(); i++)
+                sum += mean_state_vector(i);
+            if (option_display_["state_average"])
+                Logger::StdOut(*this, "Forecast state average: "
+                               + to_str(sum / Ts(model_.GetNstate())));
+            else
+                Logger::Log<-3>(*this, "Forecast state average: "
+                                + to_str(sum / Ts(model_.GetNstate())));
+            // Computes the minimum and maximum of the mean forecast.
+            Ts minimum = mean_state_vector(0);
+            Ts maximum = mean_state_vector(0);
+            for (int i = 1; i < model_.GetNstate(); i++)
+            {
+                minimum = min(minimum, mean_state_vector(i));
+                maximum = max(maximum, mean_state_vector(i));
+            }
+            if (option_display_["state_average"])
+                Logger::StdOut(*this, "Forecast state minimum and maximum: ("
+                               + to_str(minimum) + ", " + to_str(maximum)
+                               + ")");
+            else
+                Logger::Log<-3>(*this, "Forecast state minimum and maximum: ("
+                                + to_str(minimum) + ", " + to_str(maximum)
+                                + ")");
+#ifdef VERDANDI_WITH_MPI
+        }
+#endif
 
         ++iteration_;
 
@@ -614,8 +719,9 @@ namespace Verdandi
             model_state state(Nstate_);
             for (int m = 0; m < Nlocal_member_; m++)
             {
-                model_.GetFullState() = ensemble_[m];
+                model_.GetFullState() = ensemble_full_[m];
                 model_.FullStateUpdated();
+                ensemble_[m] = model_.GetState();
                 observation_manager_.ApplyOperator(model_.GetState(), Hx);
                 Mlt(To(-1), Hx);
                 Add(To(1), obs, Hx);
@@ -639,7 +745,7 @@ namespace Verdandi
             {
                 HL.Fill(To(0));
                 for (int i = 0; i < Nobservation_; i++)
-                    for (int j = 0; j < Nlocal_member_; j++)
+                    for (int j = 0; j < Nmember_; j++)
                         for (int k = 0; k < Nstate_; k++)
                             HL(i, j) +=
                                 observation_manager_.
@@ -678,8 +784,9 @@ namespace Verdandi
             mean_state_vector = 0.;
             for (int m = 0; m < Nlocal_member_; m++)
             {
-                model_.GetFullState() = ensemble_[m];
-                model_.FullStateUpdated();
+                model_.GetState() = ensemble_[m];
+                model_.StateUpdated();
+                ensemble_full_[m] = model_.GetFullState();
                 Add(Ts(1), model_.GetState(), mean_state_vector);
             }
 
@@ -695,6 +802,40 @@ namespace Verdandi
             Mlt(Ts(1) / Ts(Nmember_), mean_state_vector);
             model_.GetState() = mean_state_vector;
             model_.StateUpdated();
+
+#ifdef VERDANDI_WITH_MPI
+            if (rank_ == 0)
+            {
+#endif
+                // Computes the average of the mean analysis.
+                Ts sum = 0.;
+                for (int i = 0; i < model_.GetNstate(); i++)
+                    sum += mean_state_vector(i);
+                if (option_display_["state_average"])
+                    Logger::StdOut(*this, "Analysis state average: "
+                                   + to_str(sum / Ts(model_.GetNstate())));
+                else
+                    Logger::Log<-3>(*this, "Analysis state average: "
+                                    + to_str(sum / Ts(model_.GetNstate())));
+                // Computes the minimum and maximum of the mean forecast.
+                Ts minimum = mean_state_vector(0);
+                Ts maximum = mean_state_vector(0);
+                for (int i = 1; i < model_.GetNstate(); i++)
+                {
+                    minimum = min(minimum, mean_state_vector(i));
+                    maximum = max(maximum, mean_state_vector(i));
+                }
+                if (option_display_["state_average"])
+                    Logger::StdOut(*this, "Analysis state minimum and "
+                                   "maximum: (" + to_str(minimum) + ", "
+                                   + to_str(maximum) + ")");
+                else
+                    Logger::Log<-3>(*this, "Analysis state minimum and "
+                                   "maximum: (" + to_str(minimum) + ", "
+                                   + to_str(maximum) + ")");
+#ifdef VERDANDI_WITH_MPI
+            }
+#endif
 
             MessageHandler::Send(*this, "model", "analysis");
             MessageHandler::Send(*this, "observation_manager", "analysis");
@@ -845,16 +986,6 @@ namespace Verdandi
                 output_saver_.Save(model_.GetState(), model_.GetTime(),
                                    "forecast_state");
             }
-        int global_member_number = 0;
-
-#if defined(VERDANDI_WITH_MPI)
-        int div = Nmember_ % Nprocess_;
-        if (rank_ < div)
-            global_member_number = rank_ * Nlocal_member_;
-        else
-            global_member_number = div * (Nlocal_member_ + 1)
-                + (rank_ - div) * Nlocal_member_;
-#endif
 
         if (message.find("forecast") != string::npos)
         {
@@ -864,14 +995,14 @@ namespace Verdandi
             for (int m = 0; m < Nlocal_member_; m++)
                 if (output_saver_
                     .IsVariable("forecast_state-"
-                                + to_str(m + global_member_number)))
+                                + to_str(m + first_member_index_)))
                 {
-                    model_.GetFullState() = ensemble_[m];
+                    model_.GetFullState() = ensemble_full_[m];
                     model_.FullStateUpdated();
                     output_saver_.Save(model_.GetState(),
                                        model_.GetTime(),
                                        "forecast_state-"
-                                       + to_str(m + global_member_number));
+                                       + to_str(m + first_member_index_));
                 }
 
             model_.GetFullState() = mean_state_vector;
@@ -897,14 +1028,14 @@ namespace Verdandi
             for (int m = 0; m < Nlocal_member_; m++)
                 if (output_saver_
                     .IsVariable("analysis_state-"
-                                + to_str(m + global_member_number)))
+                                + to_str(m + first_member_index_)))
                 {
-                    model_.GetFullState() = ensemble_[m];
+                    model_.GetFullState() = ensemble_full_[m];
                     model_.FullStateUpdated();
                     output_saver_.Save(model_.GetState(),
                                        model_.GetTime(),
                                        "analysis_state-" +
-                                       to_str(m + global_member_number));
+                                       to_str(m + first_member_index_));
                 }
             model_.GetFullState() = mean_state_vector;
             model_.FullStateUpdated();

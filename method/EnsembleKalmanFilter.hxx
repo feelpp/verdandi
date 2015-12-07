@@ -77,9 +77,16 @@ namespace Verdandi
 
         //! The ensemble state vectors.
         ensemble ensemble_;
+        //! The ensemble full state vectors.
+        ensemble ensemble_full_;
 
         //! Ensemble for the parameters.
         vector<vector<uncertain_parameter> > parameter_;
+
+        /*! Ensemble for the perturbations. It is needed only for the option
+            "every_step_same" where the same perturbation is applied at each
+            time step. */
+        vector<vector<uncertain_parameter> > perturbation_;
 
         //! Number of parameters to be perturbed.
         int Nparameter_;
@@ -122,6 +129,9 @@ namespace Verdandi
         //! Number of processes.
         int Nprocess_;
 #endif
+
+        //! Index of the first member managed by this MPI process.
+        int first_member_index_;
 
         /*** Output saver ***/
 
