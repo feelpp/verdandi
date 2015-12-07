@@ -262,7 +262,7 @@ namespace Verdandi
                           observation_tangent_linear_operator_access_);
 
 #ifdef VERDANDI_WITH_MPI
-        if (world_rank_ == 0)
+        if (rank_ == 0)
         {
 #endif
             if (option_display_["iteration"])
@@ -393,7 +393,7 @@ namespace Verdandi
         MessageHandler::Send(*this, "all", "::InitializeStep begin");
 
 #ifdef VERDANDI_WITH_MPI
-        if (world_rank_ == 0)
+        if (rank_ == 0)
         {
 #endif
             if (option_display_["iteration"])
@@ -576,7 +576,7 @@ namespace Verdandi
         if (observation_manager_.HasObservation())
         {
 #ifdef VERDANDI_WITH_MPI
-            if (world_rank_ == 0)
+            if (rank_ == 0)
             {
 #endif
                 if (option_display_["analysis_time"])
