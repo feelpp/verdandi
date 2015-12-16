@@ -100,7 +100,7 @@ void TestMean(PerturbationManager rng)
 }
 
 
-// This tests perform a chi^2 test in order to check the independence of the
+// This test perform a chi^2 test in order to check the independence of the
 // samples.
 template <class PerturbationManager>
 void TestChiSquared(PerturbationManager rng)
@@ -124,4 +124,34 @@ void TestChiSquared(PerturbationManager rng)
          criteria += (stack[i] - expected) * (stack[i] - expected) / expected;
     ASSERT_LT(criteria, critical_value);
     delete[] stack;
+}
+
+
+// This test checks that 68% on the values from the 'Normal(mean, variance,
+// parameter)' will be in the [mean - sigma, mean + sigma] interval.
+
+template <class PerturbationManager>
+void TestNormalCriteria(PerturbationManager rng)
+{
+    double iter = 100000;
+    double count = 0;
+    Vector<double> clipping(2);
+    double accuracy = 0.01;
+    double mean = 2.1;
+    double variance = 1.28;
+    double value;
+    double criteria;
+    double normality_criteria = 0.6827;
+
+    clipping(0) = mean - 5 * variance;
+    clipping(1) = mean + 5 * variance;
+
+    for (int i = 0 ; i < iter; i++)
+    {
+        value = rng.Normal(mean, variance, clipping);
+        if (value < mean + sqrt(variance) && value > mean - sqrt(variance))
+            count++;
+    }
+    criteria = count / iter;
+    ASSERT_NEAR(criteria, normality_criteria, accuracy);
 }

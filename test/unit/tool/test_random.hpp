@@ -67,3 +67,9 @@ TEST_F(TestRandom, TestChi2)
 {
     TestChiSquared(rng_);
 }
+
+
+TEST_F(TestRandom, TestNormalCriteria)
+{
+    TestNormalCriteria(rng_);
+}
