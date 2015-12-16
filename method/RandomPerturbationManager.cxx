@@ -27,6 +27,7 @@
 #include "BasePerturbationManager.cxx"
 #include "share/LockFile.cxx"
 #include <chrono>
+#include <cmath>
 
 
 namespace Verdandi
@@ -131,6 +132,7 @@ namespace Verdandi
     ::Normal(double mean, double variance,
              Vector<double, VectFull>& parameter)
     {
+        variance = sqrt(variance);
         std::normal_distribution<double> distribution(mean,variance);
         double value = distribution(generator_);
         if (parameter.GetLength() == 2)
