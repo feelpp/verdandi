@@ -1480,8 +1480,13 @@ namespace Verdandi
         observation2.Reallocate(Nt);
         if (observation_file_type_ == "binary")
             for (int h = 0; h < Nt; h++)
+            {
+                observation temp;
                 ReadObservation(file_stream, available_time(h), 0,
-                                observation2(h));
+                                temp);
+                observation2(h).Reallocate(temp.GetM());
+                Copy(temp, observation2(h));
+            }
 #ifdef VERDANDI_WITH_HDF5
         else if (observation_file_type_ == "HDF")
             for (int h = 0; h < Nt; h++)
@@ -2095,7 +2100,7 @@ namespace Verdandi
     */
     template <class T>
     void LinearObservationManager<T>
-    ::GetBLUECorrection(Vector<T>& BLUE_correction) const
+    ::GetBLUECorrection(observation& BLUE_correction) const
     {
         throw ErrorUndefined("LinearObservationManager"
                              "::GetBLUECorrection(correction)");

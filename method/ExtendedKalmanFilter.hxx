@@ -101,6 +101,8 @@ namespace Verdandi
         //! Current time.
         double time_;
 
+
+        model_state_error_variance temp_;
         //! Computation mode for BLUE: "vector" or "matrix".
         string blue_computation_;
         //! Computation mode for covariance: "vector" or "matrix".

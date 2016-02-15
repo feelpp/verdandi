@@ -47,14 +47,21 @@ namespace Verdandi
         typedef const T* const_pointer;
         typedef T& reference;
         typedef const T& const_reference;
-        typedef Matrix<T> tangent_linear_operator;
-        typedef Matrix<T> state_error_variance;
+#ifdef VERDANDI_WITH_MPI
+        typedef Matrix<T, General, PETScMPIDense> matrix_type;
+        typedef Vector<T, PETScPar> vector_type;
+#else
+        typedef Matrix<T> matrix_type;
+        typedef Vector<T> vector_type;
+#endif
+        typedef matrix_type tangent_linear_operator;
+        typedef matrix_type state_error_variance;
         typedef Matrix<T> state_error_variance_reduced;
-        typedef Vector<T> state_error_variance_row;
-        typedef Vector<T> state;
-        typedef Matrix<T> matrix_state_observation;
-        typedef Matrix<T> error_variance;
-        typedef Vector<T> uncertain_parameter;
+        typedef vector_type state_error_variance_row;
+        typedef vector_type state;
+        typedef matrix_type matrix_state_observation;
+        typedef matrix_type error_variance;
+        typedef vector_type uncertain_parameter;
         typedef Matrix<T, Symmetric, Seldon::RowSymPacked> parameter_variance;
 
     protected:
@@ -63,7 +70,7 @@ namespace Verdandi
         size_t Nstate_;
 
         //! State vector.
-        Vector<T> state_;
+        state state_;
 
         //! Source vector.
         state source_;
@@ -76,13 +83,13 @@ namespace Verdandi
         bool with_constant_term_;
 
         //! Quadratic terms.
-        vector<Matrix<T> > S_;
+        vector<matrix_type > S_;
 
         //! Matrix that defines the linear part of the model.
-        Matrix<T> L_;
+        matrix_type L_;
 
         //! Vector that defines the constant part of the model.
-        Vector<T> b_;
+        vector_type b_;
 
         //! Time step.
         double Delta_t_;
@@ -94,7 +101,7 @@ namespace Verdandi
         double time_;
 
         //! Temporary variable that stores S times the state vector.
-        Vector<T> S_state_;
+        state S_state_;
 
         /*** Uncertainty on parameters ***/
 
@@ -158,6 +165,10 @@ namespace Verdandi
 
         //! Tangent linear operator (H).
         tangent_linear_operator tangent_linear_operator_;
+
+        tangent_linear_operator temp_identity_;
+
+        tangent_linear_operator tangent_linear_linear_term_;
 
         //! Index of the row of P currently stored.
         int current_row_;

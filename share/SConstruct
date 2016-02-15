@@ -120,6 +120,7 @@ fortran_compiler = ARGUMENTS.get("fortran", fortran_compiler)
 linker = ARGUMENTS.get("link", linker)
 
 if ARGUMENTS["mpi"] == "yes":
+    env.Append(CXXFLAGS = ["-DVERDANDI_WITH_MPI"])
     mpi_cxx_compiler = None
     # search for known good MPI C++ compilers
     option_list = ['mpiCC','mpic++']

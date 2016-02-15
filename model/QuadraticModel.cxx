@@ -107,7 +107,7 @@ namespace Verdandi
         configuration.Set("with_linear_term", with_linear_term_);
         configuration.Set("with_constant_term", with_constant_term_);
 
-        source_.Resize(Nstate_);
+        source_.Reallocate(Nstate_);
         source_.Fill(T(0));
 
         if (with_quadratic_term_)
@@ -202,7 +202,7 @@ namespace Verdandi
 
             if (is_constant_perturbed_)
             {
-                Vector<T> constant_mean;
+                vector_type constant_mean;
                 constant_mean.Reallocate(b_.GetLength());
                 configuration.Set("constant.mean", constant_mean);
                 if (constant_mean.GetLength() != Nstate_)
@@ -254,7 +254,7 @@ namespace Verdandi
 
             if (is_linear_perturbed_)
             {
-                Vector<T> linear_mean;
+                vector_type linear_mean;
                 linear_mean.Reallocate(Nstate_);
                 configuration.Set("linear_term.mean", linear_mean);
                 if (linear_mean.GetLength() != Nstate_)
@@ -295,10 +295,9 @@ namespace Verdandi
                 Vector<T> linear_parameter;
                 configuration.Set("linear_term.parameter",
                                   linear_parameter);
-
                 for (size_t i = 0; i < Nstate_; i++)
                 {
-                    Vector<T> row;
+                    vector_type row;
                     GetRow(L_, i, row);
                     Add(T(1), linear_mean, row);
                     SetRow(row, i, L_);
@@ -306,8 +305,8 @@ namespace Verdandi
 
                 for (size_t i = 0; i < Nstate_; i++)
                 {
-                    Vector<T> *row = new Vector<T>;
-                    row->SetData(Nstate_, L_.GetMe()[i]);
+                    vector_type *row = new vector_type;
+                    GetRow(L_, i, *row);
                     parameter_.push_back(row);
                     parameter_name_.push_back(Str() + "linear_term" + i);
                     variance_.push_back(linear_variance);
@@ -318,7 +317,7 @@ namespace Verdandi
 
             if (is_quadratic_perturbed_)
             {
-                Vector<T> quadratic_mean;
+                vector_type quadratic_mean;
                 quadratic_mean.Reallocate(Nstate_);
                 configuration.Set("quadratic_term.mean", quadratic_mean);
                 if (quadratic_mean.GetLength() != Nstate_)
@@ -360,7 +359,7 @@ namespace Verdandi
                 configuration.Set("quadratic_term.parameter",
                                   quadratic_parameter);
 
-                Vector<T> row;
+                vector_type row;
                 for (size_t i = 0; i < Nstate_; i++)
                     for (size_t j = 0; j < Nstate_; j++)
                     {
@@ -372,8 +371,8 @@ namespace Verdandi
                 for (size_t i = 0; i < Nstate_; i++)
                     for (size_t j = 0; j < Nstate_; j++)
                     {
-                        Vector<T> *row = new Vector<T>;
-                        row->SetData(Nstate_, S_[i].GetMe()[j]);
+                        vector_type *row = new vector_type;
+                        GetRow(S_[i], j, *row);
                         parameter_.push_back(row);
                         parameter_name_.push_back(Str() + "quadratic_term"
                                                   + i + "_" + j);
@@ -438,7 +437,16 @@ namespace Verdandi
         state_error_variance_projector_.Reallocate(Nstate_, Nstate_);
         state_error_variance_projector_.Fill(T(0));
         state_error_variance_projector_.SetIdentity();
-        state_error_variance_reduced_ = P_;
+        Copy(P_, state_error_variance_reduced_);
+
+        temp_identity_.Reallocate(Nstate_, Nstate_);
+        temp_identity_.SetIdentity();
+
+
+        tangent_linear_linear_term_.Reallocate(Nstate_, Nstate_);
+        tangent_linear_linear_term_.Copy(L_);
+        Mlt(Delta_t_, tangent_linear_linear_term_);
+        Add(T(1), temp_identity_, tangent_linear_linear_term_);
 
         /*** Output saver ***/
 
@@ -461,6 +469,8 @@ namespace Verdandi
             output_saver_.Save(b_, "b");
         }
         output_saver_.Empty("state");
+
+
     }
 
 
@@ -489,7 +499,13 @@ namespace Verdandi
             for (size_t i = 0; i < Nstate_; i++)
             {
                 MltAdd(Delta_t_, S_[i], current_state, T(0), S_state_);
+#ifdef VERDANDI_WITH_MPI
+                state_.SetBuffer(i, state_(i) + DotProd(S_state_,
+                                                        current_state));
+                state_.Flush();
+#else
                 state_(i) += DotProd(S_state_, current_state);
+#endif
             }
             if (with_linear_term_)
                 MltAdd(Delta_t_, L_, current_state, T(1), state_);
@@ -556,7 +572,12 @@ namespace Verdandi
             {
                 MltAdd(Delta_t_, S_[i], state_, T(0), S_state_);
                 MltAdd(Delta_t_, SeldonTrans, S_[i], state_, T(1), S_state_);
+#ifdef VERDANDI_WITH_MPI
+                x.SetBuffer(i, x(i) + DotProd(S_state_, input));
+                x.Flush();
+#else
                 x(i) += DotProd(S_state_, input);
+#endif
             }
             if (with_linear_term_)
                 MltAdd(Delta_t_, L_, input, T(1), x);
@@ -579,24 +600,25 @@ namespace Verdandi
         tangent_linear_operator_.Reallocate(Nstate_, Nstate_);
         if (with_quadratic_term_)
         {
-            Vector<T> M_row(Nstate_);
+            vector_type M_row(Nstate_);
             for (size_t i = 0; i < Nstate_; i++)
             {
                 MltAdd(T(1), S_[i], state_, T(0), M_row);
                 MltAdd(T(Delta_t_), SeldonTrans, S_[i], state_,
                        T(Delta_t_), M_row);
-                SetRow(M_row, i, tangent_linear_operator_);
-                tangent_linear_operator_(i, i) += T(1);
+                SetRow(M_row, (int)i, tangent_linear_operator_);
             }
+            Add(T(1), temp_identity_, tangent_linear_operator_);
             if (with_linear_term_)
                 Add(T(Delta_t_), L_, tangent_linear_operator_);
         }
         else if (with_linear_term_)
         {
+            if (Nstate_ == tangent_linear_linear_term_.GetM())
+                return tangent_linear_linear_term_;
             tangent_linear_operator_.Copy(L_);
             Mlt(Delta_t_, tangent_linear_operator_);
-            for (size_t i = 0; i < Nstate_; i++)
-                tangent_linear_operator_(i, i) += T(1);
+            Add(T(1), temp_identity_, tangent_linear_operator_);
         }
         else
             tangent_linear_operator_.SetIdentity();

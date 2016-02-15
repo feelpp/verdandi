@@ -122,6 +122,10 @@ namespace Verdandi
         Copy(model_.GetStateErrorVariance(), state_error_variance_);
 
 
+        // Pre-allocations and temporary matrixes
+        temp_.Reallocate(Nstate_, Nstate_);
+
+
         /***************************
          * Reads the configuration *
          ***************************/
@@ -363,10 +367,9 @@ namespace Verdandi
 
         model_tangent_linear_operator& A = model_.GetTangentLinearOperator();
 
-        MltAdd(Ts(1.), A, state_error_variance_, Ts(0.),
-               state_error_variance_);
+        MltAdd(Ts(1.), A, state_error_variance_, Ts(0.), temp_);
 
-        MltAdd(Ts(1.), SeldonNoTrans, state_error_variance_,
+        MltAdd(Ts(1.), SeldonNoTrans, temp_,
                SeldonTrans, A, Ts(0.), state_error_variance_);
 
         if (model_.GetErrorVariance().GetM() != 0

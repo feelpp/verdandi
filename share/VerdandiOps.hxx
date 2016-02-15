@@ -92,11 +92,25 @@ namespace Verdandi
                       Seldon::Matrix<T, Prop, PETScMPIAIJ, Allocator>& value);
         template<class T, class Prop, class Allocator>
         void SetValue(string name, string constraint,
+                      const Seldon::Matrix<T, Prop, PETScMPIDense, Allocator>&
+                      default_value,
+                      bool with_default,
+                      Seldon::Matrix<T, Prop, PETScMPIDense, Allocator>& value);
+        template<class T, class Prop, class Allocator>
+        void SetValue(string name, string constraint,
                       const
                       vector<Seldon::Matrix<T, Prop, PETScMPIAIJ,
                       Allocator> >& default_value,
                       bool with_default,
                       vector<Seldon::Matrix<T, Prop, PETScMPIAIJ,
+                      Allocator> >& value);
+        template<class T, class Prop, class Allocator>
+        void SetValue(string name, string constraint,
+                      const
+                      vector<Seldon::Matrix<T, Prop, PETScMPIDense,
+                      Allocator> >& default_value,
+                      bool with_default,
+                      vector<Seldon::Matrix<T, Prop, PETScMPIDense,
                       Allocator> >& value);
         template<class T, class Prop, class Storage, class Allocator>
         void SetValue(string name, string constraint,

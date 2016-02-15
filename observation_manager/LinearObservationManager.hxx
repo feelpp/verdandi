@@ -52,21 +52,54 @@ namespace Verdandi
     {
 
     public:
+
 #ifdef VERDANDI_TANGENT_LINEAR_OPERATOR_SPARSE
+#ifdef VERDANDI_WITH_MPI
+        //! Type of the tangent linear operator.
+        typedef Matrix<T, General, PETScMPIAIJ> tangent_linear_operator;
+#else
         //! Type of the tangent linear operator.
         typedef Matrix<T, General, RowSparse> tangent_linear_operator;
+#endif
+#else
+#ifdef VERDANDI_WITH_MPI
+        //! Type of the tangent linear operator.
+        typedef Matrix<T, General, PETScMPIDense> tangent_linear_operator;
 #else
         //! Type of the tangent linear operator.
         typedef Matrix<T> tangent_linear_operator;
 #endif
+#endif
 
-#ifdef VERDANDI_OBSERVATION_ERROR_SPARSE
+
+#ifdef VERDANDI_ERROR_SPARSE
+#ifdef VERDANDI_WITH_MPI
+        //! Type of the observation error covariance matrix.
+        typedef Matrix<T, General, PETScMPIAIJ> error_variance;
+#else
         //! Type of the observation error covariance matrix.
         typedef Matrix<T, General, RowSparse> error_variance;
+#endif
+#else
+#ifdef VERDANDI_WITH_MPI
+        //! Type of the observation error covariance matrix.
+        typedef Matrix<T, General, PETScMPIDense> error_variance;
 #else
         //! Type of the observation error covariance matrix.
         typedef Matrix<T> error_variance;
 #endif
+#endif
+
+#ifdef VERDANDI_WITH_MPI
+        //! Type of a row of the tangent linear operator.
+        typedef Vector<T, PETScPar> tangent_linear_operator_row;
+
+        //! Type of the observation vector.
+        typedef Vector<T, PETScPar> observation;
+        //! Type of the observation vector.
+        typedef Vector<T, PETScPar> observation_vector;
+
+#else
         //! Type of a row of the tangent linear operator.
         typedef Vector<T> tangent_linear_operator_row;
 
@@ -74,6 +107,8 @@ namespace Verdandi
         typedef Vector<T> observation;
         //! Type of the observation vector.
         typedef Vector<T> observation_vector;
+#endif
+
         //! Type of the observation vector 2.
         typedef Vector2<T> observation_vector2;
         //! Type of the observation vector 3.
@@ -430,7 +465,7 @@ namespace Verdandi
         void ApplyAdjointOperator(const state& x, observation& y) const;
 
         bool HasBLUECorrection() const;
-        void GetBLUECorrection(Vector<T>& BLUE_correction) const;
+        void GetBLUECorrection(observation& BLUE_correction) const;
 
         T GetErrorVariance(int i, int j) const;
         const error_variance& GetErrorVariance() const;
