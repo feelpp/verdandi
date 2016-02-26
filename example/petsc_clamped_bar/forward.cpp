@@ -22,9 +22,7 @@
 
 #include "Verdandi.hxx"
 #include "seldon/SeldonSolver.hxx"
-
-#include "seldon/vector/PetscVector.cxx"
-#include "seldon/matrix/PetscMatrix.cxx"
+#include "seldon/SeldonPetsc.hxx"
 
 #include "model/PetscClampedBar.cxx"
 #include "method/ForwardDriver.cxx"

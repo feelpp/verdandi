@@ -13,7 +13,7 @@
 
 //#define VERDANDI_LOGGING_LEVEL -7
 
-//#define VERDANDI_WITH_MPI
+#define VERDANDI_WITH_MPI
 
 #if defined(VERDANDI_WITH_MPI)
 #include <mpi.h>
@@ -29,10 +29,7 @@
 
 #include "Verdandi.hxx"
 #include "seldon/SeldonSolver.hxx"
-
-
-#include "seldon/vector/PetscVector.cxx"
-#include "seldon/matrix/PetscMatrix.cxx"
+#include "seldon/SeldonPetsc.hxx"
 
 #include "model/PetscClampedBar.cxx"
 #include "observation_manager/PetscLinearObservationManager.cxx"
