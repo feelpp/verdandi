@@ -285,7 +285,7 @@ namespace Verdandi
         {
             configuration.SetPrefix("hjb.lax_friedrichs.");
 
-            configuration.Set("Upper_bound_model", upper_bound_model_);
+            configuration.Set("upper_bound_model", upper_bound_model_);
             if (upper_bound_model_.GetLength() != Ndimension_)
                 throw ErrorConfiguration("HamiltonJacobiBellman::"
                                          "HamiltonJacobiBellman",

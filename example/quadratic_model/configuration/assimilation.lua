@@ -434,7 +434,7 @@ hjb = {
       model_time_dependent = false,
       -- Upper bound on the absolute value of the model operator, in every
       -- direction.
-      Upper_bound_model = {150.}
+      upper_bound_model = {150.}
 
    },
 
@@ -456,13 +456,18 @@ hjb = {
 }
 
 -- For the 2D version.
--- hjb.domain.discretization = {-1., 0.01, 201,
---                              -1., 0.01, 201}
--- hjb.equation_coefficient.Q_0 = {1., 0.,
---                                 0., 1.}
--- hjb.equation_coefficient.x_0 = {0., 0.}
--- hjb.equation_coefficient.Q = {1., 0.,
---                               0., 1.}
--- hjb.equation_coefficient.R = {10., 0.,
---                               0., 10.}
--- hjb.lax_friedrich.Upper_bound_model = {150., 150.}
+ hjb.domain.discretization = {-1., 0.01, 201,
+                              -1., 0.01, 201}
+
+ hjb.equation_coefficient.Q_0 = {1., 0.,
+                                 0., 1.}
+
+ hjb.equation_coefficient.x_0 = {0., 0.}
+
+ hjb.equation_coefficient.Q = {1., 0.,
+                               0., 1.}
+
+ hjb.equation_coefficient.R = {10., 0.,
+                               0., 10.}
+
+-- hjb.lax_friedrichs.upper_bound_model = {150., 150.}
