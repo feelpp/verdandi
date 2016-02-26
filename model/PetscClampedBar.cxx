@@ -1126,8 +1126,7 @@ namespace Verdandi
         PC pc;
         ierr = KSPCreate(mpi_communicator_, &ksp);
         CHKERRABORT(mpi_communicator_, ierr);
-        ierr = KSPSetOperators(ksp, A.GetPetscMatrix(), A.GetPetscMatrix(),
-                               DIFFERENT_NONZERO_PATTERN);
+        ierr = KSPSetOperators(ksp, A.GetPetscMatrix(), A.GetPetscMatrix());
         CHKERRABORT(mpi_communicator_, ierr);
         ierr = KSPGetPC(ksp,&pc);
         CHKERRABORT(mpi_communicator_, ierr);
