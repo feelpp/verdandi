@@ -67,11 +67,11 @@ class LinearObservationManager:
         if self.observation_type_ == "state":
             self.Nbyte_observation_ = Nstate_model \
                 * ctypes.sizeof(ctypes.c_double) \
-                + ctypes.sizeof(ctypes.c_int)
+                + ctypes.sizeof(ctypes.c_ulong)
         if self.observation_type_ == "observation":
             self.Nbyte_observation_ = self.Nobservation_ \
                 * ctypes.sizeof(ctypes.c_double) \
-                + sizeof(ctypes.c_int)
+                + sizeof(ctypes.c_ulong)
 
         expected_file_size = self.Nbyte_observation_ \
             * (int((self.final_time_ - self.initial_time_)
@@ -127,7 +127,7 @@ class LinearObservationManager:
                              / self.Delta_t_ + 0.5)
                        * self.Nbyte_observation_)
         f.seek(position)
-        a = array.array('i')
+        a = array.array('L')
         a.read(f, 1)
         size = a[0]
         obs = array.array('d')
