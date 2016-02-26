@@ -49,7 +49,7 @@ int main(int argc, char** argv)
     while (!driver.HasFinished())
     {
         driver.InitializeStep();
-        driver.Analyze();
+        driver.Forward();
     }
 
 END;
