@@ -93,6 +93,10 @@ namespace Verdandi
 #define OPS_WITH_EXCEPTION
 #endif
 
+// Uncomment these lines to disable the logger and its messages. This is
+// useful to speed up the unit tests.
+// #define VERDANDI_IGNORE_MESSAGE
+// #define VERDANDI_LOG_IS_ACTIVE 0
 
 // Convenient macros to catch exceptions.
 #ifndef VERDANDI_TRY
