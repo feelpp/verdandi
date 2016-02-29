@@ -13,3 +13,5 @@ Optional dependencies:
     - Newran03 beta
     - TRNG 4.11
     - Google Test 1.7.0
+    - PETSc 3.5.3
+    - OpenMPI 1.8.4 
