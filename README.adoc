@@ -1,0 +1,15 @@
+= Verdandi
+
+This is Verdandi, a data assimilation framegeneric data assimilation library, primarily for high-dimensional systems. 
+It aims to provide many methods (like Kalman filters and 4D-Var) and related tools, for a wide range of numerical models.
+
+This is a fork of https://gitlab.inria.fr/mallet/verdandi[verdandi gitlab].
+
+== Developers
+
+Verdandi has been developed by INRIA teams and in particular:
+
+- Vivien Mallet 
+- Nicolas Claude
+
+
