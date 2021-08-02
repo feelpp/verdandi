@@ -48,6 +48,10 @@ jobs:
       with:
         lfs: true
     - 
+      name: Install dependencies
+      run: |
+        sudo apt install liblua5.2-0-dev swig
+    - 
       name: Build MyProject
       run: |
         rm -rf build
