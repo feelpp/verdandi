@@ -22,9 +22,8 @@
 
 #ifndef VERDANDI_FILE_OBSERVATION_MANAGER_PYTHONOBSERVATIONMANAGER_HXX
 
-#define PYTHON_EVAL_HELPER <python
-#define EVAL(v) v
-#include EVAL(PYTHON_EVAL_HELPER)EVAL(VERDANDI_PYTHON_VERSION)/Python.h>
+
+#include <Python.h>
 
 #include<numpy/arrayobject.h>
 

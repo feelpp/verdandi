@@ -56,7 +56,7 @@ if(NOT libops_POPULATED)
 endif()
 file(GLOB OPS_CPP_FILES ${libops_SOURCE_DIR}/*.cxx)
 add_library(ops SHARED ${OPS_CPP_FILES})  
-target_compile_definitions(ops PUBLIC -DOPS_WITH_EXCEPTION)
+#target_compile_definitions(ops PUBLIC -DOPS_WITH_EXCEPTION)
 ADD_CUSTOM_TARGET(ops_link_target ALL
                   COMMAND ${CMAKE_COMMAND} -E create_symlink ${libops_SOURCE_DIR} ${libops_SOURCE_DIR}/ops)
 add_dependencies(ops ops_link_target)

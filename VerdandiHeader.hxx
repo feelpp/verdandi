@@ -178,7 +178,7 @@ namespace Verdandi
 
 
 #ifndef VERDANDI_PYTHON_VERSION
-#define VERDANDI_PYTHON_VERSION 2.6
+#define VERDANDI_PYTHON_VERSION 3.8
 #endif
 
 #include "share/VerdandiOps.hxx"
