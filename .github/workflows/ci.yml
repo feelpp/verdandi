@@ -56,7 +56,7 @@ jobs:
       run: |
         rm -rf build
         mkdir build && cd build
-        CXX=clang++ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/install ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/install ..
         make -j5
 #        make install
 #    - 
@@ -77,66 +77,4 @@ jobs:
 #        # Directory containing files to upload
 #        path: build/assets/myproject-*
 
-  check:
-    needs: build_code
-    runs-on: ubuntu-20.04
-    name: Check Build, Install, Run
-    steps:
-    - name: Install feelpp
-      uses: feelpp/action-install-feelpp@v1.1
-      with:
-        dist: ubuntu
-        flavor: focal
-        install: libfeelpp1 feelpp-tools libfeelpp-dev libfeelpp-toolboxes1-all-dev feelpp-toolboxes
-    - name: Download 
-      uses: actions/download-artifact@v2
-      with:
-        # Artifact name
-        name: feelpp-project-artifacts
-        # Directory containing files to upload
-        path: build/assets/
-    - name: Display Artifact
-      run: ls -R
-      working-directory: build/assets
-    - name: Install Project
-      run: sudo dpkg -i build/assets/*.deb
-
-  deliver:
-    runs-on: ubuntu-20.04
-    needs: check
-    name: Docker Build, Tag, Push
-
-    steps:
-    - uses: actions/checkout@v2.3.4
-      with:
-        lfs: true
-    
-    - name: Download 
-      uses: actions/download-artifact@v2
-      with:
-        # Artifact name
-        name: feelpp-project-artifacts
-        path: artifacts/
-    -
-      name: Set up QEMU
-      uses: docker/setup-qemu-action@v1.1.0
-    -
-      name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1.3.0        
-    - 
-      name: Login to GitHub Container Registry
-      uses: docker/login-action@v1.9.0 
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.CR_PAT }}
-    - 
-      name: Build container image
-      uses: docker/build-push-action@v2
-      with: 
-        context: artifacts
-        repository: feelpp/feelpp-project
-        tags: ghcr.io/feelpp/feelpp-project:latest
-        file: ./Dockerfile
-        push: true
-        
+  
