@@ -28,7 +28,7 @@ jobs:
     - name: Build
       run: |
         echo "add doc geeneration command here..."
-      working-directory: docs
+#      working-directory: docs
 #    - name: Deploy
 #      uses: JamesIves/github-pages-deploy-action@4.1.4
 #      with:
