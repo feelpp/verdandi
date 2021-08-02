@@ -50,7 +50,7 @@ jobs:
     - 
       name: Install dependencies
       run: |
-        sudo apt-get -yq install liblua5.2-dev swig
+        sudo apt -yq install liblua5.2-dev swig
     - 
       name: Build MyProject
       run: |
