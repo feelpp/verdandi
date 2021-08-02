@@ -444,7 +444,10 @@ namespace Verdandi
 
 
         tangent_linear_linear_term_.Reallocate(Nstate_, Nstate_);
-        tangent_linear_linear_term_.Copy(L_);
+        if (with_linear_term_)
+        {
+            tangent_linear_linear_term_.Copy(L_);
+        }        
         Mlt(Delta_t_, tangent_linear_linear_term_);
         Add(T(1), temp_identity_, tangent_linear_linear_term_);
 
