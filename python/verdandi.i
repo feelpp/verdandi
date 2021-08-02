@@ -145,63 +145,81 @@ namespace Verdandi
 }
 
 %define VERDANDI_OPS_INSTANTIATE_ELEMENT(suffix, type)
-%template(Get ## suffix) Get<type >;
-%template(Apply ## suffix) Apply<type >;
-%template(Is ## suffix) Is<type >;
+namespace Verdandi
+{
+  %extend VerdandiOps
+  {
+    %template(Get ## suffix) Get<type >;
+    %template(Is ## suffix) Is<type >;
+  };
+}
+namespace Ops
+{
+  %extend Ops
+  {
+    %template(Apply##suffix) Apply<type>;
+  };
+}
 %enddef
 
 %define VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(suffix0, type0, suffix1, type1)
-%template(Apply ## suffix0 ## suffix1) Apply<type0, type1 >;
+namespace Ops
+{
+  %extend Ops
+  {
+    %template(Apply ## suffix0 ## suffix1) Apply<type0, type1 >;
+  };
+}
 %enddef
 
 %define VERDANDI_OPS_INSTANTIATE_VECTOR(suffix, type)
-%template(Get ## suffix) Get<type >;
-%template(Is ## suffix) Is<type >;
-%enddef
-
 namespace Verdandi
 {
-
   %extend VerdandiOps
   {
-    VERDANDI_OPS_INSTANTIATE_ELEMENT(Bool, bool);
-    VERDANDI_OPS_INSTANTIATE_ELEMENT(Int, int);
-    VERDANDI_OPS_INSTANTIATE_ELEMENT(Float, float);
-    VERDANDI_OPS_INSTANTIATE_ELEMENT(Double, double);
-    VERDANDI_OPS_INSTANTIATE_ELEMENT(String, string);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, Bool, bool);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, Bool, bool);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, Bool, bool);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, Bool, bool);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, Bool, bool);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, Int, int);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, Int, int);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, Int, int);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, Int, int);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, Int, int);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, Float, float);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, Float, float);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, Float, float);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, Float, float);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, Float, float);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, Double, double);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, Double, double);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, Double, double);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, Double, double);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, Double, double);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, String, string);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, String, string);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, String, string);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, String, string);
-    VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, String, string);
-    VERDANDI_OPS_INSTANTIATE_VECTOR(VectorBool, std::vector<bool>);
-    VERDANDI_OPS_INSTANTIATE_VECTOR(VectorInt, std::vector<int>);
-    VERDANDI_OPS_INSTANTIATE_VECTOR(VectorFloat, std::vector<float>);
-    VERDANDI_OPS_INSTANTIATE_VECTOR(VectorDouble, std::vector<double>);
-    VERDANDI_OPS_INSTANTIATE_VECTOR(VectorString, std::vector<string>);
+    %template(Get ## suffix) Get<type >;
+    %template(Is ## suffix) Is<type >;
   };
-
 }
+%enddef
+
+
+VERDANDI_OPS_INSTANTIATE_ELEMENT(Bool, bool);
+VERDANDI_OPS_INSTANTIATE_ELEMENT(Int, int);
+VERDANDI_OPS_INSTANTIATE_ELEMENT(Float, float);
+VERDANDI_OPS_INSTANTIATE_ELEMENT(Double, double);
+VERDANDI_OPS_INSTANTIATE_ELEMENT(String, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, Bool, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, Bool, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, Bool, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, Bool, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, Bool, bool);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, Int, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, Int, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, Int, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, Int, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, Int, int);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, Float, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, Float, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, Float, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, Float, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, Float, float);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, Double, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, Double, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, Double, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, Double, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, Double, double);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Bool, bool, String, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Int, int, String, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Float, float, String, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(Double, double, String, string);
+VERDANDI_OPS_INSTANTIATE_CROSSED_ELEMENT(String, string, String, string);
+VERDANDI_OPS_INSTANTIATE_VECTOR(VectorBool, std::vector<bool>);
+VERDANDI_OPS_INSTANTIATE_VECTOR(VectorInt, std::vector<int>);
+VERDANDI_OPS_INSTANTIATE_VECTOR(VectorFloat, std::vector<float>);
+VERDANDI_OPS_INSTANTIATE_VECTOR(VectorDouble, std::vector<double>);
+VERDANDI_OPS_INSTANTIATE_VECTOR(VectorString, std::vector<string>);
+
 
 // For conversions from Seldon to Numpy, and from Numpy to Seldon.
 %pythoncode %{
