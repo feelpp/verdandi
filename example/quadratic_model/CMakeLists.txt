@@ -11,3 +11,7 @@ add_dependencies(quadratic_model quadratic_model_forward)
 add_executable(quadratic_model_optimal_interpolation optimal_interpolation.cpp)
 target_link_libraries(quadratic_model_optimal_interpolation verdandi)
 add_dependencies(quadratic_model quadratic_model_optimal_interpolation)
+
+add_executable(quadratic_model_nudging nudging.cpp)
+target_link_libraries(quadratic_model_nudging verdandi)
+add_dependencies(quadratic_model quadratic_model_nudging)

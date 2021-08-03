@@ -6,3 +6,11 @@ target_include_directories(verdandi PUBLIC
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/share>
       $<INSTALL_INTERFACE:include/ops> )
 target_link_libraries(verdandi PUBLIC seldon ops lua)
+
+
+install(TARGETS verdandi EXPORT VerdandiTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )

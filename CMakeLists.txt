@@ -13,16 +13,18 @@ option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
 #set(BLA_VENDOR Intel10_64lp)
 find_package(BLAS)
 find_package(LAPACK)
-
+include(GNUInstallDirs)
 include(FetchContent)
 
 # get seldon from github
-FetchContent_Declare(seldon GIT_REPOSITORY https://github.com/libseldon/seldon.git) 
+set(FETCHCONTENT_SOURCE_DIR_SELDON /home/prudhomm/Devel/seldon)
+FetchContent_Declare(seldon GIT_REPOSITORY https://github.com/feelpp/seldon.git ) 
 FetchContent_GetProperties(seldon)
 if(NOT seldon_POPULATED)
     FetchContent_Populate(seldon)
 endif()
-add_library(seldon SHARED ${seldon_SOURCE_DIR}/Seldon.cpp)  
+add_library(seldon SHARED ${seldon_SOURCE_DIR}/Seldon.cpp) 
+#target_compile_definitions(seldon PUBLIC -DSELDON_WITH_COMPILED_LIBRARY) 
 target_compile_features(seldon PUBLIC cxx_std_17)
 target_link_libraries(seldon ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 
@@ -34,7 +36,13 @@ add_dependencies(seldon seldon_link_target)
 target_include_directories(seldon PUBLIC
       $<BUILD_INTERFACE:${seldon_SOURCE_DIR}/>
       $<INSTALL_INTERFACE:include/seldon> )
- 
+ install(TARGETS seldon EXPORT VerdandiTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )
+
  find_library(MATH_LIBRARY_FOR_LUA m)
 message(STATUS "${MATH_LIBRARY_FOR_LUA}")
 find_package(Lua 5.2) 
@@ -65,6 +73,12 @@ target_link_libraries(ops PUBLIC lua)
 target_include_directories(ops PUBLIC
       $<BUILD_INTERFACE:${libops_SOURCE_DIR}/>
       $<INSTALL_INTERFACE:include/ops> )
+install(TARGETS ops EXPORT VerdandiTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )
 
 
 add_subdirectory(share)
