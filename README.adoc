@@ -12,4 +12,4 @@ Verdandi has been developed by INRIA teams and in particular:
 - Vivien Mallet 
 - Nicolas Claude
 
-
+Changes are done by C Prud'homme
