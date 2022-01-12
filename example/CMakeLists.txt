@@ -1,1 +1,5 @@
 add_subdirectory(quadratic_model)
+add_subdirectory(lorenz)
+# add_subdirectory(clamped_bar)
+# add_subdirectory(petsc_clamped_bar)
+# add_subdirectory(shallow_water)
