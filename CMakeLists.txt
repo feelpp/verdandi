@@ -17,8 +17,8 @@ include(GNUInstallDirs)
 include(FetchContent)
 
 # get seldon from github
-set(FETCHCONTENT_SOURCE_DIR_SELDON /home/prudhomm/Devel/seldon)
-FetchContent_Declare(seldon GIT_REPOSITORY https://github.com/feelpp/seldon.git ) 
+#set(FETCHCONTENT_SOURCE_DIR_SELDON /home/prudhomm/Devel/seldon)
+FetchContent_Declare(seldon GIT_REPOSITORY https://github.com/feelpp/seldon.git GIT_TAG 69ce459439504461e39f80cb2a20252cdf4e8291) 
 FetchContent_GetProperties(seldon)
 if(NOT seldon_POPULATED)
     FetchContent_Populate(seldon)
@@ -84,4 +84,5 @@ install(TARGETS ops EXPORT VerdandiTargets
 add_subdirectory(share)
 
 add_subdirectory(python)
+add_subdirectory(observation_manager)
 add_subdirectory(example)
