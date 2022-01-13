@@ -17,7 +17,7 @@ include(GNUInstallDirs)
 include(FetchContent)
 
 # get seldon from github
-set(FETCHCONTENT_SOURCE_DIR_SELDON /home/prudhomm/Devel/seldon)
+#set(FETCHCONTENT_SOURCE_DIR_SELDON /home/prudhomm/Devel/seldon)
 FetchContent_Declare(seldon GIT_REPOSITORY https://github.com/feelpp/seldon.git ) 
 FetchContent_GetProperties(seldon)
 if(NOT seldon_POPULATED)
