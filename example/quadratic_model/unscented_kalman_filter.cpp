@@ -19,8 +19,8 @@ int main(int argc, char** argv)
 
     if (argc != 2)
     {
-        string mesg  = "Usage:\n";
-        mesg += string("  ") + argv[0] + " [configuration file]";
+        std::string mesg  = "Usage:\n";
+        mesg += std::string("  ") + argv[0] + " [configuration file]";
         std::cout << mesg << std::endl;
         return 1;
     }
