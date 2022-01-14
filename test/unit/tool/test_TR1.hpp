@@ -20,7 +20,7 @@
 //      http://verdandi.gforge.inria.fr/
 
 #include <iostream>
-#include "TR1PerturbationManager.cxx"
+#include "method/TR1PerturbationManager.cxx"
 
 using namespace Verdandi;
 

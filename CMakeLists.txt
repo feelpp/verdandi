@@ -85,3 +85,4 @@ add_subdirectory(share)
 
 add_subdirectory(python)
 add_subdirectory(example)
+add_subdirectory(test)

@@ -20,7 +20,7 @@
 //      http://verdandi.gforge.inria.fr/
 
 #include <iostream>
-#include "RandomPerturbationManager.cxx"
+#include "method/RandomPerturbationManager.cxx"
 
 using namespace Verdandi;
 

@@ -25,13 +25,16 @@
 #define SELDON_WITH_LAPACK
 #define VERDANDI_DENSE
 #define VERDANDI_WITH_TRAJECTORY_MANAGER
+#define VERDANDI_GTEST_MODEL Verdandi::QuadraticModel<real>
+#define VERDANDI_GTEST_MODEL_PATH "model/QuadraticModel.cxx"
+#define VERDANDI_GTEST_CONFIG_PATH "configuration.lua"
 
 #include "Verdandi.hxx"
 #include VERDANDI_GTEST_MODEL_PATH
 #include "seldon/SeldonSolver.hxx"
 
 #ifdef VERDANDI_HAS_CXX11
-#include "RandomPerturbationManager.cxx"
+#include "method/RandomPerturbationManager.cxx"
 #define PerturbationManager RandomPerturbationManager
 #else
 #include "TR1PerturbationManager.cxx"
