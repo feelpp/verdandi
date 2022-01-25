@@ -31,6 +31,10 @@
 #include "method/ReducedOrderExtendedKalmanFilter.cxx"
 #include "method/Nudging.cxx"
 
+#define VERDANDI_GTEST_MODEL Verdandi::QuadraticModel<real>
+#define VERDANDI_GTEST_MODEL_PATH "model/QuadraticModel.cxx"
+#define VERDANDI_GTEST_CONFIG_PATH "configuration.lua"
+
 
 using namespace Verdandi;
 typedef Verdandi::Vector<double> state;

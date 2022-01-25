@@ -27,6 +27,9 @@
 #define VERDANDI_WITH_TRAJECTORY_MANAGER
 
 #include "Verdandi.hxx"
+#define VERDANDI_GTEST_MODEL Verdandi::QuadraticModel<real>
+#define VERDANDI_GTEST_MODEL_PATH "model/QuadraticModel.cxx"
+#define VERDANDI_GTEST_CONFIG_PATH "configuration.lua"
 #include VERDANDI_GTEST_MODEL_PATH
 #include "seldon/computation/optimization/NLoptSolver.cxx"
 #include "seldon/SeldonSolver.hxx"
