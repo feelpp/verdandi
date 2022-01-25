@@ -19,7 +19,7 @@
 
 #define _QUOTE(x) #x
 #define QUOTE(x) _QUOTE(x)
-#include QUOTE(OBSERVATION_OPERATOR.cxx)
+#include "observation_manager/LinearObservationManager.cxx"
 
 
 int main(int argc, char** argv)
